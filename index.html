@@ -611,6 +611,26 @@ button:disabled { opacity: .3; cursor: default; }
     </div>
     
     <div class="corlima-helper">Haz clic y arrastra dentro del lienzo para centrar. Usa el zoom para ajustar el tamaño.</div>
+    
+    <div class="ctrl" style="grid-column: span 2; display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 10px;">
+      <label style="display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; font-size:13px; color:var(--text);">
+        <input type="checkbox" id="corlimaFitMode" style="accent-color:var(--accent); width:14px; height:14px;">
+        <span>Nada me funciona 😔</span>
+      </label>
+      <div id="corlimaFitOptions" style="display:none; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span style="font-size:11px; color:var(--muted);">Fondo:</span>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;color:var(--text);">
+          <input type="radio" name="corlimaFitBg" value="transparent" checked style="accent-color:var(--accent);"> Transparente
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;color:var(--text);">
+          <input type="radio" name="corlimaFitBg" value="white" style="accent-color:var(--accent);"> Blanco
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;color:var(--text);">
+          <input type="radio" name="corlimaFitBg" value="black" style="accent-color:var(--accent);"> Negro
+        </label>
+      </div>
+    </div>
+
     <div class="corlima-canvas-wrap" id="corlimaCanvasWrap">
       <canvas id="corlimaCanvas" width="1000" height="1000"></canvas>
     </div>
@@ -1418,7 +1438,17 @@ resSelect.addEventListener('change', () => {
 });
 updateResNote(); 
 
+function isFitMode() {
+  return document.getElementById('corlimaFitMode').checked;
+}
+
+function getFitBg() {
+  const sel = document.querySelector('input[name="corlimaFitBg"]:checked');
+  return sel ? sel.value : 'transparent';
+}
+
 function clampCorlimaData(data) {
+  if (isFitMode()) return; // En modo fit no se clampea — la imagen puede ser más pequeña que el canvas
   if (data.scale < data.baseScale) data.scale = data.baseScale;
   
   const minX = baseW - (data.img.width * data.scale);
@@ -1548,7 +1578,23 @@ function drawCorlimaCanvas() {
   const data = corlimaImages[corlimaActiveIndex];
   
   cCtx.clearRect(0, 0, baseW, baseH);
-  cCtx.drawImage(data.img, data.x, data.y, data.img.width * data.scale, data.img.height * data.scale);
+
+  if (isFitMode()) {
+    const bg = getFitBg();
+    if (bg === 'white') { cCtx.fillStyle = '#ffffff'; cCtx.fillRect(0, 0, baseW, baseH); }
+    else if (bg === 'black') { cCtx.fillStyle = '#000000'; cCtx.fillRect(0, 0, baseW, baseH); }
+    // transparente: no fill
+
+    // Escala contain: la imagen entra completa
+    const fitScale = Math.min(baseW / data.img.width, baseH / data.img.height);
+    const fw = data.img.width * fitScale;
+    const fh = data.img.height * fitScale;
+    const fx = (baseW - fw) / 2;
+    const fy = (baseH - fh) / 2;
+    cCtx.drawImage(data.img, fx, fy, fw, fh);
+  } else {
+    cCtx.drawImage(data.img, data.x, data.y, data.img.width * data.scale, data.img.height * data.scale);
+  }
 }
 
 cWrap.addEventListener('mousedown', e => {
@@ -1623,6 +1669,15 @@ document.getElementById('corlimaZoom').addEventListener('input', e => {
   drawCorlimaCanvas();
 });
 
+// FIT MODE LISTENERS
+document.getElementById('corlimaFitMode').addEventListener('change', function() {
+  document.getElementById('corlimaFitOptions').style.display = this.checked ? 'flex' : 'none';
+  drawCorlimaCanvas();
+});
+document.querySelectorAll('input[name="corlimaFitBg"]').forEach(r => {
+  r.addEventListener('change', drawCorlimaCanvas);
+});
+
 function showSuccessAnimation() {
     const overlay = document.getElementById('successOverlay');
     overlay.classList.add('show');
@@ -1647,28 +1702,45 @@ async function exportCorlimaQueue(format) {
   offCanvas.width = tW; offCanvas.height = tH;
   const offCtx = offCanvas.getContext('2d');
   
-  const mime = format === 'webp' ? 'image/webp' : 'image/jpeg';
-  const ext = format === 'webp' ? '.webp' : '.jpg';
+  const mime = (format === 'webp') ? 'image/webp' : (format === 'png' ? 'image/png' : 'image/jpeg');
+  const ext  = (format === 'webp') ? '.webp' : (format === 'png' ? '.png' : '.jpg');
   const quality = format === 'webp' ? 0.8 : 0.95;
+
+  // Si modo fit + transparente → forzar PNG
+  const fitMode = isFitMode();
+  const fitBg = getFitBg();
+  const usePng = fitMode && fitBg === 'transparent';
+  const finalMime = usePng ? 'image/png' : mime;
+  const finalExt  = usePng ? '.png' : ext;
 
   for (let i = 0; i < corlimaImages.length; i++) {
       const data = corlimaImages[i];
       clampCorlimaData(data);
       
-      offCtx.fillStyle = '#ffffff';
-      offCtx.fillRect(0, 0, tW, tH);
-      
-      offCtx.drawImage(
-          data.img, 
-          data.x * multiplier, 
-          data.y * multiplier, 
-          data.img.width * data.scale * multiplier, 
-          data.img.height * data.scale * multiplier
-      );
+      offCtx.clearRect(0, 0, tW, tH);
+
+      if (fitMode) {
+        if (fitBg === 'white') { offCtx.fillStyle = '#ffffff'; offCtx.fillRect(0, 0, tW, tH); }
+        else if (fitBg === 'black') { offCtx.fillStyle = '#000000'; offCtx.fillRect(0, 0, tW, tH); }
+        const fitScale = Math.min(tW / data.img.width, tH / data.img.height);
+        const fw = data.img.width * fitScale;
+        const fh = data.img.height * fitScale;
+        offCtx.drawImage(data.img, (tW - fw) / 2, (tH - fh) / 2, fw, fh);
+      } else {
+        offCtx.fillStyle = '#ffffff';
+        offCtx.fillRect(0, 0, tW, tH);
+        offCtx.drawImage(
+            data.img, 
+            data.x * multiplier, 
+            data.y * multiplier, 
+            data.img.width * data.scale * multiplier, 
+            data.img.height * data.scale * multiplier
+        );
+      }
       
       const a = document.createElement('a');
-      a.href = offCanvas.toDataURL(mime, quality);
-      a.download = `DosaScale_${String(i + 1).padStart(2, '0')}${ext}`;
+      a.href = offCanvas.toDataURL(finalMime, quality);
+      a.download = `DosaScale_${String(i + 1).padStart(2, '0')}${finalExt}`;
       
       document.body.appendChild(a);
       a.click();
@@ -1700,21 +1772,32 @@ document.getElementById('downloadCorlimaSingle').addEventListener('click', () =>
     offCanvas.width = tW; offCanvas.height = tH;
     const offCtx = offCanvas.getContext('2d');
     
-    offCtx.fillStyle = '#ffffff';
-    offCtx.fillRect(0, 0, tW, tH);
+    offCtx.clearRect(0, 0, tW, tH);
+
+    if (isFitMode()) {
+      const bg = getFitBg();
+      if (bg === 'white') { offCtx.fillStyle = '#ffffff'; offCtx.fillRect(0, 0, tW, tH); }
+      else if (bg === 'black') { offCtx.fillStyle = '#000000'; offCtx.fillRect(0, 0, tW, tH); }
+      const fitScale = Math.min(tW / data.img.width, tH / data.img.height);
+      const fw = data.img.width * fitScale;
+      const fh = data.img.height * fitScale;
+      offCtx.drawImage(data.img, (tW - fw) / 2, (tH - fh) / 2, fw, fh);
+    } else {
+      offCtx.fillStyle = '#ffffff';
+      offCtx.fillRect(0, 0, tW, tH);
+      offCtx.drawImage(
+          data.img, 
+          data.x * multiplier, 
+          data.y * multiplier, 
+          data.img.width * data.scale * multiplier, 
+          data.img.height * data.scale * multiplier
+      );
+    }
     
-    offCtx.drawImage(
-        data.img, 
-        data.x * multiplier, 
-        data.y * multiplier, 
-        data.img.width * data.scale * multiplier, 
-        data.img.height * data.scale * multiplier
-    );
-    
+    const usePngSingle = isFitMode() && getFitBg() === 'transparent';
     const a = document.createElement('a');
-    a.href = offCanvas.toDataURL('image/jpeg', 0.95);
-    
-    a.download = `DosaScale_Single.jpg`;
+    a.href = offCanvas.toDataURL(usePngSingle ? 'image/png' : 'image/jpeg', 0.95);
+    a.download = usePngSingle ? 'DosaScale_Single.png' : 'DosaScale_Single.jpg';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
