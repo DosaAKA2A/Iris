@@ -690,27 +690,27 @@ button:disabled { opacity: .3; cursor: default; }
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;">
     <div>
       <div class="ctrl-lbl" style="margin-bottom:5px;">Nombre completo</div>
-      <input id="firmaNombre" type="text" value="Eduardo Enrico Carranza" placeholder="Nombre completo"
+      <input id="firmaNombre" type="text" value="Nombre del Trabajador" placeholder="Nombre completo"
              style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;color:var(--text);font-family:inherit;outline:none;box-sizing:border-box;">
     </div>
     <div>
       <div class="ctrl-lbl" style="margin-bottom:5px;">Cargo</div>
-      <input id="firmaCargo" type="text" value="Gestión Digital" placeholder="Cargo"
+      <input id="firmaCargo" type="text" value="Cargo" placeholder="Cargo"
              style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;color:var(--text);font-family:inherit;outline:none;box-sizing:border-box;">
     </div>
     <div>
       <div class="ctrl-lbl" style="margin-bottom:5px;">Móvil</div>
-      <input id="firmaMovil" type="text" value="+51 943 581 077" placeholder="+51 9XX XXX XXX"
+      <input id="firmaMovil" type="text" value="+51 9XX XXX XXX" placeholder="+51 9XX XXX XXX"
              style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;color:var(--text);font-family:inherit;outline:none;box-sizing:border-box;">
     </div>
     <div>
       <div class="ctrl-lbl" style="margin-bottom:5px;">Fijo + Anexo</div>
-      <input id="firmaFijo" type="text" value="+51 01 5001005 anexo 214" placeholder="+51 01 XXXXXXX anexo XXX"
+      <input id="firmaFijo" type="text" value="+51 01 XXXXXXX anexo XXX" placeholder="+51 01 XXXXXXX anexo XXX"
              style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;color:var(--text);font-family:inherit;outline:none;box-sizing:border-box;">
     </div>
     <div style="grid-column:span 2;">
       <div class="ctrl-lbl" style="margin-bottom:5px;">Email</div>
-      <input id="firmaEmail" type="email" value="eduardo.enrico@corlima.pe" placeholder="nombre@corlima.pe"
+      <input id="firmaEmail" type="email" value="nombre@corlima.pe" placeholder="nombre@corlima.pe"
              style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;color:var(--text);font-family:inherit;outline:none;box-sizing:border-box;">
     </div>
   </div>
@@ -726,9 +726,11 @@ button:disabled { opacity: .3; cursor: default; }
   </div>
 
   <!-- Preview -->
-  <div class="ctrl-lbl" style="margin-bottom:8px;">Vista previa</div>
-  <div style="background:#ffffff;border:1px solid var(--border);border-radius:6px;padding:20px;overflow-x:auto;">
-    <div id="firmaPreview"></div>
+  <div id="firmaPreviewWrap" style="display:none;">
+    <div class="ctrl-lbl" style="margin-bottom:8px;">Vista previa</div>
+    <div style="background:#ffffff;border:1px solid var(--border);border-radius:6px;padding:20px;overflow-x:auto;">
+      <div id="firmaPreview"></div>
+    </div>
   </div>
 
   <!-- Aviso -->
@@ -761,6 +763,12 @@ button:disabled { opacity: .3; cursor: default; }
 <div id="successOverlay" class="success-overlay">
   <div class="success-box">
     <div class="success-text">Todo Listo</div>
+  </div>
+</div>
+
+<div id="firmaCopiadaOverlay" class="success-overlay">
+  <div class="success-box" style="border-color:rgba(13,40,122,0.8);box-shadow:0 40px 80px rgba(0,0,0,0.6),0 0 40px rgba(13,40,122,0.2),0 0 0 1px rgba(255,255,255,0.05) inset;">
+    <div class="success-text" style="color:#c9a227;">Firma Copiada</div>
   </div>
 </div>
 
@@ -1943,39 +1951,47 @@ function firmaGetTemplate(NOMBRE, CARGO, MOVIL, FIJO, EMAIL, MOVIL_RAW, FIJO_RAW
 }
 
 function firmaActualizar() {
-  const NOMBRE    = document.getElementById('firmaNombre').value || 'Nombre Apellido';
+  const NOMBRE    = document.getElementById('firmaNombre').value || 'Nombre del Trabajador';
   const CARGO     = document.getElementById('firmaCargo').value  || 'Cargo';
   const MOVIL     = document.getElementById('firmaMovil').value  || '+51 9XX XXX XXX';
   const FIJO      = document.getElementById('firmaFijo').value   || '+51 01 XXXXXXX';
-  const EMAIL     = document.getElementById('firmaEmail').value  || 'email@corlima.pe';
+  const EMAIL     = document.getElementById('firmaEmail').value  || 'nombre@corlima.pe';
   const MOVIL_RAW = MOVIL.replace(/\s/g, '');
   const FIJO_RAW  = FIJO.replace(/\s.*/, '').replace(/\s/g, '');
 
-  document.getElementById('firmaPreview').innerHTML = firmaGetTemplate(NOMBRE, CARGO, MOVIL, FIJO, EMAIL, MOVIL_RAW, FIJO_RAW);
+  const preview = document.getElementById('firmaPreview');
+  preview.innerHTML = firmaGetTemplate(NOMBRE, CARGO, MOVIL, FIJO, EMAIL, MOVIL_RAW, FIJO_RAW);
+  document.getElementById('firmaPreviewWrap').style.display = 'block';
 }
 
 async function firmaCopiar() {
-  const NOMBRE    = document.getElementById('firmaNombre').value || 'Nombre Apellido';
+  const NOMBRE    = document.getElementById('firmaNombre').value || 'Nombre del Trabajador';
   const CARGO     = document.getElementById('firmaCargo').value  || 'Cargo';
   const MOVIL     = document.getElementById('firmaMovil').value  || '+51 9XX XXX XXX';
   const FIJO      = document.getElementById('firmaFijo').value   || '+51 01 XXXXXXX';
-  const EMAIL     = document.getElementById('firmaEmail').value  || 'email@corlima.pe';
+  const EMAIL     = document.getElementById('firmaEmail').value  || 'nombre@corlima.pe';
   const MOVIL_RAW = MOVIL.replace(/\s/g, '');
   const FIJO_RAW  = FIJO.replace(/\s.*/, '').replace(/\s/g, '');
 
+  // Actualizar preview primero
+  const preview = document.getElementById('firmaPreview');
+  preview.innerHTML = firmaGetTemplate(NOMBRE, CARGO, MOVIL, FIJO, EMAIL, MOVIL_RAW, FIJO_RAW);
+  document.getElementById('firmaPreviewWrap').style.display = 'block';
+
   const html = firmaGetTemplate(NOMBRE, CARGO, MOVIL, FIJO, EMAIL, MOVIL_RAW, FIJO_RAW);
-  
+
+  const showFirmaCopiadaAnim = () => {
+    const overlay = document.getElementById('firmaCopiadaOverlay');
+    overlay.classList.add('show');
+    setTimeout(() => overlay.classList.remove('show'), 2000);
+  };
+
   try {
     await navigator.clipboard.write([
       new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }) })
     ]);
-    const btn = document.getElementById('firmaCopyBtn');
-    const orig = btn.innerHTML;
-    btn.innerHTML = '&#10003; ¡Copiado!';
-    btn.style.color = '#3fb950';
-    setTimeout(() => { btn.innerHTML = orig; btn.style.color = ''; }, 2500);
+    showFirmaCopiadaAnim();
   } catch(e) {
-    // Fallback: crear un elemento, seleccionar y copiar
     const div = document.getElementById('firmaPreview');
     const sel = window.getSelection();
     const range = document.createRange();
@@ -1984,11 +2000,7 @@ async function firmaCopiar() {
     sel.addRange(range);
     document.execCommand('copy');
     sel.removeAllRanges();
-    const btn = document.getElementById('firmaCopyBtn');
-    const orig = btn.innerHTML;
-    btn.innerHTML = '&#10003; ¡Copiado!';
-    btn.style.color = '#3fb950';
-    setTimeout(() => { btn.innerHTML = orig; btn.style.color = ''; }, 2500);
+    showFirmaCopiadaAnim();
   }
 }
 
