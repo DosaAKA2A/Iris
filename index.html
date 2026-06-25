@@ -355,10 +355,10 @@ button:disabled { opacity: .3; cursor: default; }
 <div class="status" id="statusBar"></div>
 
 <div class="tabs">
-  <button class="tab active" id="tabDither" onclick="switchTab('dither')">Pixel Dither</button>
-  <button class="tab" id="tabAscii" onclick="switchTab('ascii')">ASCII</button>
-  <button class="tab" id="tabDosa" onclick="switchTab('dosa')">Pruebas Dosa</button>
-  <button class="tab" id="tabCorlima" onclick="switchTab('corlima')">Scale Corlima</button>
+  <button type="button" class="tab active" id="tabDither" onclick="switchTab('dither')">Pixel Dither</button>
+  <button type="button" class="tab" id="tabAscii" onclick="switchTab('ascii')">ASCII</button>
+  <button type="button" class="tab" id="tabDosa" onclick="switchTab('dosa')">Pruebas Dosa</button>
+  <button type="button" class="tab" id="tabCorlima" onclick="switchTab('corlima')">Scale Corlima</button>
 </div>
 
 <div id="panelDither">
@@ -599,8 +599,8 @@ button:disabled { opacity: .3; cursor: default; }
     <div class="sec" style="display:flex; align-items:center; flex-wrap:wrap; margin-top:1.5rem; gap:10px;">
       <!-- TABS AJUSTE -->
       <div style="display:flex; background:var(--bg2); border:0.5px solid var(--border); border-radius:6px; overflow:hidden; flex-shrink:0;">
-        <button id="tabAjusteManual" onclick="setAjusteMode('manual')" style="padding:6px 14px; font-size:11px; font-family:inherit; cursor:pointer; border:none; background:var(--bg4); color:#fff; font-weight:500; letter-spacing:.03em;">Ajuste Manual</button>
-        <button id="tabAjusteAuto" onclick="setAjusteMode('auto')" style="padding:6px 14px; font-size:11px; font-family:inherit; cursor:pointer; border:none; background:transparent; color:var(--muted); letter-spacing:.03em;">Ajuste Automático</button>
+        <button type="button" id="tabAjusteManual" onclick="setAjusteMode('manual')" style="padding:6px 14px; font-size:11px; font-family:inherit; cursor:pointer; border:none; background:var(--bg4); color:#fff; font-weight:500; letter-spacing:.03em;">Ajuste Manual</button>
+        <button type="button" id="tabAjusteAuto" onclick="setAjusteMode('auto')" style="padding:6px 14px; font-size:11px; font-family:inherit; cursor:pointer; border:none; background:transparent; color:var(--muted); letter-spacing:.03em;">Ajuste Automático</button>
       </div>
 
       <!-- MANUAL: selector de resolución -->
@@ -719,6 +719,9 @@ button:disabled { opacity: .3; cursor: default; }
 </div>
 <script>
 // GIF encoder
+window.addEventListener('error', function(e) {
+  console.error('[DosaTools] Error global:', e.message, 'en', e.filename, 'línea', e.lineno);
+});
 const GIFEncoder = (() => {
   function ByteArray() { this.data = []; }
   ByteArray.prototype.writeByte = function(b) { this.data.push(b & 0xFF); };
@@ -1276,6 +1279,8 @@ function switchTab(tab) {
   const sharedControls=document.getElementById('sharedControls'); if(sharedControls) sharedControls.style.display=isCorlima?'none':'block';
   
   if (isCorlima) {
+      initCorlimaElements();
+      initCorlimaResListener();
       document.getElementById('globalExportArea').style.display = corlimaImages.length > 0 ? 'block' : 'none';
       document.getElementById('btnRow').style.display = 'none';
       document.getElementById('btnRowCorlima').style.display = 'flex';
@@ -1295,12 +1300,15 @@ function setStatus(msg, type) {
 }
 
 // Events
-const fileInput=document.getElementById('fileInput'); const dropZone=document.getElementById('dropZone');
-fileInput.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;if(f.type.startsWith('video/'))loadVideoFile(f);else loadImageFile(f);e.target.value='';});
-dropZone.addEventListener('click',()=>fileInput.click());
-dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
-dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(!f)return;if(f.type.startsWith('video/'))loadVideoFile(f);else loadImageFile(f);});
+const fileInput=document.getElementById('fileInput');
+const dropZone=document.getElementById('dropZone');
+if(fileInput) fileInput.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;if(f.type.startsWith('video/'))loadVideoFile(f);else loadImageFile(f);e.target.value='';});
+if(dropZone) {
+  dropZone.addEventListener('click',()=>fileInput && fileInput.click());
+  dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+  dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(!f)return;if(f.type.startsWith('video/'))loadVideoFile(f);else loadImageFile(f);});
+}
 
 ['shrinkMode','invertB','bgColor'].forEach(id=>document.getElementById(id).addEventListener('change',reRender));
 ['minH','maxH','pixW','gridCols','gap','thresh','pixAlpha','colorMix','paperTex','pixelShadow'].forEach(id=>{
@@ -1376,59 +1384,105 @@ updatePalSwatches();
 // ════════════════════════════════════
 let corlimaImages = [];
 let corlimaActiveIndex = -1;
-let multiWarningShown = false; // Control de Popup Multiple Imágenes
+let multiWarningShown = false;
 
-const cCanvas = document.getElementById('corlimaCanvas');
-const cCtx = cCanvas.getContext('2d');
-const cWrap = document.getElementById('corlimaCanvasWrap');
+let cCanvas, cCtx, cWrap;
 let cIsDragging = false;
 let cStartX = 0, cStartY = 0;
 
-// Sistema de escala de Canvas dinámico
 let baseW = 1000;
 let baseH = 1000;
 
-const cFileInput = document.getElementById('corlimaFileInput');
-const cDropZone = document.getElementById('corlimaDropZone');
+let corlimaInputListenerSet = false;
+function initCorlimaElements() {
+    if (cCanvas) return; // ya inicializado
+    cCanvas = document.getElementById('corlimaCanvas');
+    if (!cCanvas) return;
+    cCtx = cCanvas.getContext('2d');
+    cWrap = document.getElementById('corlimaCanvasWrap');
 
-cFileInput.addEventListener('change', handleCorlimaUpload);
-cDropZone.addEventListener('click', () => cFileInput.click());
-cDropZone.addEventListener('dragover', e => { e.preventDefault(); cDropZone.classList.add('drag-over'); });
-cDropZone.addEventListener('dragleave', () => cDropZone.classList.remove('drag-over'));
-cDropZone.addEventListener('drop', e => {
-    e.preventDefault(); cDropZone.classList.remove('drag-over');
-    if (e.dataTransfer.files) handleCorlimaUpload({ target: { files: e.dataTransfer.files } });
-});
+    const cFileInput = document.getElementById('corlimaFileInput');
+    const cDropZone  = document.getElementById('corlimaDropZone');
+
+    if (!corlimaInputListenerSet && cFileInput && cDropZone) {
+        cFileInput.addEventListener('change', handleCorlimaUpload);
+        cDropZone.addEventListener('click', () => cFileInput.click());
+        cDropZone.addEventListener('dragover', e => { e.preventDefault(); cDropZone.classList.add('drag-over'); });
+        cDropZone.addEventListener('dragleave', () => cDropZone.classList.remove('drag-over'));
+        cDropZone.addEventListener('drop', e => {
+            e.preventDefault(); cDropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files) handleCorlimaUpload({ target: { files: e.dataTransfer.files } });
+        });
+
+        // Touch/mouse drag en canvas wrap
+        cWrap.addEventListener('mousedown', e => {
+            if (corlimaActiveIndex < 0) return;
+            cIsDragging = true; cStartX = e.clientX; cStartY = e.clientY;
+        });
+        cWrap.addEventListener('touchstart', e => {
+            if (corlimaActiveIndex < 0) return;
+            cIsDragging = true; cStartX = e.touches[0].clientX; cStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        corlimaInputListenerSet = true;
+
+        // Zoom
+        const zoomSlider = document.getElementById('corlimaZoom');
+        if (zoomSlider) {
+            zoomSlider.addEventListener('input', e => {
+                if (corlimaActiveIndex < 0) return;
+                const data = corlimaImages[corlimaActiveIndex];
+                const factor = parseFloat(e.target.value);
+                const newScale = data.baseScale * factor;
+                const cx = data.x + (data.img.width * data.scale) / 2;
+                const cy = data.y + (data.img.height * data.scale) / 2;
+                data.scale = newScale;
+                data.x = cx - (data.img.width * data.scale) / 2;
+                data.y = cy - (data.img.height * data.scale) / 2;
+                document.getElementById('corlimaZoomVal').textContent = Math.round(factor * 100) + '%';
+                clampCorlimaData(data);
+                drawCorlimaCanvas();
+            });
+        }
+
+        // Radios de fondo fit
+        document.querySelectorAll('input[name="corlimaFitBg"]').forEach(r => {
+            r.addEventListener('change', drawCorlimaCanvas);
+        });
+    }
+}
 
 // UI DYNAMIC TEXT RESOLUTION
-const resSelect = document.getElementById('corlimaRes');
-const resNote = document.getElementById('corlimaResNote');
+function getResSelect() { return document.getElementById('corlimaRes'); }
+function getResNote()   { return document.getElementById('corlimaResNote'); }
 
 function getTargetRes() {
-    const val = resSelect.value;
+    const val = getResSelect() ? getResSelect().value : '1000x1000';
     if (val === '2000x2000') return { w: 2000, h: 2000 };
     if (val === '1080x1350') return { w: 1080, h: 1350 };
-    return { w: 1000, h: 1000 }; // Default
+    return { w: 1000, h: 1000 };
 }
 
 function updateResNote() {
-    const val = resSelect.value;
+    const sel = getResSelect(); const note = getResNote();
+    if (!sel || !note) return;
+    const val = sel.value;
     if (val === '1000x1000') {
-        resNote.textContent = 'Este formato es el adecuado para corlima.pe';
-        resNote.style.color = '#3fb950'; // Verde
+        note.textContent = 'Este formato es el adecuado para corlima.pe';
+        note.style.color = '#3fb950';
     } else if (val === '1080x1350') {
-        resNote.textContent = 'Este formato es el adecuado para Instagram';
-        resNote.style.color = '#e3a341'; // Naranja Llamativo
+        note.textContent = 'Este formato es el adecuado para Instagram';
+        note.style.color = '#e3a341';
     } else {
-        resNote.textContent = 'Este formato es el adecuado para otras plataformas';
-        resNote.style.color = '#ffb6c1'; // Rosa pastel
+        note.textContent = 'Este formato es el adecuado para otras plataformas';
+        note.style.color = '#ffb6c1';
     }
 }
 
 function updateCorlimaWorkspace() {
     const { w, h } = getTargetRes();
     baseW = 1000;
-    baseH = Math.round(1000 * (h / w)); // Dinámico dependiendo de 1:1 o 4:5
+    baseH = Math.round(1000 * (h / w));
     
     cCanvas.width = baseW;
     cCanvas.height = baseH;
@@ -1442,11 +1496,16 @@ function updateCorlimaWorkspace() {
     drawCorlimaCanvas();
 }
 
-resSelect.addEventListener('change', () => {
+// Registrar el listener solo cuando el panel Corlima se abra por primera vez
+let corlimaResListenerSet = false;
+function initCorlimaResListener() {
+    if (corlimaResListenerSet) return;
+    const sel = getResSelect();
+    if (!sel) return;
+    sel.addEventListener('change', () => { updateResNote(); updateCorlimaWorkspace(); });
     updateResNote();
-    updateCorlimaWorkspace();
-});
-updateResNote(); 
+    corlimaResListenerSet = true;
+}
 
 function isFitMode() {
   return ajusteMode === 'auto';
@@ -1607,77 +1666,36 @@ function drawCorlimaCanvas() {
   }
 }
 
-cWrap.addEventListener('mousedown', e => {
-  if (corlimaActiveIndex < 0) return;
-  cIsDragging = true;
-  cStartX = e.clientX;
-  cStartY = e.clientY;
-});
 window.addEventListener('mouseup', () => { cIsDragging = false; });
 window.addEventListener('mousemove', e => {
-  if (!cIsDragging || corlimaActiveIndex < 0) return;
+  if (!cIsDragging || corlimaActiveIndex < 0 || !cWrap) return;
   const data = corlimaImages[corlimaActiveIndex];
-  
   const rect = cWrap.getBoundingClientRect();
   const scaleRatio = baseW / rect.width;
-  
   const dx = (e.clientX - cStartX) * scaleRatio;
   const dy = (e.clientY - cStartY) * scaleRatio;
-  
-  data.x += dx;
-  data.y += dy;
-  cStartX = e.clientX;
-  cStartY = e.clientY;
-  
+  data.x += dx; data.y += dy;
+  cStartX = e.clientX; cStartY = e.clientY;
   clampCorlimaData(data);
   drawCorlimaCanvas();
 });
 
-cWrap.addEventListener('touchstart', e => {
-  if (corlimaActiveIndex < 0) return;
-  cIsDragging = true;
-  cStartX = e.touches[0].clientX;
-  cStartY = e.touches[0].clientY;
-}, { passive: true });
 window.addEventListener('touchend', () => { cIsDragging = false; });
 window.addEventListener('touchmove', e => {
-  if (!cIsDragging || corlimaActiveIndex < 0) return;
-  e.preventDefault(); 
+  if (!cIsDragging || corlimaActiveIndex < 0 || !cWrap) return;
+  e.preventDefault();
   const data = corlimaImages[corlimaActiveIndex];
   const rect = cWrap.getBoundingClientRect();
   const scaleRatio = baseW / rect.width;
-  
   const dx = (e.touches[0].clientX - cStartX) * scaleRatio;
   const dy = (e.touches[0].clientY - cStartY) * scaleRatio;
-  
-  data.x += dx;
-  data.y += dy;
-  cStartX = e.touches[0].clientX;
-  cStartY = e.touches[0].clientY;
-  
+  data.x += dx; data.y += dy;
+  cStartX = e.touches[0].clientX; cStartY = e.touches[0].clientY;
   clampCorlimaData(data);
   drawCorlimaCanvas();
 }, { passive: false });
 
-document.getElementById('corlimaZoom').addEventListener('input', e => {
-  if (corlimaActiveIndex < 0) return;
-  const data = corlimaImages[corlimaActiveIndex];
-  const factor = parseFloat(e.target.value);
-  
-  const newScale = data.baseScale * factor;
-  
-  const cx = data.x + (data.img.width * data.scale) / 2;
-  const cy = data.y + (data.img.height * data.scale) / 2;
-  
-  data.scale = newScale;
-  data.x = cx - (data.img.width * data.scale) / 2;
-  data.y = cy - (data.img.height * data.scale) / 2;
-  
-  document.getElementById('corlimaZoomVal').textContent = Math.round(factor * 100) + '%';
-  
-  clampCorlimaData(data);
-  drawCorlimaCanvas();
-});
+// El listener del zoom se registra en initCorlimaElements al abrir el panel
 
 // FIT MODE LISTENERS
 let ajusteMode = 'manual';
@@ -1702,10 +1720,6 @@ function setAjusteMode(mode) {
 
   drawCorlimaCanvas();
 }
-
-document.querySelectorAll('input[name="corlimaFitBg"]').forEach(r => {
-  r.addEventListener('change', drawCorlimaCanvas);
-});
 
 function showSuccessAnimation() {
     const overlay = document.getElementById('successOverlay');
@@ -1908,12 +1922,12 @@ function togglePwdVisibility() {
     <div class="pwd-sub">Ingresa la contraseña para acceder a Scale Corlima</div>
     <div class="pwd-input-wrap">
       <input class="pwd-input" type="password" id="pwdInput" placeholder="Contraseña" autocomplete="off">
-      <button class="pwd-toggle" id="pwdToggle" onclick="togglePwdVisibility()" tabindex="-1">👁</button>
+      <button type="button" class="pwd-toggle" id="pwdToggle" onclick="togglePwdVisibility()" tabindex="-1">👁</button>
     </div>
     <div class="pwd-err" id="pwdErr"></div>
     <div class="pwd-actions">
-      <button class="pwd-btn secondary" onclick="closePwdModal()">Cancelar</button>
-      <button class="pwd-btn primary" onclick="submitPwd()">Ingresar</button>
+      <button type="button" class="pwd-btn secondary" onclick="closePwdModal()">Cancelar</button>
+      <button type="button" class="pwd-btn primary" onclick="submitPwd()">Ingresar</button>
     </div>
   </div>
 </div>
