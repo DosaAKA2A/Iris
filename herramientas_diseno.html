@@ -31,8 +31,11 @@ body {
   border-bottom: .5px solid var(--border);
 }
 .header-logo {
-  display: flex; align-items: center; flex-shrink: 0; text-decoration: none;
+  display: flex; align-items: center; flex-shrink: 0;
+  text-decoration: none; outline: none;
 }
+.header-logo:focus { outline: none; }
+.header-logo img { border-radius: 7px; }
 .header h1 { font-size: 15px; font-weight: 500; color: #fff; letter-spacing: .04em; text-transform: uppercase; }
 .header-ver {
   margin-left: auto; font-size: 11px; color: var(--muted);
@@ -355,7 +358,7 @@ button:disabled { opacity: .3; cursor: default; }
 
 <div class="header">
   <a class="header-logo" href="index.html" title="Volver al inicio">
-    <img src="dosa_favicon.svg" alt="DOSA" style="width:32px;height:32px;display:block;">
+    <img src="dosa_favicon.svg" alt="DOSA" style="width:32px;height:32px;display:block;border-radius:7px;">
   </a>
   <h1>DOSA TOOLS</h1>
   <span class="header-ver">v5.1</span>
