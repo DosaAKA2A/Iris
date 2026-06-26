@@ -1687,6 +1687,7 @@ window.addEventListener('load', function() {
 
 function autoSetMode(mode) {
   autoMode = mode;
+  window.autoMode = mode;
   const isP = mode === 'precios';
   // Tabs — verde activo/inactivo para Precios, rosa activo/inactivo para Stock
   document.getElementById('modePrecios').style.background = isP ? 'var(--bg4)' : 'transparent';
@@ -1751,6 +1752,8 @@ function autoParseRows(rows) {
   if (!rows || rows.length < 2) { alert('El archivo no tiene datos suficientes.'); return; }
   autoHeaders = rows[0].map(function(h) { return String(h).trim(); });
   autoData = rows.slice(1).filter(function(r) { return r.some(function(c) { return String(c).trim() !== ''; }); });
+  window.autoHeaders = autoHeaders;
+  window.autoData = autoData;
   autoFillSelects();
   document.getElementById('autoMapSection').style.display = 'block';
 }
