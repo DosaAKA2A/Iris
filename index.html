@@ -1974,17 +1974,20 @@ function showSuccessAnimation() {
 // 
 // Base de datos cargada desde archivo externo
 let CAT_DB = {};      // { cod: cat_string }
-let PROD_DB = {};     // { cod: { nombre, marca, cat, cat_padre } }
+let PROD_DB = {};     // { cod: { nombre, marca, cat, cat_names, cat_padre } }
+let CATS_DICT = {};   // { id: nombre_categoria }
 
 (function loadDB() {
   fetch('productos_db.json?v=' + Date.now())
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      PROD_DB = data;
+      CATS_DICT = data['__cats__'] || {};
       Object.keys(data).forEach(function(k) {
+        if (k === '__cats__') return;
+        PROD_DB[k] = data[k];
         CAT_DB[k] = data[k].cat;
       });
-      console.log('[DosaTools] DB cargada:', Object.keys(PROD_DB).length, 'productos');
+      console.log('[DosaTools] DB cargada:', Object.keys(PROD_DB).length, 'productos,', Object.keys(CATS_DICT).length, 'categorías');
     })
     .catch(function(e) { console.warn('[DosaTools] No se pudo cargar productos_db.json:', e); });
 })();
@@ -2249,22 +2252,32 @@ function buscarProducto() {
   box.style.display = 'block';
 
   if (!p) {
-    box.innerHTML = '<span style="color:#e05252;font-size:12px;">&#10007; Código <b>' + cod + '</b> no encontrado en la base de datos.</span>';
+    box.innerHTML = '<span style="color:#e05252;font-size:12px;">Código <b>' + cod + '</b> no encontrado en la base de datos.</span>';
     return;
   }
 
-  const catPadre = p.cat_padre ? '<tr><td style="padding:4px 12px 4px 0;font-size:10px;color:var(--muted);white-space:nowrap;">Categoría Padre</td><td style="padding:4px 0;font-size:12px;color:#c9a227;font-weight:600;">' + p.cat_padre + '</td></tr>' : '';
+  const catPadre = p.cat_padre
+    ? '<tr><td style="padding:5px 14px 5px 0;font-size:10px;color:var(--muted);white-space:nowrap;vertical-align:top;">Categoría padre</td><td style="padding:5px 0;font-size:12px;color:#c9a227;font-weight:600;">' + p.cat_padre + '</td></tr>'
+    : '';
+
+  const catNames = p.cat_names
+    ? '<tr><td style="padding:5px 14px 5px 0;font-size:10px;color:var(--muted);white-space:nowrap;vertical-align:top;">Árbol de categorías</td><td style="padding:5px 0;font-size:12px;color:var(--text);">' + p.cat_names + '</td></tr>'
+    : '';
+
+  const catIds = p.cat
+    ? '<tr><td style="padding:5px 14px 5px 0;font-size:10px;color:var(--muted);white-space:nowrap;vertical-align:top;">IDs de categoría</td><td style="padding:5px 0;font-size:11px;color:var(--muted2);font-family:monospace;">' + p.cat + '</td></tr>'
+    : '';
 
   box.innerHTML =
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">' +
-      '<span style="font-family:monospace;font-size:13px;color:var(--accent);font-weight:700;">' + cod + '</span>' +
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
+      '<span style="font-family:monospace;font-size:14px;color:var(--accent);font-weight:700;">' + cod + '</span>' +
       '<span style="font-size:11px;color:var(--muted2);">·</span>' +
-      '<span style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">' + (p.marca || '—') + '</span>' +
+      '<span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">' + (p.marca || '—') + '</span>' +
     '</div>' +
     '<div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;">' + (p.nombre || '—') + '</div>' +
     '<table style="border-collapse:collapse;">' +
-      '<tr><td style="padding:4px 12px 4px 0;font-size:10px;color:var(--muted);white-space:nowrap;">Árbol de Categorías</td>' +
-      '<td style="padding:4px 0;font-size:12px;color:var(--text);font-family:monospace;">' + (p.cat || '—') + '</td></tr>' +
+      catNames +
+      catIds +
       catPadre +
     '</table>';
 }
