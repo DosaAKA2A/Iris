@@ -82,95 +82,134 @@
 
   /* HERO */
   .hero {
+    position: relative;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 0 40px 64px;
-    position: relative;
     overflow: hidden;
   }
 
-  .hero-bg {
-    position: absolute; inset: 0;
-    background:
-      radial-gradient(ellipse 55% 45% at 75% 35%, rgba(220,64,42,0.09) 0%, transparent 65%),
-      radial-gradient(ellipse 35% 50% at 15% 75%, rgba(29,111,164,0.07) 0%, transparent 60%);
-    pointer-events: none;
-  }
-
-  .hero-grid {
-    position: absolute; inset: 0;
-    background-image:
-      linear-gradient(var(--border) 1px, transparent 1px),
-      linear-gradient(90deg, var(--border) 1px, transparent 1px);
-    background-size: 80px 80px;
-    mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 20%, transparent 100%);
-    -webkit-mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 20%, transparent 100%);
-    opacity: .3;
-    pointer-events: none;
-  }
-
-  .cross {
+  /* Banner imagen con parallax */
+  .hero-banner {
     position: absolute;
-    color: var(--grey2);
-    font-size: 18px;
-    font-weight: 200;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero-banner-img {
+    position: absolute;
+    inset: -15%;            /* margen extra para el parallax */
+    background:
+      url('') center center / cover no-repeat,
+      /* Placeholder mientras no hay imagen: gradiente cinematográfico */
+      linear-gradient(135deg,
+        #0a0a0f 0%,
+        #0d1117 30%,
+        #111827 55%,
+        #0f172a 75%,
+        #080810 100%);
+    will-change: transform;
+    transition: transform 0.1s linear;
+  }
+
+  /* Ruido de grano sutil encima del placeholder */
+  .hero-banner-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: .35;
     pointer-events: none;
-    user-select: none;
+  }
+
+  /* Overlay gradiente igual que Norvin: oscuro en bordes, transparente al centro */
+  .hero-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top,    rgba(8,8,10,1)   0%,  rgba(8,8,10,0)  45%),
+      linear-gradient(to bottom, rgba(8,8,10,0.6) 0%,  rgba(8,8,10,0)  30%),
+      linear-gradient(to right,  rgba(8,8,10,0.7) 0%,  rgba(8,8,10,0)  50%);
+  }
+
+  /* Luz ambiental animada (círculo que se desplaza) */
+  .hero-banner::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(220,64,42,0.12) 0%, transparent 70%);
+    top: 10%; right: 15%;
+    animation: ambient 8s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .hero-banner::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,157,214,0.08) 0%, transparent 70%);
+    bottom: 20%; left: 10%;
+    animation: ambient 10s ease-in-out infinite alternate-reverse;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  @keyframes ambient {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(40px, -30px) scale(1.15); }
+  }
+
+  /* Contenido del hero */
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 48px 72px;
+    max-width: 780px;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 20px;
+    font-family: 'Inter', sans-serif;
   }
 
   .hero-title {
-    font-size: clamp(88px, 15vw, 210px);
-    font-weight: 700;
-    line-height: .88;
-    letter-spacing: -.04em;
-    color: var(--white);
     font-family: "Clash Display", sans-serif;
-    position: relative;
-    z-index: 2;
+    font-size: clamp(96px, 16vw, 220px);
+    font-weight: 700;
+    line-height: .85;
+    letter-spacing: -.03em;
+    color: var(--white);
+    margin-bottom: 28px;
     user-select: none;
   }
   .hero-title .s { color: var(--red); }
 
-  .hero-meta {
-    margin-top: 28px;
-    display: flex;
-    align-items: flex-start;
-    gap: 48px;
-    position: relative;
-    z-index: 2;
-  }
-
   .hero-sub {
-    font-size: clamp(13px, 1.4vw, 15px);
-    color: var(--grey);
+    font-size: clamp(14px, 1.5vw, 17px);
+    color: rgba(255,255,255,0.55);
     line-height: 1.65;
-    max-width: 380px;
+    margin-bottom: 24px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
   }
 
   .hero-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 7px;
-    max-width: 340px;
-    padding-top: 2px;
-  }
-
-  .tag {
-    padding: 5px 11px;
-    border: 1px solid var(--grey2);
-    border-radius: 100px;
-    font-size: 10px;
-    letter-spacing: .08em;
-    color: var(--grey);
-    text-transform: uppercase;
-    white-space: nowrap;
+    gap: 8px;
   }
 
   .scroll-hint {
     position: absolute;
-    bottom: 32px; right: 40px;
+    bottom: 36px; right: 48px;
     z-index: 2;
     display: flex;
     flex-direction: column;
@@ -179,21 +218,27 @@
   }
   .scroll-hint span {
     font-size: 9px;
-    letter-spacing: .14em;
+    letter-spacing: .16em;
     text-transform: uppercase;
-    color: var(--grey2);
+    color: rgba(255,255,255,0.25);
     writing-mode: vertical-rl;
+    font-family: 'Inter', sans-serif;
   }
   .scroll-line {
     width: 1px; height: 52px;
-    background: linear-gradient(to bottom, var(--grey2), transparent);
-    animation: sd 2s ease-in-out infinite;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+    animation: sd 2.2s ease-in-out infinite;
   }
   @keyframes sd {
-    0%{transform:scaleY(0);transform-origin:top}
-    50%{transform:scaleY(1);transform-origin:top}
-    51%{transform-origin:bottom}
-    100%{transform:scaleY(0);transform-origin:bottom}
+    0%  { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform-origin: bottom; }
+    100%{ transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  @media (max-width: 720px) {
+    .hero-content { padding: 0 24px 56px; }
+    .scroll-hint { right: 24px; }
   }
 
   /* CARDS */
@@ -509,27 +554,26 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-  <span class="cross" style="top:20%;left:16%">+</span>
-  <span class="cross" style="top:35%;left:58%">+</span>
-  <span class="cross" style="top:60%;right:20%">+</span>
-  <span class="cross" style="top:15%;right:35%">+</span>
-  <span class="cross" style="top:72%;left:40%">+</span>
 
-  <div class="hero-title">DO<span class="s">S</span>A</div>
+  <!-- BANNER: imagen fullscreen con parallax -->
+  <div class="hero-banner" id="heroBanner">
+    <!-- Placeholder: reemplazar src por tu imagen cuando esté lista -->
+    <div class="hero-banner-img" id="heroBannerImg"></div>
+    <div class="hero-banner-overlay"></div>
+  </div>
 
-  <div class="hero-meta">
+  <!-- CONTENIDO -->
+  <div class="hero-content">
+    <div class="hero-eyebrow">Diseño · Automatización · Madrid</div>
+    <h1 class="hero-title">DO<span class="s">S</span>A</h1>
     <p class="hero-sub">
-      Diseño gráfico, interfaces digitales<br>y automatización de procesos.<br>
-      <span style="color:#555;font-size:12px;margin-top:4px;display:block;">Madrid, España · 2026</span>
+      Diseño gráfico, interfaces digitales<br>y automatización de procesos.
     </p>
     <div class="hero-tags">
       <span class="tag">Diseño Gráfico</span>
       <span class="tag">Diseño Web</span>
       <span class="tag">UI · UX</span>
       <span class="tag">Automatización</span>
-      <span class="tag">Soft Web Designer</span>
       <span class="tag">Interfaces</span>
     </div>
   </div>
@@ -538,6 +582,7 @@
     <div class="scroll-line"></div>
     <span>Proyectos</span>
   </div>
+
 </section>
 
 <!-- PROYECTOS -->
@@ -722,6 +767,26 @@ document.addEventListener('keydown', e => {
     );
   }
 });
+</script>
+
+<script>
+// ── Parallax del banner hero ────────────────────────
+(function() {
+  const img = document.getElementById('heroBannerImg');
+  if (!img) return;
+  let ticking = false;
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      requestAnimationFrame(function() {
+        const scrollY = window.scrollY;
+        const factor  = 0.35; // intensidad del parallax
+        img.style.transform = 'translateY(' + (scrollY * factor) + 'px)';
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+})();
 </script>
 </body>
 </html>
