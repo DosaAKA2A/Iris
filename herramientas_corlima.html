@@ -1691,6 +1691,31 @@ function toNumStr(v) {
 document.addEventListener('DOMContentLoaded', function() {
   switchTab('corlima');
 
+  // ── Scale Corlima: dropzone y canvas
+  const cFileInput = document.getElementById('corlimaFileInput');
+  const cDropZone  = document.getElementById('corlimaDropZone');
+  if (cFileInput && cDropZone) {
+    cFileInput.addEventListener('change', handleCorlimaUpload);
+    cDropZone.addEventListener('click', () => cFileInput.click());
+    cDropZone.addEventListener('dragover', e => { e.preventDefault(); cDropZone.classList.add('drag-over'); });
+    cDropZone.addEventListener('dragleave', () => cDropZone.classList.remove('drag-over'));
+    cDropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      cDropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files) handleCorlimaUpload({ target: { files: e.dataTransfer.files } });
+    });
+    corlimaInputListenerSet = true;
+  }
+
+  // ── Canvas Corlima
+  cCanvas = document.getElementById('corlimaCanvas');
+  if (cCanvas) {
+    cCtx = cCanvas.getContext('2d');
+    cWrap = document.getElementById('corlimaCanvasWrap');
+  }
+
+  initCorlimaResListener();
+
   // Auto file input
   const autoFileInput = document.getElementById('autoFileInput');
   if (autoFileInput) {
