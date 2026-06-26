@@ -330,9 +330,7 @@ button:disabled { opacity: .3; cursor: default; }
 </head>
 <body>
 <script>
-if (!sessionStorage.getItem('disenoAccess')) {
-  window.location.href = 'index.html';
-}
+if (!sessionStorage.getItem('disenoAccess')) { window.location.href = 'index.html'; }
 </script>
 
 <div class="wrap">
@@ -1487,55 +1485,39 @@ function reRender() {
   updatePalSwatches();
 }
 function switchTab(tab) {
-  if (tab === 'corlima' && !corlimaUnlocked) {
-    openPwdModal();
-    return;
+  currentTab = tab;
+  const isDither = tab === 'dither';
+  const isAscii  = tab === 'ascii';
+  const isDosa   = tab === 'dosa';
+
+  document.getElementById('panelDither').style.display = isDither ? 'block' : 'none';
+  document.getElementById('panelAscii').style.display  = isAscii  ? 'block' : 'none';
+  document.getElementById('panelDosa').style.display   = isDosa   ? 'block' : 'none';
+
+  document.getElementById('tabDither').classList.toggle('active', isDither);
+  document.getElementById('tabAscii').classList.toggle('active', isAscii);
+  document.getElementById('tabDosa').classList.toggle('active', isDosa);
+
+  // dropZone y controles siempre visibles en herramientas de diseño
+  const dz = document.getElementById('dropZone');
+  if (dz) dz.style.display = 'block';
+  const sc = document.getElementById('sharedControls');
+  if (sc) sc.style.display = 'block';
+
+  const gea = document.getElementById('globalExportArea');
+  const br  = document.getElementById('btnRow');
+  const brc = document.getElementById('btnRowCorlima');
+
+  if (gea && br) {
+    gea.style.display = (document.getElementById('srcCanvas') && document.getElementById('srcCanvas').width > 0) ? 'block' : 'none';
+    br.style.display = 'flex';
+    if (brc) brc.style.display = 'none';
   }
-  currentTab=tab;
-  const isCorlima = tab === 'corlima';
-  const isFirma = tab === 'firma';
-  const isAuto  = tab === 'auto';
-  document.getElementById('panelDither').style.display=tab==='dither'?'block':'none';
-  document.getElementById('panelAscii').style.display=tab==='ascii'?'block':'none';
-  document.getElementById('panelDosa').style.display=tab==='dosa'?'block':'none';
-  document.getElementById('panelCorlima').style.display=isCorlima?'block':'none';
-  document.getElementById('panelFirma').style.display=isFirma?'block':'none';
-  document.getElementById('panelAuto').style.display=isAuto?'block':'none';
-
-  document.getElementById('tabDither').classList.toggle('active',tab==='dither');
-  document.getElementById('tabAscii').classList.toggle('active',tab==='ascii');
-  document.getElementById('tabDosa').classList.toggle('active',tab==='dosa');
-  document.getElementById('tabCorlima').classList.toggle('active',isCorlima);
-  document.getElementById('tabFirma').classList.toggle('active',isFirma);
-  document.getElementById('tabAuto').classList.toggle('active',isAuto);
-
-  // En diseño: dropZone siempre visible
-  document.getElementById('dropZone').style.display='block';
-  const sharedControls=document.getElementById('sharedControls'); if(sharedControls) sharedControls.style.display='block';
-
-  if (isAuto) {
-      document.getElementById('globalExportArea').style.display = 'none';
-      document.getElementById('btnRow').style.display = 'none';
-      document.getElementById('btnRowCorlima').style.display = 'none';
-  } else if (isCorlima) {
-      initCorlimaElements();
-      initCorlimaResListener();
-      document.getElementById('globalExportArea').style.display = corlimaImages.length > 0 ? 'block' : 'none';
-      document.getElementById('btnRow').style.display = 'none';
-      document.getElementById('btnRowCorlima').style.display = 'flex';
-      setStatus('', '');
-  } else if (isFirma) {
-      document.getElementById('globalExportArea').style.display = 'none';
-      document.getElementById('btnRow').style.display = 'none';
-      document.getElementById('btnRowCorlima').style.display = 'none';
-      firmaActualizar();
-  } else {
-      document.getElementById('globalExportArea').style.display = (document.getElementById('srcCanvas').width > 0 || isVideo) ? 'block' : 'none';
-      document.getElementById('btnRow').style.display = 'flex';
-      document.getElementById('btnRowCorlima').style.display = 'none';
-      document.getElementById('downloadTxtBtn').style.display=tab==='ascii'?'inline-flex':'none';
-      reRender();
+  if (br) {
+    const dtb = document.getElementById('downloadTxtBtn');
+    if (dtb) dtb.style.display = isAscii ? 'inline-flex' : 'none';
   }
+  reRender();
 }
 function setStatus(msg, type) {
   const el=document.getElementById('statusBar'); if(!el) return;

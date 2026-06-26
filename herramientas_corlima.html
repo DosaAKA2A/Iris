@@ -330,9 +330,7 @@ button:disabled { opacity: .3; cursor: default; }
 </head>
 <body>
 <script>
-if (!sessionStorage.getItem('corlimaAccess')) {
-  window.location.href = 'index.html';
-}
+if (!sessionStorage.getItem('corlimaAccess')) { window.location.href = 'index.html'; }
 </script>
 
 <div class="wrap">
@@ -1487,51 +1485,51 @@ function reRender() {
   updatePalSwatches();
 }
 function switchTab(tab) {
-  // acceso garantizado por sesión del landing
-  currentTab=tab;
+  corlimaUnlocked = true;
+  currentTab = tab;
   const isCorlima = tab === 'corlima';
-  const isFirma = tab === 'firma';
-  const isAuto  = tab === 'auto';
-  document.getElementById('panelDither').style.display=tab==='dither'?'block':'none';
-  document.getElementById('panelAscii').style.display=tab==='ascii'?'block':'none';
-  document.getElementById('panelDosa').style.display=tab==='dosa'?'block':'none';
-  document.getElementById('panelCorlima').style.display=isCorlima?'block':'none';
-  document.getElementById('panelFirma').style.display=isFirma?'block':'none';
-  document.getElementById('panelAuto').style.display=isAuto?'block':'none';
+  const isFirma   = tab === 'firma';
+  const isAuto    = tab === 'auto';
 
-  document.getElementById('tabDither').classList.toggle('active',tab==='dither');
-  document.getElementById('tabAscii').classList.toggle('active',tab==='ascii');
-  document.getElementById('tabDosa').classList.toggle('active',tab==='dosa');
-  document.getElementById('tabCorlima').classList.toggle('active',isCorlima);
-  document.getElementById('tabFirma').classList.toggle('active',isFirma);
-  document.getElementById('tabAuto').classList.toggle('active',isAuto);
+  document.getElementById('panelCorlima').style.display = isCorlima ? 'block' : 'none';
+  document.getElementById('panelFirma').style.display   = isFirma   ? 'block' : 'none';
+  document.getElementById('panelAuto').style.display    = isAuto    ? 'block' : 'none';
 
-  // dropZone solo en Scale Corlima
-  document.getElementById('dropZone').style.display=isCorlima?'block':'none';
-  const sharedControls=document.getElementById('sharedControls'); if(sharedControls) sharedControls.style.display=isCorlima?'block':'none';
+  document.getElementById('tabCorlima').classList.toggle('active', isCorlima);
+  document.getElementById('tabFirma').classList.toggle('active', isFirma);
+  document.getElementById('tabAuto').classList.toggle('active', isAuto);
+
+  // dropZone global: solo en Scale Corlima
+  const dz = document.getElementById('dropZone');
+  if (dz) dz.style.display = isCorlima ? 'block' : 'none';
+  const sc = document.getElementById('sharedControls');
+  if (sc) sc.style.display = isCorlima ? 'block' : 'none';
 
   if (isAuto) {
-      document.getElementById('globalExportArea').style.display = 'none';
-      document.getElementById('btnRow').style.display = 'none';
-      document.getElementById('btnRowCorlima').style.display = 'none';
+    const gea = document.getElementById('globalExportArea');
+    if (gea) gea.style.display = 'none';
+    const br = document.getElementById('btnRow');
+    if (br) br.style.display = 'none';
+    const brc = document.getElementById('btnRowCorlima');
+    if (brc) brc.style.display = 'none';
   } else if (isCorlima) {
-      initCorlimaElements();
-      initCorlimaResListener();
-      document.getElementById('globalExportArea').style.display = corlimaImages.length > 0 ? 'block' : 'none';
-      document.getElementById('btnRow').style.display = 'none';
-      document.getElementById('btnRowCorlima').style.display = 'flex';
-      setStatus('', '');
+    initCorlimaElements();
+    initCorlimaResListener();
+    const gea = document.getElementById('globalExportArea');
+    if (gea) gea.style.display = corlimaImages.length > 0 ? 'block' : 'none';
+    const br = document.getElementById('btnRow');
+    if (br) br.style.display = 'none';
+    const brc = document.getElementById('btnRowCorlima');
+    if (brc) brc.style.display = 'flex';
+    setStatus('', '');
   } else if (isFirma) {
-      document.getElementById('globalExportArea').style.display = 'none';
-      document.getElementById('btnRow').style.display = 'none';
-      document.getElementById('btnRowCorlima').style.display = 'none';
-      firmaActualizar();
-  } else {
-      document.getElementById('globalExportArea').style.display = (document.getElementById('srcCanvas').width > 0 || isVideo) ? 'block' : 'none';
-      document.getElementById('btnRow').style.display = 'flex';
-      document.getElementById('btnRowCorlima').style.display = 'none';
-      document.getElementById('downloadTxtBtn').style.display=tab==='ascii'?'inline-flex':'none';
-      reRender();
+    const gea = document.getElementById('globalExportArea');
+    if (gea) gea.style.display = 'none';
+    const br = document.getElementById('btnRow');
+    if (br) br.style.display = 'none';
+    const brc = document.getElementById('btnRowCorlima');
+    if (brc) brc.style.display = 'none';
+    firmaActualizar();
   }
 }
 function setStatus(msg, type) {
@@ -2638,5 +2636,10 @@ function togglePwdVisibility() {
   </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  switchTab('corlima');
+});
+</script>
 </body>
 </html>
