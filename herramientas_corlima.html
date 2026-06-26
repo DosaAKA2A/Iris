@@ -377,7 +377,7 @@ body { padding: 0; }
 <div class="tabs">
   <button type="button" class="tab active" id="tabCorlima" onclick="switchTab('corlima')">Scale Corlima</button>
   <button type="button" class="tab" id="tabFirma" onclick="switchTab('firma')">Firma Corlima</button>
-  <button type="button" class="tab" id="tabAuto" onclick="switchTab('auto')">Automatización</button>
+  <button type="button" class="tab" id="tabAuto" onclick="switchTab('auto')">Carga Masiva</button>
 </div>
 
 <div class="content">
@@ -2036,13 +2036,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
   
 
-  // Automatización: file input
+  // Carga Masiva: dropzone + file input
   const autoFileInput = document.getElementById('autoFileInput');
+  const autoDropZone  = document.getElementById('autoDropZone');
+
   if (autoFileInput) {
     autoFileInput.addEventListener('change', function(e) {
       const f = e.target.files[0];
       if (f) autoLoadFile(f);
       e.target.value = '';
+    });
+  }
+
+  if (autoDropZone) {
+    autoDropZone.addEventListener('click', function() {
+      if (autoFileInput) autoFileInput.click();
+    });
+    autoDropZone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      autoDropZone.style.borderColor = 'rgba(255,255,255,0.4)';
+    });
+    autoDropZone.addEventListener('dragleave', function() {
+      autoDropZone.style.borderColor = 'var(--border2)';
+    });
+    autoDropZone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      autoDropZone.style.borderColor = 'var(--border2)';
+      const f = e.dataTransfer && e.dataTransfer.files[0];
+      if (f) autoLoadFile(f);
     });
   }
 
