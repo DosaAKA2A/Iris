@@ -633,29 +633,50 @@
 </div>
 
 <script>
+const TTL = 24 * 60 * 60 * 1000; // 24 horas en ms
+
 async function sha256(msg) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function isUnlocked(key) {
+  const item = localStorage.getItem(key);
+  if (!item) return false;
+  try {
+    const { ts } = JSON.parse(item);
+    return (Date.now() - ts) < TTL;
+  } catch { return false; }
+}
+
+function setUnlocked(key) {
+  localStorage.setItem(key, JSON.stringify({ ts: Date.now() }));
+  sessionStorage.setItem(key, '1'); // para los guards en herramientas_*.html
 }
 
 const PASSWORDS = {
   corlima: 'Corlima2026',
   diseno:  'Socrates99@'
 };
-
 const DESTINATIONS = {
   corlima: 'herramientas_corlima.html',
   diseno:  'herramientas_diseno.html'
 };
-
-const SESSION_KEYS = {
+const STORAGE_KEYS = {
   corlima: 'corlimaAccess',
   diseno:  'disenoAccess'
 };
 
 function openModal(which) {
-  document.getElementById('modal' + which.charAt(0).toUpperCase() + which.slice(1)).classList.add('show');
-  document.getElementById('pwd' + which.charAt(0).toUpperCase() + which.slice(1)).focus();
+  // Si ya tiene acceso válido, ir directo
+  if (isUnlocked(STORAGE_KEYS[which])) {
+    setUnlocked(STORAGE_KEYS[which]); // refrescar sessionStorage
+    window.location.href = DESTINATIONS[which];
+    return;
+  }
+  const key = which.charAt(0).toUpperCase() + which.slice(1);
+  document.getElementById('modal' + key).classList.add('show');
+  setTimeout(() => document.getElementById('pwd' + key).focus(), 50);
 }
 
 function closeModal(which) {
@@ -666,13 +687,12 @@ function closeModal(which) {
 }
 
 async function checkPwd(which) {
-  const key = which.charAt(0).toUpperCase() + which.slice(1);
+  const key   = which.charAt(0).toUpperCase() + which.slice(1);
   const input = document.getElementById('pwd' + key).value;
-  const inputHash = await sha256(input);
+  const inputHash   = await sha256(input);
   const correctHash = await sha256(PASSWORDS[which]);
-
   if (inputHash === correctHash) {
-    sessionStorage.setItem(SESSION_KEYS[which], '1');
+    setUnlocked(STORAGE_KEYS[which]);
     window.location.href = DESTINATIONS[which];
   } else {
     document.getElementById('err' + key).textContent = 'Contraseña incorrecta.';
@@ -681,21 +701,17 @@ async function checkPwd(which) {
   }
 }
 
-// Cerrar al click fuera y con Escape
-document.querySelectorAll('.modal-overlay').forEach(function(el) {
-  el.addEventListener('click', function(e) {
-    if (e.target === el) {
-      const which = el.id.replace('modal', '').toLowerCase();
-      closeModal(which);
-    }
+// Cerrar con click fuera o Escape
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => {
+    if (e.target === el) closeModal(el.id.replace('modal','').toLowerCase());
   });
 });
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    document.querySelectorAll('.modal-overlay.show').forEach(function(el) {
-      const which = el.id.replace('modal', '').toLowerCase();
-      closeModal(which);
-    });
+    document.querySelectorAll('.modal-overlay.show').forEach(el =>
+      closeModal(el.id.replace('modal','').toLowerCase())
+    );
   }
 });
 </script>

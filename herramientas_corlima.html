@@ -334,7 +334,26 @@ body { padding: 0; }
 </head>
 <body>
 <script>
-if (!sessionStorage.getItem('corlimaAccess')) { window.location.href = 'index.html'; }
+(function() {
+  var key = 'corlimaAccess';
+  var ok = false;
+  // sessionStorage (misma sesión)
+  if (sessionStorage.getItem(key)) { ok = true; }
+  // localStorage con TTL de 24h
+  if (!ok) {
+    try {
+      var item = localStorage.getItem(key);
+      if (item) {
+        var data = JSON.parse(item);
+        if ((Date.now() - data.ts) < 86400000) {
+          sessionStorage.setItem(key, '1');
+          ok = true;
+        }
+      }
+    } catch(e) {}
+  }
+  if (!ok) window.location.href = 'index.html';
+})();
 </script>
 
 <div class="page-wrap">
