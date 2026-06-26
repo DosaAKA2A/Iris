@@ -1302,6 +1302,11 @@ let CAT_DB = {};      // { cod: cat_string }
 let PROD_DB = {};     // { cod: { nombre, marca, cat, cat_names, cat_padre } }
 let CATS_DICT = {};   // { id: nombre_categoria }
 
+// Auto (Carga Masiva)
+let autoData = [];
+let autoHeaders = [];
+let autoMode = 'precios';
+
 (function loadDB() {
   fetch('productos_db.json?v=' + Date.now())
     .then(function(r) { return r.json(); })
@@ -2026,19 +2031,7 @@ function togglePwdVisibility() {
 // ═══════════════════════════════════════════════
 // CANVAS DRAG (window listeners)
 // ═══════════════════════════════════════════════
-window.addEventListener('mouseup', () => { cIsDragging = false; });
-window.addEventListener('mousemove', e => {
-  if (!cIsDragging || corlimaActiveIndex < 0 || !cWrap) return;
-  const data = corlimaImages[corlimaActiveIndex];
-  const rect = cWrap.getBoundingClientRect();
-  const scaleRatio = baseW / rect.width;
-  const dx = (e.clientX - cStartX) * scaleRatio;
-  const dy = (e.clientY - cStartY) * scaleRatio;
-  data.x += dx; data.y += dy;
-  cStartX = e.clientX; cStartY = e.clientY;
-  clampCorlimaData(data);
-  drawCorlimaCanvas();
-});
+// canvas drag manejado dentro del IIFE de Scale Corlima
 
 // ═══════════════════════════════════════════════
 // INIT
