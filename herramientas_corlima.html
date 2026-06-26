@@ -1484,10 +1484,7 @@ function reRender() {
   updatePalSwatches();
 }
 function switchTab(tab) {
-  if (tab === 'corlima' && !corlimaUnlocked) {
-    openPwdModal();
-    return;
-  }
+  corlimaUnlocked = true; // acceso garantizado por sesión del landing
   currentTab=tab;
   const isCorlima = tab === 'corlima';
   const isFirma = tab === 'firma';
@@ -1506,9 +1503,9 @@ function switchTab(tab) {
   document.getElementById('tabFirma').classList.toggle('active',isFirma);
   document.getElementById('tabAuto').classList.toggle('active',isAuto);
 
-  const isSpecial = isCorlima || isFirma || isAuto;
-  document.getElementById('dropZone').style.display=isSpecial?'none':'block';
-  const sharedControls=document.getElementById('sharedControls'); if(sharedControls) sharedControls.style.display=isSpecial?'none':'block';
+  // En herramientas_corlima: dropZone solo para Scale Corlima
+  document.getElementById('dropZone').style.display=isCorlima?'block':'none';
+  const sharedControls=document.getElementById('sharedControls'); if(sharedControls) sharedControls.style.display=isCorlima?'block':'none';
 
   if (isAuto) {
       document.getElementById('globalExportArea').style.display = 'none';
@@ -2554,8 +2551,14 @@ async function firmaCopiar() {
 }
 
 // PASSWORD MODAL
-let corlimaUnlocked = false;
+// corlimaUnlocked declarado arriba como true
 const CORLIMA_HASH = 'a2cf8e5a7d1b3f9c4e6d0821b5e3f7a9c1d4b6e8f2a5c7d9b3e1f4a8c6d2b0e';
+let corlimaUnlocked = true; // protección delegada al landing
+
+// Activar Scale Corlima al cargar
+document.addEventListener('DOMContentLoaded', function() {
+  switchTab('corlima');
+});
 
 async function hashStr(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));

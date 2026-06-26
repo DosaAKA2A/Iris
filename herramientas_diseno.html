@@ -1506,9 +1506,9 @@ function switchTab(tab) {
   document.getElementById('tabFirma').classList.toggle('active',isFirma);
   document.getElementById('tabAuto').classList.toggle('active',isAuto);
 
-  const isSpecial = isCorlima || isFirma || isAuto;
-  document.getElementById('dropZone').style.display=isSpecial?'none':'block';
-  const sharedControls=document.getElementById('sharedControls'); if(sharedControls) sharedControls.style.display=isSpecial?'none':'block';
+  // En herramientas_diseno: dropZone siempre visible
+  document.getElementById('dropZone').style.display='block';
+  const sharedControls=document.getElementById('sharedControls'); if(sharedControls) sharedControls.style.display='block';
 
   if (isAuto) {
       document.getElementById('globalExportArea').style.display = 'none';
