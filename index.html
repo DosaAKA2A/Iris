@@ -2199,9 +2199,9 @@ function autoExportar(tipo) {
     });
     filename = 'corlima_stock_' + new Date().toISOString().slice(0,10) + '.csv';
   } else {
-    lines = ['COD.SAP;PRECIO ORIGINAL;PRECIO CON DESCUENTO;CATEGORIAS'];
+    lines = ['COD.SAP;PRECIO ORIGINAL;VALOR DEL DESCUENTO;CATEGORIAS'];
     autoData._processed.forEach(function(r) {
-      lines.push([r.ref, toNum(r.precio), toNum(r.desc), r.cat].join(';'));
+      lines.push([r.ref, toNum(r.precio), toNum(r.valor), r.cat].join(';'));
     });
     filename = 'corlima_precios_' + new Date().toISOString().slice(0,10) + '.csv';
   }
