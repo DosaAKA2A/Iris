@@ -766,69 +766,66 @@ function setStatus(msg, type) {
 
 // ── initCorlimaElements
 function initCorlimaElements() {
-    // cCanvas/cCtx/cWrap solo si existen (no requeridos para Scale Corlima standalone)
-    if (!cCanvas) {
-      cCanvas = document.getElementById('corlimaCanvas');
-      if (cCanvas) {
-        cCtx = cCanvas.getContext('2d');
-        cWrap = document.getElementById('corlimaCanvasWrap');
-      }
+    // Registrar eventos del dropzone (independiente del canvas)
+    if (!corlimaInputListenerSet) {
+        const cFileInput = document.getElementById('corlimaFileInput');
+        const cDropZone  = document.getElementById('corlimaDropZone');
+        if (cFileInput && cDropZone) {
+            cFileInput.addEventListener('change', handleCorlimaUpload);
+            cDropZone.addEventListener('click', () => cFileInput.click());
+            cDropZone.addEventListener('dragover', e => { e.preventDefault(); cDropZone.classList.add('drag-over'); });
+            cDropZone.addEventListener('dragleave', () => cDropZone.classList.remove('drag-over'));
+            cDropZone.addEventListener('drop', e => {
+                e.preventDefault(); cDropZone.classList.remove('drag-over');
+                if (e.dataTransfer.files) handleCorlimaUpload({ target: { files: e.dataTransfer.files } });
+            });
+            corlimaInputListenerSet = true;
+        }
     }
 
-    const cFileInput = document.getElementById('corlimaFileInput');
-    const cDropZone  = document.getElementById('corlimaDropZone');
+    // Inicializar canvas (solo cuando ya existe en el DOM — aparece al subir primera imagen)
+    if (!cCanvas) {
+        cCanvas = document.getElementById('corlimaCanvas');
+        if (cCanvas) {
+            cCtx = cCanvas.getContext('2d');
+            cWrap = document.getElementById('corlimaCanvasWrap');
+            if (cWrap) {
+                cWrap.addEventListener('mousedown', e => {
+                    if (corlimaActiveIndex < 0) return;
+                    cIsDragging = true; cStartX = e.clientX; cStartY = e.clientY;
+                });
+                cWrap.addEventListener('touchstart', e => {
+                    if (corlimaActiveIndex < 0) return;
+                    cIsDragging = true; cStartX = e.touches[0].clientX; cStartY = e.touches[0].clientY;
+                }, { passive: true });
+            }
 
-    if (!corlimaInputListenerSet && cFileInput && cDropZone) {
-        cFileInput.addEventListener('change', handleCorlimaUpload);
-        cDropZone.addEventListener('click', () => cFileInput.click());
-        cDropZone.addEventListener('dragover', e => { e.preventDefault(); cDropZone.classList.add('drag-over'); });
-        cDropZone.addEventListener('dragleave', () => cDropZone.classList.remove('drag-over'));
-        cDropZone.addEventListener('drop', e => {
-            e.preventDefault(); cDropZone.classList.remove('drag-over');
-            if (e.dataTransfer.files) handleCorlimaUpload({ target: { files: e.dataTransfer.files } });
-        });
+            // Zoom
+            const zoomSlider = document.getElementById('corlimaZoom');
+            if (zoomSlider) {
+                zoomSlider.addEventListener('input', e => {
+                    if (corlimaActiveIndex < 0) return;
+                    const data = corlimaImages[corlimaActiveIndex];
+                    const factor = parseFloat(e.target.value);
+                    const newScale = data.baseScale * factor;
+                    const cx = data.x + (data.img.width * data.scale) / 2;
+                    const cy = data.y + (data.img.height * data.scale) / 2;
+                    data.scale = newScale;
+                    data.x = cx - (data.img.width * data.scale) / 2;
+                    data.y = cy - (data.img.height * data.scale) / 2;
+                    document.getElementById('corlimaZoomVal').textContent = Math.round(factor * 100) + '%';
+                    clampCorlimaData(data);
+                    drawCorlimaCanvas();
+                });
+            }
 
-        corlimaInputListenerSet = true;
-
-        // Touch/mouse drag en canvas wrap (solo si existe)
-        if (cWrap) {
-          cWrap.addEventListener('mousedown', e => {
-              if (corlimaActiveIndex < 0) return;
-              cIsDragging = true; cStartX = e.clientX; cStartY = e.clientY;
-          });
-          cWrap.addEventListener('touchstart', e => {
-              if (corlimaActiveIndex < 0) return;
-              cIsDragging = true; cStartX = e.touches[0].clientX; cStartY = e.touches[0].clientY;
-          }, { passive: true });
-        }
-
-        // Zoom
-        const zoomSlider = document.getElementById('corlimaZoom');
-        if (zoomSlider) {
-            zoomSlider.addEventListener('input', e => {
-                if (corlimaActiveIndex < 0) return;
-                const data = corlimaImages[corlimaActiveIndex];
-                const factor = parseFloat(e.target.value);
-                const newScale = data.baseScale * factor;
-                const cx = data.x + (data.img.width * data.scale) / 2;
-                const cy = data.y + (data.img.height * data.scale) / 2;
-                data.scale = newScale;
-                data.x = cx - (data.img.width * data.scale) / 2;
-                data.y = cy - (data.img.height * data.scale) / 2;
-                document.getElementById('corlimaZoomVal').textContent = Math.round(factor * 100) + '%';
-                clampCorlimaData(data);
-                drawCorlimaCanvas();
+            // Radios de fondo fit
+            document.querySelectorAll('input[name="corlimaFitBg"]').forEach(r => {
+                r.addEventListener('change', drawCorlimaCanvas);
             });
         }
-
-        // Radios de fondo fit
-        document.querySelectorAll('input[name="corlimaFitBg"]').forEach(r => {
-            r.addEventListener('change', drawCorlimaCanvas);
-        });
     }
 }
-
-// ── initCorlimaResListener
 function initCorlimaResListener() {
     if (corlimaResListenerSet) return;
     const sel = getResSelect();
