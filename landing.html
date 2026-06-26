@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOSA — Diseño & Automatización</title>
+<link rel="icon" href="dosa_favicon.svg" type="image/svg+xml">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black:   #080808;
+    --white:   #f5f5f5;
+    --grey:    #888;
+    --grey2:   #444;
+    --red:     #dc402a;
+    --border:  rgba(255,255,255,0.08);
+    --card-bg: rgba(255,255,255,0.03);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ─────────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .nav-logo svg { width: 28px; height: 28px; }
+  /* Logo en blanco para el nav */
+  .nav-logo svg rect { fill: transparent; }
+  .nav-logo svg path { fill: var(--white); }
+
+  .nav-wordmark {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .18em;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--white);
+    font-size: 12px;
+    font-family: inherit;
+    letter-spacing: .06em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .2s, border-color .2s;
+  }
+  .nav-cta:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.2); }
+  .nav-cta-dot { width: 6px; height: 6px; border-radius: 50%; background: #3fb950; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* ── HERO ────────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 40px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 70% 40%, rgba(220,64,42,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(220,64,42,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Grid decorativo */
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    opacity: .35;
+    pointer-events: none;
+  }
+
+  /* Cruces decorativas */
+  .cross {
+    position: absolute;
+    color: var(--grey2);
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 300;
+    pointer-events: none;
+  }
+
+  .hero-title {
+    font-size: clamp(80px, 14vw, 200px);
+    font-weight: 900;
+    line-height: .9;
+    letter-spacing: -.04em;
+    color: var(--white);
+    position: relative;
+    z-index: 2;
+    user-select: none;
+  }
+
+  .hero-title .accent { color: var(--red); }
+
+  .hero-sub {
+    margin-top: 24px;
+    font-size: clamp(13px, 1.5vw, 16px);
+    color: var(--grey);
+    letter-spacing: .02em;
+    line-height: 1.6;
+    max-width: 440px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-tags {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .tag {
+    padding: 5px 12px;
+    border: 1px solid var(--grey2);
+    border-radius: 100px;
+    font-size: 11px;
+    letter-spacing: .07em;
+    color: var(--grey);
+    text-transform: uppercase;
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 36px;
+    right: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 2;
+  }
+
+  .hero-scroll span {
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--grey2);
+    writing-mode: vertical-rl;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 50px;
+    background: linear-gradient(to bottom, var(--grey2), transparent);
+    animation: scrolldown 1.8s ease-in-out infinite;
+  }
+
+  @keyframes scrolldown { 0%{transform:scaleY(0);transform-origin:top} 50%{transform:scaleY(1);transform-origin:top} 51%{transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom} }
+
+  /* ── PROYECTOS ───────────────────────────── */
+  .projects {
+    padding: 80px 40px 120px;
+    position: relative;
+  }
+
+  .section-eyebrow {
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-eyebrow::before {
+    content: '';
+    display: block;
+    width: 28px;
+    height: 1px;
+    background: var(--grey2);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 700px) {
+    .cards { grid-template-columns: 1fr; }
+    nav { padding: 16px 20px; }
+    .hero { padding: 0 20px 48px; }
+    .projects { padding: 60px 20px 80px; }
+    .hero-scroll { right: 20px; }
+  }
+
+  .card {
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--card-bg);
+    padding: 36px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color .25s, transform .25s;
+    text-decoration: none;
+    display: block;
+    min-height: 300px;
+  }
+
+  .card:hover {
+    border-color: rgba(255,255,255,0.18);
+    transform: translateY(-3px);
+  }
+
+  .card-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0;
+    transition: opacity .4s;
+    pointer-events: none;
+  }
+
+  .card:hover .card-glow { opacity: 1; }
+
+  .card--corlima .card-glow {
+    width: 200px; height: 200px;
+    background: rgba(220,64,42,0.18);
+    top: -40px; right: -40px;
+  }
+
+  .card--design .card-glow {
+    width: 200px; height: 200px;
+    background: rgba(63,185,80,0.12);
+    bottom: -40px; left: -40px;
+  }
+
+  .card-number {
+    font-size: 11px;
+    letter-spacing: .14em;
+    color: var(--grey2);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-number::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    font-size: 20px;
+  }
+
+  .card--corlima .card-icon { background: rgba(220,64,42,0.12); border: 1px solid rgba(220,64,42,0.2); }
+  .card--design  .card-icon { background: rgba(63,185,80,0.08);  border: 1px solid rgba(63,185,80,0.15); }
+
+  .card-title {
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--grey);
+    line-height: 1.65;
+    margin-bottom: 32px;
+    max-width: 320px;
+  }
+
+  .card-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 36px;
+  }
+
+  .pill {
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 10px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    color: var(--grey);
+  }
+
+  .card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    transition: gap .2s;
+  }
+
+  .card:hover .card-cta { gap: 12px; }
+
+  .card--corlima .card-cta { color: var(--red); }
+  .card--design  .card-cta { color: #3fb950; }
+
+  .cta-arrow {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+
+  /* Badge lock */
+  .badge-lock {
+    position: absolute;
+    top: 28px; right: 28px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    font-size: 10px;
+    letter-spacing: .08em;
+    color: var(--grey2);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* ── MODAL PASSWORD ──────────────────────── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: #111;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 380px;
+    position: relative;
+  }
+
+  .modal-title {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    margin-bottom: 6px;
+  }
+
+  .modal-sub {
+    font-size: 12px;
+    color: var(--grey);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+
+  .modal-input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: var(--white);
+    font-family: monospace;
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color .2s;
+  }
+
+  .modal-input:focus { border-color: rgba(255,255,255,0.2); }
+
+  .modal-error {
+    font-size: 11px;
+    color: var(--red);
+    margin-bottom: 12px;
+    min-height: 16px;
+  }
+
+  .modal-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: var(--white);
+    color: var(--black);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    letter-spacing: .04em;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  .modal-btn:hover { opacity: .88; }
+
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: none; border: none;
+    color: var(--grey2);
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+  }
+  .modal-close:hover { color: var(--white); }
+
+  /* ── FOOTER ──────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  footer span { font-size: 11px; color: var(--grey2); letter-spacing: .05em; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.98 19.98">
+      <rect width="19.98" height="19.98" fill="transparent"/>
+      <g fill="#f5f5f5">
+        <path d="M9.54,6.21c0,.99-.35,1.83-1.05,2.53s-1.54,1.05-2.53,1.05-1.83-.35-2.53-1.05-1.05-1.54-1.05-2.53.35-1.83,1.05-2.53,1.54-1.05,2.53-1.05h1.01v-.53h2.56v4.1ZM7.5,5.95c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.13-.91.38-.38.55-.38.91.12.65.38.9.55.38.91.38.65-.12.9-.38.38-.55.38-.9Z"/>
+        <path d="M17.4,5.95c0,1.06-.38,1.96-1.12,2.71s-1.65,1.12-2.71,1.12-1.97-.38-2.72-1.12-1.12-1.65-1.12-2.71.38-1.96,1.13-2.72,1.66-1.13,2.72-1.13,1.96.38,2.71,1.12,1.12,1.66,1.12,2.72ZM14.84,5.95c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.13-.91.38-.38.55-.38.91.12.65.38.9.55.38.91.38.65-.12.9-.38.38-.55.38-.9Z"/>
+        <path d="M9.96,12.76h-1.17c-.36,0-.66.12-.91.38s-.38.55-.38.9c0,1.06-.38,1.96-1.12,2.71s-1.66,1.12-2.72,1.12h-1.17v-2.55h1.17c.36,0,.66-.12.91-.38s.38-.55.38-.9c0-1.06.38-1.96,1.12-2.71s1.66-1.12,2.72-1.12h1.17v2.56Z"/>
+        <path d="M17.61,17.79h-2.56v-3.63c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.12-.9.38-.38.55-.38.91v3.63h-2.56v-3.63c0-1.06.38-1.97,1.12-2.72s1.65-1.12,2.71-1.12,1.96.38,2.71,1.12,1.12,1.66,1.12,2.72v3.63ZM14.3,17.27c0,.14-.05.27-.16.37s-.23.15-.38.15-.27-.05-.37-.15-.16-.22-.16-.37.05-.27.16-.37.23-.16.37-.16.27.05.38.16.16.23.16.37Z"/>
+      </g>
+    </svg>
+    <span class="nav-wordmark">Dosa</span>
+  </a>
+  <a class="nav-cta" href="mailto:hola@dosa.pe">
+    <span class="nav-cta-dot"></span>
+    Disponible para proyectos
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <span class="cross" style="top:22%;left:18%">+</span>
+  <span class="cross" style="top:38%;left:55%">+</span>
+  <span class="cross" style="top:62%;right:22%">+</span>
+  <span class="cross" style="top:18%;right:38%">+</span>
+
+  <div class="hero-title">
+    DO<span class="accent">S</span>A
+  </div>
+  <p class="hero-sub">
+    Diseño gráfico, interfaces y automatización.<br>
+    Herramientas que trabajan mientras tú creas.
+  </p>
+  <div class="hero-tags">
+    <span class="tag">Diseño Gráfico</span>
+    <span class="tag">Diseño Web</span>
+    <span class="tag">UI · UX</span>
+    <span class="tag">Automatización</span>
+    <span class="tag">Soft Web</span>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Proyectos</span>
+  </div>
+</section>
+
+<!-- PROYECTOS -->
+<section class="projects">
+  <div class="section-eyebrow">Proyectos activos</div>
+
+  <div class="cards">
+
+    <!-- CARD CORLIMA -->
+    <a class="card card--corlima" href="index.html" onclick="goCorlima(event)">
+      <div class="card-glow"></div>
+      <div class="card-number">01</div>
+      <div class="card-icon">
+        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="20" height="20" rx="4" fill="rgba(220,64,42,0.0)"/>
+          <path d="M4 10h12M10 4v12" stroke="#dc402a" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="6" y="6" width="8" height="8" rx="1" stroke="#dc402a" stroke-width="1.2" fill="none"/>
+        </svg>
+      </div>
+      <div class="card-title">Herramientas<br>Corlima</div>
+      <div class="card-desc">Suite de automatización para gestión de productos, generación de firmas corporativas y actualización masiva de catálogos en Prestashop.</div>
+      <div class="card-pills">
+        <span class="pill">Automatización</span>
+        <span class="pill">Prestashop</span>
+        <span class="pill">Firma Corporativa</span>
+        <span class="pill">Catálogo</span>
+      </div>
+      <div class="card-cta">
+        Acceder
+        <span class="cta-arrow">&#8599;</span>
+      </div>
+    </a>
+
+    <!-- CARD DISEÑO -->
+    <div class="card card--design" onclick="openDesignModal()">
+      <div class="card-glow"></div>
+      <div class="badge-lock">
+        <svg width="9" height="11" viewBox="0 0 9 11" fill="none"><rect x="1" y="4.5" width="7" height="6" rx="1" stroke="currentColor" stroke-width="1"/><path d="M2.5 4.5V3a2 2 0 014 0v1.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+        Acceso privado
+      </div>
+      <div class="card-number">02</div>
+      <div class="card-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4" stroke="#3fb950" stroke-width="1.4"/>
+          <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="#3fb950" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="card-title">Herramientas<br>de Diseño</div>
+      <div class="card-desc">Laboratorio de experimentación visual: dithering, arte ASCII, escalado de imágenes y utilidades para el proceso creativo.</div>
+      <div class="card-pills">
+        <span class="pill">Pixel Dither</span>
+        <span class="pill">ASCII Art</span>
+        <span class="pill">Procesamiento</span>
+        <span class="pill">Experimental</span>
+      </div>
+      <div class="card-cta" style="color:#3fb950;">
+        Acceder
+        <span class="cta-arrow">&#8599;</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>DOSA &copy; 2026</span>
+  <span>Madrid, ES</span>
+</footer>
+
+<!-- MODAL DISEÑO -->
+<div class="modal-overlay" id="designModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeDesignModal()">&#215;</button>
+    <div class="modal-title">Acceso restringido</div>
+    <div class="modal-sub">Esta sección es de uso privado.<br>Introduce la contraseña para continuar.</div>
+    <input class="modal-input" type="password" id="designPwd" placeholder="Contraseña"
+           onkeydown="if(event.key==='Enter') checkDesignPwd()">
+    <div class="modal-error" id="designErr"></div>
+    <button class="modal-btn" onclick="checkDesignPwd()">Entrar</button>
+  </div>
+</div>
+
+<script>
+// Hash SHA-256 de "Socrates99@"
+const DESIGN_HASH = 'b2d5e3f7a1c8b0f4e9d6c2a7b8e3f1d0a5c9b4e7f2a8d3c6b1e5f0a9d2c4b7e6';
+
+async function sha256(msg) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function openDesignModal() {
+  document.getElementById('designModal').classList.add('show');
+  document.getElementById('designPwd').focus();
+  document.getElementById('designErr').textContent = '';
+  document.getElementById('designPwd').value = '';
+}
+
+function closeDesignModal() {
+  document.getElementById('designModal').classList.remove('show');
+}
+
+async function checkDesignPwd() {
+  const pwd = document.getElementById('designPwd').value;
+  const hash = await sha256(pwd);
+  // Comparar con el hash real de "Socrates99@"
+  const realHash = await sha256('Socrates99@');
+  if (hash === realHash) {
+    sessionStorage.setItem('dosaDisenoUnlocked', '1');
+    window.location.href = 'index.html?tab=dither';
+  } else {
+    document.getElementById('designErr').textContent = 'Contraseña incorrecta.';
+    document.getElementById('designPwd').value = '';
+    document.getElementById('designPwd').focus();
+  }
+}
+
+function goCorlima(e) {
+  // Acceso directo a Corlima — sin contraseña
+}
+
+// Cerrar modal al click fuera
+document.getElementById('designModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDesignModal();
+});
+
+// Escape cierra modal
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeDesignModal();
+});
+</script>
+</body>
+</html>
