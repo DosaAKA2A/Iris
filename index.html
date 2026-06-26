@@ -38,47 +38,218 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 40px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(8,8,8,0.88);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    padding: 16px 28px;
+    background: transparent;
   }
 
-  .nav-logo {
+  /* Izquierda */
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .nav-menu-btn {
     display: flex;
     align-items: center;
     gap: 10px;
-    text-decoration: none;
-  }
-  .nav-logo svg { width: 28px; height: 28px; }
-  .nav-wordmark {
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: .18em;
+    padding: 10px 16px;
+    border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(15,15,15,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     color: var(--white);
-    text-transform: uppercase;
-    font-family: "Clash Display", sans-serif;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+    letter-spacing: .01em;
+  }
+  .nav-menu-btn:hover {
+    background: rgba(30,30,30,0.95);
+    border-color: rgba(255,255,255,0.28);
   }
 
-  .nav-status {
+  .nav-menu-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 16px;
+  }
+  .nav-menu-icon span {
+    display: block;
+    height: 1.5px;
+    background: var(--white);
+    border-radius: 2px;
+    transition: transform .25s, opacity .25s;
+  }
+  /* Animación a X cuando está abierto */
+  .nav-menu-btn.open .nav-menu-icon span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+  .nav-menu-btn.open .nav-menu-icon span:nth-child(2) { opacity: 0; }
+  .nav-menu-btn.open .nav-menu-icon span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+
+  .nav-sep {
+    color: rgba(255,255,255,0.2);
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .nav-location {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: .02em;
+  }
+
+  /* Centro — logo pill estilo Norvin */
+  .nav-logo-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-decoration: none;
+  }
+
+  .nav-logo-pill {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border: 1px solid var(--border);
+    gap: 9px;
+    padding: 10px 20px 10px 14px;
     border-radius: 100px;
-    font-size: 11.5px;
-    color: var(--grey);
-    letter-spacing: .04em;
+    background: rgba(12,12,12,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.12);
+    transition: border-color .2s;
   }
-  .status-dot {
-    width: 6px; height: 6px;
+  .nav-logo-pill:hover { border-color: rgba(255,255,255,0.25); }
+
+  .nav-logo-pill svg {
+    width: 24px; height: 24px;
+    background: #dc402a;
+    border-radius: 6px;
+    padding: 2px;
+  }
+  .nav-logo-pill svg rect { fill: transparent; }
+  .nav-logo-pill svg path { fill: #f5f5f5; }
+
+  .nav-wordmark {
+    font-family: "Clash Display", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+
+  /* Derecha — CTA */
+  .nav-cta-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px 10px 20px;
+    border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(240,240,240,0.96);
+    color: #0a0a0a;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: .01em;
+    transition: opacity .2s;
+  }
+  .nav-cta-btn:hover { opacity: .88; }
+
+  .nav-cta-arrow {
+    width: 28px; height: 28px;
     border-radius: 50%;
-    background: var(--green);
-    animation: pulse 2.4s ease-in-out infinite;
+    background: #0a0a0a;
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; line-height: 1;
   }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* Drawer menú */
+  .nav-drawer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 320px; height: 100vh;
+    background: rgba(10,10,10,0.97);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255,255,255,0.07);
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    padding: 80px 36px 40px;
+    display: flex; flex-direction: column;
+  }
+  .nav-drawer.open { transform: translateX(0); }
+
+  .nav-drawer-inner { display: flex; flex-direction: column; gap: 4px; }
+
+  .nav-drawer-label {
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    margin-bottom: 20px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .nav-drawer-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    text-decoration: none;
+    transition: padding-left .2s;
+    cursor: pointer;
+  }
+  .nav-drawer-item:hover { padding-left: 6px; }
+
+  .nav-drawer-num {
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: .08em;
+    min-width: 22px;
+  }
+  .nav-drawer-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--white);
+    font-family: "Clash Display", sans-serif;
+    flex: 1;
+    letter-spacing: -.01em;
+  }
+  .nav-drawer-arrow {
+    font-size: 16px;
+    color: rgba(255,255,255,0.3);
+    transition: color .2s, transform .2s;
+  }
+  .nav-drawer-item:hover .nav-drawer-arrow {
+    color: var(--white);
+    transform: translateX(4px);
+  }
+
+  .nav-drawer-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    z-index: 199;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(2px);
+  }
+  .nav-drawer-backdrop.open { display: block; }
+
+  @media (max-width: 600px) {
+    nav { padding: 14px 18px; }
+    .nav-location { display: none; }
+    .nav-sep { display: none; }
+  }
 
   /* HERO */
   .hero {
@@ -534,8 +705,23 @@
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="#">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.98 19.98">
+
+  <!-- IZQUIERDA: Menú + ubicación -->
+  <div class="nav-left">
+    <button class="nav-menu-btn" id="navMenuBtn" onclick="toggleMenu()">
+      <span class="nav-menu-icon">
+        <span></span><span></span><span></span>
+      </span>
+      Menú
+    </button>
+    <span class="nav-sep">/</span>
+    <span class="nav-location">España, Madrid</span>
+  </div>
+
+  <!-- CENTRO: Logo DOSA con bordes redondeados -->
+  <a class="nav-logo-center" href="#">
+    <div class="nav-logo-pill">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.98 19.98">
       <rect width="19.98" height="19.98" fill="transparent"/>
       <g fill="#f5f5f5">
         <path d="M9.54,6.21c0,.99-.35,1.83-1.05,2.53s-1.54,1.05-2.53,1.05-1.83-.35-2.53-1.05-1.05-1.54-1.05-2.53.35-1.83,1.05-2.53,1.54-1.05,2.53-1.05h1.01v-.53h2.56v4.1ZM7.5,5.95c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.13-.91.38-.38.55-.38.91.12.65.38.9.55.38.91.38.65-.12.9-.38.38-.55.38-.9Z"/>
@@ -544,13 +730,35 @@
         <path d="M17.61,17.79h-2.56v-3.63c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.12-.9.38-.38.55-.38.91v3.63h-2.56v-3.63c0-1.06.38-1.97,1.12-2.72s1.65-1.12,2.71-1.12,1.96.38,2.71,1.12,1.12,1.66,1.12,2.72v3.63ZM14.3,17.27c0,.14-.05.27-.16.37s-.23.15-.38.15-.27-.05-.37-.15-.16-.22-.16-.37.05-.27.16-.37.23-.16.37-.16.27.05.38.16.16.23.16.37Z"/>
       </g>
     </svg>
-    <span class="nav-wordmark">Dosa</span>
+      <span class="nav-wordmark">DOSA</span>
+    </div>
   </a>
-  <div class="nav-status">
-    <span class="status-dot"></span>
-    Disponible para proyectos
-  </div>
+
+  <!-- DERECHA: CTA -->
+  <button class="nav-cta-btn" onclick="#">
+    ¿Qué hacemos?
+    <span class="nav-cta-arrow">›</span>
+  </button>
+
 </nav>
+
+<!-- MENÚ DESPLEGABLE -->
+<div class="nav-drawer" id="navDrawer">
+  <div class="nav-drawer-inner">
+    <div class="nav-drawer-label">Proyectos activos</div>
+    <a class="nav-drawer-item" href="index.html" onclick="openModal('corlima');return false;">
+      <span class="nav-drawer-num">01</span>
+      <span class="nav-drawer-name">Herramientas Corlima</span>
+      <span class="nav-drawer-arrow">→</span>
+    </a>
+    <a class="nav-drawer-item" href="index.html" onclick="openModal('diseno');return false;">
+      <span class="nav-drawer-num">02</span>
+      <span class="nav-drawer-name">Herramientas de Diseño</span>
+      <span class="nav-drawer-arrow">→</span>
+    </a>
+  </div>
+</div>
+<div class="nav-drawer-backdrop" id="navBackdrop" onclick="toggleMenu()"></div>
 
 <!-- HERO -->
 <section class="hero">
@@ -787,6 +995,19 @@ document.addEventListener('keydown', e => {
     }
   }, { passive: true });
 })();
+</script>
+
+<script>
+// ── Menú desplegable ───────────────────────────────
+function toggleMenu() {
+  const btn      = document.getElementById('navMenuBtn');
+  const drawer   = document.getElementById('navDrawer');
+  const backdrop = document.getElementById('navBackdrop');
+  const isOpen   = drawer.classList.contains('open');
+  btn.classList.toggle('open', !isOpen);
+  drawer.classList.toggle('open', !isOpen);
+  backdrop.classList.toggle('open', !isOpen);
+}
 </script>
 </body>
 </html>
