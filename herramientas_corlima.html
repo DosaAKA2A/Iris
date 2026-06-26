@@ -532,6 +532,95 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 <!-- SCALE CORLIMA (nuevo panel autónomo) -->
 <div id="panelCorlima">
 
+  <div id="scalePanel">
+
+    <!-- Drop zone -->
+    <div id="scaleDropZone">
+      <input type="file" id="scaleFileInput" accept="image/*" multiple style="display:none;">
+      <div class="sdz-icon">⬆</div>
+      <div class="sdz-main">Arrastra imágenes aquí o haz clic para explorar</div>
+      <div class="sdz-sub">JPG · PNG · WebP · hasta 10 imágenes</div>
+    </div>
+
+    <!-- Resolución -->
+    <div>
+      <div class="sres-label-title">Resolución de salida</div>
+      <div class="sres-options">
+        <label class="sres-opt">
+          <input type="radio" name="scaleRes" value="1000x1000" checked>
+          <div class="sres-card">
+            <div class="sres-px">1000 × 1000 <em class="sres-ratio">1:1</em></div>
+            <div class="sres-hint blue">corlima.pe</div>
+          </div>
+        </label>
+        <label class="sres-opt">
+          <input type="radio" name="scaleRes" value="1080x1350">
+          <div class="sres-card">
+            <div class="sres-px">1080 × 1350 <em class="sres-ratio">4:5</em></div>
+            <div class="sres-hint pink">Instagram</div>
+          </div>
+        </label>
+        <label class="sres-opt">
+          <input type="radio" name="scaleRes" value="2000x2000">
+          <div class="sres-card">
+            <div class="sres-px">2000 × 2000 <em class="sres-ratio">1:1</em></div>
+            <div class="sres-hint orange">Alta resolución</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Galería de miniaturas -->
+    <div id="scaleGalleryBlock" style="display:none;">
+      <div class="s-section-title">
+        Imágenes cargadas
+        <span id="scaleCanvasSize"></span>
+      </div>
+      <div id="scaleGallery"></div>
+    </div>
+
+    <!-- Workspace: canvas dual -->
+    <div id="scaleWorkspace" style="display:none;">
+      <div id="scaleCanvasDual">
+
+        <!-- Izquierda: original con recuadro de recorte -->
+        <div class="sdual-col">
+          <div class="sdual-col-label">Original</div>
+          <div id="scaleCanvasSrcWrap">
+            <canvas id="scaleCanvasSrc"></canvas>
+          </div>
+        </div>
+
+        <!-- Derecha: resultado (arrastrable) -->
+        <div class="sdual-col">
+          <div class="sdual-col-label">
+            Resultado
+            <button class="sbtn-inline" id="scaleDlSingle">↓ Descargar</button>
+          </div>
+          <div id="scaleCanvasWrap">
+            <canvas id="scaleCanvas"></canvas>
+            <div id="scaleGrid"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Zoom -->
+      <div class="sws-zoom-row">
+        <span class="sws-zoom-lbl">Zoom</span>
+        <input id="scaleZoom" type="range" min="1" max="3" step="0.01" value="1">
+        <span id="scaleZoomVal">100%</span>
+      </div>
+    </div>
+
+    <!-- Descarga todas -->
+    <div id="scaleDlAllBlock" style="display:none;">
+      <button class="sbtn-dl-all" id="scaleDlAll">↓ Descargar todas (JPG)</button>
+      <span id="scaleDlStatus"></span>
+    </div>
+
+  </div>
+
 </div>
 
 <div id="panelFirma" style="display:none;">
@@ -784,6 +873,7 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 
 <script>
 
+document.addEventListener('DOMContentLoaded', function() {
 (function() {
   'use strict';
 
@@ -1126,6 +1216,7 @@ body { font-family: 'Inter', system-ui, sans-serif; }
   applyRes();
 
 })();
+}); // DOMContentLoaded
 
 </script>
 
