@@ -216,7 +216,7 @@ button:disabled { opacity: .3; cursor: default; }
 }
 
 /* SCALE CORLIMA */
-#panelCorlima { display: none; }
+/* panelCorlima display controlado por JS */
 .corlima-gallery {
   display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 1rem;
   scrollbar-width: thin; scrollbar-color: var(--border2) var(--bg2);
@@ -933,7 +933,7 @@ function updateCorlimaWorkspace() {
     const { w, h } = getTargetRes();
     baseW = 1000;
     baseH = Math.round(1000 * (h / w));
-    
+    if (!cCanvas || !cWrap) return;
     cCanvas.width = baseW;
     cCanvas.height = baseH;
     cWrap.style.aspectRatio = `${baseW}/${baseH}`;
@@ -946,6 +946,7 @@ function updateCorlimaWorkspace() {
     drawCorlimaCanvas();
 }
 function drawCorlimaCanvas() {
+  if (!cCtx) return;
   if (corlimaActiveIndex < 0 || !corlimaImages[corlimaActiveIndex]) return;
   const data = corlimaImages[corlimaActiveIndex];
   
@@ -1745,11 +1746,16 @@ window.addEventListener('mousemove', e => {
 // ═══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
 
+  // Activar tab primero — antes de cualquier otra cosa
+  switchTab('corlima');
+
   // Scale Corlima: canvas
   cCanvas = document.getElementById('corlimaCanvas');
   if (cCanvas) {
     cCtx  = cCanvas.getContext('2d');
     cWrap = document.getElementById('corlimaCanvasWrap');
+    // Sincronizar canvas con la resolución seleccionada
+    updateCorlimaWorkspace();
   }
 
   // Scale Corlima: dropzone — registro DIRECTO
@@ -1795,7 +1801,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  switchTab('corlima');
+  // switchTab ya llamado al inicio
 });
 </script>
 </body>
