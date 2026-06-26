@@ -372,11 +372,21 @@
     font-weight: 400;
   }
 
+  .hero-sub em {
+    font-style: italic;
+    color: rgba(255,255,255,0.8);
+    font-weight: 300;
+  }
+
   .hero-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
   }
+  .tag--gfx  { color: #dc402a; border-color: rgba(220,64,42,0.3); background: rgba(220,64,42,0.07); }
+  .tag--web  { color: rgba(255,255,255,0.75); }
+  .tag--auto { color: #f5a623; border-color: rgba(245,166,35,0.3); background: rgba(245,166,35,0.07); }
+  .tag--dim  { color: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.06); font-size: 10px; letter-spacing: .08em; }
 
   .scroll-hint {
     position: absolute;
@@ -776,14 +786,13 @@
     <div class="hero-eyebrow">Diseño · Automatización</div>
     <h1 class="hero-title">DO<span class="s">S</span>A</h1>
     <p class="hero-sub">
-      Diseño gráfico, interfaces digitales<br>y automatización de procesos.
+      Convierto ideas en piezas que<br>se ven bien <em>y</em> funcionan mejor.
     </p>
     <div class="hero-tags">
-      <span class="tag">Diseño Gráfico</span>
-      <span class="tag">Diseño Web</span>
-      <span class="tag">UI · UX</span>
-      <span class="tag">Automatización</span>
-      <span class="tag">Interfaces</span>
+      <span class="tag tag--gfx">✦ Gráfico</span>
+      <span class="tag tag--web">Web &amp; UI</span>
+      <span class="tag tag--auto">⚡ Auto</span>
+      <span class="tag tag--dim">Madrid · Remoto</span>
     </div>
   </div>
 
