@@ -330,8 +330,11 @@ button:disabled { opacity: .3; cursor: default; }
 </head>
 <body>
 <script>
-if (!sessionStorage.getItem("disenoAccess")) { window.location.href = "index.html"; }
+if (!sessionStorage.getItem('disenoAccess')) {
+  window.location.href = 'index.html';
+}
 </script>
+
 <div class="wrap">
 
 <div class="header">
@@ -1506,7 +1509,7 @@ function switchTab(tab) {
   document.getElementById('tabFirma').classList.toggle('active',isFirma);
   document.getElementById('tabAuto').classList.toggle('active',isAuto);
 
-  // En herramientas_diseno: dropZone siempre visible
+  // En diseño: dropZone siempre visible
   document.getElementById('dropZone').style.display='block';
   const sharedControls=document.getElementById('sharedControls'); if(sharedControls) sharedControls.style.display='block';
 

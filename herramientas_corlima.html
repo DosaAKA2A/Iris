@@ -330,8 +330,11 @@ button:disabled { opacity: .3; cursor: default; }
 </head>
 <body>
 <script>
-if (!sessionStorage.getItem("corlimaAccess")) { window.location.href = "index.html"; }
+if (!sessionStorage.getItem('corlimaAccess')) {
+  window.location.href = 'index.html';
+}
 </script>
+
 <div class="wrap">
 
 <div class="header">
@@ -1484,7 +1487,7 @@ function reRender() {
   updatePalSwatches();
 }
 function switchTab(tab) {
-  corlimaUnlocked = true; // acceso garantizado por sesión del landing
+  // acceso garantizado por sesión del landing
   currentTab=tab;
   const isCorlima = tab === 'corlima';
   const isFirma = tab === 'firma';
@@ -1503,7 +1506,7 @@ function switchTab(tab) {
   document.getElementById('tabFirma').classList.toggle('active',isFirma);
   document.getElementById('tabAuto').classList.toggle('active',isAuto);
 
-  // En herramientas_corlima: dropZone solo para Scale Corlima
+  // dropZone solo en Scale Corlima
   document.getElementById('dropZone').style.display=isCorlima?'block':'none';
   const sharedControls=document.getElementById('sharedControls'); if(sharedControls) sharedControls.style.display=isCorlima?'block':'none';
 
@@ -2551,14 +2554,8 @@ async function firmaCopiar() {
 }
 
 // PASSWORD MODAL
-// corlimaUnlocked declarado arriba como true
+let corlimaUnlocked = true; // protección en el landing
 const CORLIMA_HASH = 'a2cf8e5a7d1b3f9c4e6d0821b5e3f7a9c1d4b6e8f2a5c7d9b3e1f4a8c6d2b0e';
-let corlimaUnlocked = true; // protección delegada al landing
-
-// Activar Scale Corlima al cargar
-document.addEventListener('DOMContentLoaded', function() {
-  switchTab('corlima');
-});
 
 async function hashStr(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
