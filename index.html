@@ -22,8 +22,19 @@
 
   html { scroll-behavior: smooth; }
 
-  body {
+  /* ── Frame centrado 1920px max — igual que Norvin / Corlima ── */
+  #site-frame {
+    max-width: 1920px;
+    width: 100%;
+    margin: 0 auto;
     background: var(--black);
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  body {
+    background: #000; /* negro fuera del frame */
     color: var(--white);
     font-family: 'Inter', system-ui, sans-serif;
     min-height: 100vh;
@@ -33,7 +44,9 @@
   /* NAV */
   nav {
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: max(0px, calc(50% - 960px));
+    right: max(0px, calc(50% - 960px));
     z-index: 100;
     display: flex;
     align-items: center;
@@ -363,6 +376,18 @@
   }
 
   /* Overlay gradiente igual que Norvin: oscuro en bordes, transparente al centro */
+  .hero-grain {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    mix-blend-mode: overlay;
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 1;
+  }
+
   .hero-banner-overlay {
     position: absolute;
     inset: 0;
@@ -789,6 +814,8 @@
 </head>
 <body>
 
+<div id="site-frame">
+
 <!-- NAV -->
 <nav>
 
@@ -862,6 +889,7 @@
     <!-- Placeholder: reemplazar src por tu imagen cuando esté lista -->
     <img class="hero-banner-img" id="heroBannerImg" src="hero_banner.jpg" alt="" aria-hidden="true">
     <div class="hero-banner-overlay"></div>
+    <img class="hero-grain" src="grain.jpg" alt="" aria-hidden="true">
   </div>
 
   <!-- CONTENIDO -->
@@ -1102,5 +1130,8 @@ function toggleMenu() {
   backdrop.classList.toggle('open', !isOpen);
 }
 </script>
+
+</div><!-- /site-frame -->
+
 </body>
 </html>
