@@ -52,6 +52,7 @@
     background: rgba(8,8,8,0.85);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
   }
 
   .nav-back {
@@ -64,96 +65,33 @@
     text-decoration: none;
     font-family: 'Inter', sans-serif;
     transition: color .2s;
-    padding: 8px 16px;
-    border-radius: 100px;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(15,15,15,0.85);
   }
-  .nav-back:hover { color: var(--white); border-color: rgba(255,255,255,0.25); }
+  .nav-back:hover { color: var(--white); }
   .nav-back svg { width: 14px; height: 14px; }
 
-  /* Logo pill — igual que index */
-  .nav-logo-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    text-decoration: none;
-  }
-  .nav-logo-pill {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 10px 20px 10px 14px;
-    border-radius: 100px;
-    background: rgba(12,12,12,0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.12);
-    transition: border-color .2s;
-  }
-  .nav-logo-pill:hover { border-color: rgba(255,255,255,0.25); }
-  .nav-logo-pill svg {
-    width: 24px; height: 24px;
-    background: #dc402a;
-    border-radius: 6px;
-    padding: 2px;
-  }
-  .nav-logo-pill svg rect { fill: transparent; }
-  .nav-logo-pill svg path { fill: #f5f5f5; }
-  .nav-wordmark {
+  .nav-logo {
     font-family: 'Clash Display', sans-serif;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 700;
-    letter-spacing: .12em;
+    letter-spacing: -.02em;
     color: var(--white);
-    text-transform: uppercase;
-  }
-
-  /* Botón descargar PDF */
-  .nav-dl-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 9px 18px;
-    border-radius: 100px;
-    border: 1px solid rgba(255,255,255,0.15);
-    background: rgba(15,15,15,0.85);
-    color: rgba(255,255,255,0.7);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: .06em;
-    font-family: 'Inter', sans-serif;
-    cursor: pointer;
     text-decoration: none;
-    transition: background .2s, border-color .2s, color .2s;
-    position: relative;
-    overflow: hidden;
   }
-  .nav-dl-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--white);
-    transform: translateY(100%);
-    transition: transform .28s cubic-bezier(0.4,0,0.2,1);
+  .nav-logo .s { color: var(--red); }
+
+  .nav-tag {
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
   }
-  .nav-dl-btn:hover { color: var(--black); border-color: var(--white); }
-  .nav-dl-btn:hover::before { transform: translateY(0); }
-  .nav-dl-btn span { position: relative; z-index: 1; }
-  .nav-dl-btn svg { position: relative; z-index: 1; width: 12px; height: 12px; }
 
   /* ── HERO HEADER ── */
   .cv-hero {
-    max-width: 1200px;
-    margin: 0 auto;
     padding: 140px 80px 80px;
+    border-bottom: 1px solid var(--border);
     animation: fadeUp .7s cubic-bezier(0.44,0,0.34,0.98) .1s both;
-  }
-  .cv-hero-divider {
-    max-width: 1200px;
-    margin: 0 auto 0;
-    border: none;
-    border-top: 1px solid var(--border);
   }
 
   .cv-hero-eyebrow {
@@ -214,7 +152,7 @@
   /* ── LAYOUT ── */
   .cv-body {
     display: grid;
-    grid-template-columns: 1fr 320px;
+    grid-template-columns: 1fr 340px;
     gap: 0;
     max-width: 1200px;
     margin: 0 auto;
@@ -287,8 +225,8 @@
 
   .cv-job-desc {
     font-size: 13px;
-    color: rgba(255,255,255,0.65);
-    line-height: 1.75;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.7;
     margin-bottom: 14px;
   }
 
@@ -302,8 +240,8 @@
     font-size: 9px;
     letter-spacing: .1em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.55);
-    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.4);
+    border: 1px solid var(--border);
     padding: 4px 10px;
     border-radius: 100px;
   }
@@ -343,9 +281,9 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid var(--border);
     font-size: 12px;
-    color: rgba(255,255,255,0.7);
+    color: rgba(255,255,255,0.6);
     letter-spacing: .02em;
   }
   .cv-skill-item:last-child { border-bottom: none; }
@@ -400,38 +338,10 @@
     margin-bottom: 6px;
   }
   .cv-project-desc {
-    font-size: 13px;
-    color: rgba(255,255,255,0.62);
-    line-height: 1.72;
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.65;
     margin-bottom: 10px;
-  }
-
-  /* ── BADGE DISPONIBILIDAD ── */
-  .cv-avail-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 6px 14px;
-    border-radius: 100px;
-    border: 1px solid rgba(63,185,80,0.4);
-    background: rgba(63,185,80,0.1);
-    color: #3fb950;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: .06em;
-    font-family: 'Inter', sans-serif;
-    margin-bottom: 36px;
-  }
-  .cv-avail-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #3fb950;
-    animation: pulse 2s ease-in-out infinite;
-    flex-shrink: 0;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: .5; transform: scale(.7); }
   }
 
   /* ── ANIMACIONES ── */
@@ -455,45 +365,20 @@
 
 <!-- NAV -->
 <nav>
-  <!-- Izquierda: volver -->
   <a class="nav-back" href="index.html">
     <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M8.5 2.5L4 7l4.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     Volver
   </a>
-
-  <!-- Centro: logo pill igual que index -->
-  <a class="nav-logo-center nav-logo-pill" href="index.html">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.98 19.98">
-      <rect width="19.98" height="19.98" fill="transparent"/>
-      <g fill="#f5f5f5">
-        <path d="M9.54,6.21c0,.99-.35,1.83-1.05,2.53s-1.54,1.05-2.53,1.05-1.83-.35-2.53-1.05-1.05-1.54-1.05-2.53.35-1.83,1.05-2.53,1.54-1.05,2.53-1.05h1.01v-.53h2.56v4.1ZM7.5,5.95c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.13-.91.38-.38.55-.38.91.12.65.38.9.55.38.91.38.65-.12.9-.38.38-.55.38-.9Z"/>
-        <path d="M17.4,5.95c0,1.06-.38,1.96-1.12,2.71s-1.65,1.12-2.71,1.12-1.97-.38-2.72-1.12-1.12-1.65-1.12-2.71.38-1.96,1.13-2.72,1.66-1.13,2.72-1.13,1.96.38,2.71,1.12,1.12,1.66,1.12,2.72ZM14.84,5.95c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.13-.91.38-.38.55-.38.91.12.65.38.9.55.38.91.38.65-.12.9-.38.38-.55.38-.9Z"/>
-        <path d="M9.96,12.76h-1.17c-.36,0-.66.12-.91.38s-.38.55-.38.9c0,1.06-.38,1.96-1.12,2.71s-1.66,1.12-2.72,1.12h-1.17v-2.55h1.17c.36,0,.66-.12.91-.38s.38-.55.38-.9c0-1.06.38-1.96,1.12-2.71s1.66-1.12,2.72-1.12h1.17v2.56Z"/>
-        <path d="M17.61,17.79h-2.56v-3.63c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.12-.9.38-.38.55-.38.91v3.63h-2.56v-3.63c0-1.06.38-1.97,1.12-2.72s1.65-1.12,2.71-1.12,1.96.38,2.71,1.12,1.12,1.66,1.12,2.72v3.63ZM14.3,17.27c0,.14-.05.27-.16.37s-.23.15-.38.15-.27-.05-.37-.15-.16-.22-.16-.37.05-.27.16-.37.23-.16.37-.16.27.05.38.16.16.23.16.37Z"/>
-      </g>
-    </svg>
-    <span class="nav-wordmark">DOSA</span>
-  </a>
-
-  <!-- Derecha: descargar PDF -->
-  <button class="nav-dl-btn" onclick="downloadCV()">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <span>Descargar CV</span>
-  </button>
+  <a class="nav-logo" href="index.html">DO<span class="s">S</span>A</a>
+  <span class="nav-tag">Perfil</span>
 </nav>
 
 <!-- HERO HEADER -->
 <div class="cv-hero">
   <div class="cv-hero-eyebrow">Perfil profesional · Madrid, España</div>
   <h1 class="cv-hero-name">Eduardo<br>En<span class="s">r</span>ico</h1>
-  <div class="cv-avail-badge">
-    <span class="cv-avail-dot"></span>
-    Disponibilidad inmediata
-  </div>
   <div class="cv-hero-meta">
     <p class="cv-hero-role">
       Diseñador digital y gestor de e-commerce con perfil híbrido creativo-técnico.<br>
@@ -515,7 +400,6 @@
     </div>
   </div>
 </div>
-<hr class="cv-hero-divider">
 
 <!-- BODY -->
 <div class="cv-body">
@@ -584,41 +468,35 @@
 
       <div class="cv-project">
         <div class="cv-project-title">Contenido & Campañas Corlima</div>
-        <p class="cv-project-desc">Estrategia y producción de contenido multiplataforma para Instagram, Facebook y WhatsApp, con enfoque en conversión. Desarrollo de un modelo de comunicación de doble variante —aspiracional y de urgencia— aplicado de forma consistente a líneas de producto como Luminarc, KitchenAid y FTA Robust, siempre con la identidad de marca como eje.</p>
+        <p class="cv-project-desc">Producción de contenido para Instagram, Facebook y WhatsApp con modelo de doble variante (aspiracional + urgencia). Prompts de fotografía de producto en Adobe Firefly para vidrio y cristalería con efectos de transparencia y refracción realista.</p>
         <div class="cv-tags">
           <span class="cv-tag">Meta Ads</span>
+          <span class="cv-tag">Adobe Firefly</span>
           <span class="cv-tag">Copywriting</span>
           <span class="cv-tag">Social Media</span>
-          <span class="cv-tag">Adobe Firefly</span>
-          <span class="cv-tag">Estrategia de contenido</span>
         </div>
       </div>
-    </div>
 
       <div class="cv-project">
-        <div class="cv-project-title">Proyecto Aurora — Iris Studio</div>
-        <p class="cv-project-desc">Servidor de videojuegos desarrollado de forma colaborativa por el equipo de Iris Studio, colectivo creativo del que formo parte. Mi rol se centró en el crecimiento y la retención de la comunidad: definición de estrategia de paid media, gestión de campañas orientadas a captación, dinamización activa en redes sociales y diseño de mecánicas de engagement que impulsaron la participación continua de los usuarios.</p>
+        <div class="cv-project-title">Catálogo Interactivo Luminarc</div>
+        <p class="cv-project-desc">Editor de catálogo de productos para Corlima, con colecciones Diwali, Carine y Lotusia. Interfaz de navegación y edición de fichas técnicas integrada en el ecosistema de herramientas internas.</p>
         <div class="cv-tags">
-          <span class="cv-tag">Paid Media</span>
-          <span class="cv-tag">Community Management</span>
-          <span class="cv-tag">Redes Sociales</span>
-          <span class="cv-tag">Engagement</span>
-          <span class="cv-tag">Iris Studio</span>
+          <span class="cv-tag">E-commerce</span>
+          <span class="cv-tag">Luminarc</span>
+          <span class="cv-tag">Catálogo digital</span>
         </div>
       </div>
 
       <div class="cv-project">
         <div class="cv-project-title">DOSA Tools</div>
-        <p class="cv-project-desc">Proyecto personal de diseño y automatización orientado al e-commerce. Una plataforma web desarrollada desde cero que centraliza flujos operativos complejos —desde la gestión de catálogos y la generación de documentos hasta el procesamiento masivo de imágenes— reduciendo tiempos de producción y eliminando errores manuales en entornos de venta digital.</p>
+        <p class="cv-project-desc">Suite de herramientas web bajo marca propia. Incluye Scale Corlima (reescalado de imágenes para e-commerce), Firma Corlima, Carga Masiva para PrestaShop, y una sección de Filtros con efectos Dreamy Blur y CRT Machine sobre imágenes. Desarrollado en HTML/CSS/JS vanilla y desplegado en GitHub Pages.</p>
         <div class="cv-tags">
-          <span class="cv-tag">Diseño web</span>
-          <span class="cv-tag">Automatización</span>
-          <span class="cv-tag">E-commerce</span>
           <span class="cv-tag">JavaScript</span>
-          <span class="cv-tag">HTML / CSS</span>
+          <span class="cv-tag">Canvas API</span>
+          <span class="cv-tag">HTML/CSS</span>
+          <span class="cv-tag">GitHub Pages</span>
         </div>
       </div>
-
     </div>
 
     <!-- ESTUDIOS -->
@@ -675,28 +553,24 @@
       </div>
     </div>
 
-    <!-- CONTACTO -->
+    <!-- DISPONIBILIDAD -->
     <div class="cv-section" style="animation-delay:.4s">
-      <div class="cv-section-label">Contacto</div>
+      <div class="cv-section-label">Disponibilidad</div>
       <div class="cv-avail-item">
-        <span class="cv-avail-label">Email</span>
-        <a href="mailto:hatred.aka2a@gmail.com" class="cv-avail-value" style="color:rgba(255,255,255,0.6);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">hatred.aka2a@gmail.com</a>
-      </div>
-      <div class="cv-avail-item">
-        <span class="cv-avail-label">Teléfono</span>
-        <a href="tel:+34635923470" class="cv-avail-value" style="color:rgba(255,255,255,0.6);text-decoration:none;">+34 635 923 470</a>
-      </div>
-      <div class="cv-avail-item">
-        <span class="cv-avail-label">Ubicación</span>
-        <span class="cv-avail-value">Madrid, España · 28037</span>
+        <span class="cv-avail-label">Situación</span>
+        <span class="cv-avail-value">Búsqueda activa</span>
       </div>
       <div class="cv-avail-item">
         <span class="cv-avail-label">Viajes</span>
         <span class="cv-avail-value">Buena disponibilidad</span>
       </div>
       <div class="cv-avail-item">
-        <span class="cv-avail-label">Residencia</span>
-        <span class="cv-avail-value">Depende de condiciones</span>
+        <span class="cv-avail-label">Cambio de residencia</span>
+        <span class="cv-avail-value">Depende de las condiciones</span>
+      </div>
+      <div class="cv-avail-item">
+        <span class="cv-avail-label">Ubicación actual</span>
+        <span class="cv-avail-value">Madrid, España</span>
       </div>
     </div>
 
@@ -705,45 +579,5 @@
 </div><!-- /cv-body -->
 
 </div><!-- /site-frame -->
-<script>
-function downloadCV() {
-  window.print();
-}
-</script>
-
-<style media="print">
-  @page { margin: 20mm; size: A4; }
-  nav, .nav-dl-btn { display: none !important; }
-  body, #site-frame, .cv-hero, .cv-body, .cv-main, .cv-side {
-    background: #fff !important;
-    color: #111 !important;
-  }
-  .cv-hero-name, .cv-job-title, .cv-edu-degree, .cv-project-title, .cv-skill-item {
-    color: #111 !important;
-  }
-  .cv-hero-eyebrow, .cv-section-label, .cv-job-period, .cv-edu-period,
-  .cv-job-company, .cv-avail-label, .cv-lang-level {
-    color: #555 !important;
-  }
-  .cv-job-desc, .cv-project-desc, .cv-hero-role, .cv-contact-item,
-  .cv-avail-value, .cv-lang-name {
-    color: #333 !important;
-  }
-  .cv-job-company, .cv-edu-school { color: #c0392b !important; }
-  .cv-tag {
-    border-color: #ccc !important;
-    color: #444 !important;
-  }
-  .cv-section, .cv-hero-divider, .cv-main, .cv-skill-item, .cv-lang,
-  .cv-avail-item, .cv-project { border-color: #ddd !important; }
-  .cv-hero { padding-top: 20px !important; }
-  .cv-avail-badge { border-color: #27ae60 !important; color: #27ae60 !important; }
-  .cv-avail-dot { background: #27ae60 !important; }
-  .cv-hero-contacts { display: none !important; }
-  a { color: inherit !important; text-decoration: none !important; }
-  .cv-section-label::after { background: #ddd !important; }
-  .cv-skill-dot { background: #c0392b !important; }
-</style>
-
 </body>
 </html>
