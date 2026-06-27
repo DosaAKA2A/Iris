@@ -390,7 +390,7 @@ button:disabled { opacity: .3; cursor: default; }
   <button type="button" class="tab active" id="tabDither" onclick="switchTab('dither')">Pixel Dither</button>
   <button type="button" class="tab" id="tabAscii" onclick="switchTab('ascii')">ASCII</button>
   <button type="button" class="tab" id="tabDosa" onclick="switchTab('dosa')">Pruebas Dosa</button>
-  <button type="button" class="tab" id="tabDreamy" onclick="switchTab('dreamy')">Dreamy Blur</button>
+  <button type="button" class="tab" id="tabFiltros" onclick="switchTab('filtros')">Filtros</button>
 </div>
 
 <div id="panelDither">
@@ -615,8 +615,16 @@ button:disabled { opacity: .3; cursor: default; }
   <div class="status" id="dosaStatus" style="margin-top:-4px;margin-bottom:12px;"></div>
 </div>
 
-<!-- ══════════════ DREAMY BLUR ══════════════ -->
-<div id="panelDreamy" style="display:none">
+<!-- ══════════════ FILTROS ══════════════ -->
+<div id="panelFiltros" style="display:none">
+
+  <!-- Sub-selector de filtro -->
+  <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:14px;">
+    <button type="button" class="small-btn active" id="filtroTabDreamy" onclick="switchFiltro('dreamy')">Dreamy Blur</button>
+  </div>
+
+  <!-- Panel Dreamy Blur -->
+  <div id="filtrosDreamy">
 
   <div class="sec">Imagen</div>
   <div class="drop-zone" id="dreamyDrop" style="cursor:pointer;">
@@ -701,7 +709,9 @@ button:disabled { opacity: .3; cursor: default; }
     "></div>
   </div>
 
-</div>
+  </div><!-- /filtrosDreamy -->
+
+</div><!-- /panelFiltros -->
 
 <div id="panelCorlima">
   <div class="sec">Subir Imágenes (Máx 10)</div>
@@ -1602,26 +1612,26 @@ function reRender() {
 }
 function switchTab(tab) {
   currentTab = tab;
-  const isDither = tab === 'dither';
-  const isAscii  = tab === 'ascii';
-  const isDosa   = tab === 'dosa';
+  const isDither  = tab === 'dither';
+  const isAscii   = tab === 'ascii';
+  const isDosa    = tab === 'dosa';
+  const isFiltros = tab === 'filtros';
 
-  document.getElementById('panelDither').style.display  = isDither  ? 'block' : 'none';
-  document.getElementById('panelAscii').style.display   = isAscii   ? 'block' : 'none';
-  document.getElementById('panelDosa').style.display    = isDosa    ? 'block' : 'none';
-  document.getElementById('panelDreamy').style.display  = (tab === 'dreamy') ? 'block' : 'none';
-  const tabDreamy = document.getElementById('tabDreamy');
-  if (tabDreamy) tabDreamy.classList.toggle('active', tab === 'dreamy');
+  document.getElementById('panelDither').style.display   = isDither  ? 'block' : 'none';
+  document.getElementById('panelAscii').style.display    = isAscii   ? 'block' : 'none';
+  document.getElementById('panelDosa').style.display     = isDosa    ? 'block' : 'none';
+  document.getElementById('panelFiltros').style.display  = isFiltros ? 'block' : 'none';
 
   document.getElementById('tabDither').classList.toggle('active', isDither);
   document.getElementById('tabAscii').classList.toggle('active', isAscii);
   document.getElementById('tabDosa').classList.toggle('active', isDosa);
+  document.getElementById('tabFiltros').classList.toggle('active', isFiltros);
 
-  // dropZone y controles siempre visibles en herramientas de diseño
+  // Ocultar uploader global en Filtros (tiene su propio uploader por imagen)
   const dz = document.getElementById('dropZone');
-  if (dz) dz.style.display = 'block';
+  if (dz) dz.style.display = isFiltros ? 'none' : 'block';
   const sc = document.getElementById('sharedControls');
-  if (sc) sc.style.display = 'block';
+  if (sc) sc.style.display = isFiltros ? 'none' : 'block';
 
   const gea = document.getElementById('globalExportArea');
   const br  = document.getElementById('btnRow');
@@ -2719,6 +2729,17 @@ function togglePwdVisibility() {
   }
 }
 
+// ══════════════ FILTROS: sub-navegación ══════════════
+function switchFiltro(filtro) {
+  const panels = { dreamy: 'filtrosDreamy' };
+  const btns   = { dreamy: 'filtroTabDreamy' };
+  Object.keys(panels).forEach(k => {
+    const p = document.getElementById(panels[k]);
+    const b = document.getElementById(btns[k]);
+    if (p) p.style.display = k === filtro ? 'block' : 'none';
+    if (b) b.classList.toggle('active', k === filtro);
+  });
+}
 
 // ══════════════ DREAMY BLUR ENGINE ══════════════
 (function () {
