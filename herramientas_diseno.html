@@ -3152,16 +3152,19 @@ document.addEventListener('DOMContentLoaded', function() {
 (function () {
   'use strict';
 
-  let srcImg   = null;
+  let srcImg    = null;
   let crtFocalX = 0.5;
   let crtFocalY = 0.5;
   let crtMode   = 'radial';
+  let glitchSeed = Math.random() * 10000 | 0;
 
   const canvas = document.getElementById('crtCanvas');
   const dot    = document.getElementById('crtFocalDot');
   const wrap   = document.getElementById('crtWrap');
 
-  if (!canvas) { console.error('[CRT] canvas not found'); return; }
+  if (!canvas) { console.error('[CRT] crtCanvas not found'); return; }
+
+  const ctx = canvas.getContext('2d');
 
   const sl = {
     shift    : document.getElementById('crtShift'),
@@ -3199,54 +3202,48 @@ document.addEventListener('DOMContentLoaded', function() {
     render();
   };
 
-  // ── Máscara de intensidad ────────────────────────
+  // ── Máscara focal ────────────────────────────────
   function buildCrtMask(W, H) {
-    const mask   = new Float32Array(W * H);
-    const cx     = crtFocalX * W;
-    const cy     = crtFocalY * H;
-    const radius = parseInt(sl.radius.value) / 100;
-    const diag   = Math.sqrt(W * W + H * H);
-    const inner  = radius * diag * 0.5;
-    const outer  = diag * 0.5;
+    const mask  = new Float32Array(W * H);
+    const cx    = crtFocalX * W;
+    const cy    = crtFocalY * H;
+    const r     = parseInt(sl.radius.value) / 100;
+    const diag  = Math.sqrt(W * W + H * H);
+    const inner = r * diag * 0.5;
+    const outer = diag * 0.5;
 
     if (crtMode === 'radial') {
       for (let y = 0; y < H; y++) {
         for (let x = 0; x < W; x++) {
           const dx = x - cx, dy = y - cy;
-          mask[y * W + x] = Math.min(1, Math.max(0, (Math.sqrt(dx*dx + dy*dy) - inner) / (outer - inner)));
+          mask[y * W + x] = Math.min(1, Math.max(0,
+            (Math.sqrt(dx*dx + dy*dy) - inner) / (outer - inner)));
         }
       }
     } else {
       const angle = (parseInt(sl.angle.value) - 90) * Math.PI / 180;
-      const nx    = Math.cos(angle);
-      const ny    = Math.sin(angle);
+      const nx = Math.cos(angle), ny = Math.sin(angle);
       const proj0 = nx * cx + ny * cy;
       const maxP  = diag;
       for (let y = 0; y < H; y++) {
         for (let x = 0; x < W; x++) {
           const d = (nx * x + ny * y) - proj0;
-          mask[y * W + x] = Math.min(1, Math.max(0, (d - inner * 0.3) / (maxP * 0.6)));
+          mask[y * W + x] = Math.min(1, Math.max(0,
+            (d - inner * 0.3) / (maxP * 0.6)));
         }
       }
     }
     return mask;
   }
 
-  // Semilla fija por sesión para que el glitch no cambie al mover sliders
-  let glitchSeed = Math.random() * 10000 | 0;
-
+  // ── LCG semilla ──────────────────────────────────
   function seededRand(s) {
-    // LCG rápido — determinista para la misma semilla
-    let x = Math.sin(s) * 43758.5453123;
+    const x = Math.sin(s) * 43758.5453123;
     return x - Math.floor(x);
   }
 
-  function renderToCanvas(target) {
-    const tctx = target.getContext('2d');
-    const W = srcImg.naturalWidth;
-    const H = srcImg.naturalHeight;
-    target.width = W; target.height = H;
-
+  // ── Render sobre cualquier canvas ────────────────
+  function renderToCtx(tctx, W, H) {
     const shift     = parseInt(sl.shift.value);
     const scan      = parseInt(sl.scan.value)     / 100;
     const scanDens  = parseInt(sl.scanDens.value);
@@ -3257,14 +3254,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const con       = parseInt(sl.con.value)      / 100;
     const vig       = parseInt(sl.vig.value)      / 100;
 
-    // ── A: imagen base limpia (para mezcla con máscara) ──
+    // A: imagen limpia
     const offClean = document.createElement('canvas');
     offClean.width = W; offClean.height = H;
     const ctxClean = offClean.getContext('2d');
     ctxClean.drawImage(srcImg, 0, 0, W, H);
     const cleanData = ctxClean.getImageData(0, 0, W, H);
 
-    // ── A2: imagen base con filtros CSS ───────────
+    // A2: imagen con sat+contraste
     const offBase = document.createElement('canvas');
     offBase.width = W; offBase.height = H;
     const ctxB = offBase.getContext('2d');
@@ -3273,73 +3270,54 @@ document.addEventListener('DOMContentLoaded', function() {
     ctxB.filter = 'none';
     const base = ctxB.getImageData(0, 0, W, H);
 
-    // ── B: construir mapa de desplazamiento de bloques ──
-    // Cada fila puede pertenecer a un bloque desplazado
+    // B: mapa de desplazamiento de bloques
     const rowOffset = new Int32Array(H);
-    let y = 0;
-    let blockIdx = 0;
+    let y = 0, blockIdx = 0;
     while (y < H) {
-      // Altura del bloque: 2..20px, aleatoria pero determinista
-      const blockH = 2 + (seededRand(glitchSeed + blockIdx * 7.1) * 18 | 0);
-      // ¿Este bloque se desplaza?
+      const blockH    = 2 + (seededRand(glitchSeed + blockIdx * 7.1) * 18 | 0);
       const willGlitch = seededRand(glitchSeed + blockIdx * 3.3) < glitchPct;
-      const offset = willGlitch
+      const offset    = willGlitch
         ? ((seededRand(glitchSeed + blockIdx * 5.7) - 0.5) * 2 * glitchAmp) | 0
         : 0;
-      for (let i = y; i < Math.min(y + blockH, H); i++) {
-        rowOffset[i] = offset;
-      }
-      y += blockH;
-      blockIdx++;
+      for (let i = y; i < Math.min(y + blockH, H); i++) rowOffset[i] = offset;
+      y += blockH; blockIdx++;
     }
 
-    // ── C: RGB split + desplazamiento de bloques ─────
+    // C: RGB split + glitch bloques
     const out = tctx.createImageData(W, H);
-
     for (let row = 0; row < H; row++) {
       const dx = rowOffset[row];
       for (let x = 0; x < W; x++) {
-        const i = (row * W + x) * 4;
-
-        // Canal R: shift derecha + desplazamiento bloque
-        const xR = Math.min(W - 1, Math.max(0, x + shift + dx));
-        // Canal G: solo desplazamiento bloque
-        const xG = Math.min(W - 1, Math.max(0, x + dx));
-        // Canal B: shift izquierda + desplazamiento bloque
-        const xB = Math.min(W - 1, Math.max(0, x - shift + dx));
-
-        const iR = (row * W + xR) * 4;
-        const iG = (row * W + xG) * 4;
-        const iB = (row * W + xB) * 4;
-
-        out.data[i    ] = base.data[iR    ];
-        out.data[i + 1] = base.data[iG + 1];
-        out.data[i + 2] = base.data[iB + 2];
+        const i  = (row * W + x) * 4;
+        const xR = Math.min(W-1, Math.max(0, x + shift + dx));
+        const xG = Math.min(W-1, Math.max(0, x + dx));
+        const xB = Math.min(W-1, Math.max(0, x - shift + dx));
+        out.data[i    ] = base.data[(row * W + xR) * 4    ];
+        out.data[i + 1] = base.data[(row * W + xG) * 4 + 1];
+        out.data[i + 2] = base.data[(row * W + xB) * 4 + 2];
         out.data[i + 3] = 255;
       }
     }
-    // ── C2: mezcla con máscara focal ─────────────
-    const mask = buildCrtMask(W, H);
+
+    // C2: mezcla con máscara focal
+    const mask  = buildCrtMask(W, H);
     const mixed = tctx.createImageData(W, H);
     for (let i = 0; i < W * H; i++) {
-      const t = mask[i];
-      const p = i * 4;
-      mixed.data[p    ] = cleanData.data[p    ] * (1 - t) + out.data[p    ] * t;
-      mixed.data[p + 1] = cleanData.data[p + 1] * (1 - t) + out.data[p + 1] * t;
-      mixed.data[p + 2] = cleanData.data[p + 2] * (1 - t) + out.data[p + 2] * t;
+      const t = mask[i], p = i * 4;
+      mixed.data[p    ] = cleanData.data[p    ] * (1-t) + out.data[p    ] * t;
+      mixed.data[p + 1] = cleanData.data[p + 1] * (1-t) + out.data[p + 1] * t;
+      mixed.data[p + 2] = cleanData.data[p + 2] * (1-t) + out.data[p + 2] * t;
       mixed.data[p + 3] = 255;
     }
     tctx.putImageData(mixed, 0, 0);
 
-    // ── D: scanlines ─────────────────────────────────
+    // D: scanlines
     if (scan > 0) {
       tctx.save();
       for (let row = 0; row < H; row += scanDens + 1) {
-        // Línea oscura
         tctx.globalAlpha = scan * 0.55;
         tctx.fillStyle   = '#000000';
         tctx.fillRect(0, row, W, 1);
-        // Línea de brillo tenue entre scanlines (efecto fósforo)
         if (scanDens >= 2) {
           tctx.globalAlpha = scan * 0.04;
           tctx.fillStyle   = '#ffffff';
@@ -3349,21 +3327,18 @@ document.addEventListener('DOMContentLoaded', function() {
       tctx.restore();
     }
 
-    // ── E: grain de alta frecuencia ──────────────────
+    // E: grain
     if (grain > 0) {
-      // Renderizar grain en canvas offscreen y componerlo con drawImage (overlay)
       const grainOff = document.createElement('canvas');
       grainOff.width = W; grainOff.height = H;
       const gctx = grainOff.getContext('2d');
-      const grainData = gtctx.createImageData(W, H);
+      const grainData = gctx.createImageData(W, H);
       for (let i = 0; i < W * H * 4; i += 4) {
         const n = (Math.random() * 255 * grain) | 0;
-        grainData.data[i    ] = n;
-        grainData.data[i + 1] = n;
-        grainData.data[i + 2] = n;
-        grainData.data[i + 3] = (grain * 180) | 0;
+        grainData.data[i] = grainData.data[i+1] = grainData.data[i+2] = n;
+        grainData.data[i+3] = (grain * 180) | 0;
       }
-      gtctx.putImageData(grainData, 0, 0);
+      gctx.putImageData(grainData, 0, 0);
       tctx.save();
       tctx.globalCompositeOperation = 'overlay';
       tctx.globalAlpha = grain * 0.5;
@@ -3371,28 +3346,30 @@ document.addEventListener('DOMContentLoaded', function() {
       tctx.restore();
     }
 
-    // ── F: vignette fuerte en esquinas ───────────────
+    // F: vignette
     if (vig > 0) {
       const grad = tctx.createRadialGradient(
-        W / 2, H / 2, Math.min(W, H) * 0.25,
-        W / 2, H / 2, Math.max(W, H) * 0.85
+        W/2, H/2, Math.min(W,H) * 0.25,
+        W/2, H/2, Math.max(W,H) * 0.85
       );
       grad.addColorStop(0, 'rgba(0,0,0,0)');
       grad.addColorStop(1, `rgba(0,0,0,${vig * 0.85})`);
       tctx.fillStyle = grad;
       tctx.fillRect(0, 0, W, H);
     }
-
   }
 
   function render() {
     if (!srcImg) return;
-    renderToCanvas(canvas);
+    const W = srcImg.naturalWidth;
+    const H = srcImg.naturalHeight;
+    canvas.width = W; canvas.height = H;
+    renderToCtx(ctx, W, H);
     canvas.style.display = 'block';
     updateCrtDot();
   }
 
-  // ── Punto focal ──────────────────────────────────
+  // ── Dot focal ────────────────────────────────────
   function updateCrtDot() {
     if (!srcImg) return;
     const rect  = canvas.getBoundingClientRect();
@@ -3409,68 +3386,54 @@ document.addEventListener('DOMContentLoaded', function() {
     crtFocalY = (e.clientY - rect.top)  / rect.height;
     render();
   });
-
-  let draggingCrtFocal = false;
-  canvas.addEventListener('mousedown', () => { draggingCrtFocal = true; });
-  window.addEventListener('mouseup',   () => { draggingCrtFocal = false; });
+  let dragging = false;
+  canvas.addEventListener('mousedown', () => { dragging = true; });
+  window.addEventListener('mouseup',   () => { dragging = false; });
   canvas.addEventListener('mousemove', e => {
-    if (!draggingCrtFocal || !srcImg) return;
+    if (!dragging || !srcImg) return;
     const rect = canvas.getBoundingClientRect();
     crtFocalX = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
     crtFocalY = Math.min(1, Math.max(0, (e.clientY - rect.top)  / rect.height));
     render();
   });
-
-  // ── Imagen desde uploader compartido ────────────
-  window.filtrosHooks = window.filtrosHooks || [];
-  window.filtrosHooks.push(function(img) {
-    srcImg = img;
-    glitchSeed = Math.random() * 10000 | 0;
-    // Renderizar siempre; si el panel está oculto el canvas queda listo
-    // y se mostrará cuando switchFiltro active el panel
-    render();
-  });
-
-  // Re-renderizar cuando se activa el tab CRT (imagen ya podría estar cargada)
-  window.crtOnActivate = function() {
-    if (srcImg) render();
-  };
-
-  // ── Sliders ───────────────────────────────────────
-  Object.keys(sl).forEach(k => {
-    sl[k].addEventListener('input', () => {
-      lb[k].textContent = sl[k].value;
-      render();
-    });
-  });
-
-  // Botón regenerar glitch (nueva semilla)
-  // Se activa también al hacer doble clic en el canvas
   canvas.addEventListener('dblclick', () => {
     glitchSeed = Math.random() * 10000 | 0;
     render();
   });
 
-  // ── Descarga ──────────────────────────────────────
+  // ── Imagen compartida ────────────────────────────
+  window.filtrosHooks = window.filtrosHooks || [];
+  window.filtrosHooks.push(function(img) {
+    srcImg = img;
+    glitchSeed = Math.random() * 10000 | 0;
+    render();
+  });
+  window.crtOnActivate = function() { if (srcImg) render(); };
+
+  // ── Sliders ──────────────────────────────────────
+  Object.keys(sl).forEach(k => {
+    sl[k].addEventListener('input', () => { lb[k].textContent = sl[k].value; render(); });
+  });
+
+  // ── Descarga ─────────────────────────────────────
   document.getElementById('crtDl').addEventListener('click', () => {
     if (!srcImg) return;
+    const W = srcImg.naturalWidth, H = srcImg.naturalHeight;
     const off = document.createElement('canvas');
-    renderToCanvas(off);
+    off.width = W; off.height = H;
+    renderToCtx(off.getContext('2d'), W, H);
     const a = document.createElement('a');
     a.href = off.toDataURL('image/png');
     a.download = 'dosa_crt.png';
     a.click();
   });
 
-  // ── Reset ─────────────────────────────────────────
+  // ── Reset ────────────────────────────────────────
   const defaults = { shift:6, scan:80, scanDens:2, glitch:40, glitchAmp:18, grain:35, sat:160, con:120, vig:70, radius:20, angle:0 };
   document.getElementById('crtReset').addEventListener('click', () => {
-    Object.keys(defaults).forEach(k => {
-      sl[k].value = defaults[k];
-      lb[k].textContent = defaults[k];
-    });
+    Object.keys(defaults).forEach(k => { sl[k].value = defaults[k]; lb[k].textContent = defaults[k]; });
     crtFocalX = 0.5; crtFocalY = 0.5;
-    crtMode   = 'radial';
+    crtMode = 'radial';
     window.crtSetMode('radial');
     glitchSeed = Math.random() * 10000 | 0;
     render();
