@@ -621,6 +621,7 @@ button:disabled { opacity: .3; cursor: default; }
   <!-- Sub-selector de filtro -->
   <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:14px;">
     <button type="button" class="small-btn active" id="filtroTabDreamy" onclick="switchFiltro('dreamy')">Dreamy Blur</button>
+    <button type="button" class="small-btn" id="filtroTabCrt" onclick="switchFiltro('crt')">CRT Machine</button>
   </div>
 
   <!-- Panel Dreamy Blur -->
@@ -710,6 +711,77 @@ button:disabled { opacity: .3; cursor: default; }
   </div>
 
   </div><!-- /filtrosDreamy -->
+
+  <!-- ── CRT MACHINE ── -->
+  <div id="filtrosCrt" style="display:none">
+
+    <div class="sec">Imagen</div>
+    <div class="drop-zone" id="crtDrop" style="cursor:pointer;">
+      <div class="drop-icon">&#8593;</div>
+      <div class="drop-main">Arrastra una imagen o haz clic</div>
+      <input type="file" id="crtFile" accept="image/*" style="display:none">
+    </div>
+
+    <div class="sec" style="margin-top:18px;">Efecto</div>
+    <div class="controls">
+
+      <div class="ctrl">
+        <div class="ctrl-lbl">RGB Split &nbsp;<span id="crtShiftVal">6</span>px</div>
+        <input type="range" id="crtShift" min="0" max="30" value="6">
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-lbl">Scanlines &nbsp;<span id="crtScanVal">80</span>%</div>
+        <input type="range" id="crtScan" min="0" max="100" value="80">
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-lbl">Densidad scanlines &nbsp;<span id="crtScanDensVal">2</span>px</div>
+        <input type="range" id="crtScanDens" min="1" max="6" value="2">
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-lbl">Glitch bloques &nbsp;<span id="crtGlitchVal">40</span>%</div>
+        <input type="range" id="crtGlitch" min="0" max="100" value="40">
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-lbl">Desplaz. máx. bloque &nbsp;<span id="crtGlitchAmpVal">18</span>px</div>
+        <input type="range" id="crtGlitchAmp" min="0" max="60" value="18">
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-lbl">Grain &nbsp;<span id="crtGrainVal">35</span>%</div>
+        <input type="range" id="crtGrain" min="0" max="100" value="35">
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-lbl">Saturación &nbsp;<span id="crtSatVal">160</span>%</div>
+        <input type="range" id="crtSat" min="80" max="300" value="160">
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-lbl">Contraste &nbsp;<span id="crtConVal">120</span>%</div>
+        <input type="range" id="crtCon" min="80" max="220" value="120">
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-lbl">Vignette &nbsp;<span id="crtVigVal">70</span>%</div>
+        <input type="range" id="crtVig" min="0" max="100" value="70">
+      </div>
+
+    </div>
+
+    <div class="btn-row" style="margin-top:8px;">
+      <button class="small-btn accent" id="crtDl">&#8595; Descargar PNG</button>
+      <button class="small-btn" id="crtReset">Resetear</button>
+    </div>
+
+    <div style="margin-top:16px; position:relative; display:inline-block; max-width:100%;">
+      <canvas id="crtCanvas" style="max-width:100%; border-radius:6px; display:none;"></canvas>
+    </div>
+
+  </div><!-- /filtrosCrt -->
 
 </div><!-- /panelFiltros -->
 
@@ -2731,8 +2803,8 @@ function togglePwdVisibility() {
 
 // ══════════════ FILTROS: sub-navegación ══════════════
 function switchFiltro(filtro) {
-  const panels = { dreamy: 'filtrosDreamy' };
-  const btns   = { dreamy: 'filtroTabDreamy' };
+  const panels = { dreamy: 'filtrosDreamy', crt: 'filtrosCrt' };
+  const btns   = { dreamy: 'filtroTabDreamy', crt: 'filtroTabCrt' };
   Object.keys(panels).forEach(k => {
     const p = document.getElementById(panels[k]);
     const b = document.getElementById(btns[k]);
@@ -3009,6 +3081,232 @@ function switchFiltro(filtro) {
 
 })();
 // ══════════════ FIN DREAMY BLUR ══════════════
+
+// ══════════════ CRT MACHINE ENGINE ══════════════
+(function () {
+  'use strict';
+
+  let srcImg = null;
+
+  const canvas = document.getElementById('crtCanvas');
+  const ctx    = canvas.getContext('2d');
+
+  const sl = {
+    shift    : document.getElementById('crtShift'),
+    scan     : document.getElementById('crtScan'),
+    scanDens : document.getElementById('crtScanDens'),
+    glitch   : document.getElementById('crtGlitch'),
+    glitchAmp: document.getElementById('crtGlitchAmp'),
+    grain    : document.getElementById('crtGrain'),
+    sat      : document.getElementById('crtSat'),
+    con      : document.getElementById('crtCon'),
+    vig      : document.getElementById('crtVig'),
+  };
+  const lb = {
+    shift    : document.getElementById('crtShiftVal'),
+    scan     : document.getElementById('crtScanVal'),
+    scanDens : document.getElementById('crtScanDensVal'),
+    glitch   : document.getElementById('crtGlitchVal'),
+    glitchAmp: document.getElementById('crtGlitchAmpVal'),
+    grain    : document.getElementById('crtGrainVal'),
+    sat      : document.getElementById('crtSatVal'),
+    con      : document.getElementById('crtConVal'),
+    vig      : document.getElementById('crtVigVal'),
+  };
+
+  // Semilla fija por sesión para que el glitch no cambie al mover sliders
+  let glitchSeed = Math.random() * 10000 | 0;
+
+  function seededRand(s) {
+    // LCG rápido — determinista para la misma semilla
+    let x = Math.sin(s) * 43758.5453123;
+    return x - Math.floor(x);
+  }
+
+  function render() {
+    if (!srcImg) return;
+    const W = srcImg.naturalWidth;
+    const H = srcImg.naturalHeight;
+    canvas.width = W; canvas.height = H;
+
+    const shift     = parseInt(sl.shift.value);
+    const scan      = parseInt(sl.scan.value)     / 100;
+    const scanDens  = parseInt(sl.scanDens.value);
+    const glitchPct = parseInt(sl.glitch.value)   / 100;
+    const glitchAmp = parseInt(sl.glitchAmp.value);
+    const grain     = parseInt(sl.grain.value)    / 100;
+    const sat       = parseInt(sl.sat.value)      / 100;
+    const con       = parseInt(sl.con.value)      / 100;
+    const vig       = parseInt(sl.vig.value)      / 100;
+
+    // ── A: imagen base con filtros CSS ────────────
+    const offBase = document.createElement('canvas');
+    offBase.width = W; offBase.height = H;
+    const ctxB = offBase.getContext('2d');
+    ctxB.filter = `saturate(${sat}) contrast(${con})`;
+    ctxB.drawImage(srcImg, 0, 0, W, H);
+    ctxB.filter = 'none';
+    const base = ctxB.getImageData(0, 0, W, H);
+
+    // ── B: construir mapa de desplazamiento de bloques ──
+    // Cada fila puede pertenecer a un bloque desplazado
+    const rowOffset = new Int32Array(H);
+    let y = 0;
+    let blockIdx = 0;
+    while (y < H) {
+      // Altura del bloque: 2..20px, aleatoria pero determinista
+      const blockH = 2 + (seededRand(glitchSeed + blockIdx * 7.1) * 18 | 0);
+      // ¿Este bloque se desplaza?
+      const willGlitch = seededRand(glitchSeed + blockIdx * 3.3) < glitchPct;
+      const offset = willGlitch
+        ? ((seededRand(glitchSeed + blockIdx * 5.7) - 0.5) * 2 * glitchAmp) | 0
+        : 0;
+      for (let i = y; i < Math.min(y + blockH, H); i++) {
+        rowOffset[i] = offset;
+      }
+      y += blockH;
+      blockIdx++;
+    }
+
+    // ── C: RGB split + desplazamiento de bloques ─────
+    const out = ctx.createImageData(W, H);
+
+    for (let row = 0; row < H; row++) {
+      const dx = rowOffset[row];
+      for (let x = 0; x < W; x++) {
+        const i = (row * W + x) * 4;
+
+        // Canal R: shift derecha + desplazamiento bloque
+        const xR = Math.min(W - 1, Math.max(0, x + shift + dx));
+        // Canal G: solo desplazamiento bloque
+        const xG = Math.min(W - 1, Math.max(0, x + dx));
+        // Canal B: shift izquierda + desplazamiento bloque
+        const xB = Math.min(W - 1, Math.max(0, x - shift + dx));
+
+        const iR = (row * W + xR) * 4;
+        const iG = (row * W + xG) * 4;
+        const iB = (row * W + xB) * 4;
+
+        out.data[i    ] = base.data[iR    ];
+        out.data[i + 1] = base.data[iG + 1];
+        out.data[i + 2] = base.data[iB + 2];
+        out.data[i + 3] = 255;
+      }
+    }
+    ctx.putImageData(out, 0, 0);
+
+    // ── D: scanlines ─────────────────────────────────
+    if (scan > 0) {
+      ctx.save();
+      for (let row = 0; row < H; row += scanDens + 1) {
+        // Línea oscura
+        ctx.globalAlpha = scan * 0.55;
+        ctx.fillStyle   = '#000000';
+        ctx.fillRect(0, row, W, 1);
+        // Línea de brillo tenue entre scanlines (efecto fósforo)
+        if (scanDens >= 2) {
+          ctx.globalAlpha = scan * 0.04;
+          ctx.fillStyle   = '#ffffff';
+          ctx.fillRect(0, row + 1, W, 1);
+        }
+      }
+      ctx.restore();
+    }
+
+    // ── E: grain de alta frecuencia ──────────────────
+    if (grain > 0) {
+      const grainData = ctx.createImageData(W, H);
+      for (let i = 0; i < W * H * 4; i += 4) {
+        const n = (Math.random() - 0.5) * 255 * grain;
+        grainData.data[i    ] = 128 + n;
+        grainData.data[i + 1] = 128 + n;
+        grainData.data[i + 2] = 128 + n;
+        grainData.data[i + 3] = Math.abs(n) * 0.6;
+      }
+      ctx.save();
+      ctx.globalCompositeOperation = 'overlay';
+      ctx.putImageData(grainData, 0, 0);
+      ctx.restore();
+    }
+
+    // ── F: vignette fuerte en esquinas ───────────────
+    if (vig > 0) {
+      const grad = ctx.createRadialGradient(
+        W / 2, H / 2, Math.min(W, H) * 0.25,
+        W / 2, H / 2, Math.max(W, H) * 0.85
+      );
+      grad.addColorStop(0, 'rgba(0,0,0,0)');
+      grad.addColorStop(1, `rgba(0,0,0,${vig * 0.85})`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    canvas.style.display = 'block';
+  }
+
+  // ── Carga ─────────────────────────────────────────
+  function loadFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      srcImg = img;
+      glitchSeed = Math.random() * 10000 | 0; // nueva semilla por imagen
+      render();
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  }
+
+  const drop      = document.getElementById('crtDrop');
+  const fileInput = document.getElementById('crtFile');
+  drop.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+  drop.addEventListener('dragover',  e => { e.preventDefault(); drop.style.borderColor = 'var(--accent)'; });
+  drop.addEventListener('dragleave', () => { drop.style.borderColor = ''; });
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.style.borderColor = '';
+    if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+  });
+
+  // ── Sliders ───────────────────────────────────────
+  Object.keys(sl).forEach(k => {
+    sl[k].addEventListener('input', () => {
+      lb[k].textContent = sl[k].value;
+      render();
+    });
+  });
+
+  // Botón regenerar glitch (nueva semilla)
+  // Se activa también al hacer doble clic en el canvas
+  canvas.addEventListener('dblclick', () => {
+    glitchSeed = Math.random() * 10000 | 0;
+    render();
+  });
+
+  // ── Descarga ──────────────────────────────────────
+  document.getElementById('crtDl').addEventListener('click', () => {
+    if (!srcImg) return;
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'dosa_crt.png';
+    a.click();
+  });
+
+  // ── Reset ─────────────────────────────────────────
+  const defaults = { shift:6, scan:80, scanDens:2, glitch:40, glitchAmp:18, grain:35, sat:160, con:120, vig:70 };
+  document.getElementById('crtReset').addEventListener('click', () => {
+    Object.keys(defaults).forEach(k => {
+      sl[k].value = defaults[k];
+      lb[k].textContent = defaults[k];
+    });
+    glitchSeed = Math.random() * 10000 | 0;
+    render();
+  });
+
+})();
+// ══════════════ FIN CRT MACHINE ══════════════
+
 
 </script>
 
