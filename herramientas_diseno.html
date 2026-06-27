@@ -2924,11 +2924,11 @@ function switchFiltro(filtro) {
   }
 
   // ── Render principal ─────────────────────────────
-  function render() {
-    if (!srcImg) return;
+  function renderToCanvas(target) {
+    const tctx = target.getContext('2d');
     const W = srcImg.naturalWidth;
     const H = srcImg.naturalHeight;
-    canvas.width = W; canvas.height = H;
+    target.width = W; target.height = H;
 
     const shift  = parseInt(sliders.shift.value);
     const blurPx = parseInt(sliders.blur.value);
@@ -2988,7 +2988,7 @@ function switchFiltro(filtro) {
 
     // ── C: mezcla píxel a píxel usando máscara ─────
     const mask   = buildMask(W, H);
-    const out    = ctx.createImageData(W, H);
+    const out    = tctx.createImageData(W, H);
 
     for (let i = 0; i < W * H; i++) {
       const t  = mask[i];           // 0 = limpio, 1 = efecto
@@ -2998,29 +2998,34 @@ function switchFiltro(filtro) {
       out.data[p + 2] = cleanData.data[p + 2] * (1 - t) + fxData.data[p + 2] * t;
       out.data[p + 3] = 255;
     }
-    ctx.putImageData(out, 0, 0);
+    tctx.putImageData(out, 0, 0);
 
     // ── D: scanlines encima ────────────────────────
     if (scan > 0) {
-      ctx.save();
-      ctx.globalAlpha = scan * 0.35;
-      ctx.fillStyle   = '#000';
-      for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
-      ctx.restore();
+      tctx.save();
+      tctx.globalAlpha = scan * 0.35;
+      tctx.fillStyle   = '#000';
+      for (let y = 0; y < H; y += 3) tctx.fillRect(0, y, W, 1);
+      tctx.restore();
     }
 
     // ── E: vignette ────────────────────────────────
     if (vig > 0) {
-      const grad = ctx.createRadialGradient(
+      const grad = tctx.createRadialGradient(
         W/2, H/2, Math.min(W,H) * 0.3,
         W/2, H/2, Math.max(W,H) * 0.8
       );
       grad.addColorStop(0, 'rgba(0,0,0,0)');
       grad.addColorStop(1, `rgba(0,0,0,${vig * 0.75})`);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
+      tctx.fillStyle = grad;
+      tctx.fillRect(0, 0, W, H);
     }
 
+  }
+
+  function render() {
+    if (!srcImg) return;
+    renderToCanvas(canvas);
     canvas.style.display = 'block';
     updateDot();
   }
@@ -3087,8 +3092,10 @@ function switchFiltro(filtro) {
   // ── Descarga ─────────────────────────────────────
   document.getElementById('dreamyDl').addEventListener('click', () => {
     if (!srcImg) return;
+    const off = document.createElement('canvas');
+    renderToCanvas(off);
     const a = document.createElement('a');
-    a.href = canvas.toDataURL('image/png');
+    a.href = off.toDataURL('image/png');
     a.download = 'dosa_dreamy.png';
     a.click();
   });
@@ -3201,11 +3208,11 @@ function switchFiltro(filtro) {
     return x - Math.floor(x);
   }
 
-  function render() {
-    if (!srcImg) return;
+  function renderToCanvas(target) {
+    const tctx = target.getContext('2d');
     const W = srcImg.naturalWidth;
     const H = srcImg.naturalHeight;
-    canvas.width = W; canvas.height = H;
+    target.width = W; target.height = H;
 
     const shift     = parseInt(sl.shift.value);
     const scan      = parseInt(sl.scan.value)     / 100;
@@ -3254,7 +3261,7 @@ function switchFiltro(filtro) {
     }
 
     // ── C: RGB split + desplazamiento de bloques ─────
-    const out = ctx.createImageData(W, H);
+    const out = tctx.createImageData(W, H);
 
     for (let row = 0; row < H; row++) {
       const dx = rowOffset[row];
@@ -3280,7 +3287,7 @@ function switchFiltro(filtro) {
     }
     // ── C2: mezcla con máscara focal ─────────────
     const mask = buildCrtMask(W, H);
-    const mixed = ctx.createImageData(W, H);
+    const mixed = tctx.createImageData(W, H);
     for (let i = 0; i < W * H; i++) {
       const t = mask[i];
       const p = i * 4;
@@ -3289,24 +3296,24 @@ function switchFiltro(filtro) {
       mixed.data[p + 2] = cleanData.data[p + 2] * (1 - t) + out.data[p + 2] * t;
       mixed.data[p + 3] = 255;
     }
-    ctx.putImageData(mixed, 0, 0);
+    tctx.putImageData(mixed, 0, 0);
 
     // ── D: scanlines ─────────────────────────────────
     if (scan > 0) {
-      ctx.save();
+      tctx.save();
       for (let row = 0; row < H; row += scanDens + 1) {
         // Línea oscura
-        ctx.globalAlpha = scan * 0.55;
-        ctx.fillStyle   = '#000000';
-        ctx.fillRect(0, row, W, 1);
+        tctx.globalAlpha = scan * 0.55;
+        tctx.fillStyle   = '#000000';
+        tctx.fillRect(0, row, W, 1);
         // Línea de brillo tenue entre scanlines (efecto fósforo)
         if (scanDens >= 2) {
-          ctx.globalAlpha = scan * 0.04;
-          ctx.fillStyle   = '#ffffff';
-          ctx.fillRect(0, row + 1, W, 1);
+          tctx.globalAlpha = scan * 0.04;
+          tctx.fillStyle   = '#ffffff';
+          tctx.fillRect(0, row + 1, W, 1);
         }
       }
-      ctx.restore();
+      tctx.restore();
     }
 
     // ── E: grain de alta frecuencia ──────────────────
@@ -3315,7 +3322,7 @@ function switchFiltro(filtro) {
       const grainOff = document.createElement('canvas');
       grainOff.width = W; grainOff.height = H;
       const gctx = grainOff.getContext('2d');
-      const grainData = gctx.createImageData(W, H);
+      const grainData = gtctx.createImageData(W, H);
       for (let i = 0; i < W * H * 4; i += 4) {
         const n = (Math.random() * 255 * grain) | 0;
         grainData.data[i    ] = n;
@@ -3323,26 +3330,31 @@ function switchFiltro(filtro) {
         grainData.data[i + 2] = n;
         grainData.data[i + 3] = (grain * 180) | 0;
       }
-      gctx.putImageData(grainData, 0, 0);
-      ctx.save();
-      ctx.globalCompositeOperation = 'overlay';
-      ctx.globalAlpha = grain * 0.5;
-      ctx.drawImage(grainOff, 0, 0);
-      ctx.restore();
+      gtctx.putImageData(grainData, 0, 0);
+      tctx.save();
+      tctx.globalCompositeOperation = 'overlay';
+      tctx.globalAlpha = grain * 0.5;
+      tctx.drawImage(grainOff, 0, 0);
+      tctx.restore();
     }
 
     // ── F: vignette fuerte en esquinas ───────────────
     if (vig > 0) {
-      const grad = ctx.createRadialGradient(
+      const grad = tctx.createRadialGradient(
         W / 2, H / 2, Math.min(W, H) * 0.25,
         W / 2, H / 2, Math.max(W, H) * 0.85
       );
       grad.addColorStop(0, 'rgba(0,0,0,0)');
       grad.addColorStop(1, `rgba(0,0,0,${vig * 0.85})`);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
+      tctx.fillStyle = grad;
+      tctx.fillRect(0, 0, W, H);
     }
 
+  }
+
+  function render() {
+    if (!srcImg) return;
+    renderToCanvas(canvas);
     canvas.style.display = 'block';
     updateCrtDot();
   }
@@ -3419,8 +3431,10 @@ function switchFiltro(filtro) {
   // ── Descarga ──────────────────────────────────────
   document.getElementById('crtDl').addEventListener('click', () => {
     if (!srcImg) return;
+    const off = document.createElement('canvas');
+    renderToCanvas(off);
     const a = document.createElement('a');
-    a.href = canvas.toDataURL('image/png');
+    a.href = off.toDataURL('image/png');
     a.download = 'dosa_crt.png';
     a.click();
   });
