@@ -2825,6 +2825,9 @@ function togglePwdVisibility() {
 
 // ══════════════ FILTROS: uploader compartido ══════════════
 (function() {
+  // Los hooks de cada filtro se registran en window.filtrosHooks[]
+  window.filtrosHooks = window.filtrosHooks || [];
+
   function loadFiltrosFile(file) {
     if (!file || !file.type.startsWith('image/')) return;
     const url = URL.createObjectURL(file);
@@ -2836,9 +2839,8 @@ function togglePwdVisibility() {
         status.textContent = '• ' + file.name + ' — ' + img.naturalWidth + ' × ' + img.naturalHeight + 'px';
         status.style.display = 'block';
       }
-      // Despachar a todos los filtros
-      if (window.dreamySetImg) window.dreamySetImg(img);
-      if (window.crtSetImg)    window.crtSetImg(img);
+      // Despachar a todos los filtros registrados
+      window.filtrosHooks.forEach(function(fn) { try { fn(img); } catch(e) {} });
     };
     img.src = url;
   }
@@ -3100,8 +3102,8 @@ function switchFiltro(filtro) {
   });
 
   // ── Imagen desde uploader compartido ────────────
-  // El uploader global de filtros llama window.filtrosSetImg(img)
-  window.dreamySetImg = function(img) { srcImg = img; render(); };
+  window.filtrosHooks = window.filtrosHooks || [];
+  window.filtrosHooks.push(function(img) { srcImg = img; render(); });
 
   // ── Sliders ──────────────────────────────────────
   Object.keys(sliders).forEach(k => {
@@ -3139,6 +3141,7 @@ function switchFiltro(filtro) {
 // ══════════════ FIN DREAMY BLUR ══════════════
 
 // ══════════════ CRT MACHINE ENGINE ══════════════
+document.addEventListener('DOMContentLoaded', function() {
 (function () {
   'use strict';
 
@@ -3411,11 +3414,12 @@ function switchFiltro(filtro) {
   });
 
   // ── Imagen desde uploader compartido ────────────
-  window.crtSetImg = function(img) {
+  window.filtrosHooks = window.filtrosHooks || [];
+  window.filtrosHooks.push(function(img) {
     srcImg = img;
     glitchSeed = Math.random() * 10000 | 0;
     render();
-  };
+  });
 
   // ── Sliders ───────────────────────────────────────
   Object.keys(sl).forEach(k => {
@@ -3458,6 +3462,7 @@ function switchFiltro(filtro) {
   });
 
 })();
+}); // DOMContentLoaded CRT
 // ══════════════ FIN CRT MACHINE ══════════════
 
 
