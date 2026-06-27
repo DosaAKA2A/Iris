@@ -2870,6 +2870,9 @@ function switchFiltro(filtro) {
     if (p) p.style.display = k === filtro ? 'block' : 'none';
     if (b) b.classList.toggle('active', k === filtro);
   });
+  // Notificar al filtro activado para que re-renderice si ya tiene imagen
+  if (filtro === 'crt'    && window.crtOnActivate)    window.crtOnActivate();
+  if (filtro === 'dreamy' && window.dreamyOnActivate) window.dreamyOnActivate();
 }
 
 // ══════════════ DREAMY BLUR ENGINE ══════════════
@@ -3105,6 +3108,10 @@ function switchFiltro(filtro) {
   window.filtrosHooks = window.filtrosHooks || [];
   window.filtrosHooks.push(function(img) { srcImg = img; render(); });
 
+  window.dreamyOnActivate = function() {
+    if (srcImg) render();
+  };
+
   // ── Sliders ──────────────────────────────────────
   Object.keys(sliders).forEach(k => {
     sliders[k].addEventListener('input', () => {
@@ -3151,9 +3158,10 @@ document.addEventListener('DOMContentLoaded', function() {
   let crtMode   = 'radial';
 
   const canvas = document.getElementById('crtCanvas');
-  const ctx    = canvas.getContext('2d');
   const dot    = document.getElementById('crtFocalDot');
   const wrap   = document.getElementById('crtWrap');
+
+  if (!canvas) { console.error('[CRT] canvas not found'); return; }
 
   const sl = {
     shift    : document.getElementById('crtShift'),
@@ -3418,8 +3426,15 @@ document.addEventListener('DOMContentLoaded', function() {
   window.filtrosHooks.push(function(img) {
     srcImg = img;
     glitchSeed = Math.random() * 10000 | 0;
+    // Renderizar siempre; si el panel está oculto el canvas queda listo
+    // y se mostrará cuando switchFiltro active el panel
     render();
   });
+
+  // Re-renderizar cuando se activa el tab CRT (imagen ya podría estar cargada)
+  window.crtOnActivate = function() {
+    if (srcImg) render();
+  };
 
   // ── Sliders ───────────────────────────────────────
   Object.keys(sl).forEach(k => {
