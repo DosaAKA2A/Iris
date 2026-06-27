@@ -618,6 +618,15 @@ button:disabled { opacity: .3; cursor: default; }
 <!-- ══════════════ FILTROS ══════════════ -->
 <div id="panelFiltros" style="display:none">
 
+  <!-- Uploader compartido -->
+  <div class="sec">Imagen</div>
+  <div class="drop-zone" id="filtrosSharedDrop" style="cursor:pointer;">
+    <div class="drop-icon">&#8593;</div>
+    <div class="drop-main">Arrastra una imagen o haz clic</div>
+    <input type="file" id="filtrosSharedFile" accept="image/*" style="display:none">
+  </div>
+  <div id="filtrosImgStatus" style="font-size:11px;color:var(--muted);margin:6px 0 14px;display:none;"></div>
+
   <!-- Sub-selector de filtro -->
   <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:14px;">
     <button type="button" class="small-btn active" id="filtroTabDreamy" onclick="switchFiltro('dreamy')">Dreamy Blur</button>
@@ -627,14 +636,7 @@ button:disabled { opacity: .3; cursor: default; }
   <!-- Panel Dreamy Blur -->
   <div id="filtrosDreamy">
 
-  <div class="sec">Imagen</div>
-  <div class="drop-zone" id="dreamyDrop" style="cursor:pointer;">
-    <div class="drop-icon">&#8593;</div>
-    <div class="drop-main">Arrastra una imagen o haz clic</div>
-    <input type="file" id="dreamyFile" accept="image/*" style="display:none">
-  </div>
-
-  <div class="sec" style="margin-top:18px;">Punto focal &amp; modo de degradado</div>
+  <div class="sec">Punto focal &amp; modo de degradado</div>
   <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">
     Haz clic en la preview para definir el origen del efecto
   </div>
@@ -715,14 +717,7 @@ button:disabled { opacity: .3; cursor: default; }
   <!-- ── CRT MACHINE ── -->
   <div id="filtrosCrt" style="display:none">
 
-    <div class="sec">Imagen</div>
-    <div class="drop-zone" id="crtDrop" style="cursor:pointer;">
-      <div class="drop-icon">&#8593;</div>
-      <div class="drop-main">Arrastra una imagen o haz clic</div>
-      <input type="file" id="crtFile" accept="image/*" style="display:none">
-    </div>
-
-    <div class="sec" style="margin-top:18px;">Punto focal &amp; modo de degradado</div>
+    <div class="sec">Punto focal &amp; modo de degradado</div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">
       Haz clic en la preview para definir el origen del efecto
     </div>
@@ -2828,6 +2823,41 @@ function togglePwdVisibility() {
   }
 }
 
+// ══════════════ FILTROS: uploader compartido ══════════════
+(function() {
+  function loadFiltrosFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = function() {
+      URL.revokeObjectURL(url);
+      const status = document.getElementById('filtrosImgStatus');
+      if (status) {
+        status.textContent = '• ' + file.name + ' — ' + img.naturalWidth + ' × ' + img.naturalHeight + 'px';
+        status.style.display = 'block';
+      }
+      // Despachar a todos los filtros
+      if (window.dreamySetImg) window.dreamySetImg(img);
+      if (window.crtSetImg)    window.crtSetImg(img);
+    };
+    img.src = url;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const drop  = document.getElementById('filtrosSharedDrop');
+    const input = document.getElementById('filtrosSharedFile');
+    if (!drop || !input) return;
+    drop.addEventListener('click', () => input.click());
+    input.addEventListener('change', () => { if (input.files[0]) loadFiltrosFile(input.files[0]); });
+    drop.addEventListener('dragover',  e => { e.preventDefault(); drop.style.borderColor = 'var(--accent)'; });
+    drop.addEventListener('dragleave', () => { drop.style.borderColor = ''; });
+    drop.addEventListener('drop', e => {
+      e.preventDefault(); drop.style.borderColor = '';
+      if (e.dataTransfer.files[0]) loadFiltrosFile(e.dataTransfer.files[0]);
+    });
+  });
+})();
+
 // ══════════════ FILTROS: sub-navegación ══════════════
 function switchFiltro(filtro) {
   const panels = { dreamy: 'filtrosDreamy', crt: 'filtrosCrt' };
@@ -3003,9 +3033,17 @@ function switchFiltro(filtro) {
     // ── D: scanlines encima ────────────────────────
     if (scan > 0) {
       tctx.save();
-      tctx.globalAlpha = scan * 0.35;
-      tctx.fillStyle   = '#000';
-      for (let y = 0; y < H; y += 3) tctx.fillRect(0, y, W, 1);
+      // Línea oscura
+      tctx.fillStyle = '#000';
+      for (let y = 0; y < H; y += 3) {
+        tctx.globalAlpha = scan * 0.7;
+        tctx.fillRect(0, y, W, 1);
+        // Microbrillo entre scanlines (fósforo)
+        tctx.globalAlpha = scan * 0.08;
+        tctx.fillStyle = '#fff';
+        tctx.fillRect(0, y + 1, W, 1);
+        tctx.fillStyle = '#000';
+      }
       tctx.restore();
     }
 
@@ -3061,25 +3099,9 @@ function switchFiltro(filtro) {
     render();
   });
 
-  // ── Carga imagen ─────────────────────────────────
-  function loadFile(file) {
-    if (!file || !file.type.startsWith('image/')) return;
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => { srcImg = img; render(); URL.revokeObjectURL(url); };
-    img.src = url;
-  }
-
-  const drop      = document.getElementById('dreamyDrop');
-  const fileInput = document.getElementById('dreamyFile');
-  drop.addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
-  drop.addEventListener('dragover',  e => { e.preventDefault(); drop.style.borderColor = 'var(--accent)'; });
-  drop.addEventListener('dragleave', () => { drop.style.borderColor = ''; });
-  drop.addEventListener('drop', e => {
-    e.preventDefault(); drop.style.borderColor = '';
-    if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
-  });
+  // ── Imagen desde uploader compartido ────────────
+  // El uploader global de filtros llama window.filtrosSetImg(img)
+  window.dreamySetImg = function(img) { srcImg = img; render(); };
 
   // ── Sliders ──────────────────────────────────────
   Object.keys(sliders).forEach(k => {
@@ -3388,30 +3410,12 @@ function switchFiltro(filtro) {
     render();
   });
 
-  // ── Carga ─────────────────────────────────────────
-  function loadFile(file) {
-    if (!file || !file.type.startsWith('image/')) return;
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      srcImg = img;
-      glitchSeed = Math.random() * 10000 | 0;
-      render();
-      URL.revokeObjectURL(url);
-    };
-    img.src = url;
-  }
-
-  const drop      = document.getElementById('crtDrop');
-  const fileInput = document.getElementById('crtFile');
-  drop.addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
-  drop.addEventListener('dragover',  e => { e.preventDefault(); drop.style.borderColor = 'var(--accent)'; });
-  drop.addEventListener('dragleave', () => { drop.style.borderColor = ''; });
-  drop.addEventListener('drop', e => {
-    e.preventDefault(); drop.style.borderColor = '';
-    if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
-  });
+  // ── Imagen desde uploader compartido ────────────
+  window.crtSetImg = function(img) {
+    srcImg = img;
+    glitchSeed = Math.random() * 10000 | 0;
+    render();
+  };
 
   // ── Sliders ───────────────────────────────────────
   Object.keys(sl).forEach(k => {
