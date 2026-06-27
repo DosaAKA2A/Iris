@@ -159,6 +159,41 @@
   }
 
   /* Derecha — CTA */
+  .nav-cv-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; height: 40px;
+    border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .25s, color .25s;
+  }
+
+  /* Barrido rojo al hover */
+  .nav-cv-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--red);
+    transform: translateY(100%);
+    transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 100px;
+  }
+  .nav-cv-btn:hover { border-color: var(--red); color: #fff; }
+  .nav-cv-btn:hover::before { transform: translateY(0); }
+
+  .nav-cv-btn span { position: relative; z-index: 1; }
+
   .nav-cta-btn {
     display: flex;
     align-items: center;
@@ -991,10 +1026,13 @@
   </a>
 
   <!-- DERECHA: CTA -->
-  <button class="nav-cta-btn" onclick="#">
-    ¿Qué hacemos?
-    <span class="nav-cta-arrow">›</span>
-  </button>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <a class="nav-cv-btn" href="dosa-cv.html"><span>CV</span></a>
+    <button class="nav-cta-btn" onclick="#">
+      ¿Qué hacemos?
+      <span class="nav-cta-arrow">›</span>
+    </button>
+  </div>
 
 </nav>
 
@@ -1049,12 +1087,6 @@
       <span class="tag">Automatización</span>
     </div>
   </div>
-
-  <!-- Botón CV -->
-  <a class="hero-cv-btn" href="dosa-cv.html">
-    <div class="hero-cv-line"></div>
-    <span>Perfil</span>
-  </a>
 
   <div class="scroll-hint">
     <div class="scroll-line"></div>
