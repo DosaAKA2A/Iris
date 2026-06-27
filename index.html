@@ -272,7 +272,7 @@
     position: absolute;
     inset: -15%;            /* margen extra para el parallax */
     background:
-      url('hero_banner.jpg') center center / cover no-repeat,
+      url('hero_banner.jpg') center 30% / cover no-repeat,
       linear-gradient(135deg,
         #0a0a0f 0%,
         #0d1117 30%,
@@ -281,6 +281,12 @@
         #080810 100%);
     will-change: transform;
     transition: transform 0.1s linear;
+    animation: heroZoomIn 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes heroZoomIn {
+    0%   { transform: scale(1.14); opacity: 0; }
+    100% { transform: scale(1);    opacity: 1; }
   }
 
   /* Ruido de grano sutil encima del placeholder */
