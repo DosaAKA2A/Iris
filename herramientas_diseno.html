@@ -722,6 +722,26 @@ button:disabled { opacity: .3; cursor: default; }
       <input type="file" id="crtFile" accept="image/*" style="display:none">
     </div>
 
+    <div class="sec" style="margin-top:18px;">Punto focal &amp; modo de degradado</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">
+      Haz clic en la preview para definir el origen del efecto
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <button type="button" class="small-btn active" id="crtModeRadial"  onclick="crtSetMode('radial')">Radial</button>
+      <button type="button" class="small-btn"        id="crtModeLinear" onclick="crtSetMode('linear')">Direccional</button>
+    </div>
+
+    <div class="ctrl" id="crtAngleRow" style="display:none;">
+      <div class="ctrl-lbl">Ángulo &nbsp;<span id="crtAngleVal">0</span>°</div>
+      <input type="range" id="crtAngle" min="0" max="360" value="0">
+    </div>
+
+    <div class="ctrl">
+      <div class="ctrl-lbl">Radio limpio &nbsp;<span id="crtRadiusVal">20</span>%</div>
+      <input type="range" id="crtRadius" min="0" max="100" value="20">
+    </div>
+
     <div class="sec" style="margin-top:18px;">Efecto</div>
     <div class="controls">
 
@@ -777,8 +797,15 @@ button:disabled { opacity: .3; cursor: default; }
       <button class="small-btn" id="crtReset">Resetear</button>
     </div>
 
-    <div style="margin-top:16px; position:relative; display:inline-block; max-width:100%;">
-      <canvas id="crtCanvas" style="max-width:100%; border-radius:6px; display:none;"></canvas>
+    <div style="margin-top:16px; position:relative; display:inline-block; max-width:100%;" id="crtWrap">
+      <canvas id="crtCanvas" style="max-width:100%; border-radius:6px; display:none; cursor:crosshair;"></canvas>
+      <div id="crtFocalDot" style="
+        display:none; position:absolute; width:14px; height:14px;
+        border-radius:50%; border:2px solid #fff;
+        box-shadow:0 0 0 1px rgba(0,0,0,.5), 0 0 8px rgba(255,255,255,.6);
+        pointer-events:none; transform:translate(-50%,-50%);
+        transition:left .08s, top .08s;
+      "></div>
     </div>
 
   </div><!-- /filtrosCrt -->
@@ -3086,10 +3113,15 @@ function switchFiltro(filtro) {
 (function () {
   'use strict';
 
-  let srcImg = null;
+  let srcImg   = null;
+  let crtFocalX = 0.5;
+  let crtFocalY = 0.5;
+  let crtMode   = 'radial';
 
   const canvas = document.getElementById('crtCanvas');
   const ctx    = canvas.getContext('2d');
+  const dot    = document.getElementById('crtFocalDot');
+  const wrap   = document.getElementById('crtWrap');
 
   const sl = {
     shift    : document.getElementById('crtShift'),
@@ -3101,6 +3133,8 @@ function switchFiltro(filtro) {
     sat      : document.getElementById('crtSat'),
     con      : document.getElementById('crtCon'),
     vig      : document.getElementById('crtVig'),
+    radius   : document.getElementById('crtRadius'),
+    angle    : document.getElementById('crtAngle'),
   };
   const lb = {
     shift    : document.getElementById('crtShiftVal'),
@@ -3112,7 +3146,51 @@ function switchFiltro(filtro) {
     sat      : document.getElementById('crtSatVal'),
     con      : document.getElementById('crtConVal'),
     vig      : document.getElementById('crtVigVal'),
+    radius   : document.getElementById('crtRadiusVal'),
+    angle    : document.getElementById('crtAngleVal'),
   };
+
+  // ── Modo radial / lineal ─────────────────────────
+  window.crtSetMode = function(m) {
+    crtMode = m;
+    document.getElementById('crtModeRadial').classList.toggle('active', m === 'radial');
+    document.getElementById('crtModeLinear').classList.toggle('active', m === 'linear');
+    document.getElementById('crtAngleRow').style.display = m === 'linear' ? 'flex' : 'none';
+    render();
+  };
+
+  // ── Máscara de intensidad ────────────────────────
+  function buildCrtMask(W, H) {
+    const mask   = new Float32Array(W * H);
+    const cx     = crtFocalX * W;
+    const cy     = crtFocalY * H;
+    const radius = parseInt(sl.radius.value) / 100;
+    const diag   = Math.sqrt(W * W + H * H);
+    const inner  = radius * diag * 0.5;
+    const outer  = diag * 0.5;
+
+    if (crtMode === 'radial') {
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const dx = x - cx, dy = y - cy;
+          mask[y * W + x] = Math.min(1, Math.max(0, (Math.sqrt(dx*dx + dy*dy) - inner) / (outer - inner)));
+        }
+      }
+    } else {
+      const angle = (parseInt(sl.angle.value) - 90) * Math.PI / 180;
+      const nx    = Math.cos(angle);
+      const ny    = Math.sin(angle);
+      const proj0 = nx * cx + ny * cy;
+      const maxP  = diag;
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const d = (nx * x + ny * y) - proj0;
+          mask[y * W + x] = Math.min(1, Math.max(0, (d - inner * 0.3) / (maxP * 0.6)));
+        }
+      }
+    }
+    return mask;
+  }
 
   // Semilla fija por sesión para que el glitch no cambie al mover sliders
   let glitchSeed = Math.random() * 10000 | 0;
@@ -3139,7 +3217,14 @@ function switchFiltro(filtro) {
     const con       = parseInt(sl.con.value)      / 100;
     const vig       = parseInt(sl.vig.value)      / 100;
 
-    // ── A: imagen base con filtros CSS ────────────
+    // ── A: imagen base limpia (para mezcla con máscara) ──
+    const offClean = document.createElement('canvas');
+    offClean.width = W; offClean.height = H;
+    const ctxClean = offClean.getContext('2d');
+    ctxClean.drawImage(srcImg, 0, 0, W, H);
+    const cleanData = ctxClean.getImageData(0, 0, W, H);
+
+    // ── A2: imagen base con filtros CSS ───────────
     const offBase = document.createElement('canvas');
     offBase.width = W; offBase.height = H;
     const ctxB = offBase.getContext('2d');
@@ -3193,7 +3278,18 @@ function switchFiltro(filtro) {
         out.data[i + 3] = 255;
       }
     }
-    ctx.putImageData(out, 0, 0);
+    // ── C2: mezcla con máscara focal ─────────────
+    const mask = buildCrtMask(W, H);
+    const mixed = ctx.createImageData(W, H);
+    for (let i = 0; i < W * H; i++) {
+      const t = mask[i];
+      const p = i * 4;
+      mixed.data[p    ] = cleanData.data[p    ] * (1 - t) + out.data[p    ] * t;
+      mixed.data[p + 1] = cleanData.data[p + 1] * (1 - t) + out.data[p + 1] * t;
+      mixed.data[p + 2] = cleanData.data[p + 2] * (1 - t) + out.data[p + 2] * t;
+      mixed.data[p + 3] = 255;
+    }
+    ctx.putImageData(mixed, 0, 0);
 
     // ── D: scanlines ─────────────────────────────────
     if (scan > 0) {
@@ -3248,7 +3344,37 @@ function switchFiltro(filtro) {
     }
 
     canvas.style.display = 'block';
+    updateCrtDot();
   }
+
+  // ── Punto focal ──────────────────────────────────
+  function updateCrtDot() {
+    if (!srcImg) return;
+    const rect  = canvas.getBoundingClientRect();
+    const wRect = wrap.getBoundingClientRect();
+    dot.style.left    = ((rect.left - wRect.left) + crtFocalX * rect.width)  + 'px';
+    dot.style.top     = ((rect.top  - wRect.top)  + crtFocalY * rect.height) + 'px';
+    dot.style.display = 'block';
+  }
+
+  canvas.addEventListener('click', e => {
+    if (!srcImg) return;
+    const rect = canvas.getBoundingClientRect();
+    crtFocalX = (e.clientX - rect.left) / rect.width;
+    crtFocalY = (e.clientY - rect.top)  / rect.height;
+    render();
+  });
+
+  let draggingCrtFocal = false;
+  canvas.addEventListener('mousedown', () => { draggingCrtFocal = true; });
+  window.addEventListener('mouseup',   () => { draggingCrtFocal = false; });
+  canvas.addEventListener('mousemove', e => {
+    if (!draggingCrtFocal || !srcImg) return;
+    const rect = canvas.getBoundingClientRect();
+    crtFocalX = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    crtFocalY = Math.min(1, Math.max(0, (e.clientY - rect.top)  / rect.height));
+    render();
+  });
 
   // ── Carga ─────────────────────────────────────────
   function loadFile(file) {
@@ -3257,7 +3383,7 @@ function switchFiltro(filtro) {
     const img = new Image();
     img.onload = () => {
       srcImg = img;
-      glitchSeed = Math.random() * 10000 | 0; // nueva semilla por imagen
+      glitchSeed = Math.random() * 10000 | 0;
       render();
       URL.revokeObjectURL(url);
     };
@@ -3300,12 +3426,15 @@ function switchFiltro(filtro) {
   });
 
   // ── Reset ─────────────────────────────────────────
-  const defaults = { shift:6, scan:80, scanDens:2, glitch:40, glitchAmp:18, grain:35, sat:160, con:120, vig:70 };
+  const defaults = { shift:6, scan:80, scanDens:2, glitch:40, glitchAmp:18, grain:35, sat:160, con:120, vig:70, radius:20, angle:0 };
   document.getElementById('crtReset').addEventListener('click', () => {
     Object.keys(defaults).forEach(k => {
       sl[k].value = defaults[k];
       lb[k].textContent = defaults[k];
     });
+    crtFocalX = 0.5; crtFocalY = 0.5;
+    crtMode   = 'radial';
+    window.crtSetMode('radial');
     glitchSeed = Math.random() * 10000 | 0;
     render();
   });
