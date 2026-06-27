@@ -390,6 +390,7 @@ button:disabled { opacity: .3; cursor: default; }
   <button type="button" class="tab active" id="tabDither" onclick="switchTab('dither')">Pixel Dither</button>
   <button type="button" class="tab" id="tabAscii" onclick="switchTab('ascii')">ASCII</button>
   <button type="button" class="tab" id="tabDosa" onclick="switchTab('dosa')">Pruebas Dosa</button>
+  <button type="button" class="tab" id="tabDreamy" onclick="switchTab('dreamy')">Dreamy Blur</button>
 </div>
 
 <div id="panelDither">
@@ -612,6 +613,62 @@ button:disabled { opacity: .3; cursor: default; }
   <div class="sec">Formas por estado — 7 slots (0=oscuro · 6=claro) · SVG, PNG, WebP</div>
   <div class="shapes-grid" id="shapesGrid"></div>
   <div class="status" id="dosaStatus" style="margin-top:-4px;margin-bottom:12px;"></div>
+</div>
+
+<!-- ══════════════ DREAMY BLUR ══════════════ -->
+<div id="panelDreamy" style="display:none">
+
+  <div class="sec">Imagen</div>
+  <div class="drop-zone" id="dreamyDrop" style="cursor:pointer;">
+    <div class="drop-icon">&#8593;</div>
+    <div class="drop-main">Arrastra una imagen o haz clic</div>
+    <input type="file" id="dreamyFile" accept="image/*" style="display:none">
+  </div>
+
+  <div class="sec" style="margin-top:18px;">Efecto</div>
+  <div class="controls">
+
+    <div class="ctrl">
+      <div class="ctrl-lbl">RGB Split &nbsp;<span id="dreamyShiftVal">12</span>px</div>
+      <input type="range" id="dreamyShift" min="0" max="60" value="12">
+    </div>
+
+    <div class="ctrl">
+      <div class="ctrl-lbl">Blur &nbsp;<span id="dreamyBlurVal">8</span>px</div>
+      <input type="range" id="dreamyBlur" min="0" max="40" value="8">
+    </div>
+
+    <div class="ctrl">
+      <div class="ctrl-lbl">Scanlines &nbsp;<span id="dreamyScanVal">70</span>%</div>
+      <input type="range" id="dreamyScan" min="0" max="100" value="70">
+    </div>
+
+    <div class="ctrl">
+      <div class="ctrl-lbl">Saturación &nbsp;<span id="dreamySatVal">180</span>%</div>
+      <input type="range" id="dreamySat" min="100" max="400" value="180">
+    </div>
+
+    <div class="ctrl">
+      <div class="ctrl-lbl">Brillo &nbsp;<span id="dreamyBriVal">110</span>%</div>
+      <input type="range" id="dreamyBri" min="60" max="200" value="110">
+    </div>
+
+    <div class="ctrl">
+      <div class="ctrl-lbl">Opacidad vignette &nbsp;<span id="dreamyVigVal">60</span>%</div>
+      <input type="range" id="dreamyVig" min="0" max="100" value="60">
+    </div>
+
+  </div>
+
+  <div class="btn-row" style="margin-top:8px;">
+    <button class="small-btn accent" id="dreamyDl">&#8595; Descargar PNG</button>
+    <button class="small-btn" id="dreamyReset">Resetear</button>
+  </div>
+
+  <div style="margin-top:16px; position:relative; display:inline-block; max-width:100%;">
+    <canvas id="dreamyCanvas" style="max-width:100%; border-radius:6px; display:none;"></canvas>
+  </div>
+
 </div>
 
 <div id="panelCorlima">
@@ -1517,9 +1574,12 @@ function switchTab(tab) {
   const isAscii  = tab === 'ascii';
   const isDosa   = tab === 'dosa';
 
-  document.getElementById('panelDither').style.display = isDither ? 'block' : 'none';
-  document.getElementById('panelAscii').style.display  = isAscii  ? 'block' : 'none';
-  document.getElementById('panelDosa').style.display   = isDosa   ? 'block' : 'none';
+  document.getElementById('panelDither').style.display  = isDither  ? 'block' : 'none';
+  document.getElementById('panelAscii').style.display   = isAscii   ? 'block' : 'none';
+  document.getElementById('panelDosa').style.display    = isDosa    ? 'block' : 'none';
+  document.getElementById('panelDreamy').style.display  = (tab === 'dreamy') ? 'block' : 'none';
+  const tabDreamy = document.getElementById('tabDreamy');
+  if (tabDreamy) tabDreamy.classList.toggle('active', tab === 'dreamy');
 
   document.getElementById('tabDither').classList.toggle('active', isDither);
   document.getElementById('tabAscii').classList.toggle('active', isAscii);
@@ -2626,6 +2686,173 @@ function togglePwdVisibility() {
     btn.textContent = '';
   }
 }
+
+
+// ══════════════ DREAMY BLUR ENGINE ══════════════
+(function () {
+  'use strict';
+
+  // ── Estado ──────────────────────────────────────
+  let srcImg = null;
+
+  const canvas  = document.getElementById('dreamyCanvas');
+  const ctx     = canvas.getContext('2d');
+
+  // Controles
+  const sliders = {
+    shift : document.getElementById('dreamyShift'),
+    blur  : document.getElementById('dreamyBlur'),
+    scan  : document.getElementById('dreamyScan'),
+    sat   : document.getElementById('dreamySat'),
+    bri   : document.getElementById('dreamyBri'),
+    vig   : document.getElementById('dreamyVig'),
+  };
+  const labels = {
+    shift : document.getElementById('dreamyShiftVal'),
+    blur  : document.getElementById('dreamyBlurVal'),
+    scan  : document.getElementById('dreamyScanVal'),
+    sat   : document.getElementById('dreamySatVal'),
+    bri   : document.getElementById('dreamyBriVal'),
+    vig   : document.getElementById('dreamyVigVal'),
+  };
+
+  // ── Render ──────────────────────────────────────
+  function render() {
+    if (!srcImg) return;
+
+    const W = srcImg.naturalWidth;
+    const H = srcImg.naturalHeight;
+    canvas.width  = W;
+    canvas.height = H;
+
+    const shift = parseInt(sliders.shift.value);
+    const blur  = parseInt(sliders.blur.value);
+    const scan  = parseInt(sliders.scan.value) / 100;
+    const sat   = parseInt(sliders.sat.value)  / 100;
+    const bri   = parseInt(sliders.bri.value)  / 100;
+    const vig   = parseInt(sliders.vig.value)  / 100;
+
+    // ── Paso 1: dibujar imagen con filtros base ──
+    ctx.filter = `saturate(${sat}) brightness(${bri})`;
+    ctx.drawImage(srcImg, 0, 0, W, H);
+    ctx.filter = 'none';
+
+    // ── Paso 2: RGB split en offscreen canvases ──
+    if (shift > 0) {
+      const base = ctx.getImageData(0, 0, W, H);
+      const out  = ctx.createImageData(W, H);
+
+      // Para cada píxel: canal R de x+shift, G de x, B de x-shift
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const i = (y * W + x) * 4;
+
+          const xR = Math.min(x + shift, W - 1);
+          const xB = Math.max(x - shift, 0);
+
+          const iR = (y * W + xR) * 4;
+          const iB = (y * W + xB) * 4;
+
+          out.data[i    ] = base.data[iR    ]; // R desplazado +
+          out.data[i + 1] = base.data[i  + 1]; // G sin desplazar
+          out.data[i + 2] = base.data[iB + 2]; // B desplazado -
+          out.data[i + 3] = 255;
+        }
+      }
+      ctx.putImageData(out, 0, 0);
+    }
+
+    // ── Paso 3: blur gaussiano con CSS filter ───
+    if (blur > 0) {
+      const tmp = document.createElement('canvas');
+      tmp.width = W; tmp.height = H;
+      const tctx = tmp.getContext('2d');
+      tctx.filter = `blur(${blur}px)`;
+      tctx.drawImage(canvas, 0, 0);
+      tctx.filter = 'none';
+      ctx.clearRect(0, 0, W, H);
+      ctx.drawImage(tmp, 0, 0);
+    }
+
+    // ── Paso 4: scanlines ───────────────────────
+    if (scan > 0) {
+      const step = 3; // grosor + gap en px
+      ctx.save();
+      ctx.globalAlpha = scan * 0.35;
+      ctx.fillStyle = '#000000';
+      for (let y = 0; y < H; y += step) {
+        ctx.fillRect(0, y, W, 1);
+      }
+      ctx.restore();
+    }
+
+    // ── Paso 5: vignette radial ─────────────────
+    if (vig > 0) {
+      const grad = ctx.createRadialGradient(
+        W / 2, H / 2, Math.min(W, H) * 0.3,
+        W / 2, H / 2, Math.max(W, H) * 0.8
+      );
+      grad.addColorStop(0, 'rgba(0,0,0,0)');
+      grad.addColorStop(1, `rgba(0,0,0,${vig * 0.75})`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    canvas.style.display = 'block';
+  }
+
+  // ── Carga de imagen ─────────────────────────────
+  function loadFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => { srcImg = img; render(); URL.revokeObjectURL(url); };
+    img.src = url;
+  }
+
+  // Drop zone
+  const drop = document.getElementById('dreamyDrop');
+  const fileInput = document.getElementById('dreamyFile');
+
+  drop.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor = 'var(--accent)'; });
+  drop.addEventListener('dragleave', () => { drop.style.borderColor = ''; });
+  drop.addEventListener('drop', e => {
+    e.preventDefault();
+    drop.style.borderColor = '';
+    if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+  });
+
+  // Sliders
+  Object.keys(sliders).forEach(k => {
+    sliders[k].addEventListener('input', () => {
+      labels[k].textContent = sliders[k].value;
+      render();
+    });
+  });
+
+  // Descarga
+  document.getElementById('dreamyDl').addEventListener('click', () => {
+    if (!srcImg) return;
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'dosa_dreamy.png';
+    a.click();
+  });
+
+  // Reset
+  const defaults = { shift: 12, blur: 8, scan: 70, sat: 180, bri: 110, vig: 60 };
+  document.getElementById('dreamyReset').addEventListener('click', () => {
+    Object.keys(defaults).forEach(k => {
+      sliders[k].value  = defaults[k];
+      labels[k].textContent = defaults[k];
+    });
+    render();
+  });
+
+})();
+// ══════════════ FIN DREAMY BLUR ══════════════
 
 </script>
 
