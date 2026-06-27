@@ -20,7 +20,7 @@
     --border: rgba(255,255,255,0.07);
   }
 
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; background: #000; }
 
   /* ── Frame centrado 1920px max — igual que Norvin / Corlima ── */
   #site-frame {
@@ -29,8 +29,10 @@
     margin: 0 auto;
     background: var(--black);
     position: relative;
-    overflow-x: hidden;
+    overflow: hidden;
     min-height: 100vh;
+    border: none;
+    outline: none;
   }
 
   body {
@@ -314,7 +316,7 @@
     flex-direction: column;
     justify-content: flex-end;
     overflow: hidden;
-    border-radius: 24px;
+    border-radius: 28px;
   }
 
   /* Banner imagen con parallax */
