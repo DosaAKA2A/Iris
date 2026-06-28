@@ -691,6 +691,8 @@ html, body { width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; }
 <script>
 function animateCounters() {
   document.querySelectorAll('.i-count').forEach(el => {
+    // Reset primero
+    el.textContent = '0';
     const target = +el.dataset.target;
     const duration = 1800;
     const start = performance.now();
@@ -703,6 +705,22 @@ function animateCounters() {
     }
     requestAnimationFrame(update);
   });
+}
+
+function setupCounterObserver() {
+  const counters = document.querySelector('.i-counters');
+  if (!counters) return;
+  let fired = false;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !fired) {
+        fired = true;
+        animateCounters();
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.4 });
+  observer.observe(counters);
 }
 
 window.setIrisTheme = function(theme, flashColor) {
@@ -729,7 +747,7 @@ window.setIrisTheme = function(theme, flashColor) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           iris.classList.add('is-animating');
-          animateCounters();
+          setupCounterObserver();
         });
       });
     }
