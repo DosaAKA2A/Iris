@@ -49,13 +49,22 @@ html, body { width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; }
 .theme-dark  .i-logo { font-family:'Clash Display',sans-serif; letter-spacing:.18em; }
 .theme-gold  .i-logo { font-family:'Clash Display',sans-serif; letter-spacing:.18em; }
 
-/* Logo color utilities */
-.logo-no        { color:#fff; }
-.logo-no-dark   { color:#1847e8; }
-.logo-vo-dark   { color:#fff; }     /* blanco sobre fondo oscuro */
-.logo-vo-blue   { color:#1847e8; }  /* azul sobre fondo blanco */
-.logo-vo-gold   { color:#b8923a; }
-.logo-vo-yellow { color:#fff; }     /* blanco sobre banner azul */
+/* Logo color utilities — solo theme-light */
+.theme-light .logo-no-dark   { color:#1847e8; }
+.theme-light .logo-vo-blue   { color:#1847e8; }
+
+/* Dark/gold nav logo: todo blanco */
+.theme-dark  .i-logo { color:#fff; }
+.theme-gold  .i-logo { color:var(--g-fg); }
+.theme-light .i-logo { color:#1847e8; }
+
+/* Banner NOVO: todo blanco */
+.i-novo-brand { font-size:clamp(26px,4vw,40px); font-weight:800; color:#fff; letter-spacing:-.03em; line-height:1; }
+.i-novo-brand .logo-vo-yellow { color:#fff; }
+
+/* Footer: todo blanco */
+.i-footer-logo { font-size:18px; font-weight:800; color:#fff; letter-spacing:.04em; }
+.i-footer-logo .logo-vo-blue { color:#fff; }
 
 .i-logo-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; transition:background .7s; }
 .theme-dark  .i-logo-dot { background:var(--d-accent); }
@@ -357,9 +366,9 @@ html, body { width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; }
 <nav class="i-nav">
   <div class="i-logo">
     <span class="i-logo-dot"></span>
-    <span class="t-dark"><span class="logo-no">NO</span><span class="logo-vo-dark">VO</span></span>
-    <span class="t-light"><span class="logo-no-dark">NO</span><span class="logo-vo-blue">VO</span></span>
-    <span class="t-gold"><span class="logo-no">NO</span><span class="logo-vo-gold">VO</span></span>
+    <span class="t-dark">DOSA</span>
+    <span class="t-light" style="color:#1847e8;font-weight:800;">NOVO</span>
+    <span class="t-gold">CELESTIA</span>
   </div>
   <div class="i-nav-links">
     <a class="i-nav-link" href="#">Servicios</a>
@@ -492,7 +501,7 @@ html, body { width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; }
 <!-- LIGHT: NOVO PROMO BANNER -->
 <div class="i-novo-banner">
   <div class="i-novo-banner-left">
-    <div class="i-novo-brand"><span class="logo-no">NO</span><span class="logo-vo-yellow">VO</span></div>
+    <div class="i-novo-brand">NOVO</div>
     <div class="i-novo-tagline">Refrigeración Comercial · Oficinas y Corporativo · Soporte 24/7</div>
     <div class="i-novo-offer">
       <div class="i-offer-badge"><small>Hasta</small>30%<small>dcto.</small></div>
@@ -555,7 +564,7 @@ html, body { width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; }
 <footer class="i-footer">
   <div class="i-footer-top">
     <div class="i-footer-brand">
-      <div class="i-footer-logo"><span class="logo-no">NO</span><span class="logo-vo-blue">VO</span></div>
+      <div class="i-footer-logo">NOVO</div>
       <div class="i-footer-tagline">Refrigeración comercial de alto rendimiento para empresas.</div>
     </div>
     <div class="i-footer-cols">
