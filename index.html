@@ -1087,7 +1087,7 @@
     letter-spacing: .04em; text-align: center; max-width: 180px; margin: 0 auto;
   }
   .iris-browser-body { position: relative; height: 860px; overflow: hidden; }
-  .iris-browser-body iframe { width: 100%; height: 100%; border: none; display: block; }
+  .iris-browser-body iframe { width: 100%; height: 100%; border: none; display: block; overflow-y: auto; }
   @media (max-width: 860px) {
     .iris-layout { grid-template-columns: 1fr; }
     .iris-themes { flex-direction: row; position: static; }
@@ -1299,7 +1299,7 @@
         <div style="font-family:'Clash Display',sans-serif;font-size:13px;font-weight:700;letter-spacing:.22em;color:rgba(255,255,255,0.6);text-transform:uppercase;">IRIS STUDIO</div>
       </div>
       <div class="iris-browser-body">
-        <iframe id="irisFrame" src="iris-frame.html" scrolling="no" frameborder="0"></iframe>
+        <iframe id="irisFrame" src="iris-frame.html" scrolling="yes" frameborder="0"></iframe>
       </div>
     </div>
 
