@@ -743,10 +743,13 @@ window.setIrisTheme = function(theme) {
     heroBgImg.style.opacity = '0';
     heroBgImg.style.display = 'none';
     const T_heroImg = { light: 'novo-hero.jpg', dark: null, gold: 'celestia-hero.jpg' };
+    const T_heroPos = { light: 'center 40%', dark: null, gold: 'right center' };
     const imgSrc = T_heroImg[theme];
+    const imgPos = T_heroPos[theme] || 'center';
     if (imgSrc) {
       setTimeout(() => {
         heroBgImg.src = imgSrc;
+        heroBgImg.style.objectPosition = imgPos;
         heroBgImg.style.display = 'block';
         requestAnimationFrame(() => requestAnimationFrame(() => {
           heroBgImg.style.transition = 'opacity 0.8s ease';
