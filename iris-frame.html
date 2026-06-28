@@ -589,96 +589,72 @@ function apply(t){
 // ── LETTER SCATTER / GATHER ──────────────────────────────
 
 function scatterText(el, onDone) {
-  // Wrap each letter preserving HTML structure
-  const spans = [];
-  el.querySelectorAll('.lg, .ls').forEach(s => s.outerHTML = s.textContent); // cleanup
-
-  // Re-wrap by iterating child nodes
-  function wrapNode(node) {
-    if (node.nodeType === 3) { // text node
-      const frag = document.createDocumentFragment();
-      node.textContent.split('').forEach((ch, i) => {
-        if (ch === ' ') { frag.appendChild(document.createTextNode(' ')); return; }
-        const s = document.createElement('span');
-        s.className = 'ls';
-        s.textContent = ch;
-        s.style.cssText = `display:inline-block;transition:transform 0.2s cubic-bezier(0.4,0,1,1) ${spans.length*0.016}s,opacity 0.16s ease ${spans.length*0.016}s`;
-        spans.push(s);
-        frag.appendChild(s);
-      });
-      node.parentNode.replaceChild(frag, node);
-    } else if (node.nodeType === 1 && node.tagName !== 'SPAN') {
-      Array.from(node.childNodes).forEach(wrapNode);
-    } else if (node.nodeType === 1) {
-      // it's a span (color span) — wrap its text children
-      Array.from(node.childNodes).forEach(child => {
-        if (child.nodeType === 3) {
-          const frag = document.createDocumentFragment();
-          child.textContent.split('').forEach(ch => {
-            if (ch === ' ') { frag.appendChild(document.createTextNode(' ')); return; }
-            const s = document.createElement('span');
-            s.className = 'ls';
-            s.textContent = ch;
-            s.style.cssText = `display:inline-block;transition:transform 0.2s cubic-bezier(0.4,0,1,1) ${spans.length*0.016}s,opacity 0.16s ease ${spans.length*0.016}s;color:inherit`;
-            spans.push(s);
-            frag.appendChild(s);
-          });
-          child.parentNode.replaceChild(frag, child);
-        }
-      });
-    }
-  }
-  Array.from(el.childNodes).forEach(wrapNode);
-
-  requestAnimationFrame(() => {
-    spans.forEach(s => {
-      const up = Math.random() > 0.5;
-      s.style.transform = `translateY(${up ? -(40 + Math.random()*50) : (40 + Math.random()*50)}px)`;
-      s.style.opacity = '0';
-    });
-  });
-
-  const maxDelay = spans.length * 16 + 280;
-  setTimeout(() => { onDone && onDone(); }, maxDelay);
+  // Simplemente fade out el bloque completo rápido
+  el.style.transition = 'opacity 0.15s ease, transform 0.18s ease';
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(-10px)';
+  setTimeout(() => { onDone && onDone(); }, 200);
 }
 
 function gatherText(el, html) {
+  // Reset estilos
+  el.style.transition = 'none';
+  el.style.opacity = '1';
+  el.style.transform = '';
+
+  // Parsear HTML para extraer segmentos (texto plano + spans con clase)
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
 
-  // Build new HTML with scattered spans
-  function processNode(node, idx) {
+  // Construir array de {char, color} preservando spans
+  const chars = [];
+  function extractChars(node, color) {
+    if (node.nodeType === 3) {
+      node.textContent.split('').forEach(ch => chars.push({ch, color}));
+    } else if (node.nodeType === 1) {
+      const col = node.style.color || (node.tagName === 'SPAN' ? 'inherit-span' : null);
+      node.childNodes.forEach(c => extractChars(c, col || color));
+    }
+  }
+  // Obtener el color del span del tema actual
+  const accentSpan = tmp.querySelector('span');
+  const accentColor = accentSpan ? window.getComputedStyle(accentSpan).color : null;
+
+  // Reconstruir con spans individuales por letra
+  let i = 0;
+  function buildHTML(node) {
     if (node.nodeType === 3) {
       return node.textContent.split('').map(ch => {
         if (ch === ' ') return ' ';
         const up = Math.random() > 0.5;
-        const dist = 40 + Math.random() * 50;
-        const i = idx.i++;
-        return `<span class="lg" style="display:inline-block;transform:translateY(${up ? -dist : dist}px);opacity:0;transition:transform 0.28s cubic-bezier(0.34,1.4,0.64,1) ${i*0.022}s,opacity 0.2s ease ${i*0.022}s">${ch}</span>`;
+        const dist = 30 + Math.random() * 40;
+        const delay = i++ * 0.02;
+        return `<span style="display:inline-block;transform:translateY(${up?-dist:dist}px);opacity:0;transition:transform 0.3s cubic-bezier(0.34,1.4,0.64,1) ${delay}s,opacity 0.22s ease ${delay}s">${ch}</span>`;
       }).join('');
+    } else if (node.nodeType === 1 && node.tagName === 'BR') {
+      return '<br>';
     } else if (node.nodeType === 1) {
-      const tag = node.tagName.toLowerCase();
-      const style = node.getAttribute('style') || '';
-      const cls = node.getAttribute('class') || '';
-      const inner = Array.from(node.childNodes).map(c => processNode(c, idx)).join('');
-      return `<${tag}${cls ? ` class="${cls}"` : ''}${style ? ` style="${style}"` : ''}>${inner}</${tag}>`;
+      // Preservar el span con su estilo/clase
+      const attrs = Array.from(node.attributes).map(a => `${a.name}="${a.value}"`).join(' ');
+      const inner = Array.from(node.childNodes).map(buildHTML).join('');
+      return `<${node.tagName.toLowerCase()} ${attrs}>${inner}</${node.tagName.toLowerCase()}>`;
     }
     return '';
   }
 
-  const idx = {i: 0};
-  el.innerHTML = Array.from(tmp.childNodes).map(n => processNode(n, idx)).join('');
+  el.innerHTML = Array.from(tmp.childNodes).map(buildHTML).join('');
 
-  const totalSpans = idx.i;
+  // Animar hacia posición final
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    el.querySelectorAll('.lg').forEach(s => {
+    el.querySelectorAll('span[style*="translateY"]').forEach(s => {
       s.style.transform = 'translateY(0)';
       s.style.opacity = '1';
     });
   }));
 
-  // Cleanup after animation
-  setTimeout(() => { el.innerHTML = html; }, totalSpans * 22 + 500);
+  // Cleanup: restaurar HTML limpio al final
+  const total = i;
+  setTimeout(() => { el.innerHTML = html; }, total * 20 + 500);
 }
 
 // Morphing de color CSS (background, color, border-color)
