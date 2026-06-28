@@ -689,9 +689,9 @@ html, body { width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; }
 </div><!-- /iris -->
 
 <script>
+// ── COUNTER ──────────────────────────────────────────────
 function animateCounters() {
   document.querySelectorAll('.i-count').forEach(el => {
-    // Reset primero
     el.textContent = '0';
     const target = +el.dataset.target;
     const duration = 1800;
@@ -711,47 +711,140 @@ function setupCounterObserver() {
   const counters = document.querySelector('.i-counters');
   if (!counters) return;
   let fired = false;
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && !fired) {
-        fired = true;
-        animateCounters();
-        observer.disconnect();
-      }
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !fired) { fired = true; animateCounters(); obs.disconnect(); }
     });
   }, { threshold: 0.4 });
-  observer.observe(counters);
+  obs.observe(counters);
 }
 
+// ── MORPH TRANSITION ─────────────────────────────────────
+let currentTheme = 'dark';
+let isTransitioning = false;
+
+const themeBg     = { dark: '#09090b', light: '#f4f4f2', gold: '#f9f5ef' };
+const themeAccent = { dark: '#dc402a', light: '#1847e8', gold: '#b8923a' };
+
 window.setIrisTheme = function(theme, flashColor) {
-  const iris = document.getElementById('iris');
-  const flash = document.getElementById('theme-flash');
-  const cart = document.getElementById('navCart');
+  if (isTransitioning || theme === currentTheme) return;
+  isTransitioning = true;
+
+  const iris    = document.getElementById('iris');
+  const cart    = document.getElementById('navCart');
   const account = document.getElementById('navAccount');
-  flash.style.background = flashColor || 'rgba(255,255,255,0.06)';
-  flash.classList.add('active');
+  const from    = currentTheme;
+  currentTheme  = theme;
 
-  // Quitar animación previa
-  iris.classList.remove('is-animating');
+  // 1. SALIDA — textos vuelan hacia afuera
+  const exitText = iris.querySelectorAll('.i-hero-content, .i-hero-img-content, .i-headline, .i-sub, .i-eyebrow, .i-novo-brand, .i-section-title, .i-section-link');
+  exitText.forEach((el, i) => {
+    el.style.transition = `transform ${0.22 + i*0.025}s cubic-bezier(0.4,0,0.2,1), opacity ${0.18 + i*0.02}s ease`;
+    el.style.transform  = i % 2 === 0 ? 'translateY(-44px) rotate(-3deg)' : 'translateY(44px) rotate(3deg)';
+    el.style.opacity    = '0';
+  });
 
+  // Imágenes: zoom + blur out
+  iris.querySelectorAll('.i-hero-img-banner img, .i-novo-banner-right img, .i-hero-bg').forEach(el => {
+    el.style.transition = 'transform 0.45s ease, opacity 0.38s ease, filter 0.45s ease';
+    el.style.transform  = 'scale(1.1)';
+    el.style.opacity    = '0';
+    el.style.filter     = 'blur(10px)';
+  });
+
+  // Cards: escalonado hacia abajo
+  iris.querySelectorAll('.i-product-card').forEach((el, i) => {
+    el.style.transition = `transform ${0.18 + i*0.04}s ease ${i*0.03}s, opacity 0.18s ease ${i*0.03}s`;
+    el.style.transform  = `translateY(${60}px) scale(0.94)`;
+    el.style.opacity    = '0';
+  });
+
+  // Nav desliza hacia arriba
+  const nav = iris.querySelector('.i-nav');
+  if (nav) {
+    nav.style.transition = 'transform 0.28s ease, opacity 0.22s ease';
+    nav.style.transform  = 'translateY(-100%)';
+    nav.style.opacity    = '0';
+  }
+
+  // Counters flip
+  iris.querySelectorAll('.i-counter-num').forEach(el => {
+    el.style.transition = 'transform 0.25s ease, opacity 0.2s ease';
+    el.style.transform  = 'rotateX(90deg)';
+    el.style.opacity    = '0';
+  });
+
+  // 2. CAPA MORPH — círculo que se expande desde el centro
+  const layer  = document.createElement('div');
+  const circle = document.createElement('div');
+  layer.style.cssText = `position:fixed;inset:0;z-index:9998;pointer-events:none;overflow:hidden;`;
+  circle.style.cssText = `
+    position:absolute;left:50%;top:50%;
+    width:0;height:0;margin:0;
+    border-radius:50%;
+    background:${themeBg[theme]};
+    transform:translate(-50%,-50%);
+    transition:none;
+  `;
+  layer.appendChild(circle);
+
+  // Líneas de barrido horizontal
+  for (let i = 0; i < 5; i++) {
+    const line = document.createElement('div');
+    line.style.cssText = `
+      position:absolute;left:0;right:0;height:1.5px;
+      background:${themeAccent[theme]};opacity:0.5;
+      top:${10 + i*18}%;
+      transform:translateX(-110%);
+      transition:transform ${0.5+i*0.06}s cubic-bezier(0.4,0,0.2,1) ${0.04+i*0.05}s;
+    `;
+    layer.appendChild(line);
+  }
+
+  document.body.appendChild(layer);
+
+  // Lanzar expansión del círculo después de 1 frame
+  requestAnimationFrame(() => {
+    const size = Math.hypot(window.innerWidth, window.innerHeight) * 2.2;
+    circle.style.transition = `width 0.6s cubic-bezier(0.4,0,0.2,1), height 0.6s cubic-bezier(0.4,0,0.2,1)`;
+    circle.style.width  = size + 'px';
+    circle.style.height = size + 'px';
+    // Líneas barren
+    layer.querySelectorAll('div + div').forEach(l => { l.style.transform = 'translateX(110%)'; });
+  });
+
+  // 3. SWAP en el punto medio
   setTimeout(() => {
-    iris.className = 'theme-' + theme;
-    const show = theme === 'light' ? 'flex' : 'none';
-    cart.style.display = show;
-    account.style.display = show;
-    flash.classList.remove('active');
+    // Limpiar estilos de salida
+    exitText.forEach(el => { el.style.transition=''; el.style.transform=''; el.style.opacity=''; });
+    iris.querySelectorAll('.i-hero-img-banner img,.i-novo-banner-right img,.i-hero-bg').forEach(el => {
+      el.style.transition=''; el.style.transform=''; el.style.opacity=''; el.style.filter='';
+    });
+    iris.querySelectorAll('.i-product-card').forEach(el => { el.style.transition=''; el.style.transform=''; el.style.opacity=''; });
+    iris.querySelectorAll('.i-counter-num').forEach(el => { el.style.transition=''; el.style.transform=''; el.style.opacity=''; });
+    if (nav) { nav.style.transition=''; nav.style.transform=''; nav.style.opacity=''; }
 
-    // Activar animaciones si es light
-    if (theme === 'light') {
-      // Pequeño delay para que el DOM se pinte antes de animar
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          iris.classList.add('is-animating');
-          setupCounterObserver();
-        });
-      });
-    }
-  }, 120);
+    iris.className = 'theme-' + theme;
+    iris.classList.remove('is-animating');
+
+    const show = theme === 'light' ? 'flex' : 'none';
+    cart.style.display    = show;
+    account.style.display = show;
+    window.scrollTo(0, 0);
+  }, 500);
+
+  // 4. REVELAR + entrada
+  setTimeout(() => {
+    layer.style.transition = 'opacity 0.4s ease';
+    layer.style.opacity    = '0';
+    setTimeout(() => layer.remove(), 400);
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      iris.classList.add('is-animating');
+      if (theme === 'light') setupCounterObserver();
+      isTransitioning = false;
+    }));
+  }, 650);
 };
 
 window.addEventListener('message', function(e) {
