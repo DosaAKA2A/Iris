@@ -589,41 +589,87 @@ function apply(t){
 // ── LETTER SCATTER / GATHER ──────────────────────────────
 
 function scatterText(el, onDone) {
-  const text = el.textContent;
-  if (!text.trim()) { onDone && onDone(); return; }
+  // Wrap each letter preserving HTML structure
+  const spans = [];
+  el.querySelectorAll('.lg, .ls').forEach(s => s.outerHTML = s.textContent); // cleanup
 
-  // Wrap each letter in a span
-  el.innerHTML = text.split('').map((ch, i) =>
-    ch === ' ' ? ' ' :
-    `<span class="ls" style="display:inline-block;transition:transform ${0.2 + Math.random()*0.15}s cubic-bezier(0.4,0,1,1) ${i*0.018}s,opacity ${0.18}s ease ${i*0.018}s">${ch}</span>`
-  ).join('');
+  // Re-wrap by iterating child nodes
+  function wrapNode(node) {
+    if (node.nodeType === 3) { // text node
+      const frag = document.createDocumentFragment();
+      node.textContent.split('').forEach((ch, i) => {
+        if (ch === ' ') { frag.appendChild(document.createTextNode(' ')); return; }
+        const s = document.createElement('span');
+        s.className = 'ls';
+        s.textContent = ch;
+        s.style.cssText = `display:inline-block;transition:transform 0.2s cubic-bezier(0.4,0,1,1) ${spans.length*0.016}s,opacity 0.16s ease ${spans.length*0.016}s`;
+        spans.push(s);
+        frag.appendChild(s);
+      });
+      node.parentNode.replaceChild(frag, node);
+    } else if (node.nodeType === 1 && node.tagName !== 'SPAN') {
+      Array.from(node.childNodes).forEach(wrapNode);
+    } else if (node.nodeType === 1) {
+      // it's a span (color span) — wrap its text children
+      Array.from(node.childNodes).forEach(child => {
+        if (child.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          child.textContent.split('').forEach(ch => {
+            if (ch === ' ') { frag.appendChild(document.createTextNode(' ')); return; }
+            const s = document.createElement('span');
+            s.className = 'ls';
+            s.textContent = ch;
+            s.style.cssText = `display:inline-block;transition:transform 0.2s cubic-bezier(0.4,0,1,1) ${spans.length*0.016}s,opacity 0.16s ease ${spans.length*0.016}s;color:inherit`;
+            spans.push(s);
+            frag.appendChild(s);
+          });
+          child.parentNode.replaceChild(frag, child);
+        }
+      });
+    }
+  }
+  Array.from(el.childNodes).forEach(wrapNode);
 
   requestAnimationFrame(() => {
-    el.querySelectorAll('.ls').forEach(s => {
+    spans.forEach(s => {
       const up = Math.random() > 0.5;
-      const dist = 40 + Math.random() * 60;
-      s.style.transform = `translateY(${up ? -dist : dist}px)`;
+      s.style.transform = `translateY(${up ? -(40 + Math.random()*50) : (40 + Math.random()*50)}px)`;
       s.style.opacity = '0';
     });
   });
 
-  const maxDelay = text.length * 18 + 350;
+  const maxDelay = spans.length * 16 + 280;
   setTimeout(() => { onDone && onDone(); }, maxDelay);
 }
 
 function gatherText(el, html) {
-  // Set new content with letters starting scattered
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
-  const plain = tmp.textContent;
 
-  el.innerHTML = plain.split('').map((ch, i) => {
-    if (ch === ' ') return ' ';
-    const up = Math.random() > 0.5;
-    const dist = 40 + Math.random() * 60;
-    return `<span class="lg" style="display:inline-block;transform:translateY(${up ? -dist : dist}px);opacity:0;transition:transform ${0.25 + Math.random()*0.15}s cubic-bezier(0.34,1.56,0.64,1) ${i*0.022}s,opacity 0.2s ease ${i*0.022}s">${ch}</span>`;
-  }).join('');
+  // Build new HTML with scattered spans
+  function processNode(node, idx) {
+    if (node.nodeType === 3) {
+      return node.textContent.split('').map(ch => {
+        if (ch === ' ') return ' ';
+        const up = Math.random() > 0.5;
+        const dist = 40 + Math.random() * 50;
+        const i = idx.i++;
+        return `<span class="lg" style="display:inline-block;transform:translateY(${up ? -dist : dist}px);opacity:0;transition:transform 0.28s cubic-bezier(0.34,1.4,0.64,1) ${i*0.022}s,opacity 0.2s ease ${i*0.022}s">${ch}</span>`;
+      }).join('');
+    } else if (node.nodeType === 1) {
+      const tag = node.tagName.toLowerCase();
+      const style = node.getAttribute('style') || '';
+      const cls = node.getAttribute('class') || '';
+      const inner = Array.from(node.childNodes).map(c => processNode(c, idx)).join('');
+      return `<${tag}${cls ? ` class="${cls}"` : ''}${style ? ` style="${style}"` : ''}>${inner}</${tag}>`;
+    }
+    return '';
+  }
 
+  const idx = {i: 0};
+  el.innerHTML = Array.from(tmp.childNodes).map(n => processNode(n, idx)).join('');
+
+  const totalSpans = idx.i;
   requestAnimationFrame(() => requestAnimationFrame(() => {
     el.querySelectorAll('.lg').forEach(s => {
       s.style.transform = 'translateY(0)';
@@ -631,9 +677,8 @@ function gatherText(el, html) {
     });
   }));
 
-  // After animation settles, replace with clean HTML (for spans with color etc)
-  const maxDelay = plain.length * 22 + 400;
-  setTimeout(() => { el.innerHTML = html; }, maxDelay);
+  // Cleanup after animation
+  setTimeout(() => { el.innerHTML = html; }, totalSpans * 22 + 500);
 }
 
 // Morphing de color CSS (background, color, border-color)
@@ -776,7 +821,7 @@ window.setIrisTheme = function(theme) {
       if (fg) fg.style.display = 'block';
     }
 
-    // Revelar imagen después de que scatter/gather termine (~800ms desde inicio)
+    // Revelar imagen después de que scatter/gather termine (~1000ms desde inicio)
     setTimeout(() => {
       if (overlay) { overlay.style.transition = 'opacity 0.6s ease'; overlay.style.opacity = '1'; }
       if (d.heroImg && hi) {
@@ -786,7 +831,7 @@ window.setIrisTheme = function(theme) {
         fb.style.transition = 'opacity 0.8s ease';
         fb.style.opacity = '0.85';
       }
-    }, 600);
+    }, 900);
   }, 100);
 
   // ── 8. Resto del contenido: aplica al punto medio ────
