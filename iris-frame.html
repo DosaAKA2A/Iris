@@ -597,7 +597,7 @@ function scatterText(el, onDone) {
   setTimeout(() => { onDone && onDone(); }, 200);
 }
 
-function gatherText(el, html, targetTheme) {
+function gatherText(el, html, targetTheme, baseColor) {
   el.style.transition = 'none';
   el.style.opacity = '1';
   el.style.transform = '';
@@ -605,9 +605,9 @@ function gatherText(el, html, targetTheme) {
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
 
-  // Color blanco para texto normal, acento para spans
   const accentColors = { dark:'#ff6b35', light:'#ffd166', gold:'#b8923a' };
-  const accentColor = accentColors[targetTheme] || '#fff';
+  const accentColor  = accentColors[targetTheme] || '#fff';
+  const normalColor  = baseColor || '#ffffff';
 
   let i = 0;
   function buildHTML(node, isAccent) {
@@ -617,7 +617,7 @@ function gatherText(el, html, targetTheme) {
         const up = Math.random() > 0.5;
         const dist = 30 + Math.random() * 40;
         const delay = i++ * 0.02;
-        const col = isAccent ? accentColor : '#ffffff';
+        const col = isAccent ? accentColor : normalColor;
         return `<span style="display:inline-block;color:${col};transform:translateY(${up?-dist:dist}px);opacity:0;transition:transform 0.3s cubic-bezier(0.34,1.4,0.64,1) ${delay}s,opacity 0.22s ease ${delay}s">${ch}</span>`;
       }).join('');
     } else if (node.nodeType === 1 && node.tagName === 'BR') {
@@ -641,7 +641,11 @@ function gatherText(el, html, targetTheme) {
   }));
 
   const total = i;
-  setTimeout(() => { el.innerHTML = html; }, total * 20 + 500);
+  // Cleanup: restore clean HTML. Also set color inline on the element so CSS transition doesn't flicker
+  setTimeout(() => {
+    el.innerHTML = html;
+    if (baseColor) el.style.color = baseColor;
+  }, total * 20 + 500);
 }
 
 // Morphing de color CSS (background, color, border-color)
@@ -763,12 +767,9 @@ window.setIrisTheme = function(theme) {
   // ── 4. LOGO scatter → gather ─────────────────────────
   const logoEl = document.getElementById('logo-text');
   if (logoEl) {
-    // Forzar color del logo inmediatamente via style inline
     const navColors = { dark:'#f5f5f5', light:'#1847e8', gold:'#1a1410' };
-    scatterText(logoEl, () => {
-      gatherText(logoEl, d.logo, theme);
-      // Una vez que gather termina (~500ms), el className ya está actualizado
-    });
+    const logoColor = navColors[theme];
+    scatterText(logoEl, () => gatherText(logoEl, d.logo, theme, logoColor));
   }
 
   // ── 5. NAV CTA color ─────────────────────────────────
