@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: "Clash Display";
+  src: url("https://framerusercontent.com/third-party-assets/fontshare/wf/BFBSY7LX5W2U2EROCLVVTQP4VS7S4PC3/IIUX4FGTMD2LK2VWD3RVTAS4SSMUN7B5/53RZKGODFYDW3QHTIL7IPOWTBCSUEZK7.woff2");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+
+/* ── TOKENS POR TEMA ── */
+:root {
+  /* Dark */
+  --d-bg:       #09090b;
+  --d-bg2:      #111113;
+  --d-fg:       #f5f5f5;
+  --d-muted:    rgba(245,245,245,0.35);
+  --d-accent:   #dc402a;
+  --d-border:   rgba(255,255,255,0.07);
+  --d-nav-bg:   rgba(10,10,12,0.85);
+
+  /* Light */
+  --l-bg:       #f8f8f6;
+  --l-bg2:      #eeeeed;
+  --l-fg:       #111111;
+  --l-muted:    rgba(17,17,17,0.4);
+  --l-accent:   #1d5fe8;
+  --l-border:   rgba(0,0,0,0.08);
+  --l-nav-bg:   rgba(248,248,246,0.88);
+
+  /* Gold */
+  --g-bg:       #f9f5ef;
+  --g-bg2:      #ede8e0;
+  --g-fg:       #1a1612;
+  --g-muted:    rgba(26,22,18,0.4);
+  --g-accent:   #b8923a;
+  --g-border:   rgba(184,146,58,0.15);
+  --g-nav-bg:   rgba(249,245,239,0.9);
+}
+
+/* ── PÁGINA ── */
+#iris {
+  width: 100%; height: 100%;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', system-ui, sans-serif;
+  transition: background 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── TEMAS ── */
+#iris.theme-dark  { background: var(--d-bg); color: var(--d-fg); }
+#iris.theme-light { background: var(--l-bg); color: var(--l-fg); }
+#iris.theme-gold  { background: var(--g-bg); color: var(--g-fg); }
+
+/* ── NAV ── */
+.i-nav {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.7s cubic-bezier(0.4,0,0.2,1), border-color 0.7s;
+  border-bottom: 1px solid transparent;
+}
+.theme-dark  .i-nav { background: var(--d-nav-bg); border-color: var(--d-border); }
+.theme-light .i-nav { background: var(--l-nav-bg); border-color: var(--l-border); }
+.theme-gold  .i-nav { background: var(--g-nav-bg); border-color: var(--g-border); }
+
+.i-logo {
+  font-family: 'Clash Display', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  transition: color 0.7s;
+  display: flex; align-items: center; gap: 6px;
+}
+.i-logo-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  transition: background 0.7s;
+  flex-shrink: 0;
+}
+.theme-dark  .i-logo-dot { background: var(--d-accent); }
+.theme-light .i-logo-dot { background: var(--l-accent); }
+.theme-gold  .i-logo-dot { background: var(--g-accent); }
+
+.i-nav-links {
+  display: flex; gap: 20px; align-items: center;
+}
+.i-nav-link {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  transition: color 0.7s, opacity 0.7s;
+  text-decoration: none;
+}
+.theme-dark  .i-nav-link { color: var(--d-muted); }
+.theme-light .i-nav-link { color: var(--l-muted); }
+.theme-gold  .i-nav-link { color: var(--g-muted); }
+.i-nav-link:hover { opacity: 1 !important; }
+.theme-dark  .i-nav-link:hover { color: var(--d-fg); }
+.theme-light .i-nav-link:hover { color: var(--l-fg); }
+.theme-gold  .i-nav-link:hover { color: var(--g-fg); }
+
+.i-nav-cta {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 100px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.7s, color 0.7s, border-color 0.7s;
+  text-decoration: none;
+}
+.theme-dark  .i-nav-cta { background: var(--d-accent); color: #fff; border-color: var(--d-accent); }
+.theme-light .i-nav-cta { background: var(--l-accent); color: #fff; border-color: var(--l-accent); }
+.theme-gold  .i-nav-cta { background: transparent; color: var(--g-accent); border-color: var(--g-accent); }
+
+/* ── HERO ── */
+.i-hero {
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 32px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fondo hero — capas */
+.i-hero-bg {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1);
+  z-index: 0;
+}
+
+/* Dark: textura oscura con luces ambientales */
+.i-hero-bg-dark {
+  background:
+    radial-gradient(ellipse 60% 50% at 70% 30%, rgba(220,64,42,0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 20% 80%, rgba(100,100,120,0.15) 0%, transparent 70%),
+    #09090b;
+}
+/* Rejilla decorativa dark */
+.i-hero-bg-dark::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Light: gradiente limpio */
+.i-hero-bg-light {
+  background:
+    radial-gradient(ellipse 70% 50% at 80% 20%, rgba(29,95,232,0.08) 0%, transparent 70%),
+    #f8f8f6;
+}
+.i-hero-bg-light::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(29,95,232,0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Gold: gradiente cálido con textura sutil */
+.i-hero-bg-gold {
+  background:
+    radial-gradient(ellipse 60% 40% at 75% 25%, rgba(184,146,58,0.12) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 60% at 10% 90%, rgba(184,146,58,0.06) 0%, transparent 60%),
+    #f9f5ef;
+}
+.i-hero-bg-gold::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 40px,
+    rgba(184,146,58,0.03) 40px,
+    rgba(184,146,58,0.03) 41px
+  );
+}
+
+/* Opacidad según tema activo */
+.theme-dark  .i-hero-bg-dark  { opacity: 1; }
+.theme-dark  .i-hero-bg-light { opacity: 0; pointer-events: none; }
+.theme-dark  .i-hero-bg-gold  { opacity: 0; pointer-events: none; }
+
+.theme-light .i-hero-bg-dark  { opacity: 0; pointer-events: none; }
+.theme-light .i-hero-bg-light { opacity: 1; }
+.theme-light .i-hero-bg-gold  { opacity: 0; pointer-events: none; }
+
+.theme-gold  .i-hero-bg-dark  { opacity: 0; pointer-events: none; }
+.theme-gold  .i-hero-bg-light { opacity: 0; pointer-events: none; }
+.theme-gold  .i-hero-bg-gold  { opacity: 1; }
+
+/* ── CONTENIDO HERO ── */
+.i-hero-content {
+  position: relative; z-index: 1;
+}
+
+.i-eyebrow {
+  font-size: 9px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  font-weight: 500;
+  transition: color 0.7s;
+}
+.theme-dark  .i-eyebrow { color: var(--d-muted); }
+.theme-light .i-eyebrow { color: var(--l-muted); }
+.theme-gold  .i-eyebrow { color: var(--g-accent); }
+
+.i-headline {
+  font-family: 'Clash Display', sans-serif;
+  font-size: clamp(42px, 10vw, 80px);
+  font-weight: 700;
+  line-height: .9;
+  letter-spacing: -.03em;
+  margin-bottom: 16px;
+  transition: color 0.7s;
+  overflow: hidden;
+}
+
+/* Palabra destacada */
+.i-headline-accent {
+  display: inline-block;
+  transition: color 0.7s, -webkit-text-stroke 0.7s;
+}
+.theme-dark  .i-headline-accent { color: var(--d-accent); }
+.theme-light .i-headline-accent { color: var(--l-accent); }
+.theme-gold  .i-headline-accent {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--g-accent);
+}
+
+.i-sub {
+  font-size: clamp(11px, 1.8vw, 13px);
+  line-height: 1.7;
+  max-width: 320px;
+  margin-bottom: 24px;
+  font-weight: 400;
+  transition: color 0.7s;
+}
+.theme-dark  .i-sub { color: var(--d-muted); }
+.theme-light .i-sub { color: var(--l-muted); }
+.theme-gold  .i-sub { color: var(--g-muted); }
+
+.i-cta-row {
+  display: flex; gap: 10px; align-items: center;
+  flex-wrap: wrap;
+}
+
+.i-btn-primary {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.7s, color 0.7s, transform .2s;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.i-btn-primary:hover { transform: translateY(-1px); }
+.theme-dark  .i-btn-primary { background: var(--d-accent); color: #fff; }
+.theme-light .i-btn-primary { background: var(--l-accent); color: #fff; }
+.theme-gold  .i-btn-primary { background: var(--g-accent); color: #fff; }
+
+.i-btn-secondary {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: background 0.7s, color 0.7s, border-color 0.7s;
+  background: transparent;
+  text-decoration: none;
+}
+.theme-dark  .i-btn-secondary { color: var(--d-fg);  border: 1px solid var(--d-border); }
+.theme-light .i-btn-secondary { color: var(--l-fg);  border: 1px solid var(--l-border); }
+.theme-gold  .i-btn-secondary { color: var(--g-muted); border: 1px solid var(--g-border); }
+
+/* ── DECORACIÓN HERO — elemento flotante ── */
+.i-hero-deco {
+  position: absolute;
+  z-index: 1;
+  top: 50%; right: 10%;
+  transform: translateY(-50%);
+  transition: opacity 0.7s;
+}
+
+/* Dark: cuadrícula de píxeles */
+.i-deco-dark {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3px;
+}
+.i-deco-dark span {
+  width: 8px; height: 8px;
+  border-radius: 1px;
+  background: rgba(220,64,42,0.4);
+  animation: pixelPulse 2s ease-in-out infinite;
+}
+.i-deco-dark span:nth-child(odd)  { animation-delay: .3s; }
+.i-deco-dark span:nth-child(3n)   { background: rgba(255,255,255,0.12); }
+@keyframes pixelPulse {
+  0%,100% { opacity: .4; }
+  50%      { opacity: 1; }
+}
+
+/* Light: círculo de datos */
+.i-deco-light {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  border: 1px solid rgba(29,95,232,0.2);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.i-deco-light::before {
+  content: '';
+  position: absolute;
+  width: 70px; height: 70px;
+  border-radius: 50%;
+  border: 1px dashed rgba(29,95,232,0.3);
+  animation: spin 8s linear infinite;
+}
+.i-deco-light::after {
+  content: '↗';
+  font-size: 24px;
+  color: rgba(29,95,232,0.5);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Gold: rombo elegante */
+.i-deco-gold {
+  width: 80px; height: 80px;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.i-deco-gold::before {
+  content: '';
+  position: absolute;
+  width: 60px; height: 60px;
+  border: 1px solid rgba(184,146,58,0.5);
+  transform: rotate(45deg);
+}
+.i-deco-gold::after {
+  content: '';
+  position: absolute;
+  width: 40px; height: 40px;
+  border: 1px solid rgba(184,146,58,0.25);
+  transform: rotate(45deg);
+  animation: breathe 3s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,100% { transform: rotate(45deg) scale(1); }
+  50%      { transform: rotate(45deg) scale(1.12); }
+}
+
+/* Visibilidad decoraciones */
+.theme-dark  .i-deco-dark  { opacity: 1; }
+.theme-dark  .i-deco-light { opacity: 0; pointer-events: none; }
+.theme-dark  .i-deco-gold  { opacity: 0; pointer-events: none; }
+.theme-light .i-deco-dark  { opacity: 0; pointer-events: none; }
+.theme-light .i-deco-light { opacity: 1; }
+.theme-light .i-deco-gold  { opacity: 0; pointer-events: none; }
+.theme-gold  .i-deco-dark  { opacity: 0; pointer-events: none; }
+.theme-gold  .i-deco-light { opacity: 0; pointer-events: none; }
+.theme-gold  .i-deco-gold  { opacity: 1; }
+
+/* ── DIVISOR ── */
+.i-divider {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  transition: background 0.7s;
+}
+.theme-dark  .i-divider { background: var(--d-border); }
+.theme-light .i-divider { background: var(--l-border); }
+.theme-gold  .i-divider { background: var(--g-border); }
+
+/* ── TRANSICIÓN GLOBAL: flash overlay ── */
+#theme-flash {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 99;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+#theme-flash.active { opacity: 1; }
+
+/* ── TEXTO CAMBIABLE ── */
+/* Los textos tienen span internos por tema */
+.t-dark, .t-light, .t-gold { transition: opacity 0.4s; }
+.theme-dark  .t-dark  { opacity: 1; }
+.theme-dark  .t-light { opacity: 0; position: absolute; pointer-events: none; }
+.theme-dark  .t-gold  { opacity: 0; position: absolute; pointer-events: none; }
+.theme-light .t-dark  { opacity: 0; position: absolute; pointer-events: none; }
+.theme-light .t-light { opacity: 1; }
+.theme-light .t-gold  { opacity: 0; position: absolute; pointer-events: none; }
+.theme-gold  .t-dark  { opacity: 0; position: absolute; pointer-events: none; }
+.theme-gold  .t-light { opacity: 0; position: absolute; pointer-events: none; }
+.theme-gold  .t-gold  { opacity: 1; }
+
+.i-headline-wrap {
+  position: relative;
+  display: inline-block;
+}
+</style>
+</head>
+<body>
+
+<div id="iris" class="theme-dark">
+
+  <!-- Flash overlay para transición -->
+  <div id="theme-flash"></div>
+
+  <!-- NAV -->
+  <nav class="i-nav">
+    <div class="i-logo">
+      <span class="i-logo-dot"></span>
+      IRIS
+    </div>
+    <div class="i-nav-links">
+      <a class="i-nav-link" href="#">Servicios</a>
+      <a class="i-nav-link" href="#">Proyectos</a>
+      <a class="i-nav-link" href="#">Nosotros</a>
+    </div>
+    <a class="i-nav-cta" href="#">
+      <span class="t-dark">Hablemos</span>
+      <span class="t-light">Contáctanos</span>
+      <span class="t-gold">Reservar cita</span>
+    </a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="i-hero">
+
+    <!-- Fondos por tema -->
+    <div class="i-hero-bg i-hero-bg-dark"></div>
+    <div class="i-hero-bg i-hero-bg-light"></div>
+    <div class="i-hero-bg i-hero-bg-gold"></div>
+
+    <!-- Decoración flotante -->
+    <div class="i-hero-deco">
+      <!-- Dark -->
+      <div class="i-deco-dark">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <!-- Light -->
+      <div class="i-deco-light"></div>
+      <!-- Gold -->
+      <div class="i-deco-gold"></div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="i-hero-content">
+
+      <div class="i-eyebrow">
+        <span class="t-dark">Diseño · Tecnología · Identidad</span>
+        <span class="t-light">Software · Estrategia · Crecimiento</span>
+        <span class="t-gold">Joyería · Artesanía · Exclusividad</span>
+      </div>
+
+      <h1 class="i-headline">
+        <div class="i-headline-wrap">
+          <span class="t-dark">El diseño<br>que <span class="i-headline-accent">define.</span></span>
+          <span class="t-light">Escala tu<br>negocio <span class="i-headline-accent">hoy.</span></span>
+          <span class="t-gold">Belleza<br>que <span class="i-headline-accent">perdura.</span></span>
+        </div>
+      </h1>
+
+      <p class="i-sub">
+        <span class="t-dark">Creamos identidades visuales y experiencias digitales que no pasan desapercibidas.</span>
+        <span class="t-light">Soluciones digitales que convierten visitantes en clientes con precisión y velocidad.</span>
+        <span class="t-gold">Piezas únicas diseñadas para quienes saben que los detalles lo son todo.</span>
+      </p>
+
+      <div class="i-cta-row">
+        <a class="i-btn-primary" href="#">
+          <span class="t-dark">Ver proyectos →</span>
+          <span class="t-light">Empezar ahora →</span>
+          <span class="t-gold">Explorar colección →</span>
+        </a>
+        <a class="i-btn-secondary" href="#">
+          <span class="t-dark">Sobre nosotros</span>
+          <span class="t-light">Cómo funciona</span>
+          <span class="t-gold">Nuestra historia</span>
+        </a>
+      </div>
+
+    </div>
+
+    <div class="i-divider"></div>
+  </section>
+
+</div>
+
+<script>
+// API pública para cambiar tema desde el padre
+window.setIrisTheme = function(theme, flashColor) {
+  const iris  = document.getElementById('iris');
+  const flash = document.getElementById('theme-flash');
+
+  // Flash rápido del color del tema nuevo
+  flash.style.background = flashColor || 'rgba(255,255,255,0.06)';
+  flash.classList.add('active');
+
+  setTimeout(() => {
+    iris.className = 'theme-' + theme;
+    flash.classList.remove('active');
+  }, 120);
+};
+
+// Escucha mensajes del padre (iframe postMessage)
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'SET_THEME') {
+    window.setIrisTheme(e.data.theme, e.data.flashColor);
+  }
+});
+</script>
+</body>
+</html>
