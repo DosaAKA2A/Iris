@@ -146,9 +146,9 @@ html,body{width:100%;height:100%;overflow-x:hidden;overflow-y:auto}
 .i-promo {
   display:flex; overflow:hidden; position:relative;
 }
-.theme-dark  .i-promo { background:linear-gradient(120deg,#1a0800 0%,#2d0f00 50%,#1a0800 100%); min-height:260px; }
-.theme-light .i-promo { background:linear-gradient(120deg,#1847e8 0%,#0f2fa3 55%,#0a1f6e 100%); min-height:260px; }
-.theme-gold  .i-promo { background:linear-gradient(120deg,#1a1410 0%,#2a1f0f 55%,#1a1410 100%); min-height:260px; }
+.theme-dark  .i-promo { background:linear-gradient(120deg,#1a0800 0%,#2d0f00 50%,#1a0800 100%); min-height:200px; }
+.theme-light .i-promo { background:linear-gradient(120deg,#1847e8 0%,#0f2fa3 55%,#0a1f6e 100%); min-height:200px; }
+.theme-gold  .i-promo { background:linear-gradient(120deg,#1a1410 0%,#2a1f0f 55%,#1a1410 100%); min-height:200px; }
 
 .i-promo-left {
   width:38%; padding:28px 28px 28px 36px; display:flex; flex-direction:column;
@@ -525,111 +525,105 @@ html,body{width:100%;height:100%;overflow-x:hidden;overflow-y:auto}
 // ── DATA POR TEMA ─────────────────────────────────────────
 const themes = {
   dark: {
-    logo: 'DOSA', navMid: 'Proyectos', navCta: 'Hablemos',
-    heroTag: 'Diseño · Tecnología · Identidad',
-    heroTitle: 'El diseño que<br><span>define marcas.</span>',
-    heroSub: 'Creamos identidades visuales y experiencias digitales que no pasan desapercibidas.',
-    heroCta: 'Ver proyectos →',
-    heroImg: null,
-    sectionTitle: 'Proyectos destacados', sectionLink: 'Ver todos →',
-    promoBrand: 'DO<span class="accent">SA</span>',
-    promoTagline: 'Diseño · Automatización · Identidad',
-    promoOfferText: '30% en servicios de diseño<span>Proyectos nuevos. Oferta limitada.</span>',
-    promoBadges: ['Branding', 'Web design', 'Automatización'],
-    promoCta: 'Ver servicios →', promoImg: null,
-    counters: [
-      {val:120, label:'Marcas diseñadas<br>y lanzadas'},
-      {val:340, label:'Proyectos digitales<br>completados'},
-      {val:98, label:'Clientes activos<br>en 12 países'}
+    logo:'DOSA', navMid:'Proyectos', navCta:'Hablemos',
+    heroTag:'Diseño · Tecnología · Identidad',
+    heroTitle:'El diseño que<br><span>define marcas.</span>',
+    heroSub:'Creamos identidades visuales y experiencias digitales que no pasan desapercibidas.',
+    heroCta:'Ver proyectos →', heroImg:null,
+    sectionTitle:'Proyectos destacados', sectionLink:'Ver todos →',
+    promoBrand:'DO<span class="accent">SA</span>',
+    promoTagline:'Diseño · Automatización · Identidad',
+    promoOfferText:'30% en servicios de diseño<span>Proyectos nuevos. Oferta limitada.</span>',
+    promoBadges:['Branding','Web design','Automatización'],
+    promoCta:'Ver servicios →', promoImg:null,
+    counters:[
+      {val:120,label:'Marcas diseñadas<br>y lanzadas'},
+      {val:340,label:'Proyectos digitales<br>completados'},
+      {val:98,label:'Clientes activos<br>en 12 países'}
     ],
-    infoTag: 'Metodología DOSA', infoTitle: 'Proceso <span>creativo</span> sin límites',
-    infoSub: 'Desde el concepto hasta la implementación. Trabajamos contigo en cada fase para garantizar resultados que superan expectativas.',
-    infoBadges: ['Briefing en 24h', 'Iteraciones ilimitadas', 'Entrega garantizada'],
-    footerLogo: 'DO<span class="accent">SA</span>', footerTagline: 'Diseño e identidad para marcas que quieren destacar.',
-    footerCol2Title: 'Servicios', footerCol2Links: ['Identidad visual','Desarrollo web','UI / UX'],
-    footerContact: 'hola@dosa.studio', footerCopy: '© 2026 DOSA. Todos los derechos reservados.',
-    products: [
-      {img:'novo-img4.jpg', discount:null, brand:'DOSA', name:'Branding completo', old:null, price:'$2,400'},
-      {img:'novo-img5.jpg', discount:null, brand:'DOSA', name:'Sitio web a medida', old:null, price:'$3,800'},
-      {img:'novo-img1.jpg', discount:null, brand:'DOSA', name:'Sistema de diseño UI', old:null, price:'$1,900'},
-      {img:'novo-img6.jpg', discount:null, brand:'DOSA', name:'App móvil iOS/Android', old:null, price:'$5,500'},
-      {img:'novo-img2.jpg', discount:null, brand:'DOSA', name:'Automatización de procesos', old:null, price:'$2,100'},
-      {img:'novo-img7.jpg', discount:null, brand:'DOSA', name:'Consultoría de identidad', old:null, price:'$900'},
+    infoTag:'Metodología DOSA', infoTitle:'Proceso <span>creativo</span> sin límites',
+    infoSub:'Desde el concepto hasta la implementación. Trabajamos contigo en cada fase para garantizar resultados que superan expectativas.',
+    infoBadges:['Briefing en 24h','Iteraciones ilimitadas','Entrega garantizada'],
+    footerLogo:'DO<span class="accent">SA</span>', footerTagline:'Diseño e identidad para marcas que quieren destacar.',
+    footerCol2Title:'Servicios', footerCol2Links:['Identidad visual','Desarrollo web','UI / UX'],
+    footerContact:'hola@dosa.studio', footerCopy:'© 2026 DOSA. Todos los derechos reservados.',
+    products:[
+      {img:'novo-img4.jpg',discount:null,brand:'DOSA',name:'Branding completo',old:null,price:'$2,400'},
+      {img:'novo-img5.jpg',discount:null,brand:'DOSA',name:'Sitio web a medida',old:null,price:'$3,800'},
+      {img:'novo-img1.jpg',discount:null,brand:'DOSA',name:'Sistema de diseño UI',old:null,price:'$1,900'},
+      {img:'novo-img6.jpg',discount:null,brand:'DOSA',name:'App móvil iOS/Android',old:null,price:'$5,500'},
+      {img:'novo-img2.jpg',discount:null,brand:'DOSA',name:'Automatización de procesos',old:null,price:'$2,100'},
+      {img:'novo-img7.jpg',discount:null,brand:'DOSA',name:'Consultoría de identidad',old:null,price:'$900'},
     ]
   },
   light: {
-    logo: 'NOVO', navMid: 'Cotizaciones', navCta: 'Contáctanos',
-    heroTag: 'Soluciones para grandes espacios',
-    heroTitle: 'Climatización de alto<br>rendimiento para <span>tu empresa</span>',
-    heroSub: 'Diseñamos, instalamos y mantenemos sistemas HVAC para oficinas corporativas e infraestructuras industriales.',
-    heroCta: 'Solicitar diagnóstico →',
-    heroImg: 'novo-hero.jpg',
-    sectionTitle: 'Productos destacados', sectionLink: 'Ver todos →',
-    promoBrand: 'NO<span class="accent">VO</span>',
-    promoTagline: 'Refrigeración Comercial · Oficinas · Soporte 24/7',
-    promoOfferText: '30% en sistemas de climatización<span>Instalación incluida. Financiamiento disponible.</span>',
-    promoBadges: ['Instalación incluida','Inverter A+++','Mantenimiento'],
-    promoCta: 'Ver sistemas →', promoImg: 'novo-img1.jpg',
-    counters: [
-      {val:210, label:'Empresas confían en<br>los sistemas NOVO'},
-      {val:520, label:'Proyectos de climatización<br>completados'},
-      {val:800, label:'Equipos en nuestro<br>portafolio técnico'}
+    logo:'NOVO', navMid:'Cotizaciones', navCta:'Contáctanos',
+    heroTag:'Soluciones para grandes espacios',
+    heroTitle:'Climatización de alto<br>rendimiento para <span>tu empresa</span>',
+    heroSub:'Diseñamos, instalamos y mantenemos sistemas HVAC para oficinas corporativas e infraestructuras industriales.',
+    heroCta:'Solicitar diagnóstico →', heroImg:'novo-hero.jpg',
+    sectionTitle:'Productos destacados', sectionLink:'Ver todos →',
+    promoBrand:'NO<span class="accent">VO</span>',
+    promoTagline:'Refrigeración Comercial · Oficinas · Soporte 24/7',
+    promoOfferText:'30% en sistemas de climatización<span>Instalación incluida. Financiamiento disponible.</span>',
+    promoBadges:['Instalación incluida','Inverter A+++','Mantenimiento'],
+    promoCta:'Ver sistemas →', promoImg:'novo-img1.jpg',
+    counters:[
+      {val:210,label:'Empresas confían en<br>los sistemas NOVO'},
+      {val:520,label:'Proyectos de climatización<br>completados'},
+      {val:800,label:'Equipos en nuestro<br>portafolio técnico'}
     ],
-    infoTag: 'Soporte 24/7', infoTitle: 'Atención al cliente <span>personalizada</span>',
-    infoSub: 'Un ingeniero NOVO dedicado a tu proyecto desde el primer contacto. Siempre disponibles, con respuesta en menos de 2 horas.',
-    infoBadges: ['Línea directa 24/7','Ingeniero asignado','Plan de mantenimiento','Respuesta en menos de 2h'],
-    footerLogo: 'NO<span class="accent">VO</span>', footerTagline: 'Refrigeración comercial de alto rendimiento.',
-    footerCol2Title: 'Servicios', footerCol2Links: ['Instalación','Mantenimiento','Cotizaciones'],
-    footerContact: 'info@novo.pe', footerCopy: '© 2026 NOVO. Todos los derechos reservados.',
-    products: [
-      {img:'novo-img4.jpg', discount:'-24%', brand:'NOVO', name:'Condensadora Exterior 48,000 BTU', old:'$3,299', price:'$2,499'},
-      {img:'novo-img5.jpg', discount:'-37%', brand:'NOVO', name:'Mini Split Inverter 12,000 BTU', old:'$1,190', price:'$749'},
-      {img:'novo-img1.jpg', discount:'-31%', brand:'NOVO', name:'Cassette Techo 24,000 BTU', old:'$3,299', price:'$2,499'},
-      {img:'novo-img6.jpg', discount:'-28%', brand:'NOVO', name:'Ducto Ventilación Azotea 36,000 BTU', old:'$2,100', price:'$1,499'},
-      {img:'novo-img2.jpg', discount:'-22%', brand:'NOVO', name:'Fan Coil Piso-Techo 18,000 BTU', old:'$699', price:'$549'},
-      {img:'novo-img7.jpg', discount:'-35%', brand:'NOVO', name:'Ducto Galvanizado 24,000 BTU', old:'$1,850', price:'$1,199'},
+    infoTag:'Soporte 24/7', infoTitle:'Atención al cliente <span>personalizada</span>',
+    infoSub:'Un ingeniero NOVO dedicado a tu proyecto desde el primer contacto. Siempre disponibles, con respuesta en menos de 2 horas.',
+    infoBadges:['Línea directa 24/7','Ingeniero asignado','Plan de mantenimiento','Respuesta en menos de 2h'],
+    footerLogo:'NO<span class="accent">VO</span>', footerTagline:'Refrigeración comercial de alto rendimiento.',
+    footerCol2Title:'Servicios', footerCol2Links:['Instalación','Mantenimiento','Cotizaciones'],
+    footerContact:'info@novo.pe', footerCopy:'© 2026 NOVO. Todos los derechos reservados.',
+    products:[
+      {img:'novo-img4.jpg',discount:'-24%',brand:'NOVO',name:'Condensadora Exterior 48,000 BTU',old:'$3,299',price:'$2,499'},
+      {img:'novo-img5.jpg',discount:'-37%',brand:'NOVO',name:'Mini Split Inverter 12,000 BTU',old:'$1,190',price:'$749'},
+      {img:'novo-img1.jpg',discount:'-31%',brand:'NOVO',name:'Cassette Techo 24,000 BTU',old:'$3,299',price:'$2,499'},
+      {img:'novo-img6.jpg',discount:'-28%',brand:'NOVO',name:'Ducto Ventilación Azotea 36,000 BTU',old:'$2,100',price:'$1,499'},
+      {img:'novo-img2.jpg',discount:'-22%',brand:'NOVO',name:'Fan Coil Piso-Techo 18,000 BTU',old:'$699',price:'$549'},
+      {img:'novo-img7.jpg',discount:'-35%',brand:'NOVO',name:'Ducto Galvanizado 24,000 BTU',old:'$1,850',price:'$1,199'},
     ]
   },
   gold: {
-    logo: 'CELESTIA', navMid: 'Colección', navCta: 'Reservar cita',
-    heroTag: 'Joyería · Artesanía · Exclusividad',
-    heroTitle: 'Belleza que<br><span>perdura.</span>',
-    heroSub: 'Piezas únicas diseñadas para quienes saben que los detalles lo son todo. Oro, plata y gemas seleccionadas a mano.',
-    heroCta: 'Explorar colección →',
-    heroImg: 'celestia-hero.jpg',
-    sectionTitle: 'Colección exclusiva', sectionLink: 'Ver colección →',
-    promoBrand: 'CELES<span class="accent">TIA</span>',
-    promoTagline: 'Alta Joyería · Piezas únicas · Envío asegurado',
-    promoOfferText: 'Piezas seleccionadas en oferta<span>Colección de temporada. Unidades limitadas.</span>',
-    promoBadges: ['Oro 18k garantizado','Certificado de autenticidad','Envío asegurado'],
-    promoCta: 'Ver colección →', promoImg: 'celestia-hero.jpg',
-    counters: [
-      {val:1200, label:'Piezas únicas<br>creadas a mano'},
-      {val:98, label:'Clientes satisfechos<br>en todo el mundo'},
-      {val:15, label:'Años de experiencia<br>en alta joyería'}
+    logo:'CELESTIA', navMid:'Colección', navCta:'Reservar cita',
+    heroTag:'Joyería · Artesanía · Exclusividad',
+    heroTitle:'Belleza que<br><span>perdura.</span>',
+    heroSub:'Piezas únicas diseñadas para quienes saben que los detalles lo son todo. Oro, plata y gemas seleccionadas a mano.',
+    heroCta:'Explorar colección →', heroImg:'celestia-hero.jpg',
+    sectionTitle:'Colección exclusiva', sectionLink:'Ver colección →',
+    promoBrand:'CELES<span class="accent">TIA</span>',
+    promoTagline:'Alta Joyería · Piezas únicas · Envío asegurado',
+    promoOfferText:'Piezas seleccionadas en oferta<span>Colección de temporada. Unidades limitadas.</span>',
+    promoBadges:['Oro 18k garantizado','Certificado de autenticidad','Envío asegurado'],
+    promoCta:'Ver colección →', promoImg:'celestia-hero.jpg',
+    counters:[
+      {val:1200,label:'Piezas únicas<br>creadas a mano'},
+      {val:98,label:'Clientes satisfechos<br>en todo el mundo'},
+      {val:15,label:'Años de experiencia<br>en alta joyería'}
     ],
-    infoTag: 'Nuestra promesa', infoTitle: 'Cada pieza, una <span>obra de arte</span>',
-    infoSub: 'Cada joya CELESTIA es creada a mano por artesanos con más de 20 años de experiencia. Materiales certificados y acabados impecables.',
-    infoBadges: ['Oro 18k','Plata 925','Gemas certificadas','Garantía de por vida'],
-    footerLogo: 'CELES<span class="accent">TIA</span>', footerTagline: 'Alta joyería para momentos que perduran.',
-    footerCol2Title: 'Colección', footerCol2Links: ['Anillos','Collares','Aretes'],
-    footerContact: 'hola@celestia.co', footerCopy: '© 2026 CELESTIA. Todos los derechos reservados.',
-    products: [
-      {img:'celestia-hero.jpg', discount:null, brand:'CELESTIA', name:'Anillo Tanzanita con Diamantes Oro 18k', old:'$2,800', price:'$2,200'},
-      {img:'celestia-hero.jpg', discount:null, brand:'CELESTIA', name:'Aretes Aro Grande Oro 18k', old:'$1,400', price:'$1,100'},
-      {img:'celestia-hero.jpg', discount:null, brand:'CELESTIA', name:'Collar Solitario Diamante Pera', old:'$3,500', price:'$2,900'},
-      {img:'celestia-hero.jpg', discount:null, brand:'CELESTIA', name:'Pulsera Eslabón Oro Blanco 18k', old:'$1,800', price:'$1,450'},
-      {img:'celestia-hero.jpg', discount:null, brand:'CELESTIA', name:'Anillo Eternidad Rubí y Diamantes', old:'$4,200', price:'$3,600'},
-      {img:'celestia-hero.jpg', discount:null, brand:'CELESTIA', name:'Pendientes Esmeralda Talla Pera', old:'$2,200', price:'$1,800'},
+    infoTag:'Nuestra promesa', infoTitle:'Cada pieza, una <span>obra de arte</span>',
+    infoSub:'Cada joya CELESTIA es creada a mano por artesanos con más de 20 años de experiencia. Materiales certificados y acabados impecables.',
+    infoBadges:['Oro 18k','Plata 925','Gemas certificadas','Garantía de por vida'],
+    footerLogo:'CELES<span class="accent">TIA</span>', footerTagline:'Alta joyería para momentos que perduran.',
+    footerCol2Title:'Colección', footerCol2Links:['Anillos','Collares','Aretes'],
+    footerContact:'hola@celestia.co', footerCopy:'© 2026 CELESTIA. Todos los derechos reservados.',
+    products:[
+      {img:'celestia-hero.jpg',discount:null,brand:'CELESTIA',name:'Anillo Tanzanita con Diamantes Oro 18k',old:'$2,800',price:'$2,200'},
+      {img:'celestia-hero.jpg',discount:null,brand:'CELESTIA',name:'Aretes Aro Grande Oro 18k',old:'$1,400',price:'$1,100'},
+      {img:'celestia-hero.jpg',discount:null,brand:'CELESTIA',name:'Collar Solitario Diamante Pera',old:'$3,500',price:'$2,900'},
+      {img:'celestia-hero.jpg',discount:null,brand:'CELESTIA',name:'Pulsera Eslabón Oro Blanco 18k',old:'$1,800',price:'$1,450'},
+      {img:'celestia-hero.jpg',discount:null,brand:'CELESTIA',name:'Anillo Eternidad Rubí y Diamantes',old:'$4,200',price:'$3,600'},
+      {img:'celestia-hero.jpg',discount:null,brand:'CELESTIA',name:'Pendientes Esmeralda Talla Pera',old:'$2,200',price:'$1,800'},
     ]
   }
 };
 
-// ── APPLY THEME DATA ──────────────────────────────────────
 function applyThemeData(t) {
   const d = themes[t];
-  const iris = document.getElementById('iris');
-
   document.getElementById('logo-text').innerHTML = d.logo;
   document.getElementById('nav-mid').textContent = d.navMid;
   document.getElementById('nav-cta').textContent = d.navCta;
@@ -637,167 +631,179 @@ function applyThemeData(t) {
   document.getElementById('hero-title').innerHTML = d.heroTitle;
   document.getElementById('hero-sub').textContent = d.heroSub;
   document.getElementById('hero-cta').textContent = d.heroCta;
-
-  // Hero image
   const heroImg = document.getElementById('hero-img');
   const fluidBg = document.querySelector('.i-fluid-bg');
   const fluidGrain = document.querySelector('.i-fluid-grain');
   if (d.heroImg) {
-    heroImg.src = d.heroImg; heroImg.style.display = 'block';
-    fluidBg.style.display = 'none'; fluidGrain.style.display = 'none';
+    heroImg.src=d.heroImg; heroImg.style.display='block';
+    if(fluidBg) fluidBg.style.display='none';
+    if(fluidGrain) fluidGrain.style.display='none';
   } else {
-    heroImg.style.display = 'none';
-    fluidBg.style.display = 'block'; fluidGrain.style.display = 'block';
+    heroImg.style.display='none';
+    if(fluidBg) fluidBg.style.display='block';
+    if(fluidGrain) fluidGrain.style.display='block';
   }
-
   document.getElementById('section-title').textContent = d.sectionTitle;
   document.getElementById('section-link').textContent = d.sectionLink;
-
   document.getElementById('promo-brand').innerHTML = d.promoBrand;
   document.getElementById('promo-tagline').textContent = d.promoTagline;
   document.getElementById('promo-offer-text').innerHTML = d.promoOfferText;
   document.getElementById('promo-cta').textContent = d.promoCta;
-
-  // Promo badges
   const pb = document.getElementById('promo-badges');
-  pb.innerHTML = d.promoBadges.map(b => `<span class="i-promo-badge-pill">${b}</span>`).join('');
-
-  // Promo image
+  pb.innerHTML = d.promoBadges.map(b=>`<span class="i-promo-badge-pill">${b}</span>`).join('');
   const pi = document.getElementById('promo-img');
   const pd = document.getElementById('promo-deco');
   if (d.promoImg) {
-    pi.src = d.promoImg; pi.style.display = 'block'; pd.style.display = 'none';
+    pi.src=d.promoImg; pi.style.display='block'; if(pd) pd.style.display='none';
   } else {
-    pi.style.display = 'none'; pd.style.display = 'block';
+    pi.style.display='none'; if(pd) pd.style.display='block';
   }
-
-  // Products
   const grid = document.getElementById('products-grid');
-  grid.innerHTML = d.products.map(p => `
+  grid.innerHTML = d.products.map(p=>`
     <div class="i-product-card">
       <div class="i-product-img">
         <img src="${p.img}" alt="" style="object-position:center ${t==='gold'?'20%':'center'}">
-        ${p.discount ? `<span class="i-product-discount">${p.discount}</span>` : ''}
+        ${p.discount?`<span class="i-product-discount">${p.discount}</span>`:''}
       </div>
       <div class="i-product-info">
         <div class="i-product-brand">${p.brand}</div>
         <div class="i-product-name">${p.name}</div>
         <div class="i-product-prices">
-          ${p.old ? `<div class="i-product-price-old">${p.old}</div>` : ''}
+          ${p.old?`<div class="i-product-price-old">${p.old}</div>`:''}
           <div class="i-product-price">${p.price}</div>
         </div>
       </div>
       <div class="i-product-footer">
         <button class="i-add-cart">
           <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
-          ${t==='gold' ? 'Reservar' : 'Añadir'}
+          ${t==='gold'?'Reservar':'Añadir'}
         </button>
       </div>
-    </div>
-  `).join('');
-
-  // Counters
-  d.counters.forEach((c,i) => {
-    const el = document.getElementById(`c${i+1}`);
-    const lel = document.getElementById(`cl${i+1}`);
-    if(el) { el.dataset.target = c.val; el.textContent = '0'; }
-    if(lel) lel.innerHTML = c.label;
+    </div>`).join('');
+  d.counters.forEach((c,i)=>{
+    const el=document.getElementById(`c${i+1}`);
+    const lel=document.getElementById(`cl${i+1}`);
+    if(el){el.dataset.target=c.val;el.textContent='0';}
+    if(lel) lel.innerHTML=c.label;
   });
-
-  // Info banner
   document.getElementById('info-tag').textContent = d.infoTag;
   document.getElementById('info-title').innerHTML = d.infoTitle;
   document.getElementById('info-sub').textContent = d.infoSub;
   const ib = document.getElementById('info-badges');
   ib.innerHTML = d.infoBadges.map(b=>`<span class="i-info-badge">${b}</span>`).join('');
-
-  // Footer
   document.getElementById('footer-logo').innerHTML = d.footerLogo;
   document.getElementById('footer-tagline').textContent = d.footerTagline;
   document.getElementById('footer-copy').textContent = d.footerCopy;
   document.getElementById('footer-contact1').textContent = d.footerContact;
-  const fc2 = document.getElementById('footer-col2');
-  fc2.innerHTML = `<div class="i-footer-col-title">${d.footerCol2Title}</div>` +
-    d.footerCol2Links.map(l=>`<a class="i-footer-link">${l}</a>`).join('');
-
-  // Icons
-  const show = (t==='light' || t==='gold') ? 'flex' : 'none';
-  document.getElementById('navCart').style.display = show;
-  document.getElementById('navAccount').style.display = show;
+  const fc2=document.getElementById('footer-col2');
+  fc2.innerHTML=`<div class="i-footer-col-title">${d.footerCol2Title}</div>`+d.footerCol2Links.map(l=>`<a class="i-footer-link">${l}</a>`).join('');
+  const show=(t==='light'||t==='gold')?'flex':'none';
+  document.getElementById('navCart').style.display=show;
+  document.getElementById('navAccount').style.display=show;
 }
 
 // ── COUNTER ──────────────────────────────────────────────
 function animateCounters() {
-  document.querySelectorAll('.i-count').forEach(el => {
-    const target = +el.dataset.target;
-    const duration = 1600;
-    const start = performance.now();
-    function update(now) {
-      const p = Math.min((now-start)/duration, 1);
-      const ease = p===1 ? 1 : 1-Math.pow(2,-10*p);
-      el.textContent = Math.floor(ease*target);
-      if (p<1) requestAnimationFrame(update);
-      else el.textContent = target;
+  document.querySelectorAll('.i-count').forEach(el=>{
+    const target=+el.dataset.target, duration=1600, start=performance.now();
+    function update(now){
+      const p=Math.min((now-start)/duration,1), ease=p===1?1:1-Math.pow(2,-10*p);
+      el.textContent=Math.floor(ease*target);
+      if(p<1) requestAnimationFrame(update); else el.textContent=target;
     }
     requestAnimationFrame(update);
   });
 }
-function setupCounterObserver() {
-  const counters = document.querySelector('.i-counters');
-  if (!counters) return;
-  let fired = false;
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => { if(e.isIntersecting && !fired){fired=true;animateCounters();obs.disconnect();}});
-  }, {threshold:0.4});
-  obs.observe(counters);
+function setupCounterObserver(){
+  const c=document.querySelector('.i-counters'); if(!c) return;
+  let fired=false;
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting&&!fired){fired=true;animateCounters();obs.disconnect();}});
+  },{threshold:0.4});
+  obs.observe(c);
 }
 
-// ── TRANSITION ───────────────────────────────────────────
-let currentTheme = 'dark';
-let isTransitioning = false;
+// ── TRANSITION — sin flash, objetos se mueven ─────────────
+let currentTheme='dark', isTransitioning=false;
+
+// Elementos que salen hacia la izquierda
+const EXIT_LEFT  = '.i-hero-banner, .i-nav';
+// Elementos que salen hacia abajo
+const EXIT_DOWN  = '.i-section-header, .i-promo, .i-counters, .i-info-banner, .i-footer';
+// Cards salen escalonadas
+const EXIT_CARDS = '.i-products';
 
 window.setIrisTheme = function(theme) {
-  if (isTransitioning || theme === currentTheme) return;
+  if (isTransitioning || theme===currentTheme) return;
   isTransitioning = true;
   currentTheme = theme;
-
   const iris = document.getElementById('iris');
 
-  // SALIDA: elementos clave vuelan fuera
-  const exitEls = iris.querySelectorAll('.i-hero-content > *, .i-section-header, .i-promo-left > *');
-  exitEls.forEach((el, i) => {
-    el.style.transition = `transform 0.14s ease ${i*0.012}s, opacity 0.12s ease ${i*0.012}s`;
-    el.style.transform = i%2===0 ? 'translateY(-22px)' : 'translateY(22px)';
-    el.style.opacity = '0';
+  // Contenedor: overflow hidden para que los elementos salgan limpiamente
+  iris.style.overflow = 'hidden';
+
+  const dur = '0.22s', ease = 'cubic-bezier(0.4,0,0.2,1)';
+
+  // Hero + nav: salen hacia la izquierda
+  ['.i-hero-banner','.i-nav'].forEach((sel,i)=>{
+    const el=iris.querySelector(sel); if(!el) return;
+    el.style.transition=`transform ${dur} ${ease} ${i*0.03}s, opacity 0.18s ease ${i*0.03}s`;
+    el.style.transform='translateX(-60px)';
+    el.style.opacity='0';
   });
+
+  // Sections: salen hacia abajo
+  ['.i-section-header','.i-promo','.i-counters','.i-info-banner','.i-footer'].forEach((sel,i)=>{
+    const el=iris.querySelector(sel); if(!el) return;
+    el.style.transition=`transform ${dur} ${ease} ${i*0.025}s, opacity 0.16s ease ${i*0.025}s`;
+    el.style.transform='translateY(30px)';
+    el.style.opacity='0';
+  });
+
+  // Cards: salen escalonadas hacia abajo
   iris.querySelectorAll('.i-product-card').forEach((el,i)=>{
-    el.style.transition = `opacity 0.1s ease ${i*0.01}s, transform 0.1s ease ${i*0.01}s`;
-    el.style.opacity='0'; el.style.transform='translateY(14px)';
+    el.style.transition=`transform 0.14s ${ease} ${i*0.015}s, opacity 0.12s ease ${i*0.015}s`;
+    el.style.transform='translateY(20px)'; el.style.opacity='0';
   });
 
-  // SWAP en 160ms
-  setTimeout(() => {
-    exitEls.forEach(el=>{el.style.transition='';el.style.transform='';el.style.opacity='';});
-    iris.querySelectorAll('.i-product-card').forEach(el=>{el.style.transition='';el.style.transform='';el.style.opacity='';});
+  // SWAP: sin cambio de fondo visible — cambiamos EN MOVIMIENTO
+  setTimeout(()=>{
+    // Reset estilos antes del swap para que no haya flash
+    iris.querySelectorAll('.i-hero-banner,.i-nav,.i-section-header,.i-promo,.i-counters,.i-info-banner,.i-footer').forEach(el=>{
+      el.style.transition='none'; el.style.opacity='0';
+      // Posición: van a entrar desde el lado opuesto
+    });
+    iris.querySelectorAll('.i-product-card').forEach(el=>{
+      el.style.transition='none'; el.style.opacity='0';
+    });
 
-    iris.className = 'theme-' + theme;
+    // Cambiar tema y datos
+    iris.className='theme-'+theme;
     iris.classList.remove('is-animating');
     applyThemeData(theme);
     window.scrollTo(0,0);
 
+    // Entrada: arrancan desde fuera y entran
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      // Reset transforms para que las animaciones CSS funcionen
+      iris.querySelectorAll('.i-hero-banner,.i-nav,.i-section-header,.i-promo,.i-counters,.i-info-banner,.i-footer').forEach(el=>{
+        el.style.transform=''; el.style.transition=''; el.style.opacity='';
+      });
+      iris.querySelectorAll('.i-product-card').forEach(el=>{
+        el.style.transform=''; el.style.transition=''; el.style.opacity='';
+      });
+      iris.style.overflow='';
       iris.classList.add('is-animating');
       setupCounterObserver();
-      isTransitioning = false;
+      isTransitioning=false;
     }));
-  }, 160);
+  }, 200);
 };
 
-// Init
 applyThemeData('dark');
 
-window.addEventListener('message', function(e) {
-  if (e.data && e.data.type === 'SET_THEME') window.setIrisTheme(e.data.theme);
+window.addEventListener('message', function(e){
+  if(e.data&&e.data.type==='SET_THEME') window.setIrisTheme(e.data.theme);
 });
 </script>
 </body>
