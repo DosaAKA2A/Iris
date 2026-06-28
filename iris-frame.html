@@ -586,42 +586,54 @@ function apply(t){
 
 // ── MORPH UTILITIES ──────────────────────────────────────
 
-// Flip de texto letra por letra (efecto de ruleta)
-function flipText(el, newText, duration=400) {
-  // Extraer texto plano del nuevo contenido (sin HTML)
-  const tmp = document.createElement('div');
-  tmp.innerHTML = newText;
-  const plain = tmp.textContent;
-  const oldText = el.textContent;
-  const maxLen = Math.max(oldText.length, plain.length);
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  const steps = 8;
-  let frame = 0;
-  const totalFrames = steps + maxLen;
+// ── LETTER SCATTER / GATHER ──────────────────────────────
 
-  function tick() {
-    let result = '';
-    for (let i = 0; i < maxLen; i++) {
-      const target = i < plain.length ? plain[i] : '';
-      const progress = Math.max(0, frame - i);
-      if (progress >= steps) {
-        result += target;
-      } else if (progress > 0) {
-        result += chars[Math.floor(Math.random() * chars.length)];
-      } else {
-        result += i < oldText.length ? oldText[i] : '';
-      }
-    }
-    el.textContent = result;
-    frame++;
-    if (frame <= totalFrames) {
-      setTimeout(tick, duration / totalFrames);
-    } else {
-      // Al final aplicar el innerHTML real (con spans)
-      el.innerHTML = newText;
-    }
-  }
-  tick();
+function scatterText(el, onDone) {
+  const text = el.textContent;
+  if (!text.trim()) { onDone && onDone(); return; }
+
+  // Wrap each letter in a span
+  el.innerHTML = text.split('').map((ch, i) =>
+    ch === ' ' ? ' ' :
+    `<span class="ls" style="display:inline-block;transition:transform ${0.2 + Math.random()*0.15}s cubic-bezier(0.4,0,1,1) ${i*0.018}s,opacity ${0.18}s ease ${i*0.018}s">${ch}</span>`
+  ).join('');
+
+  requestAnimationFrame(() => {
+    el.querySelectorAll('.ls').forEach(s => {
+      const up = Math.random() > 0.5;
+      const dist = 40 + Math.random() * 60;
+      s.style.transform = `translateY(${up ? -dist : dist}px)`;
+      s.style.opacity = '0';
+    });
+  });
+
+  const maxDelay = text.length * 18 + 350;
+  setTimeout(() => { onDone && onDone(); }, maxDelay);
+}
+
+function gatherText(el, html) {
+  // Set new content with letters starting scattered
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const plain = tmp.textContent;
+
+  el.innerHTML = plain.split('').map((ch, i) => {
+    if (ch === ' ') return ' ';
+    const up = Math.random() > 0.5;
+    const dist = 40 + Math.random() * 60;
+    return `<span class="lg" style="display:inline-block;transform:translateY(${up ? -dist : dist}px);opacity:0;transition:transform ${0.25 + Math.random()*0.15}s cubic-bezier(0.34,1.56,0.64,1) ${i*0.022}s,opacity 0.2s ease ${i*0.022}s">${ch}</span>`;
+  }).join('');
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.querySelectorAll('.lg').forEach(s => {
+      s.style.transform = 'translateY(0)';
+      s.style.opacity = '1';
+    });
+  }));
+
+  // After animation settles, replace with clean HTML (for spans with color etc)
+  const maxDelay = plain.length * 22 + 400;
+  setTimeout(() => { el.innerHTML = html; }, maxDelay);
 }
 
 // Morphing de color CSS (background, color, border-color)
@@ -697,7 +709,12 @@ window.setIrisTheme = function(theme) {
 
   // ── 4. LOGO flip letra por letra ─────────────────────
   const logoEl = document.getElementById('logo-text');
-  if (logoEl) flipText(logoEl, d.logo, 500);
+  if (logoEl) {
+    scatterText(logoEl, () => {
+      logoEl.textContent = d.logo;
+      gatherText(logoEl, d.logo);
+    });
+  }
 
   // ── 5. NAV CTA cambia de color ───────────────────────
   const cta = document.getElementById('nav-cta');
@@ -707,10 +724,14 @@ window.setIrisTheme = function(theme) {
     cta.style.color = theme === 'gold' ? ACCENT[theme] : '#fff';
   }
 
-  // ── 6. Hero title flip (a los 200ms) ─────────────────
+  // ── 6. Hero title scatter → gather ───────────────────
   setTimeout(() => {
     const titleEl = document.getElementById('hero-title');
-    if (titleEl) flipText(titleEl, d.heroTitle, 600);
+    if (titleEl) {
+      scatterText(titleEl, () => {
+        gatherText(titleEl, d.heroTitle);
+      });
+    }
 
     const tagEl = document.getElementById('hero-tag');
     if (tagEl) {
