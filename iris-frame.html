@@ -416,8 +416,32 @@ html, body { width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; }
 .i-deco-circle.c2 { width: 80px; height: 80px; top: -40px; right: 20px; }
 .i-deco-truck { width: 120px; height: 80px; position: relative; z-index: 1; }
 
+/* ── COUNTERS ── */
+.i-counters {
+  display: none; align-items: center; justify-content: space-around;
+  background: #0a0a0a; padding: 40px 48px; gap: 0;
+}
+.theme-light .i-counters { display: flex; }
+
+.i-counter {
+  flex: 1; display: flex; flex-direction: column; gap: 10px;
+  padding: 0 24px;
+}
+.i-counter-num {
+  font-family: 'Montserrat', sans-serif; font-size: clamp(40px, 5vw, 64px);
+  font-weight: 800; color: #fff; letter-spacing: -.04em; line-height: 1;
+  display: flex; align-items: baseline; gap: 2px;
+}
+.i-counter-label {
+  font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 400;
+  color: rgba(255,255,255,0.4); line-height: 1.5; letter-spacing: .01em;
+}
+.i-counter-divider {
+  width: 1px; height: 60px; background: rgba(255,255,255,0.1); flex-shrink: 0;
+}
+
 /* Divider between banners */
-.i-banner-shipping { border-bottom: 1px solid rgba(255,255,255,0.08); }
+.i-banner-shipping { border-bottom: none; }
 
 </style>
 </head>
@@ -682,6 +706,24 @@ html, body { width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; }
     </div>
   </div>
 
+  <!-- COUNTERS STRIP -->
+  <div class="i-counters">
+    <div class="i-counter">
+      <div class="i-counter-num"><span class="i-count" data-target="210">0</span>+</div>
+      <div class="i-counter-label">Empresas confían en<br>los sistemas NOVO</div>
+    </div>
+    <div class="i-counter-divider"></div>
+    <div class="i-counter">
+      <div class="i-counter-num"><span class="i-count" data-target="520">0</span>+</div>
+      <div class="i-counter-label">Proyectos de climatización<br>completados a nivel nacional</div>
+    </div>
+    <div class="i-counter-divider"></div>
+    <div class="i-counter">
+      <div class="i-counter-num"><span class="i-count" data-target="800">0</span>+</div>
+      <div class="i-counter-label">Equipos y soluciones en<br>nuestro portafolio técnico</div>
+    </div>
+  </div>
+
   <!-- Banner 2: Atención personalizada -->
   <div class="i-info-banner i-banner-support">
     <div class="i-info-banner-icon">
@@ -730,7 +772,34 @@ window.setIrisTheme = function(theme, flashColor) {
     account.style.display = show;
     flash.classList.remove('active');
   }, 120);
+// ── COUNTER ANIMATION ──
+function animateCounters() {
+  document.querySelectorAll('.i-count').forEach(el => {
+    const target = +el.dataset.target;
+    const duration = 1800;
+    const start = performance.now();
+    function update(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutExpo
+      const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      el.textContent = Math.floor(ease * target);
+      if (progress < 1) requestAnimationFrame(update);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(update);
+  });
+}
+
+// Trigger when light theme is active
+const _origSetTheme = window.setIrisTheme;
+window.setIrisTheme = function(theme, flashColor) {
+  _origSetTheme(theme, flashColor);
+  if (theme === 'light') setTimeout(animateCounters, 200);
 };
+// Run on load if already light
+if (document.getElementById('iris').classList.contains('theme-light')) animateCounters();
+
 window.addEventListener('message', function(e) {
   if (e.data && e.data.type === 'SET_THEME') window.setIrisTheme(e.data.theme, e.data.flashColor);
 });
