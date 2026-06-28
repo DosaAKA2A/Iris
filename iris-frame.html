@@ -344,6 +344,81 @@ html, body { width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; }
 .theme-gold  .t-dark,.theme-gold  .t-light { opacity:0; position:absolute; pointer-events:none; }
 .theme-gold  .t-gold  { opacity:1; }
 .i-headline-wrap { position:relative; display:inline-block; }
+/* ── INFO BANNERS ── */
+.i-info-banners {
+  display: none; flex-direction: column; gap: 0;
+}
+.theme-light .i-info-banners { display: flex; }
+
+.i-info-banner {
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; gap: 28px;
+  padding: 36px 48px; min-height: 160px;
+}
+
+.i-banner-shipping {
+  background: linear-gradient(120deg, #1847e8 0%, #0f2fa3 60%, #0a1f6e 100%);
+}
+.i-banner-support {
+  background: linear-gradient(120deg, #0a1f6e 0%, #0f2fa3 50%, #1847e8 100%);
+}
+
+/* Icon circle */
+.i-info-banner-icon {
+  flex-shrink: 0; width: 64px; height: 64px; border-radius: 50%;
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; z-index: 1;
+}
+.i-info-banner-icon svg { width: 28px; height: 28px; }
+
+/* Body text */
+.i-info-banner-body { flex: 1; z-index: 1; }
+
+.i-info-banner-tag {
+  font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: #ffd166; margin-bottom: 6px;
+}
+.i-info-banner-title {
+  font-family: 'Montserrat', sans-serif; font-size: clamp(18px, 2.5vw, 26px);
+  font-weight: 800; color: #fff; letter-spacing: -.02em; line-height: 1.1;
+  margin-bottom: 8px;
+}
+.i-info-banner-title span { color: #ffd166; }
+
+.i-info-banner-sub {
+  font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 400;
+  color: rgba(255,255,255,0.7); line-height: 1.6; max-width: 520px;
+  margin-bottom: 14px;
+}
+
+.i-info-banner-badges {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.i-info-banner-badges span {
+  font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600;
+  color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18); border-radius: 100px;
+  padding: 4px 12px; letter-spacing: .02em;
+}
+
+/* Decorative elements */
+.i-info-banner-deco {
+  position: absolute; right: 40px; top: 50%; transform: translateY(-50%);
+  opacity: .4; pointer-events: none;
+}
+.i-deco-circle {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.i-deco-circle.c1 { width: 120px; height: 120px; top: -60px; right: -20px; }
+.i-deco-circle.c2 { width: 80px; height: 80px; top: -40px; right: 20px; }
+.i-deco-truck { width: 120px; height: 80px; position: relative; z-index: 1; }
+
+/* Divider between banners */
+.i-banner-shipping { border-bottom: 1px solid rgba(255,255,255,0.08); }
+
 </style>
 </head>
 <body>
@@ -574,6 +649,69 @@ html, body { width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; }
   </div>
 
 </div><!-- /products -->
+
+<!-- BANNERS INFO (solo light) -->
+<div class="i-info-banners">
+
+  <!-- Banner 1: Envío gratuito -->
+  <div class="i-info-banner i-banner-shipping">
+    <div class="i-info-banner-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+      </svg>
+    </div>
+    <div class="i-info-banner-body">
+      <div class="i-info-banner-tag">Beneficio exclusivo</div>
+      <div class="i-info-banner-title">Envío e instalación <span>gratuita</span></div>
+      <div class="i-info-banner-sub">En todos los equipos NOVO a nivel nacional. Sin costo adicional, sin letra chica. Nuestros técnicos certificados instalan en 24 horas.</div>
+      <div class="i-info-banner-badges">
+        <span>🇵🇪 A todo el país</span>
+        <span>⚡ 24h instalación</span>
+        <span>🛡️ Garantía incluida</span>
+      </div>
+    </div>
+    <div class="i-info-banner-deco">
+      <div class="i-deco-circle c1"></div>
+      <div class="i-deco-circle c2"></div>
+      <svg class="i-deco-truck" viewBox="0 0 80 50" fill="none">
+        <rect x="2" y="12" width="46" height="30" rx="3" fill="rgba(255,255,255,0.08)"/>
+        <path d="M48 20h18l10 14v8H48V20z" fill="rgba(255,255,255,0.08)"/>
+        <circle cx="16" cy="44" r="6" fill="rgba(255,255,255,0.15)"/>
+        <circle cx="62" cy="44" r="6" fill="rgba(255,255,255,0.15)"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Banner 2: Atención personalizada -->
+  <div class="i-info-banner i-banner-support">
+    <div class="i-info-banner-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11.5 19.79 19.79 0 01.5 2.82 2 2 0 012.5.82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.18a16 16 0 006 6l.76-.76a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+      </svg>
+    </div>
+    <div class="i-info-banner-body">
+      <div class="i-info-banner-tag">Soporte 24/7</div>
+      <div class="i-info-banner-title">Atención al cliente <span>personalizada</span></div>
+      <div class="i-info-banner-sub">Un ingeniero NOVO dedicado a tu proyecto. Asesoramos desde el dimensionamiento hasta el mantenimiento preventivo anual. Siempre disponibles.</div>
+      <div class="i-info-banner-badges">
+        <span>📞 Línea directa 24/7</span>
+        <span>👷 Ingeniero asignado</span>
+        <span>📋 Plan de mantenimiento</span>
+      </div>
+    </div>
+    <div class="i-info-banner-deco">
+      <div class="i-deco-circle c1"></div>
+      <div class="i-deco-circle c2"></div>
+      <svg class="i-deco-truck" viewBox="0 0 80 60" fill="none">
+        <circle cx="40" cy="24" r="16" fill="rgba(255,255,255,0.08)"/>
+        <path d="M20 54c0-11 9-20 20-20s20 9 20 20" fill="rgba(255,255,255,0.08)"/>
+        <circle cx="40" cy="24" r="8" fill="rgba(255,255,255,0.12)"/>
+      </svg>
+    </div>
+  </div>
+
+</div><!-- /info-banners -->
+
 </div><!-- /iris -->
 
 <script>
