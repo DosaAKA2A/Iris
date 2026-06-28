@@ -596,7 +596,7 @@ function scatterText(el, onDone) {
   setTimeout(() => { onDone && onDone(); }, 200);
 }
 
-function gatherText(el, html) {
+function gatherText(el, html, targetTheme) {
   el.style.transition = 'none';
   el.style.opacity = '1';
   el.style.transform = '';
@@ -604,38 +604,33 @@ function gatherText(el, html) {
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
 
+  // Color blanco para texto normal, acento para spans
+  const accentColors = { dark:'#ff6b35', light:'#ffd166', gold:'#b8923a' };
+  const accentColor = accentColors[targetTheme] || '#fff';
+
   let i = 0;
-  function buildHTML(node, inheritColor) {
+  function buildHTML(node, isAccent) {
     if (node.nodeType === 3) {
       return node.textContent.split('').map(ch => {
         if (ch === ' ') return ' ';
         const up = Math.random() > 0.5;
         const dist = 30 + Math.random() * 40;
         const delay = i++ * 0.02;
-        const colorStyle = inheritColor ? `color:${inheritColor};` : '';
-        return `<span style="display:inline-block;${colorStyle}transform:translateY(${up?-dist:dist}px);opacity:0;transition:transform 0.3s cubic-bezier(0.34,1.4,0.64,1) ${delay}s,opacity 0.22s ease ${delay}s">${ch}</span>`;
+        const col = isAccent ? accentColor : '#ffffff';
+        return `<span style="display:inline-block;color:${col};transform:translateY(${up?-dist:dist}px);opacity:0;transition:transform 0.3s cubic-bezier(0.34,1.4,0.64,1) ${delay}s,opacity 0.22s ease ${delay}s">${ch}</span>`;
       }).join('');
     } else if (node.nodeType === 1 && node.tagName === 'BR') {
       return '<br>';
+    } else if (node.nodeType === 1 && node.tagName === 'SPAN') {
+      return Array.from(node.childNodes).map(c => buildHTML(c, true)).join('');
     } else if (node.nodeType === 1) {
-      // Detectar si este span tiene color de acento — forzarlo inline
-      const isAccent = node.tagName === 'SPAN';
-      // Calcular el color real del span temporal en el DOM
-      let color = inheritColor;
-      if (isAccent) {
-        // Colores por tema actual
-        const themeColors = { dark: '#ff6b35', light: '#ffd166', gold: '#b8923a' };
-        color = themeColors[cur] || inheritColor;
-      }
-      const inner = Array.from(node.childNodes).map(c => buildHTML(c, color)).join('');
-      if (isAccent) return inner; // no envolver en span extra, el color ya está inline
       const attrs = Array.from(node.attributes).map(a => `${a.name}="${a.value}"`).join(' ');
-      return `<${node.tagName.toLowerCase()} ${attrs}>${inner}</${node.tagName.toLowerCase()}>`;
+      return `<${node.tagName.toLowerCase()} ${attrs}>${Array.from(node.childNodes).map(c=>buildHTML(c,false)).join('')}</${node.tagName.toLowerCase()}>`;
     }
     return '';
   }
 
-  el.innerHTML = Array.from(tmp.childNodes).map(n => buildHTML(n, null)).join('');
+  el.innerHTML = Array.from(tmp.childNodes).map(n => buildHTML(n, false)).join('');
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
     el.querySelectorAll('span[style*="translateY"]').forEach(s => {
@@ -712,10 +707,10 @@ window.setIrisTheme = function(theme) {
   iris.style.transition = 'background 0.7s ease';
   iris.style.background = BG[theme];
 
-  // ── 3. OVERLAY del hero cambia de color ──────────────
+  // ── 3. OVERLAY — ocultar completamente hasta que aparezca la imagen ──
   const overlay = iris.querySelector('.i-hero-overlay');
   if (overlay) {
-    overlay.style.transition = 'opacity 0.5s ease';
+    overlay.style.transition = 'none';
     overlay.style.opacity = '0';
   }
 
@@ -724,7 +719,7 @@ window.setIrisTheme = function(theme) {
   if (logoEl) {
     scatterText(logoEl, () => {
       logoEl.textContent = d.logo;
-      gatherText(logoEl, d.logo);
+      gatherText(logoEl, d.logo, theme);
     });
   }
 
@@ -741,7 +736,7 @@ window.setIrisTheme = function(theme) {
     const titleEl = document.getElementById('hero-title');
     if (titleEl) {
       scatterText(titleEl, () => {
-        gatherText(titleEl, d.heroTitle);
+        gatherText(titleEl, d.heroTitle, theme);
       });
     }
 
