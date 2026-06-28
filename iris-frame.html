@@ -389,60 +389,60 @@ html, body { width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; }
 
 /* Clase que activa las animaciones — se añade por JS al cambiar a light */
 #iris.theme-light.is-animating .i-hero-img-banner img {
-  animation: scaleIn .9s cubic-bezier(0.4,0,0.2,1) both;
+  animation: scaleIn .5s cubic-bezier(0.4,0,0.2,1) both;
 }
 #iris.theme-light.is-animating .i-hero-img-overlay {
-  animation: revealOverlay .7s ease .1s both;
+  animation: revealOverlay .4s ease .05s both;
 }
 #iris.theme-light.is-animating .i-hero-img-tag {
-  animation: fadeUp .5s ease .2s both;
+  animation: fadeUp .35s ease .05s both;
 }
 #iris.theme-light.is-animating .i-hero-img-title {
-  animation: fadeUp .6s cubic-bezier(0.34,1.56,0.64,1) .35s both;
+  animation: fadeUp .4s cubic-bezier(0.34,1.56,0.64,1) .12s both;
 }
 #iris.theme-light.is-animating .i-hero-img-sub {
-  animation: fadeUp .5s ease .5s both;
+  animation: fadeUp .35s ease .2s both;
 }
 #iris.theme-light.is-animating .i-hero-img-cta {
-  animation: fadeUp .5s ease .65s both;
+  animation: fadeUp .35s ease .3s both;
 }
 
 /* Nav */
 #iris.theme-light.is-animating .i-nav {
-  animation: fadeIn .4s ease both;
+  animation: fadeIn .25s ease both;
 }
 
 /* Sección header productos */
 #iris.theme-light.is-animating .i-section-header {
-  animation: sweepLeft .5s ease .7s both;
+  animation: sweepLeft .35s ease .32s both;
 }
 
 /* Cards pasarela — barrido de izquierda a derecha escalonado */
-#iris.theme-light.is-animating .i-product-card:nth-child(1) { animation: slideCards .5s ease .75s both; }
-#iris.theme-light.is-animating .i-product-card:nth-child(2) { animation: slideCards .5s ease .85s both; }
-#iris.theme-light.is-animating .i-product-card:nth-child(3) { animation: slideCards .5s ease .95s both; }
-#iris.theme-light.is-animating .i-product-card:nth-child(4) { animation: slideCards .5s ease 1.05s both; }
-#iris.theme-light.is-animating .i-product-card:nth-child(5) { animation: slideCards .5s ease 1.15s both; }
-#iris.theme-light.is-animating .i-product-card:nth-child(6) { animation: slideCards .5s ease 1.25s both; }
+#iris.theme-light.is-animating .i-product-card:nth-child(1) { animation: slideCards .3s ease .35s both; }
+#iris.theme-light.is-animating .i-product-card:nth-child(2) { animation: slideCards .3s ease .42s both; }
+#iris.theme-light.is-animating .i-product-card:nth-child(3) { animation: slideCards .3s ease .49s both; }
+#iris.theme-light.is-animating .i-product-card:nth-child(4) { animation: slideCards .3s ease .56s both; }
+#iris.theme-light.is-animating .i-product-card:nth-child(5) { animation: slideCards .3s ease .63s both; }
+#iris.theme-light.is-animating .i-product-card:nth-child(6) { animation: slideCards .3s ease .70s both; }
 
 /* Banner NOVO */
 #iris.theme-light.is-animating .i-novo-banner {
-  animation: fadeUp .6s ease 1.3s both;
+  animation: fadeUp .4s ease .72s both;
 }
 
 /* Contadores */
-#iris.theme-light.is-animating .i-counter:nth-child(1) { animation: fadeUp .5s ease 1.45s both; }
-#iris.theme-light.is-animating .i-counter:nth-child(3) { animation: fadeUp .5s ease 1.55s both; }
-#iris.theme-light.is-animating .i-counter:nth-child(5) { animation: fadeUp .5s ease 1.65s both; }
+#iris.theme-light.is-animating .i-counter:nth-child(1) { animation: fadeUp .35s ease .78s both; }
+#iris.theme-light.is-animating .i-counter:nth-child(3) { animation: fadeUp .35s ease .84s both; }
+#iris.theme-light.is-animating .i-counter:nth-child(5) { animation: fadeUp .35s ease .90s both; }
 
 /* Info banner atención */
 #iris.theme-light.is-animating .i-info-banner {
-  animation: fadeUp .6s ease 1.7s both;
+  animation: fadeUp .4s ease .92s both;
 }
 
 /* Footer */
 #iris.theme-light.is-animating .i-footer {
-  animation: fadeIn .7s ease 1.85s both;
+  animation: fadeIn .4s ease 1.0s both;
 }
 
 </style>
@@ -694,7 +694,7 @@ function animateCounters() {
   document.querySelectorAll('.i-count').forEach(el => {
     el.textContent = '0';
     const target = +el.dataset.target;
-    const duration = 1800;
+    const duration = 1600;
     const start = performance.now();
     function update(now) {
       const p = Math.min((now - start) / duration, 1);
@@ -706,15 +706,12 @@ function animateCounters() {
     requestAnimationFrame(update);
   });
 }
-
 function setupCounterObserver() {
   const counters = document.querySelector('.i-counters');
   if (!counters) return;
   let fired = false;
   const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting && !fired) { fired = true; animateCounters(); obs.disconnect(); }
-    });
+    entries.forEach(e => { if (e.isIntersecting && !fired) { fired=true; animateCounters(); obs.disconnect(); }});
   }, { threshold: 0.4 });
   obs.observe(counters);
 }
@@ -723,132 +720,69 @@ function setupCounterObserver() {
 let currentTheme = 'dark';
 let isTransitioning = false;
 
-const themeBg     = { dark: '#09090b', light: '#f4f4f2', gold: '#f9f5ef' };
-const themeAccent = { dark: '#dc402a', light: '#1847e8', gold: '#b8923a' };
+const themeBg = { dark:'#09090b', light:'#f4f4f2', gold:'#f9f5ef' };
 
-window.setIrisTheme = function(theme, flashColor) {
+window.setIrisTheme = function(theme) {
   if (isTransitioning || theme === currentTheme) return;
   isTransitioning = true;
 
   const iris    = document.getElementById('iris');
   const cart    = document.getElementById('navCart');
   const account = document.getElementById('navAccount');
-  const from    = currentTheme;
   currentTheme  = theme;
 
-  // 1. SALIDA — textos vuelan hacia afuera
-  const exitText = iris.querySelectorAll('.i-hero-content, .i-hero-img-content, .i-headline, .i-sub, .i-eyebrow, .i-novo-brand, .i-section-title, .i-section-link');
-  exitText.forEach((el, i) => {
-    el.style.transition = `transform ${0.22 + i*0.025}s cubic-bezier(0.4,0,0.2,1), opacity ${0.18 + i*0.02}s ease`;
-    el.style.transform  = i % 2 === 0 ? 'translateY(-44px) rotate(-3deg)' : 'translateY(44px) rotate(3deg)';
+  // 1. SALIDA RÁPIDA — textos vuelan, fondo fade
+  const texts = iris.querySelectorAll('.i-hero-img-content > *, .i-hero-content > *, .i-section-header, .i-novo-brand');
+  texts.forEach((el, i) => {
+    el.style.transition = `transform 0.18s ease ${i*0.02}s, opacity 0.15s ease ${i*0.02}s`;
+    el.style.transform  = i % 2 === 0 ? 'translateY(-30px)' : 'translateY(30px)';
     el.style.opacity    = '0';
   });
 
-  // Imágenes: zoom + blur out
-  iris.querySelectorAll('.i-hero-img-banner img, .i-novo-banner-right img, .i-hero-bg').forEach(el => {
-    el.style.transition = 'transform 0.45s ease, opacity 0.38s ease, filter 0.45s ease';
-    el.style.transform  = 'scale(1.1)';
-    el.style.opacity    = '0';
-    el.style.filter     = 'blur(10px)';
-  });
-
-  // Cards: escalonado hacia abajo
   iris.querySelectorAll('.i-product-card').forEach((el, i) => {
-    el.style.transition = `transform ${0.18 + i*0.04}s ease ${i*0.03}s, opacity 0.18s ease ${i*0.03}s`;
-    el.style.transform  = `translateY(${60}px) scale(0.94)`;
+    el.style.transition = `opacity 0.12s ease ${i*0.015}s, transform 0.15s ease ${i*0.015}s`;
     el.style.opacity    = '0';
+    el.style.transform  = 'translateY(20px)';
   });
 
-  // Nav desliza hacia arriba
-  const nav = iris.querySelector('.i-nav');
-  if (nav) {
-    nav.style.transition = 'transform 0.28s ease, opacity 0.22s ease';
-    nav.style.transform  = 'translateY(-100%)';
-    nav.style.opacity    = '0';
-  }
-
-  // Counters flip
-  iris.querySelectorAll('.i-counter-num').forEach(el => {
-    el.style.transition = 'transform 0.25s ease, opacity 0.2s ease';
-    el.style.transform  = 'rotateX(90deg)';
-    el.style.opacity    = '0';
-  });
-
-  // 2. CAPA MORPH — círculo que se expande desde el centro
-  const layer  = document.createElement('div');
-  const circle = document.createElement('div');
-  layer.style.cssText = `position:fixed;inset:0;z-index:9998;pointer-events:none;overflow:hidden;`;
-  circle.style.cssText = `
-    position:absolute;left:50%;top:50%;
-    width:0;height:0;margin:0;
-    border-radius:50%;
+  // 2. FLASH de color sobre toda la pantalla
+  const flash = document.createElement('div');
+  flash.style.cssText = `
+    position:fixed;inset:0;z-index:9999;pointer-events:none;
     background:${themeBg[theme]};
-    transform:translate(-50%,-50%);
-    transition:none;
+    opacity:0;transition:opacity 0.12s ease;
   `;
-  layer.appendChild(circle);
+  document.body.appendChild(flash);
+  requestAnimationFrame(() => { flash.style.opacity = '1'; });
 
-  // Líneas de barrido horizontal
-  for (let i = 0; i < 5; i++) {
-    const line = document.createElement('div');
-    line.style.cssText = `
-      position:absolute;left:0;right:0;height:1.5px;
-      background:${themeAccent[theme]};opacity:0.5;
-      top:${10 + i*18}%;
-      transform:translateX(-110%);
-      transition:transform ${0.5+i*0.06}s cubic-bezier(0.4,0,0.2,1) ${0.04+i*0.05}s;
-    `;
-    layer.appendChild(line);
-  }
-
-  document.body.appendChild(layer);
-
-  // Lanzar expansión del círculo después de 1 frame
-  requestAnimationFrame(() => {
-    const size = Math.hypot(window.innerWidth, window.innerHeight) * 2.2;
-    circle.style.transition = `width 0.6s cubic-bezier(0.4,0,0.2,1), height 0.6s cubic-bezier(0.4,0,0.2,1)`;
-    circle.style.width  = size + 'px';
-    circle.style.height = size + 'px';
-    // Líneas barren
-    layer.querySelectorAll('div + div').forEach(l => { l.style.transform = 'translateX(110%)'; });
-  });
-
-  // 3. SWAP en el punto medio
+  // 3. SWAP
   setTimeout(() => {
-    // Limpiar estilos de salida
-    exitText.forEach(el => { el.style.transition=''; el.style.transform=''; el.style.opacity=''; });
-    iris.querySelectorAll('.i-hero-img-banner img,.i-novo-banner-right img,.i-hero-bg').forEach(el => {
-      el.style.transition=''; el.style.transform=''; el.style.opacity=''; el.style.filter='';
-    });
+    texts.forEach(el => { el.style.transition=''; el.style.transform=''; el.style.opacity=''; });
     iris.querySelectorAll('.i-product-card').forEach(el => { el.style.transition=''; el.style.transform=''; el.style.opacity=''; });
-    iris.querySelectorAll('.i-counter-num').forEach(el => { el.style.transition=''; el.style.transform=''; el.style.opacity=''; });
-    if (nav) { nav.style.transition=''; nav.style.transform=''; nav.style.opacity=''; }
 
     iris.className = 'theme-' + theme;
     iris.classList.remove('is-animating');
-
     const show = theme === 'light' ? 'flex' : 'none';
-    cart.style.display    = show;
-    account.style.display = show;
-    window.scrollTo(0, 0);
-  }, 500);
+    cart.style.display = show; account.style.display = show;
+    window.scrollTo(0,0);
+  }, 200);
 
   // 4. REVELAR + entrada
   setTimeout(() => {
-    layer.style.transition = 'opacity 0.4s ease';
-    layer.style.opacity    = '0';
-    setTimeout(() => layer.remove(), 400);
+    flash.style.transition = 'opacity 0.2s ease';
+    flash.style.opacity = '0';
+    setTimeout(() => flash.remove(), 200);
 
     requestAnimationFrame(() => requestAnimationFrame(() => {
       iris.classList.add('is-animating');
       if (theme === 'light') setupCounterObserver();
       isTransitioning = false;
     }));
-  }, 650);
+  }, 240);
 };
 
 window.addEventListener('message', function(e) {
-  if (e.data && e.data.type === 'SET_THEME') window.setIrisTheme(e.data.theme, e.data.flashColor);
+  if (e.data && e.data.type === 'SET_THEME') window.setIrisTheme(e.data.theme);
 });
 </script>
 </body>
