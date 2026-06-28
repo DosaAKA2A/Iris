@@ -716,69 +716,59 @@ function setupCounterObserver() {
   obs.observe(counters);
 }
 
-// ── MORPH TRANSITION ─────────────────────────────────────
+// ── TRANSITION ───────────────────────────────────────────
 let currentTheme = 'dark';
 let isTransitioning = false;
-
-const themeBg = { dark:'#09090b', light:'#f4f4f2', gold:'#f9f5ef' };
 
 window.setIrisTheme = function(theme) {
   if (isTransitioning || theme === currentTheme) return;
   isTransitioning = true;
+  currentTheme = theme;
 
   const iris    = document.getElementById('iris');
   const cart    = document.getElementById('navCart');
   const account = document.getElementById('navAccount');
-  currentTheme  = theme;
 
-  // 1. SALIDA RÁPIDA — textos vuelan, fondo fade
-  const texts = iris.querySelectorAll('.i-hero-img-content > *, .i-hero-content > *, .i-section-header, .i-novo-brand');
+  // Textos vuelan hacia afuera
+  const texts = iris.querySelectorAll(
+    '.i-hero-img-content > *, .i-hero-content > *, .i-section-header, .i-novo-brand, .i-nav .i-logo, .i-nav .i-nav-cta'
+  );
   texts.forEach((el, i) => {
-    el.style.transition = `transform 0.18s ease ${i*0.02}s, opacity 0.15s ease ${i*0.02}s`;
-    el.style.transform  = i % 2 === 0 ? 'translateY(-30px)' : 'translateY(30px)';
+    el.style.transition = `transform 0.15s ease ${i*0.015}s, opacity 0.12s ease ${i*0.015}s`;
+    el.style.transform  = i % 2 === 0 ? 'translateY(-24px)' : 'translateY(24px)';
     el.style.opacity    = '0';
   });
 
+  // Cards desaparecen
   iris.querySelectorAll('.i-product-card').forEach((el, i) => {
-    el.style.transition = `opacity 0.12s ease ${i*0.015}s, transform 0.15s ease ${i*0.015}s`;
+    el.style.transition = `opacity 0.1s ease ${i*0.012}s, transform 0.12s ease ${i*0.012}s`;
     el.style.opacity    = '0';
-    el.style.transform  = 'translateY(20px)';
+    el.style.transform  = 'translateY(16px)';
   });
 
-  // 2. FLASH de color sobre toda la pantalla
-  const flash = document.createElement('div');
-  flash.style.cssText = `
-    position:fixed;inset:0;z-index:9999;pointer-events:none;
-    background:${themeBg[theme]};
-    opacity:0;transition:opacity 0.12s ease;
-  `;
-  document.body.appendChild(flash);
-  requestAnimationFrame(() => { flash.style.opacity = '1'; });
+  // Fondo del iris hace crossfade suave
+  iris.style.transition = 'background 0.22s ease';
 
-  // 3. SWAP
+  // SWAP en el punto de más opacidad baja
   setTimeout(() => {
     texts.forEach(el => { el.style.transition=''; el.style.transform=''; el.style.opacity=''; });
     iris.querySelectorAll('.i-product-card').forEach(el => { el.style.transition=''; el.style.transform=''; el.style.opacity=''; });
+    iris.style.transition = '';
 
     iris.className = 'theme-' + theme;
     iris.classList.remove('is-animating');
     const show = theme === 'light' ? 'flex' : 'none';
-    cart.style.display = show; account.style.display = show;
-    window.scrollTo(0,0);
-  }, 200);
+    cart.style.display = show;
+    account.style.display = show;
+    window.scrollTo(0, 0);
 
-  // 4. REVELAR + entrada
-  setTimeout(() => {
-    flash.style.transition = 'opacity 0.2s ease';
-    flash.style.opacity = '0';
-    setTimeout(() => flash.remove(), 200);
-
+    // Entrada inmediata
     requestAnimationFrame(() => requestAnimationFrame(() => {
       iris.classList.add('is-animating');
       if (theme === 'light') setupCounterObserver();
       isTransitioning = false;
     }));
-  }, 240);
+  }, 180);
 };
 
 window.addEventListener('message', function(e) {
