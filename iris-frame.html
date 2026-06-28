@@ -6,381 +6,323 @@
 <title>IRIS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 @font-face {
   font-family:"Clash Display";
   src:url("https://framerusercontent.com/third-party-assets/fontshare/wf/BFBSY7LX5W2U2EROCLVVTQP4VS7S4PC3/IIUX4FGTMD2LK2VWD3RVTAS4SSMUN7B5/53RZKGODFYDW3QHTIL7IPOWTBCSUEZK7.woff2");
-  font-weight:700; font-style:normal; font-display:swap;
+  font-weight:700;font-style:normal;font-display:swap;
 }
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow-x:hidden;overflow-y:auto}
 
-/* ── VARIABLES POR TEMA ── */
-.theme-dark  { --bg:#09090b; --bg2:#111113; --fg:#f5f5f5; --muted:rgba(245,245,245,.38); --accent:#dc402a; --accent2:#ff6b35; --border:rgba(255,255,255,.07); --navbg:rgba(9,9,11,.88); --card:#161618; --cardborder:rgba(255,255,255,.08); }
-.theme-light { --bg:#f4f4f2; --bg2:#fff; --fg:#0a0a0a; --muted:rgba(10,10,10,.45); --accent:#1847e8; --accent2:#0f2fa3; --border:rgba(0,0,0,.07); --navbg:rgba(255,255,255,.95); --card:#fff; --cardborder:rgba(0,0,0,.07); }
-.theme-gold  { --bg:#faf6f0; --bg2:#f2ebe0; --fg:#1a1410; --muted:rgba(26,20,16,.42); --accent:#b8923a; --accent2:#8a6820; --border:rgba(184,146,58,.15); --navbg:rgba(250,246,240,.94); --card:#fff; --cardborder:rgba(184,146,58,.15); }
-
-#iris { width:100%; min-height:100%; background:var(--bg); color:var(--fg); font-family:'Inter',sans-serif; transition:background .3s; }
-.theme-light #iris, .theme-light { font-family:'Montserrat',sans-serif; }
-.theme-gold  #iris, .theme-gold  { font-family:'Cormorant Garamond',serif; }
-
-/* ── NAV ── */
+/* ─── NAV ─────────────────────────────────────────── */
 .i-nav {
-  position:sticky; top:0; z-index:100;
-  display:flex; align-items:center; justify-content:space-between;
-  padding:12px 28px; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-  background:var(--navbg); border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 24px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
 }
-.i-logo {
-  font-weight:800; letter-spacing:.06em; text-transform:uppercase;
-  display:flex; align-items:center; gap:7px; font-size:15px;
+.theme-dark  .i-nav{background:rgba(9,9,11,.88);border-bottom:1px solid rgba(255,255,255,.07);}
+.theme-light .i-nav{background:rgba(255,255,255,.96);border-bottom:1px solid rgba(0,0,0,.07);}
+.theme-gold  .i-nav{background:rgba(250,246,240,.95);border-bottom:1px solid rgba(184,146,58,.15);}
+
+.i-logo{font-weight:800;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:7px;font-size:15px;}
+.theme-dark  .i-logo{font-family:'Clash Display',sans-serif;letter-spacing:.2em;color:#f5f5f5;}
+.theme-light .i-logo{font-family:'Montserrat',sans-serif;color:#1847e8;}
+.theme-gold  .i-logo{font-family:'Cormorant Garamond',serif;letter-spacing:.18em;font-size:17px;color:#1a1410;font-weight:700;}
+
+.i-logo-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.theme-dark  .i-logo-dot{background:#dc402a;}
+.theme-light .i-logo-dot{background:#1847e8;}
+.theme-gold  .i-logo-dot{background:#b8923a;}
+
+.i-nav-links{display:flex;gap:22px;}
+.i-nav-link{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:color .2s;}
+.theme-dark  .i-nav-link{color:rgba(245,245,245,.38);}
+.theme-light .i-nav-link{color:rgba(10,10,10,.45);font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-nav-link{color:rgba(26,20,16,.42);font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.12em;}
+
+.i-nav-right{display:flex;align-items:center;gap:8px;}
+.i-nav-cta{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:8px 18px;border-radius:100px;border:none;cursor:pointer;transition:opacity .2s;}
+.theme-dark  .i-nav-cta{background:#dc402a;color:#fff;font-family:'Inter',sans-serif;}
+.theme-light .i-nav-cta{background:#1847e8;color:#fff;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-nav-cta{background:transparent;color:#b8923a;border:1.5px solid #b8923a;font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:.1em;}
+
+.i-nav-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:transparent;cursor:pointer;position:relative;transition:border-color .2s;}
+.theme-light .i-nav-icon{border:1.5px solid rgba(0,0,0,.08);}
+.theme-gold  .i-nav-icon{border:1.5px solid rgba(184,146,58,.2);}
+.i-nav-icon svg{width:15px;height:15px;stroke-width:1.8;fill:none;}
+.theme-light .i-nav-icon svg{stroke:#0a0a0a;}
+.theme-gold  .i-nav-icon svg{stroke:#1a1410;}
+.i-cart-badge{position:absolute;top:-4px;right:-4px;width:15px;height:15px;border-radius:50%;color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;}
+.theme-light .i-cart-badge{background:#1847e8;}
+.theme-gold  .i-cart-badge{background:#b8923a;}
+
+/* ─── HERO BANNER ─────────────────────────────────── */
+/* Estructura idéntica a NOVO original */
+.i-hero-banner{position:relative;overflow:hidden;height:420px;}
+
+/* NOVO: imagen de fondo */
+.i-hero-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;display:block;}
+
+/* DOSA: gradiente fluido animado */
+.i-fluid-bg{
+  position:absolute;inset:-20%;
+  background:radial-gradient(ellipse 80% 60% at 20% 50%,#dc402a 0%,transparent 55%),
+             radial-gradient(ellipse 60% 80% at 80% 30%,#ff6b35 0%,transparent 50%),
+             radial-gradient(ellipse 50% 50% at 60% 80%,#c41c00 0%,transparent 50%),
+             #09090b;
+  animation:fluidMove 8s ease-in-out infinite alternate;filter:blur(40px);opacity:.85;
 }
-.theme-dark  .i-logo { font-family:'Clash Display',sans-serif; letter-spacing:.2em; color:#f5f5f5; }
-.theme-light .i-logo { font-family:'Montserrat',sans-serif; color:var(--accent); }
-.theme-gold  .i-logo { font-family:'Cormorant Garamond',serif; letter-spacing:.18em; font-size:18px; color:var(--fg); font-weight:700; }
-
-.i-logo-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); flex-shrink:0; }
-
-.i-nav-links { display:flex; gap:22px; }
-.i-nav-link { font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color .2s; }
-.theme-gold .i-nav-link { font-family:'Cormorant Garamond',serif; font-size:13px; font-weight:600; letter-spacing:.12em; }
-.i-nav-link:hover { color:var(--fg); }
-
-.i-nav-right { display:flex; align-items:center; gap:8px; }
-.i-nav-cta {
-  font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
-  padding:8px 18px; border-radius:100px; border:1.5px solid var(--accent);
-  color:var(--accent); background:transparent; cursor:pointer; transition:background .2s, color .2s;
+@keyframes fluidMove{
+  0%  {transform:scale(1) rotate(0deg) translate(0,0);}
+  25% {transform:scale(1.08) rotate(2deg) translate(2%,3%);}
+  50% {transform:scale(1.04) rotate(-1deg) translate(-3%,1%);}
+  75% {transform:scale(1.1) rotate(3deg) translate(1%,-2%);}
+  100%{transform:scale(1.06) rotate(-2deg) translate(-2%,2%);}
 }
-.i-nav-cta:hover { background:var(--accent); color:#fff; }
-.theme-dark .i-nav-cta { background:var(--accent); color:#fff; }
-.theme-dark .i-nav-cta:hover { opacity:.88; }
-
-.i-nav-icon { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--border); background:transparent; cursor:pointer; position:relative; transition:border-color .2s; }
-.i-nav-icon:hover { border-color:var(--accent); }
-.i-nav-icon svg { width:15px; height:15px; stroke:var(--fg); stroke-width:1.8; fill:none; }
-.i-cart-badge { position:absolute; top:-4px; right:-4px; width:15px; height:15px; border-radius:50%; background:var(--accent); color:#fff; font-size:8px; font-weight:700; display:flex; align-items:center; justify-content:center; font-family:'Inter',sans-serif; }
-
-/* ── HERO BANNER — igual para los 3 ── */
-.i-hero-banner { position:relative; overflow:hidden; height:340px; }
-
-/* DARK: gradiente fluido animado */
-.theme-dark .i-hero-banner {
-  background:#09090b;
-}
-.i-fluid-bg {
-  position:absolute; inset:-20%;
-  background: radial-gradient(ellipse 80% 60% at 20% 50%, #dc402a 0%, transparent 55%),
-              radial-gradient(ellipse 60% 80% at 80% 30%, #ff6b35 0%, transparent 50%),
-              radial-gradient(ellipse 50% 50% at 60% 80%, #c41c00 0%, transparent 50%),
-              #09090b;
-  animation: fluidMove 8s ease-in-out infinite alternate;
-  filter: blur(40px);
-  opacity: .85;
-}
-@keyframes fluidMove {
-  0%   { transform: scale(1) rotate(0deg) translate(0,0); }
-  25%  { transform: scale(1.08) rotate(2deg) translate(2%,3%); }
-  50%  { transform: scale(1.04) rotate(-1deg) translate(-3%,1%); }
-  75%  { transform: scale(1.1) rotate(3deg) translate(1%,-2%); }
-  100% { transform: scale(1.06) rotate(-2deg) translate(-2%,2%); }
-}
-/* Grain sobre el fluido */
-.i-fluid-grain {
-  position:absolute; inset:0; opacity:.04;
+.i-fluid-grain{position:absolute;inset:0;opacity:.04;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* LIGHT y GOLD: imagen de fondo */
-.i-hero-bg-img {
-  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-  object-position:center 30%; display:block;
-}
-.theme-dark .i-hero-bg-img { display:none; }
+/* Overlay */
+.i-hero-overlay{position:absolute;inset:0;display:flex;align-items:center;}
+.theme-dark  .i-hero-overlay{background:linear-gradient(90deg,rgba(9,9,11,.55) 0%,rgba(9,9,11,.05) 100%);}
+.theme-light .i-hero-overlay{background:linear-gradient(100deg,rgba(10,31,110,.82) 0%,rgba(24,71,232,.5) 40%,rgba(0,0,0,.0) 65%);}
+.theme-gold  .i-hero-overlay{background:linear-gradient(100deg,rgba(10,7,4,.75) 0%,rgba(26,20,16,.5) 42%,rgba(0,0,0,.0) 65%);}
 
-/* Overlay por tema */
-.i-hero-overlay {
-  position:absolute; inset:0; display:flex; align-items:center;
-}
-.theme-dark  .i-hero-overlay { background:linear-gradient(90deg, rgba(9,9,11,.55) 0%, rgba(9,9,11,.05) 100%); }
-.theme-light .i-hero-overlay { background:linear-gradient(100deg, rgba(10,31,110,.78) 0%, rgba(24,71,232,.4) 38%, rgba(0,0,0,.0) 65%); }
-.theme-gold  .i-hero-overlay { background:linear-gradient(100deg, rgba(10,7,4,.72) 0%, rgba(26,20,16,.45) 40%, rgba(0,0,0,.0) 65%); }
+.i-hero-content{padding:0 52px;display:flex;flex-direction:column;gap:14px;max-width:560px;position:relative;z-index:1;}
 
-.i-hero-content { padding:0 52px; display:flex; flex-direction:column; gap:14px; max-width:560px; position:relative; z-index:1; }
+.i-hero-tag{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;}
+.theme-dark  .i-hero-tag{color:#ff6b35;font-family:'Inter',sans-serif;}
+.theme-light .i-hero-tag{color:#ffd166;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-hero-tag{color:#b8923a;font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:.28em;font-style:italic;}
 
-.i-hero-tag {
-  font-size:9px; font-weight:700; letter-spacing:.2em; text-transform:uppercase;
-}
-.theme-dark  .i-hero-tag { color:var(--accent2); }
-.theme-light .i-hero-tag { color:#ffd166; }
-.theme-gold  .i-hero-tag { color:var(--accent); font-family:'Cormorant Garamond',serif; font-size:13px; letter-spacing:.3em; font-style:italic; }
+.i-hero-title{line-height:1.1;color:#fff;}
+.theme-dark  .i-hero-title{font-family:'Clash Display',sans-serif;font-size:clamp(32px,5vw,52px);font-weight:700;}
+.theme-light .i-hero-title{font-family:'Montserrat',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;}
+.theme-gold  .i-hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5.5vw,58px);font-weight:600;line-height:1.05;}
 
-.i-hero-title {
-  line-height:1.1; letter-spacing:-.02em; color:#fff;
-}
-.theme-dark  .i-hero-title { font-family:'Clash Display',sans-serif; font-size:clamp(32px,5vw,52px); font-weight:700; }
-.theme-light .i-hero-title { font-family:'Montserrat',sans-serif; font-size:clamp(28px,4vw,44px); font-weight:800; }
-.theme-gold  .i-hero-title { font-family:'Cormorant Garamond',serif; font-size:clamp(36px,5.5vw,58px); font-weight:600; letter-spacing:-.01em; line-height:1.05; }
+.i-hero-title span{display:inline;}
+.theme-dark  .i-hero-title span{color:#ff6b35;}
+.theme-light .i-hero-title span{color:#ffd166;}
+.theme-gold  .i-hero-title span{color:#b8923a;font-style:italic;}
 
-.i-hero-title span { }
-.theme-dark  .i-hero-title span { color:var(--accent2); }
-.theme-light .i-hero-title span { color:#ffd166; }
-.theme-gold  .i-hero-title span { color:var(--accent); font-style:italic; }
+.i-hero-sub{font-size:12px;line-height:1.7;color:rgba(255,255,255,.72);max-width:380px;}
+.theme-gold .i-hero-sub{font-family:'Cormorant Garamond',serif;font-size:15px;}
 
-.i-hero-sub { font-size:12px; line-height:1.7; color:rgba(255,255,255,.72); max-width:380px; }
-.theme-gold .i-hero-sub { font-family:'Cormorant Garamond',serif; font-size:15px; letter-spacing:.02em; }
+.i-hero-cta{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:11px 24px;border-radius:100px;border:none;cursor:pointer;transition:transform .2s;margin-top:4px;}
+.i-hero-cta:hover{transform:translateY(-2px);}
+.theme-dark  .i-hero-cta{background:#dc402a;color:#fff;font-family:'Inter',sans-serif;}
+.theme-light .i-hero-cta{background:#fff;color:#1847e8;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-hero-cta{background:#b8923a;color:#fff;font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.12em;}
 
-.i-hero-cta {
-  align-self:flex-start; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
-  padding:11px 24px; border-radius:100px; border:none; cursor:pointer; transition:transform .2s, opacity .2s;
-  margin-top:4px;
-}
-.i-hero-cta:hover { transform:translateY(-2px); opacity:.9; }
-.theme-dark  .i-hero-cta { background:var(--accent); color:#fff; font-family:'Inter',sans-serif; }
-.theme-light .i-hero-cta { background:#fff; color:var(--accent); font-family:'Montserrat',sans-serif; }
-.theme-gold  .i-hero-cta { background:var(--accent); color:#fff; font-family:'Cormorant Garamond',serif; font-size:13px; letter-spacing:.14em; }
+/* ─── SECTION HEADER ──────────────────────────────── */
+.i-section-header{display:flex;padding:22px 28px 12px;align-items:center;justify-content:space-between;}
+.i-section-title{font-size:16px;font-weight:700;letter-spacing:-.02em;}
+.theme-dark  .i-section-title{color:#f5f5f5;font-family:'Clash Display',sans-serif;}
+.theme-light .i-section-title{color:#0a0a0a;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-section-title{color:#1a1410;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;letter-spacing:.02em;}
+.i-section-link{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;}
+.theme-dark  .i-section-link{color:#dc402a;}
+.theme-light .i-section-link{color:#1847e8;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-section-link{color:#b8923a;font-family:'Cormorant Garamond',serif;font-size:12px;}
 
-/* ── PROMO BANNER ── */
-.i-promo {
-  display:flex; overflow:hidden; position:relative;
-}
-.theme-dark  .i-promo { background:linear-gradient(120deg,#1a0800 0%,#2d0f00 50%,#1a0800 100%); height:220px; }
-.theme-light .i-promo { background:linear-gradient(120deg,#1847e8 0%,#0f2fa3 55%,#0a1f6e 100%); height:220px; }
-.theme-gold  .i-promo { background:linear-gradient(120deg,#1a1410 0%,#2a1f0f 55%,#1a1410 100%); height:220px; }
+/* ─── PRODUCTS ────────────────────────────────────── */
+.i-products{display:grid;padding:0 24px 28px;gap:14px;grid-template-columns:repeat(6,minmax(160px,1fr));overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;}
+.i-products::-webkit-scrollbar{display:none;}
+.i-product-card{border-radius:14px;overflow:hidden;transition:box-shadow .25s,transform .25s;display:flex;flex-direction:column;scroll-snap-align:start;}
+.theme-dark  .i-product-card{background:#161618;border:1px solid rgba(255,255,255,.08);}
+.theme-light .i-product-card{background:#fff;border:1px solid rgba(0,0,0,.07);}
+.theme-gold  .i-product-card{background:#fff;border:1px solid rgba(184,146,58,.15);border-radius:4px;}
+.i-product-card:hover{box-shadow:0 12px 40px rgba(0,0,0,.12);transform:translateY(-3px);}
 
-.i-promo-left {
-  width:38%; padding:28px 28px 28px 36px; display:flex; flex-direction:column;
-  justify-content:center; gap:10px; flex-shrink:0; position:relative; z-index:1;
-}
-.i-promo-brand {
-  font-weight:800; line-height:1; letter-spacing:-.02em;
-}
-.theme-dark  .i-promo-brand { font-family:'Clash Display',sans-serif; font-size:clamp(28px,4vw,44px); color:#fff; letter-spacing:.05em; }
-.theme-light .i-promo-brand { font-family:'Montserrat',sans-serif; font-size:clamp(24px,3.5vw,38px); color:#fff; }
-.theme-gold  .i-promo-brand { font-family:'Cormorant Garamond',serif; font-size:clamp(30px,4.5vw,48px); color:#fff; letter-spacing:.05em; font-weight:600; }
+.i-product-img{width:100%;aspect-ratio:4/3;position:relative;overflow:hidden;}
+.theme-dark  .i-product-img{background:#111113;}
+.theme-light .i-product-img{background:#f0f0ee;}
+.theme-gold  .i-product-img{background:#f5f0e8;}
+.i-product-img img{width:100%;height:100%;object-fit:cover;}
+.i-product-discount{position:absolute;top:10px;left:10px;color:#fff;font-size:10px;font-weight:700;padding:3px 7px;border-radius:6px;font-family:'Montserrat',sans-serif;}
+.theme-dark  .i-product-discount{background:#dc402a;}
+.theme-light .i-product-discount{background:#1847e8;}
+.theme-gold  .i-product-discount{background:#1a1410;border-radius:0;font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.06em;}
 
-.i-promo-brand .accent { color:#ffd166; }
-.theme-gold .i-promo-brand .accent { color:var(--accent); font-style:italic; }
+.i-product-info{padding:12px 12px 0;flex:1;display:flex;flex-direction:column;gap:4px;}
+.i-product-brand{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+.theme-dark  .i-product-brand{color:rgba(245,245,245,.38);font-family:'Inter',sans-serif;}
+.theme-light .i-product-brand{color:rgba(10,10,10,.45);font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-product-brand{color:rgba(26,20,16,.42);font-family:'Cormorant Garamond',serif;font-size:10px;letter-spacing:.2em;font-weight:400;}
+.i-product-name{font-size:10px;font-weight:600;line-height:1.4;flex:1;}
+.theme-dark  .i-product-name{color:#f5f5f5;font-family:'Inter',sans-serif;}
+.theme-light .i-product-name{color:#0a0a0a;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-product-name{color:#1a1410;font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:500;}
+.i-product-prices{display:flex;flex-direction:column;gap:1px;margin-top:4px;}
+.i-product-price-old{font-size:9px;text-decoration:line-through;font-family:'Montserrat',sans-serif;}
+.theme-dark  .i-product-price-old{color:rgba(245,245,245,.38);}
+.theme-light .i-product-price-old{color:rgba(10,10,10,.45);}
+.theme-gold  .i-product-price-old{color:rgba(26,20,16,.42);}
+.i-product-price{font-size:14px;font-weight:800;font-family:'Montserrat',sans-serif;}
+.theme-dark  .i-product-price{color:#f5f5f5;}
+.theme-light .i-product-price{color:#0a0a0a;}
+.theme-gold  .i-product-price{color:#1a1410;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;}
+.i-product-footer{padding:10px 12px 12px;}
+.i-add-cart{width:100%;padding:8px;cursor:pointer;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s,color .2s;border-radius:8px;font-family:'Montserrat',sans-serif;}
+.theme-dark  .i-add-cart{background:#dc402a;color:#fff;border:1.5px solid #dc402a;}
+.theme-light .i-add-cart{background:transparent;color:#1847e8;border:1.5px solid #1847e8;}
+.theme-light .i-add-cart:hover{background:#1847e8;color:#fff;}
+.theme-gold  .i-add-cart{background:transparent;color:#1a1410;border:1.5px solid #1a1410;border-radius:0;font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.1em;}
+.theme-gold  .i-add-cart:hover{background:#1a1410;color:#fff;}
+.i-add-cart svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0;}
 
-.i-promo-tagline { font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.5); }
-.theme-gold .i-promo-tagline { font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:.2em; font-style:italic; color:rgba(255,255,255,.5); }
+/* ─── PROMO BANNER ────────────────────────────────── */
+.i-promo{display:flex;overflow:hidden;position:relative;height:280px;}
+.theme-dark  .i-promo{background:linear-gradient(120deg,#1a0500 0%,#2d0a00 55%,#0a0500 100%);}
+.theme-light .i-promo{background:linear-gradient(120deg,#1847e8 0%,#0f2fa3 55%,#0a1f6e 100%);}
+.theme-gold  .i-promo{background:linear-gradient(120deg,#1a1410 0%,#2a1f0f 55%,#1a1410 100%);}
 
-.i-promo-offer { display:flex; align-items:center; gap:12px; }
-.i-promo-badge {
-  background:#ffd166; color:#0a1f6e; padding:8px 12px; border-radius:8px;
-  font-family:'Montserrat',sans-serif; font-weight:800; font-size:20px; line-height:1;
-  display:flex; flex-direction:column; align-items:center; flex-shrink:0;
-}
-.theme-dark .i-promo-badge { background:var(--accent); color:#fff; }
-.theme-gold .i-promo-badge { background:var(--accent); color:#fff; }
-.i-promo-badge small { font-size:8px; font-weight:700; letter-spacing:.06em; }
-.i-promo-offer-text { font-size:11px; font-weight:600; color:#fff; font-family:'Montserrat',sans-serif; }
-.i-promo-offer-text span { display:block; font-weight:400; font-size:10px; color:rgba(255,255,255,.55); margin-top:2px; }
-.theme-gold .i-promo-offer-text { font-family:'Cormorant Garamond',serif; font-size:14px; }
+.i-promo-left{width:36%;padding:24px 24px 24px 32px;display:flex;flex-direction:column;justify-content:center;gap:10px;flex-shrink:0;position:relative;z-index:1;}
+.i-promo-brand{font-weight:800;line-height:1;}
+.theme-dark  .i-promo-brand{font-family:'Clash Display',sans-serif;font-size:clamp(28px,4vw,42px);color:#fff;letter-spacing:.05em;}
+.theme-light .i-promo-brand{font-family:'Montserrat',sans-serif;font-size:clamp(24px,3.5vw,38px);color:#fff;}
+.theme-gold  .i-promo-brand{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,44px);color:#fff;letter-spacing:.05em;font-weight:600;}
+.i-promo-brand .accent{color:#ffd166;}
+.theme-dark  .i-promo-brand .accent{color:#ff6b35;}
+.theme-gold  .i-promo-brand .accent{color:#b8923a;font-style:italic;}
 
-.i-promo-badges { display:flex; gap:6px; flex-wrap:wrap; }
-.i-promo-badge-pill {
-  display:inline-flex; align-items:center; gap:4px;
-  background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18);
-  border-radius:100px; padding:4px 10px; font-size:9px; font-weight:600;
-  color:rgba(255,255,255,.8); letter-spacing:.04em; text-transform:uppercase;
-  font-family:'Montserrat',sans-serif;
-}
-.i-promo-cta {
-  align-self:flex-start; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
-  padding:9px 20px; border-radius:100px; background:#fff; border:none; cursor:pointer; transition:transform .2s;
-}
-.i-promo-cta:hover { transform:translateY(-1px); }
-.theme-dark .i-promo-cta { color:var(--accent); }
-.theme-light .i-promo-cta { color:var(--accent); }
-.theme-gold  .i-promo-cta { color:var(--accent); font-family:'Cormorant Garamond',serif; font-size:12px; letter-spacing:.1em; }
+.i-promo-tagline{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);}
+.theme-gold .i-promo-tagline{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.18em;font-style:italic;}
 
-.i-promo-right { flex:1; position:relative; overflow:hidden; }
-.i-promo-right img { width:100%; height:100%; object-fit:cover; object-position:center 35%; }
-.i-promo-arrow {
-  position:absolute; top:50%; transform:translateY(-50%); z-index:3;
-  width:26px; height:26px; border-radius:50%; background:rgba(0,0,0,.3);
-  border:1px solid rgba(255,255,255,.2); display:flex; align-items:center;
-  justify-content:center; cursor:pointer; font-size:12px; color:#fff;
-}
-.i-promo-arrow.prev { left:calc(38% + 8px); }
-.i-promo-arrow.next { right:12px; }
-.i-promo-dots { position:absolute; bottom:10px; right:calc(50% - 19%); display:flex; gap:5px; z-index:3; }
-.i-promo-dots span { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.35); }
-.i-promo-dots span.active { background:#fff; width:14px; border-radius:3px; }
+.i-promo-offer{display:flex;align-items:center;gap:12px;}
+.i-promo-badge{padding:8px 12px;border-radius:8px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:20px;line-height:1;display:flex;flex-direction:column;align-items:center;flex-shrink:0;color:#fff;}
+.theme-dark  .i-promo-badge{background:#dc402a;}
+.theme-light .i-promo-badge{background:#ffd166;color:#0a1f6e;}
+.theme-gold  .i-promo-badge{background:#b8923a;}
+.i-promo-badge small{font-size:8px;font-weight:700;letter-spacing:.06em;}
+.i-promo-offer-text{font-size:11px;font-weight:600;color:#fff;font-family:'Montserrat',sans-serif;}
+.i-promo-offer-text span{display:block;font-weight:400;font-size:10px;color:rgba(255,255,255,.55);margin-top:2px;}
+.theme-gold .i-promo-offer-text{font-family:'Cormorant Garamond',serif;font-size:14px;}
 
-/* DARK promo: gradiente animado en lugar de imagen */
-.i-promo-dark-deco {
-  position:absolute; inset:0;
-  background: radial-gradient(ellipse 70% 80% at 70% 40%, rgba(220,64,42,.35) 0%, transparent 60%),
-              radial-gradient(ellipse 50% 60% at 90% 80%, rgba(255,107,53,.2) 0%, transparent 55%);
-  animation: fluidMove 6s ease-in-out infinite alternate;
-}
+.i-promo-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.i-promo-badge-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:100px;padding:4px 10px;font-size:9px;font-weight:600;color:rgba(255,255,255,.8);letter-spacing:.04em;text-transform:uppercase;font-family:'Montserrat',sans-serif;}
 
-/* ── SECTION HEADER ── */
-.i-section-header {
-  display:flex; padding:22px 28px 12px; align-items:center; justify-content:space-between;
-}
-.i-section-title { font-size:16px; font-weight:700; color:var(--fg); letter-spacing:-.02em; }
-.theme-gold .i-section-title { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; letter-spacing:.04em; }
-.i-section-link { font-size:10px; font-weight:600; color:var(--accent); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; }
-.theme-gold .i-section-link { font-family:'Cormorant Garamond',serif; font-size:12px; letter-spacing:.1em; }
+.i-promo-cta{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:9px 20px;border-radius:100px;background:#fff;border:none;cursor:pointer;transition:transform .2s;}
+.i-promo-cta:hover{transform:translateY(-1px);}
+.theme-dark  .i-promo-cta{color:#dc402a;font-family:'Inter',sans-serif;}
+.theme-light .i-promo-cta{color:#1847e8;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-promo-cta{color:#b8923a;font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:.1em;}
 
-/* ── PRODUCTS ── */
-.i-products {
-  display:grid; padding:0 24px 28px; gap:14px;
-  grid-template-columns:repeat(6,minmax(160px,1fr));
-  overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none;
-}
-.i-products::-webkit-scrollbar { display:none; }
-.i-product-card {
-  background:var(--card); border-radius:14px; overflow:hidden;
-  border:1px solid var(--cardborder); transition:box-shadow .25s, transform .25s;
-  display:flex; flex-direction:column; scroll-snap-align:start;
-}
-.theme-gold .i-product-card { border-radius:4px; }
-.i-product-card:hover { box-shadow:0 12px 40px rgba(0,0,0,.12); transform:translateY(-3px); }
-.i-product-img { width:100%; aspect-ratio:4/3; background:var(--bg2); position:relative; overflow:hidden; }
-.i-product-img img { width:100%; height:100%; object-fit:cover; }
-.i-product-discount {
-  position:absolute; top:10px; left:10px; background:var(--accent); color:#fff;
-  font-size:10px; font-weight:700; padding:3px 7px; border-radius:6px; font-family:'Montserrat',sans-serif;
-}
-.theme-gold .i-product-discount { border-radius:0; background:var(--fg); font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:.06em; }
-.i-product-info { padding:12px 12px 0; flex:1; display:flex; flex-direction:column; gap:4px; }
-.i-product-brand { font-size:8px; font-weight:700; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; }
-.theme-gold .i-product-brand { font-family:'Cormorant Garamond',serif; font-size:10px; letter-spacing:.2em; font-weight:400; }
-.i-product-name { font-size:10px; font-weight:600; color:var(--fg); line-height:1.4; flex:1; }
-.theme-gold .i-product-name { font-family:'Cormorant Garamond',serif; font-size:13px; font-weight:500; letter-spacing:.02em; }
-.i-product-prices { display:flex; flex-direction:column; gap:1px; margin-top:4px; }
-.i-product-price-old { font-size:9px; color:var(--muted); text-decoration:line-through; }
-.i-product-price { font-size:14px; font-weight:800; color:var(--fg); font-family:'Montserrat',sans-serif; }
-.theme-gold .i-product-price { font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:600; }
-.i-product-footer { padding:10px 12px 12px; }
-.i-add-cart {
-  width:100%; padding:8px; border:1.5px solid var(--accent); cursor:pointer;
-  background:transparent; color:var(--accent); font-size:9px; font-weight:700;
-  letter-spacing:.08em; text-transform:uppercase; display:flex; align-items:center;
-  justify-content:center; gap:6px; transition:background .2s, color .2s; border-radius:8px;
-  font-family:'Montserrat',sans-serif;
-}
-.theme-dark .i-add-cart { background:var(--accent); color:#fff; border-color:var(--accent); }
-.i-add-cart:hover { background:var(--accent); color:#fff; }
-.theme-gold .i-add-cart { border-radius:0; border-color:var(--fg); color:var(--fg); font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:.1em; }
-.theme-gold .i-add-cart:hover { background:var(--fg); color:var(--bg); }
-.i-add-cart svg { width:11px; height:11px; stroke:currentColor; stroke-width:2; fill:none; flex-shrink:0; }
+.i-promo-right{flex:1;position:relative;overflow:hidden;}
+.i-promo-right img{width:100%;height:100%;object-fit:cover;object-position:center 35%;}
+.i-promo-dark-deco{position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 70% 40%,rgba(220,64,42,.35) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 90% 80%,rgba(255,107,53,.2) 0%,transparent 55%);animation:fluidMove 6s ease-in-out infinite alternate;}
+.i-promo-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:#fff;}
+.i-promo-arrow.prev{left:calc(36% + 8px);}
+.i-promo-arrow.next{right:12px;}
+.i-promo-dots{position:absolute;bottom:10px;left:68%;transform:translateX(-50%);display:flex;gap:5px;z-index:3;}
+.i-promo-dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.35);}
+.i-promo-dots span.active{background:#fff;width:14px;border-radius:3px;}
 
-/* ── COUNTERS ── */
-.i-counters {
-  display:flex; align-items:center; justify-content:space-around;
-  background:var(--bg2); padding:34px 48px;
-  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
-}
-.i-counter { flex:1; display:flex; flex-direction:column; gap:8px; padding:0 20px; }
-.i-counter-num {
-  font-size:clamp(36px,4.5vw,58px); font-weight:800; color:var(--fg);
-  letter-spacing:-.04em; line-height:1; display:flex; align-items:baseline; gap:2px;
-  font-family:'Montserrat',sans-serif;
-}
-.theme-gold .i-counter-num { font-family:'Cormorant Garamond',serif; font-weight:600; }
-.i-counter-label { font-size:11px; font-weight:400; color:var(--muted); line-height:1.5; }
-.theme-gold .i-counter-label { font-family:'Cormorant Garamond',serif; font-size:13px; }
-.i-counter-divider { width:1px; height:56px; background:var(--border); flex-shrink:0; }
+/* ─── COUNTERS ────────────────────────────────────── */
+.i-counters{display:flex;align-items:center;justify-content:space-around;padding:36px 48px;border-top:1px solid;border-bottom:1px solid;}
+.theme-dark  .i-counters{background:#111113;border-color:rgba(255,255,255,.07);}
+.theme-light .i-counters{background:#fff;border-color:rgba(0,0,0,.06);}
+.theme-gold  .i-counters{background:#faf6f0;border-color:rgba(184,146,58,.12);}
+.i-counter{flex:1;display:flex;flex-direction:column;gap:8px;padding:0 20px;}
+.i-counter-num{font-size:clamp(36px,4.5vw,58px);font-weight:800;letter-spacing:-.04em;line-height:1;display:flex;align-items:baseline;gap:2px;font-family:'Montserrat',sans-serif;}
+.theme-dark  .i-counter-num{color:#f5f5f5;}
+.theme-light .i-counter-num{color:#0a0a0a;}
+.theme-gold  .i-counter-num{color:#1a1410;font-family:'Cormorant Garamond',serif;font-weight:600;}
+.i-counter-label{font-size:11px;font-weight:400;line-height:1.5;font-family:'Inter',sans-serif;}
+.theme-dark  .i-counter-label{color:rgba(245,245,245,.38);}
+.theme-light .i-counter-label{color:rgba(10,10,10,.45);}
+.theme-gold  .i-counter-label{color:rgba(26,20,16,.42);font-family:'Cormorant Garamond',serif;font-size:13px;}
+.i-counter-divider{width:1px;height:56px;flex-shrink:0;}
+.theme-dark  .i-counter-divider{background:rgba(255,255,255,.07);}
+.theme-light .i-counter-divider{background:rgba(0,0,0,.08);}
+.theme-gold  .i-counter-divider{background:rgba(184,146,58,.2);}
 
-/* ── INFO BANNER ── */
-.i-info-banner {
-  display:flex; align-items:center; gap:28px; padding:32px 48px; min-height:130px;
-  position:relative; overflow:hidden;
-}
-.theme-dark  .i-info-banner { background:linear-gradient(120deg,#1a0500 0%,#2d0a00 60%,#1a0500 100%); }
-.theme-light .i-info-banner { background:linear-gradient(120deg,#1847e8 0%,#0f2fa3 60%,#0a1f6e 100%); }
-.theme-gold  .i-info-banner { background:linear-gradient(120deg,#1a1410 0%,#2a1f0f 60%,#1a1410 100%); border-top:1px solid var(--border); }
+/* ─── INFO BANNER ─────────────────────────────────── */
+.i-info-banner{display:flex;align-items:center;gap:28px;padding:32px 48px;min-height:130px;position:relative;overflow:hidden;}
+.theme-dark  .i-info-banner{background:linear-gradient(120deg,#1a0500 0%,#2d0a00 60%,#0a0500 100%);}
+.theme-light .i-info-banner{background:linear-gradient(120deg,#1847e8 0%,#0f2fa3 60%,#0a1f6e 100%);}
+.theme-gold  .i-info-banner{background:linear-gradient(120deg,#1a1410 0%,#2a1f0f 60%,#1a1410 100%);}
+.i-info-icon{flex-shrink:0;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;color:#fff;}
+.i-info-icon svg{width:22px;height:22px;}
+.i-info-body{flex:1;}
+.i-info-tag{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#ffd166;margin-bottom:5px;font-family:'Montserrat',sans-serif;}
+.theme-dark .i-info-tag{color:#ff6b35;}
+.theme-gold .i-info-tag{color:#b8923a;font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.22em;font-style:italic;}
+.i-info-title{font-size:clamp(16px,2.2vw,22px);font-weight:800;color:#fff;margin-bottom:6px;}
+.theme-dark  .i-info-title{font-family:'Clash Display',sans-serif;}
+.theme-light .i-info-title{font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-info-title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:clamp(18px,2.4vw,26px);}
+.i-info-title span{color:#ffd166;}
+.theme-dark  .i-info-title span{color:#ff6b35;}
+.theme-gold  .i-info-title span{color:#b8923a;font-style:italic;}
+.i-info-sub{font-size:11px;color:rgba(255,255,255,.65);line-height:1.65;max-width:480px;margin-bottom:12px;font-family:'Inter',sans-serif;}
+.theme-gold .i-info-sub{font-family:'Cormorant Garamond',serif;font-size:14px;}
+.i-info-badges{display:flex;gap:8px;flex-wrap:wrap;}
+.i-info-badge{font-size:10px;font-weight:600;color:rgba(255,255,255,.8);background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);border-radius:100px;padding:4px 12px;font-family:'Montserrat',sans-serif;}
+.theme-gold .i-info-badge{font-family:'Cormorant Garamond',serif;font-size:12px;}
 
-.i-info-icon {
-  flex-shrink:0; width:52px; height:52px; border-radius:50%;
-  background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18);
-  display:flex; align-items:center; justify-content:center; color:#fff;
-}
-.i-info-icon svg { width:22px; height:22px; }
-.i-info-body { flex:1; }
-.i-info-tag { font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#ffd166; margin-bottom:5px; font-family:'Montserrat',sans-serif; }
-.theme-gold .i-info-tag { color:var(--accent); font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:.22em; font-style:italic; }
-.i-info-title { font-size:clamp(16px,2.2vw,22px); font-weight:800; color:#fff; margin-bottom:6px; }
-.theme-dark  .i-info-title { font-family:'Clash Display',sans-serif; }
-.theme-light .i-info-title { font-family:'Montserrat',sans-serif; }
-.theme-gold  .i-info-title { font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(20px,2.5vw,28px); }
-.i-info-title span { color:#ffd166; }
-.theme-gold .i-info-title span { color:var(--accent); font-style:italic; }
-.i-info-sub { font-size:11px; color:rgba(255,255,255,.65); line-height:1.65; max-width:480px; margin-bottom:12px; font-family:'Inter',sans-serif; }
-.theme-gold .i-info-sub { font-family:'Cormorant Garamond',serif; font-size:14px; }
-.i-info-badges { display:flex; gap:8px; flex-wrap:wrap; }
-.i-info-badge { font-size:10px; font-weight:600; color:rgba(255,255,255,.8); background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.15); border-radius:100px; padding:4px 12px; font-family:'Montserrat',sans-serif; }
-.theme-gold .i-info-badge { font-family:'Cormorant Garamond',serif; font-size:12px; border-radius:0; border-color:var(--accent); color:var(--accent); }
+/* ─── FOOTER ──────────────────────────────────────── */
+.i-footer{padding:32px 36px 24px;display:flex;flex-direction:column;gap:24px;}
+.theme-dark  .i-footer{background:#09090b;}
+.theme-light .i-footer{background:#0a0a0a;}
+.theme-gold  .i-footer{background:#1a1410;}
+.i-footer-top{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;}
+.i-footer-brand{display:flex;flex-direction:column;gap:10px;}
+.i-footer-logo{font-size:16px;font-weight:800;color:#fff;letter-spacing:.06em;}
+.theme-dark  .i-footer-logo{font-family:'Clash Display',sans-serif;letter-spacing:.2em;}
+.theme-light .i-footer-logo{font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-footer-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;letter-spacing:.1em;}
+.i-footer-logo .accent{color:#ff6b35;}
+.theme-light .i-footer-logo .accent{color:#1847e8;}
+.theme-gold  .i-footer-logo .accent{color:#b8923a;font-style:italic;}
+.i-footer-tagline{font-size:10px;color:rgba(255,255,255,.3);font-weight:400;line-height:1.6;max-width:200px;font-family:'Inter',sans-serif;}
+.theme-gold .i-footer-tagline{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;}
+.i-footer-cols{display:flex;gap:40px;}
+.i-footer-col{display:flex;flex-direction:column;gap:10px;}
+.i-footer-col-title{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);font-family:'Inter',sans-serif;}
+.i-footer-link{font-size:11px;color:rgba(255,255,255,.5);text-decoration:none;cursor:pointer;transition:color .2s;font-family:'Inter',sans-serif;}
+.theme-gold .i-footer-link{font-family:'Cormorant Garamond',serif;font-size:13px;}
+.i-footer-link:hover{color:#fff;}
+.i-footer-bottom{border-top:1px solid rgba(255,255,255,.07);padding-top:18px;display:flex;justify-content:space-between;align-items:center;}
+.i-footer-copy{font-size:10px;color:rgba(255,255,255,.2);font-family:'Inter',sans-serif;}
+.i-footer-legal{display:flex;gap:16px;}
+.i-footer-legal span{font-size:10px;color:rgba(255,255,255,.2);cursor:pointer;font-family:'Inter',sans-serif;}
 
-/* ── FOOTER ── */
-.i-footer { background:#0a0a0a; padding:32px 36px 24px; display:flex; flex-direction:column; gap:24px; }
-.theme-gold .i-footer { background:var(--fg); }
-.i-footer-top { display:flex; justify-content:space-between; gap:32px; flex-wrap:wrap; }
-.i-footer-brand { display:flex; flex-direction:column; gap:10px; }
-.i-footer-logo { font-size:16px; font-weight:800; color:#fff; letter-spacing:.06em; }
-.theme-dark  .i-footer-logo { font-family:'Clash Display',sans-serif; letter-spacing:.2em; }
-.theme-light .i-footer-logo { font-family:'Montserrat',sans-serif; color:#fff; }
-.theme-gold  .i-footer-logo { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; letter-spacing:.1em; }
-.i-footer-logo .accent { color:var(--accent); }
-.i-footer-tagline { font-size:10px; color:rgba(255,255,255,.3); font-weight:400; line-height:1.6; max-width:200px; font-family:'Inter',sans-serif; }
-.theme-gold .i-footer-tagline { font-family:'Cormorant Garamond',serif; font-size:12px; font-style:italic; }
-.i-footer-cols { display:flex; gap:40px; }
-.i-footer-col { display:flex; flex-direction:column; gap:10px; }
-.i-footer-col-title { font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.35); font-family:'Inter',sans-serif; }
-.i-footer-link { font-size:11px; color:rgba(255,255,255,.5); text-decoration:none; cursor:pointer; transition:color .2s; font-family:'Inter',sans-serif; }
-.theme-gold .i-footer-link { font-family:'Cormorant Garamond',serif; font-size:13px; }
-.i-footer-link:hover { color:#fff; }
-.i-footer-bottom { border-top:1px solid rgba(255,255,255,.07); padding-top:18px; display:flex; justify-content:space-between; align-items:center; }
-.i-footer-copy { font-size:10px; color:rgba(255,255,255,.2); font-family:'Inter',sans-serif; }
-.i-footer-legal { display:flex; gap:16px; }
-.i-footer-legal span { font-size:10px; color:rgba(255,255,255,.2); cursor:pointer; font-family:'Inter',sans-serif; }
+/* ─── ANIMATIONS ──────────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideCards{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:translateX(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
 
-/* ── FLASH overlay ── */
-#theme-flash { position:fixed; inset:0; pointer-events:none; z-index:9999; opacity:0; }
-
-/* ── ANIMATIONS ── */
-@keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-@keyframes fadeIn { from{opacity:0} to{opacity:1} }
-@keyframes slideCards { from{opacity:0;transform:translateX(32px)} to{opacity:1;transform:translateX(0)} }
-@keyframes scaleIn { from{opacity:0;transform:scale(.97)} to{opacity:1;transform:scale(1)} }
-
-#iris.is-animating .i-hero-banner        { animation:scaleIn .45s ease both; }
-#iris.is-animating .i-hero-tag           { animation:fadeUp .3s ease .05s both; }
-#iris.is-animating .i-hero-title         { animation:fadeUp .38s cubic-bezier(.34,1.56,.64,1) .12s both; }
-#iris.is-animating .i-hero-sub           { animation:fadeUp .3s ease .2s both; }
-#iris.is-animating .i-hero-cta           { animation:fadeUp .28s ease .28s both; }
-#iris.is-animating .i-section-header     { animation:fadeUp .3s ease .32s both; }
-#iris.is-animating .i-product-card:nth-child(1) { animation:slideCards .28s ease .35s both; }
-#iris.is-animating .i-product-card:nth-child(2) { animation:slideCards .28s ease .42s both; }
-#iris.is-animating .i-product-card:nth-child(3) { animation:slideCards .28s ease .49s both; }
-#iris.is-animating .i-product-card:nth-child(4) { animation:slideCards .28s ease .56s both; }
-#iris.is-animating .i-product-card:nth-child(5) { animation:slideCards .28s ease .63s both; }
-#iris.is-animating .i-product-card:nth-child(6) { animation:slideCards .28s ease .70s both; }
-#iris.is-animating .i-promo              { animation:fadeUp .35s ease .72s both; }
-#iris.is-animating .i-counter:nth-child(1) { animation:fadeUp .3s ease .78s both; }
-#iris.is-animating .i-counter:nth-child(3) { animation:fadeUp .3s ease .84s both; }
-#iris.is-animating .i-counter:nth-child(5) { animation:fadeUp .3s ease .90s both; }
-#iris.is-animating .i-info-banner        { animation:fadeUp .35s ease .92s both; }
-#iris.is-animating .i-footer             { animation:fadeIn .3s ease 1.0s both; }
+#iris.is-animating .i-hero-banner         {animation:scaleIn .4s ease both;}
+#iris.is-animating .i-hero-tag            {animation:fadeUp .28s ease .05s both;}
+#iris.is-animating .i-hero-title          {animation:fadeUp .35s cubic-bezier(.34,1.56,.64,1) .12s both;}
+#iris.is-animating .i-hero-sub            {animation:fadeUp .28s ease .2s both;}
+#iris.is-animating .i-hero-cta            {animation:fadeUp .25s ease .28s both;}
+#iris.is-animating .i-section-header      {animation:fadeUp .28s ease .32s both;}
+#iris.is-animating .i-product-card:nth-child(1){animation:slideCards .25s ease .34s both;}
+#iris.is-animating .i-product-card:nth-child(2){animation:slideCards .25s ease .40s both;}
+#iris.is-animating .i-product-card:nth-child(3){animation:slideCards .25s ease .46s both;}
+#iris.is-animating .i-product-card:nth-child(4){animation:slideCards .25s ease .52s both;}
+#iris.is-animating .i-product-card:nth-child(5){animation:slideCards .25s ease .58s both;}
+#iris.is-animating .i-product-card:nth-child(6){animation:slideCards .25s ease .64s both;}
+#iris.is-animating .i-promo               {animation:fadeUp .3s ease .66s both;}
+#iris.is-animating .i-counter:nth-child(1){animation:fadeUp .28s ease .72s both;}
+#iris.is-animating .i-counter:nth-child(3){animation:fadeUp .28s ease .78s both;}
+#iris.is-animating .i-counter:nth-child(5){animation:fadeUp .28s ease .84s both;}
+#iris.is-animating .i-info-banner         {animation:fadeUp .3s ease .86s both;}
+#iris.is-animating .i-footer              {animation:fadeIn .3s ease .95s both;}
 </style>
 </head>
 <body>
 <div id="iris" class="theme-dark">
-<div id="theme-flash"></div>
 
 <!-- NAV -->
 <nav class="i-nav">
-  <div class="i-logo">
-    <span class="i-logo-dot"></span>
-    <span id="logo-text">DOSA</span>
-  </div>
+  <div class="i-logo"><span class="i-logo-dot"></span><span id="logo-text">DOSA</span></div>
   <div class="i-nav-links">
     <a class="i-nav-link" href="#">Servicios</a>
     <a class="i-nav-link" id="nav-mid" href="#">Proyectos</a>
@@ -400,48 +342,41 @@ html,body{width:100%;height:100%;overflow-x:hidden;overflow-y:auto}
 
 <!-- HERO BANNER -->
 <div class="i-hero-banner">
-  <!-- Dark: gradiente fluido -->
-  <div class="i-fluid-bg"></div>
-  <div class="i-fluid-grain"></div>
-  <!-- Light / Gold: imagen -->
-  <img class="i-hero-bg-img" id="hero-img" src="novo-hero.jpg" alt="">
+  <div class="i-fluid-bg" id="fluid-bg"></div>
+  <div class="i-fluid-grain" id="fluid-grain"></div>
+  <img class="i-hero-bg-img" id="hero-img" src="" alt="" style="display:none">
   <div class="i-hero-overlay">
     <div class="i-hero-content">
-      <div class="i-hero-tag" id="hero-tag">Diseño · Tecnología · Identidad</div>
-      <h1 class="i-hero-title" id="hero-title">El diseño que<br><span>define marcas.</span></h1>
-      <p class="i-hero-sub" id="hero-sub">Creamos identidades visuales y experiencias digitales que no pasan desapercibidas.</p>
-      <button class="i-hero-cta" id="hero-cta">Ver proyectos →</button>
+      <div class="i-hero-tag" id="hero-tag"></div>
+      <h1 class="i-hero-title" id="hero-title"></h1>
+      <p class="i-hero-sub" id="hero-sub"></p>
+      <button class="i-hero-cta" id="hero-cta"></button>
     </div>
   </div>
 </div>
 
 <!-- SECTION HEADER -->
 <div class="i-section-header">
-  <span class="i-section-title" id="section-title">Proyectos destacados</span>
-  <a class="i-section-link" href="#" id="section-link">Ver todos →</a>
+  <span class="i-section-title" id="section-title"></span>
+  <a class="i-section-link" href="#" id="section-link"></a>
 </div>
 
 <!-- PRODUCTS -->
-<div class="i-products" id="products-grid">
-  <!-- Se rellena por JS -->
-</div>
+<div class="i-products" id="products-grid"></div>
 
 <!-- PROMO BANNER -->
-<div class="i-promo" id="promo-banner">
+<div class="i-promo">
   <div class="i-promo-left">
-    <div class="i-promo-brand" id="promo-brand">DO<span class="accent">SA</span></div>
-    <div class="i-promo-tagline" id="promo-tagline">Diseño · Automatización · Identidad</div>
+    <div class="i-promo-brand" id="promo-brand"></div>
+    <div class="i-promo-tagline" id="promo-tagline"></div>
     <div class="i-promo-offer">
-      <div class="i-promo-badge"><small>Hasta</small>30%<small>dcto.</small></div>
-      <div class="i-promo-offer-text" id="promo-offer-text">
-        30% en servicios de diseño
-        <span>Proyectos nuevos. Oferta por tiempo limitado.</span>
-      </div>
+      <div class="i-promo-badge" id="promo-badge"><small>Hasta</small>30%<small>dcto.</small></div>
+      <div class="i-promo-offer-text" id="promo-offer-text"></div>
     </div>
     <div class="i-promo-badges" id="promo-badges"></div>
-    <button class="i-promo-cta" id="promo-cta">Ver servicios →</button>
+    <button class="i-promo-cta" id="promo-cta"></button>
   </div>
-  <div class="i-promo-right" id="promo-right">
+  <div class="i-promo-right">
     <div class="i-promo-dark-deco" id="promo-deco"></div>
     <img id="promo-img" src="" alt="" style="display:none">
     <div class="i-promo-arrow prev">‹</div>
@@ -452,38 +387,25 @@ html,body{width:100%;height:100%;overflow-x:hidden;overflow-y:auto}
 
 <!-- COUNTERS -->
 <div class="i-counters">
-  <div class="i-counter">
-    <div class="i-counter-num"><span class="i-count" data-target="210" id="c1">0</span>+</div>
-    <div class="i-counter-label" id="cl1">Clientes satisfechos en toda la región</div>
-  </div>
+  <div class="i-counter"><div class="i-counter-num"><span class="i-count" id="c1" data-target="0">0</span>+</div><div class="i-counter-label" id="cl1"></div></div>
   <div class="i-counter-divider"></div>
-  <div class="i-counter">
-    <div class="i-counter-num"><span class="i-count" data-target="520" id="c2">0</span>+</div>
-    <div class="i-counter-label" id="cl2">Proyectos completados exitosamente</div>
-  </div>
+  <div class="i-counter"><div class="i-counter-num"><span class="i-count" id="c2" data-target="0">0</span>+</div><div class="i-counter-label" id="cl2"></div></div>
   <div class="i-counter-divider"></div>
-  <div class="i-counter">
-    <div class="i-counter-num"><span class="i-count" data-target="800" id="c3">0</span>+</div>
-    <div class="i-counter-label" id="cl3">Recursos y soluciones en portafolio</div>
-  </div>
+  <div class="i-counter"><div class="i-counter-num"><span class="i-count" id="c3" data-target="0">0</span>+</div><div class="i-counter-label" id="cl3"></div></div>
 </div>
 
 <!-- INFO BANNER -->
 <div class="i-info-banner">
   <div class="i-info-icon">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" id="info-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" id="info-icon-svg">
       <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11.5 19.79 19.79 0 01.5 2.82 2 2 0 012.5.82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.18a16 16 0 006 6l.76-.76a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
     </svg>
   </div>
   <div class="i-info-body">
-    <div class="i-info-tag" id="info-tag">Soporte 24/7</div>
-    <div class="i-info-title" id="info-title">Atención <span>personalizada</span> en cada proyecto</div>
-    <div class="i-info-sub" id="info-sub">Un equipo dedicado desde el primer contacto hasta la entrega final. Siempre disponibles, siempre comprometidos.</div>
-    <div class="i-info-badges" id="info-badges">
-      <span class="i-info-badge">Respuesta en 2h</span>
-      <span class="i-info-badge">Equipo dedicado</span>
-      <span class="i-info-badge">Garantía de entrega</span>
-    </div>
+    <div class="i-info-tag" id="info-tag"></div>
+    <div class="i-info-title" id="info-title"></div>
+    <div class="i-info-sub" id="info-sub"></div>
+    <div class="i-info-badges" id="info-badges"></div>
   </div>
 </div>
 
@@ -491,179 +413,151 @@ html,body{width:100%;height:100%;overflow-x:hidden;overflow-y:auto}
 <footer class="i-footer">
   <div class="i-footer-top">
     <div class="i-footer-brand">
-      <div class="i-footer-logo" id="footer-logo">DO<span class="accent">SA</span></div>
-      <div class="i-footer-tagline" id="footer-tagline">Diseño e identidad para marcas que quieren destacar.</div>
+      <div class="i-footer-logo" id="footer-logo"></div>
+      <div class="i-footer-tagline" id="footer-tagline"></div>
     </div>
     <div class="i-footer-cols">
-      <div class="i-footer-col">
-        <div class="i-footer-col-title">Empresa</div>
-        <a class="i-footer-link">Sobre nosotros</a>
-        <a class="i-footer-link">Portafolio</a>
-        <a class="i-footer-link">Premios</a>
-      </div>
-      <div class="i-footer-col" id="footer-col2">
-        <div class="i-footer-col-title">Servicios</div>
-        <a class="i-footer-link">Identidad visual</a>
-        <a class="i-footer-link">Desarrollo web</a>
-        <a class="i-footer-link">UI / UX</a>
-      </div>
-      <div class="i-footer-col">
-        <div class="i-footer-col-title">Contacto</div>
-        <a class="i-footer-link" id="footer-contact1">hola@dosa.studio</a>
-        <a class="i-footer-link">Madrid, ES</a>
-      </div>
+      <div class="i-footer-col"><div class="i-footer-col-title">Empresa</div><a class="i-footer-link">Sobre nosotros</a><a class="i-footer-link">Portafolio</a><a class="i-footer-link">Premios</a></div>
+      <div class="i-footer-col" id="footer-col2"></div>
+      <div class="i-footer-col"><div class="i-footer-col-title">Contacto</div><a class="i-footer-link" id="footer-contact1"></a><a class="i-footer-link" id="footer-contact2">iris.studio</a></div>
     </div>
   </div>
   <div class="i-footer-bottom">
-    <div class="i-footer-copy" id="footer-copy">© 2026 DOSA. Todos los derechos reservados.</div>
+    <div class="i-footer-copy" id="footer-copy"></div>
     <div class="i-footer-legal"><span>Privacidad</span><span>Términos</span></div>
   </div>
 </footer>
 
 </div><!-- /iris -->
 <script>
-// ── DATA POR TEMA ─────────────────────────────────────────
-const themes = {
-  dark: {
-    logo:'DOSA', navMid:'Proyectos', navCta:'Hablemos',
+const T = {
+  dark:{
+    logo:'DOSA',navMid:'Proyectos',navCta:'Hablemos',
     heroTag:'Diseño · Tecnología · Identidad',
     heroTitle:'El diseño que<br><span>define marcas.</span>',
     heroSub:'Creamos identidades visuales y experiencias digitales que no pasan desapercibidas.',
-    heroCta:'Ver proyectos →', heroImg:null,
-    sectionTitle:'Proyectos destacados', sectionLink:'Ver todos →',
+    heroCta:'Ver proyectos →',heroImg:null,
+    secTitle:'Proyectos destacados',secLink:'Ver todos →',
     promoBrand:'DO<span class="accent">SA</span>',
-    promoTagline:'Diseño · Automatización · Identidad',
-    promoOfferText:'30% en servicios de diseño<span>Proyectos nuevos. Oferta limitada.</span>',
-    promoBadges:['Branding','Web design','Automatización'],
-    promoCta:'Ver servicios →', promoImg:null,
-    counters:[
-      {val:120,label:'Marcas diseñadas<br>y lanzadas'},
-      {val:340,label:'Proyectos digitales<br>completados'},
-      {val:98,label:'Clientes activos<br>en 12 países'}
-    ],
-    infoTag:'Metodología DOSA', infoTitle:'Proceso <span>creativo</span> sin límites',
+    promoTag:'Diseño · Automatización · Identidad',
+    promoOffer:'30% en servicios de diseño<span>Proyectos nuevos. Oferta limitada.</span>',
+    promoPills:['Branding','Web design','Automatización'],
+    promoCta:'Ver servicios →',promoImg:null,
+    counters:[{v:120,l:'Marcas diseñadas<br>y lanzadas'},{v:340,l:'Proyectos digitales<br>completados'},{v:98,l:'Clientes activos<br>en 12 países'}],
+    infoTag:'Metodología DOSA',infoTitle:'Proceso <span>creativo</span> sin límites',
     infoSub:'Desde el concepto hasta la implementación. Trabajamos contigo en cada fase para garantizar resultados que superan expectativas.',
     infoBadges:['Briefing en 24h','Iteraciones ilimitadas','Entrega garantizada'],
-    footerLogo:'DO<span class="accent">SA</span>', footerTagline:'Diseño e identidad para marcas que quieren destacar.',
-    footerCol2Title:'Servicios', footerCol2Links:['Identidad visual','Desarrollo web','UI / UX'],
-    footerContact:'hola@dosa.studio', footerCopy:'© 2026 DOSA. Todos los derechos reservados.',
+    footerLogo:'DO<span class="accent">SA</span>',footerTag:'Diseño e identidad para marcas que quieren destacar.',
+    col2Title:'Servicios',col2Links:['Identidad visual','Desarrollo web','UI / UX'],
+    contact:'hola@dosa.studio',copy:'© 2026 DOSA. Todos los derechos reservados.',
     products:[
-      {img:'novo-img4.jpg',discount:null,brand:'DOSA',name:'Branding completo',old:null,price:'$2,400'},
-      {img:'novo-img5.jpg',discount:null,brand:'DOSA',name:'Sitio web a medida',old:null,price:'$3,800'},
-      {img:'novo-img1.jpg',discount:null,brand:'DOSA',name:'Sistema de diseño UI',old:null,price:'$1,900'},
-      {img:'novo-img6.jpg',discount:null,brand:'DOSA',name:'App móvil iOS/Android',old:null,price:'$5,500'},
-      {img:'novo-img2.jpg',discount:null,brand:'DOSA',name:'Automatización de procesos',old:null,price:'$2,100'},
-      {img:'novo-img7.jpg',discount:null,brand:'DOSA',name:'Consultoría de identidad',old:null,price:'$900'},
+      {img:'novo-img4.jpg',disc:null,brand:'DOSA',name:'Branding completo',old:null,price:'$2,400'},
+      {img:'novo-img5.jpg',disc:null,brand:'DOSA',name:'Sitio web a medida',old:null,price:'$3,800'},
+      {img:'novo-img1.jpg',disc:null,brand:'DOSA',name:'Sistema de diseño UI',old:null,price:'$1,900'},
+      {img:'novo-img6.jpg',disc:null,brand:'DOSA',name:'App móvil iOS/Android',old:null,price:'$5,500'},
+      {img:'novo-img2.jpg',disc:null,brand:'DOSA',name:'Automatización',old:null,price:'$2,100'},
+      {img:'novo-img7.jpg',disc:null,brand:'DOSA',name:'Consultoría de identidad',old:null,price:'$900'},
     ]
   },
-  light: {
-    logo:'NOVO', navMid:'Cotizaciones', navCta:'Contáctanos',
+  light:{
+    logo:'NOVO',navMid:'Cotizaciones',navCta:'Contáctanos',
     heroTag:'Soluciones para grandes espacios',
     heroTitle:'Climatización de alto<br>rendimiento para <span>tu empresa</span>',
     heroSub:'Diseñamos, instalamos y mantenemos sistemas HVAC para oficinas corporativas e infraestructuras industriales.',
-    heroCta:'Solicitar diagnóstico →', heroImg:'novo-hero.jpg',
-    sectionTitle:'Productos destacados', sectionLink:'Ver todos →',
+    heroCta:'Solicitar diagnóstico →',heroImg:'novo-hero.jpg',
+    secTitle:'Productos destacados',secLink:'Ver todos →',
     promoBrand:'NO<span class="accent">VO</span>',
-    promoTagline:'Refrigeración Comercial · Oficinas · Soporte 24/7',
-    promoOfferText:'30% en sistemas de climatización<span>Instalación incluida. Financiamiento disponible.</span>',
-    promoBadges:['Instalación incluida','Inverter A+++','Mantenimiento'],
-    promoCta:'Ver sistemas →', promoImg:'novo-img1.jpg',
-    counters:[
-      {val:210,label:'Empresas confían en<br>los sistemas NOVO'},
-      {val:520,label:'Proyectos de climatización<br>completados'},
-      {val:800,label:'Equipos en nuestro<br>portafolio técnico'}
-    ],
-    infoTag:'Soporte 24/7', infoTitle:'Atención al cliente <span>personalizada</span>',
+    promoTag:'Refrigeración Comercial · Oficinas · Soporte 24/7',
+    promoOffer:'30% en sistemas de climatización<span>Instalación incluida. Financiamiento disponible.</span>',
+    promoPills:['Instalación incluida','Inverter A+++','Mantenimiento'],
+    promoCta:'Ver sistemas →',promoImg:'novo-img1.jpg',
+    counters:[{v:210,l:'Empresas confían en<br>los sistemas NOVO'},{v:520,l:'Proyectos de climatización<br>completados'},{v:800,l:'Equipos en nuestro<br>portafolio técnico'}],
+    infoTag:'Soporte 24/7',infoTitle:'Atención al cliente <span>personalizada</span>',
     infoSub:'Un ingeniero NOVO dedicado a tu proyecto desde el primer contacto. Siempre disponibles, con respuesta en menos de 2 horas.',
     infoBadges:['Línea directa 24/7','Ingeniero asignado','Plan de mantenimiento','Respuesta en menos de 2h'],
-    footerLogo:'NO<span class="accent">VO</span>', footerTagline:'Refrigeración comercial de alto rendimiento.',
-    footerCol2Title:'Servicios', footerCol2Links:['Instalación','Mantenimiento','Cotizaciones'],
-    footerContact:'info@novo.pe', footerCopy:'© 2026 NOVO. Todos los derechos reservados.',
+    footerLogo:'NO<span class="accent">VO</span>',footerTag:'Refrigeración comercial de alto rendimiento.',
+    col2Title:'Servicios',col2Links:['Instalación','Mantenimiento','Cotizaciones'],
+    contact:'info@novo.pe',copy:'© 2026 NOVO. Todos los derechos reservados.',
     products:[
-      {img:'novo-img4.jpg',discount:'-24%',brand:'NOVO',name:'Condensadora Exterior 48,000 BTU',old:'$3,299',price:'$2,499'},
-      {img:'novo-img5.jpg',discount:'-37%',brand:'NOVO',name:'Mini Split Inverter 12,000 BTU',old:'$1,190',price:'$749'},
-      {img:'novo-img1.jpg',discount:'-31%',brand:'NOVO',name:'Cassette Techo 24,000 BTU',old:'$3,299',price:'$2,499'},
-      {img:'novo-img6.jpg',discount:'-28%',brand:'NOVO',name:'Ducto Ventilación Azotea 36,000 BTU',old:'$2,100',price:'$1,499'},
-      {img:'novo-img2.jpg',discount:'-22%',brand:'NOVO',name:'Fan Coil Piso-Techo 18,000 BTU',old:'$699',price:'$549'},
-      {img:'novo-img7.jpg',discount:'-35%',brand:'NOVO',name:'Ducto Galvanizado 24,000 BTU',old:'$1,850',price:'$1,199'},
+      {img:'novo-img4.jpg',disc:'-24%',brand:'NOVO',name:'Condensadora Exterior 48,000 BTU',old:'$3,299',price:'$2,499'},
+      {img:'novo-img5.jpg',disc:'-37%',brand:'NOVO',name:'Mini Split Inverter 12,000 BTU',old:'$1,190',price:'$749'},
+      {img:'novo-img1.jpg',disc:'-31%',brand:'NOVO',name:'Cassette Techo 24,000 BTU',old:'$3,299',price:'$2,499'},
+      {img:'novo-img6.jpg',disc:'-28%',brand:'NOVO',name:'Ducto Ventilación Azotea 36,000 BTU',old:'$2,100',price:'$1,499'},
+      {img:'novo-img2.jpg',disc:'-22%',brand:'NOVO',name:'Fan Coil Piso-Techo 18,000 BTU',old:'$699',price:'$549'},
+      {img:'novo-img7.jpg',disc:'-35%',brand:'NOVO',name:'Ducto Galvanizado 24,000 BTU',old:'$1,850',price:'$1,199'},
     ]
   },
-  gold: {
-    logo:'CELESTIA', navMid:'Colección', navCta:'Reservar cita',
+  gold:{
+    logo:'CELESTIA',navMid:'Colección',navCta:'Reservar cita',
     heroTag:'Joyería · Artesanía · Exclusividad',
     heroTitle:'Belleza que<br><span>perdura.</span>',
     heroSub:'Piezas únicas diseñadas para quienes saben que los detalles lo son todo. Oro, plata y gemas seleccionadas a mano.',
-    heroCta:'Explorar colección →', heroImg:'celestia-hero.jpg',
-    sectionTitle:'Colección exclusiva', sectionLink:'Ver colección →',
+    heroCta:'Explorar colección →',heroImg:'celestia-hero.jpg',
+    secTitle:'Colección exclusiva',secLink:'Ver colección →',
     promoBrand:'CELES<span class="accent">TIA</span>',
-    promoTagline:'Alta Joyería · Piezas únicas · Envío asegurado',
-    promoOfferText:'Piezas seleccionadas en oferta<span>Colección de temporada. Unidades limitadas.</span>',
-    promoBadges:['Oro 18k garantizado','Certificado de autenticidad','Envío asegurado'],
-    promoCta:'Ver colección →', promoImg:'celestia-hero.jpg',
-    counters:[
-      {val:1200,label:'Piezas únicas<br>creadas a mano'},
-      {val:98,label:'Clientes satisfechos<br>en todo el mundo'},
-      {val:15,label:'Años de experiencia<br>en alta joyería'}
-    ],
-    infoTag:'Nuestra promesa', infoTitle:'Cada pieza, una <span>obra de arte</span>',
+    promoTag:'Alta Joyería · Piezas únicas · Envío asegurado',
+    promoOffer:'Piezas seleccionadas en oferta<span>Colección de temporada. Unidades limitadas.</span>',
+    promoPills:['Oro 18k garantizado','Certificado de autenticidad','Envío asegurado'],
+    promoCta:'Ver colección →',promoImg:'celestia-hero.jpg',
+    counters:[{v:1200,l:'Piezas únicas<br>creadas a mano'},{v:98,l:'Clientes satisfechos<br>en todo el mundo'},{v:15,l:'Años de experiencia<br>en alta joyería'}],
+    infoTag:'Nuestra promesa',infoTitle:'Cada pieza, una <span>obra de arte</span>',
     infoSub:'Cada joya CELESTIA es creada a mano por artesanos con más de 20 años de experiencia. Materiales certificados y acabados impecables.',
     infoBadges:['Oro 18k','Plata 925','Gemas certificadas','Garantía de por vida'],
-    footerLogo:'CELES<span class="accent">TIA</span>', footerTagline:'Alta joyería para momentos que perduran.',
-    footerCol2Title:'Colección', footerCol2Links:['Anillos','Collares','Aretes'],
-    footerContact:'hola@celestia.co', footerCopy:'© 2026 CELESTIA. Todos los derechos reservados.',
+    footerLogo:'CELES<span class="accent">TIA</span>',footerTag:'Alta joyería para momentos que perduran.',
+    col2Title:'Colección',col2Links:['Anillos','Collares','Aretes'],
+    contact:'hola@celestia.co',copy:'© 2026 CELESTIA. Todos los derechos reservados.',
     products:[
-      {img:'celestia-hero.jpg',discount:null,brand:'CELESTIA',name:'Anillo Tanzanita con Diamantes Oro 18k',old:'$2,800',price:'$2,200'},
-      {img:'celestia-hero.jpg',discount:null,brand:'CELESTIA',name:'Aretes Aro Grande Oro 18k',old:'$1,400',price:'$1,100'},
-      {img:'celestia-hero.jpg',discount:null,brand:'CELESTIA',name:'Collar Solitario Diamante Pera',old:'$3,500',price:'$2,900'},
-      {img:'celestia-hero.jpg',discount:null,brand:'CELESTIA',name:'Pulsera Eslabón Oro Blanco 18k',old:'$1,800',price:'$1,450'},
-      {img:'celestia-hero.jpg',discount:null,brand:'CELESTIA',name:'Anillo Eternidad Rubí y Diamantes',old:'$4,200',price:'$3,600'},
-      {img:'celestia-hero.jpg',discount:null,brand:'CELESTIA',name:'Pendientes Esmeralda Talla Pera',old:'$2,200',price:'$1,800'},
+      {img:'celestia-hero.jpg',disc:null,brand:'CELESTIA',name:'Anillo Tanzanita con Diamantes Oro 18k',old:'$2,800',price:'$2,200'},
+      {img:'celestia-hero.jpg',disc:null,brand:'CELESTIA',name:'Aretes Aro Grande Oro 18k',old:'$1,400',price:'$1,100'},
+      {img:'celestia-hero.jpg',disc:null,brand:'CELESTIA',name:'Collar Solitario Diamante Pera',old:'$3,500',price:'$2,900'},
+      {img:'celestia-hero.jpg',disc:null,brand:'CELESTIA',name:'Pulsera Eslabón Oro Blanco 18k',old:'$1,800',price:'$1,450'},
+      {img:'celestia-hero.jpg',disc:null,brand:'CELESTIA',name:'Anillo Eternidad Rubí y Diamantes',old:'$4,200',price:'$3,600'},
+      {img:'celestia-hero.jpg',disc:null,brand:'CELESTIA',name:'Pendientes Esmeralda Talla Pera',old:'$2,200',price:'$1,800'},
     ]
   }
 };
 
-function applyThemeData(t) {
-  const d = themes[t];
-  document.getElementById('logo-text').innerHTML = d.logo;
-  document.getElementById('nav-mid').textContent = d.navMid;
-  document.getElementById('nav-cta').textContent = d.navCta;
-  document.getElementById('hero-tag').textContent = d.heroTag;
-  document.getElementById('hero-title').innerHTML = d.heroTitle;
-  document.getElementById('hero-sub').textContent = d.heroSub;
-  document.getElementById('hero-cta').textContent = d.heroCta;
-  const heroImg = document.getElementById('hero-img');
-  const fluidBg = document.querySelector('.i-fluid-bg');
-  const fluidGrain = document.querySelector('.i-fluid-grain');
-  if (d.heroImg) {
-    heroImg.src=d.heroImg; heroImg.style.display='block';
-    if(fluidBg) fluidBg.style.display='none';
-    if(fluidGrain) fluidGrain.style.display='none';
-  } else {
-    heroImg.style.display='none';
-    if(fluidBg) fluidBg.style.display='block';
-    if(fluidGrain) fluidGrain.style.display='block';
-  }
-  document.getElementById('section-title').textContent = d.sectionTitle;
-  document.getElementById('section-link').textContent = d.sectionLink;
-  document.getElementById('promo-brand').innerHTML = d.promoBrand;
-  document.getElementById('promo-tagline').textContent = d.promoTagline;
-  document.getElementById('promo-offer-text').innerHTML = d.promoOfferText;
-  document.getElementById('promo-cta').textContent = d.promoCta;
-  const pb = document.getElementById('promo-badges');
-  pb.innerHTML = d.promoBadges.map(b=>`<span class="i-promo-badge-pill">${b}</span>`).join('');
-  const pi = document.getElementById('promo-img');
-  const pd = document.getElementById('promo-deco');
-  if (d.promoImg) {
-    pi.src=d.promoImg; pi.style.display='block'; if(pd) pd.style.display='none';
-  } else {
-    pi.style.display='none'; if(pd) pd.style.display='block';
-  }
-  const grid = document.getElementById('products-grid');
-  grid.innerHTML = d.products.map(p=>`
+function apply(t){
+  const d=T[t], iris=document.getElementById('iris');
+  document.getElementById('logo-text').innerHTML=d.logo;
+  document.getElementById('nav-mid').textContent=d.navMid;
+  document.getElementById('nav-cta').textContent=d.navCta;
+  document.getElementById('hero-tag').textContent=d.heroTag;
+  document.getElementById('hero-title').innerHTML=d.heroTitle;
+  document.getElementById('hero-sub').textContent=d.heroSub;
+  document.getElementById('hero-cta').textContent=d.heroCta;
+  const hi=document.getElementById('hero-img'),fb=document.getElementById('fluid-bg'),fg=document.getElementById('fluid-grain');
+  if(d.heroImg){hi.src=d.heroImg;hi.style.display='block';fb.style.display='none';fg.style.display='none';}
+  else{hi.style.display='none';fb.style.display='block';fg.style.display='block';}
+  document.getElementById('section-title').textContent=d.secTitle;
+  document.getElementById('section-link').textContent=d.secLink;
+  document.getElementById('promo-brand').innerHTML=d.promoBrand;
+  document.getElementById('promo-tagline').textContent=d.promoTag;
+  document.getElementById('promo-offer-text').innerHTML=d.promoOffer;
+  document.getElementById('promo-cta').textContent=d.promoCta;
+  document.getElementById('promo-badges').innerHTML=d.promoPills.map(b=>`<span class="i-promo-badge-pill">${b}</span>`).join('');
+  const pi=document.getElementById('promo-img'),pd=document.getElementById('promo-deco');
+  if(d.promoImg){pi.src=d.promoImg;pi.style.display='block';pd.style.display='none';}
+  else{pi.style.display='none';pd.style.display='block';}
+  d.counters.forEach((c,i)=>{
+    const el=document.getElementById(`c${i+1}`),lel=document.getElementById(`cl${i+1}`);
+    if(el){el.dataset.target=c.v;el.textContent='0';}
+    if(lel) lel.innerHTML=c.l;
+  });
+  document.getElementById('info-tag').textContent=d.infoTag;
+  document.getElementById('info-title').innerHTML=d.infoTitle;
+  document.getElementById('info-sub').textContent=d.infoSub;
+  document.getElementById('info-badges').innerHTML=d.infoBadges.map(b=>`<span class="i-info-badge">${b}</span>`).join('');
+  document.getElementById('footer-logo').innerHTML=d.footerLogo;
+  document.getElementById('footer-tagline').textContent=d.footerTag;
+  document.getElementById('footer-copy').textContent=d.copy;
+  document.getElementById('footer-contact1').textContent=d.contact;
+  document.getElementById('footer-col2').innerHTML=`<div class="i-footer-col-title">${d.col2Title}</div>`+d.col2Links.map(l=>`<a class="i-footer-link">${l}</a>`).join('');
+  document.getElementById('products-grid').innerHTML=d.products.map(p=>`
     <div class="i-product-card">
       <div class="i-product-img">
         <img src="${p.img}" alt="" style="object-position:center ${t==='gold'?'20%':'center'}">
-        ${p.discount?`<span class="i-product-discount">${p.discount}</span>`:''}
+        ${p.disc?`<span class="i-product-discount">${p.disc}</span>`:''}
       </div>
       <div class="i-product-info">
         <div class="i-product-brand">${p.brand}</div>
@@ -680,131 +574,61 @@ function applyThemeData(t) {
         </button>
       </div>
     </div>`).join('');
-  d.counters.forEach((c,i)=>{
-    const el=document.getElementById(`c${i+1}`);
-    const lel=document.getElementById(`cl${i+1}`);
-    if(el){el.dataset.target=c.val;el.textContent='0';}
-    if(lel) lel.innerHTML=c.label;
-  });
-  document.getElementById('info-tag').textContent = d.infoTag;
-  document.getElementById('info-title').innerHTML = d.infoTitle;
-  document.getElementById('info-sub').textContent = d.infoSub;
-  const ib = document.getElementById('info-badges');
-  ib.innerHTML = d.infoBadges.map(b=>`<span class="i-info-badge">${b}</span>`).join('');
-  document.getElementById('footer-logo').innerHTML = d.footerLogo;
-  document.getElementById('footer-tagline').textContent = d.footerTagline;
-  document.getElementById('footer-copy').textContent = d.footerCopy;
-  document.getElementById('footer-contact1').textContent = d.footerContact;
-  const fc2=document.getElementById('footer-col2');
-  fc2.innerHTML=`<div class="i-footer-col-title">${d.footerCol2Title}</div>`+d.footerCol2Links.map(l=>`<a class="i-footer-link">${l}</a>`).join('');
-  const show=(t==='light'||t==='gold')?'flex':'none';
+  const show=(t!=='dark')?'flex':'none';
   document.getElementById('navCart').style.display=show;
   document.getElementById('navAccount').style.display=show;
 }
 
-// ── COUNTER ──────────────────────────────────────────────
-function animateCounters() {
+// COUNTER
+function animateCounters(){
   document.querySelectorAll('.i-count').forEach(el=>{
-    const target=+el.dataset.target, duration=1600, start=performance.now();
-    function update(now){
-      const p=Math.min((now-start)/duration,1), ease=p===1?1:1-Math.pow(2,-10*p);
-      el.textContent=Math.floor(ease*target);
-      if(p<1) requestAnimationFrame(update); else el.textContent=target;
-    }
-    requestAnimationFrame(update);
+    const target=+el.dataset.target,dur=1600,s=performance.now();
+    function u(now){const p=Math.min((now-s)/dur,1),e=p===1?1:1-Math.pow(2,-10*p);el.textContent=Math.floor(e*target);if(p<1)requestAnimationFrame(u);else el.textContent=target;}
+    requestAnimationFrame(u);
   });
 }
 function setupCounterObserver(){
-  const c=document.querySelector('.i-counters'); if(!c) return;
+  const c=document.querySelector('.i-counters');if(!c)return;
   let fired=false;
-  const obs=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{if(e.isIntersecting&&!fired){fired=true;animateCounters();obs.disconnect();}});
-  },{threshold:0.4});
-  obs.observe(c);
+  new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting&&!fired){fired=true;animateCounters();}});},{threshold:0.4}).observe(c);
 }
 
-// ── TRANSITION — sin flash, objetos se mueven ─────────────
-let currentTheme='dark', isTransitioning=false;
-
-// Elementos que salen hacia la izquierda
-const EXIT_LEFT  = '.i-hero-banner, .i-nav';
-// Elementos que salen hacia abajo
-const EXIT_DOWN  = '.i-section-header, .i-promo, .i-counters, .i-info-banner, .i-footer';
-// Cards salen escalonadas
-const EXIT_CARDS = '.i-products';
-
-window.setIrisTheme = function(theme) {
-  if (isTransitioning || theme===currentTheme) return;
-  isTransitioning = true;
-  currentTheme = theme;
-  const iris = document.getElementById('iris');
-
-  // Contenedor: overflow hidden para que los elementos salgan limpiamente
-  iris.style.overflow = 'hidden';
-
-  const dur = '0.22s', ease = 'cubic-bezier(0.4,0,0.2,1)';
-
-  // Hero + nav: salen hacia la izquierda
-  ['.i-hero-banner','.i-nav'].forEach((sel,i)=>{
-    const el=iris.querySelector(sel); if(!el) return;
-    el.style.transition=`transform ${dur} ${ease} ${i*0.03}s, opacity 0.18s ease ${i*0.03}s`;
-    el.style.transform='translateX(-60px)';
+// TRANSITION
+let cur='dark',busy=false;
+window.setIrisTheme=function(theme){
+  if(busy||theme===cur)return;
+  busy=true;cur=theme;
+  const iris=document.getElementById('iris');
+  // Salida: elementos se mueven
+  const out=iris.querySelectorAll('.i-hero-banner,.i-nav,.i-section-header,.i-promo,.i-counters,.i-info-banner,.i-footer');
+  out.forEach((el,i)=>{
+    el.style.transition=`transform 0.15s ease ${i*0.02}s,opacity 0.13s ease ${i*0.02}s`;
+    el.style.transform=i<2?'translateX(-40px)':'translateY(20px)';
     el.style.opacity='0';
   });
-
-  // Sections: salen hacia abajo
-  ['.i-section-header','.i-promo','.i-counters','.i-info-banner','.i-footer'].forEach((sel,i)=>{
-    const el=iris.querySelector(sel); if(!el) return;
-    el.style.transition=`transform ${dur} ${ease} ${i*0.025}s, opacity 0.16s ease ${i*0.025}s`;
-    el.style.transform='translateY(30px)';
-    el.style.opacity='0';
-  });
-
-  // Cards: salen escalonadas hacia abajo
   iris.querySelectorAll('.i-product-card').forEach((el,i)=>{
-    el.style.transition=`transform 0.14s ${ease} ${i*0.015}s, opacity 0.12s ease ${i*0.015}s`;
-    el.style.transform='translateY(20px)'; el.style.opacity='0';
+    el.style.transition=`opacity 0.1s ease ${i*0.01}s,transform 0.1s ease ${i*0.01}s`;
+    el.style.opacity='0';el.style.transform='translateY(12px)';
   });
-
-  // SWAP: sin cambio de fondo visible — cambiamos EN MOVIMIENTO
   setTimeout(()=>{
-    // Reset estilos antes del swap para que no haya flash
-    iris.querySelectorAll('.i-hero-banner,.i-nav,.i-section-header,.i-promo,.i-counters,.i-info-banner,.i-footer').forEach(el=>{
-      el.style.transition='none'; el.style.opacity='0';
-      // Posición: van a entrar desde el lado opuesto
-    });
-    iris.querySelectorAll('.i-product-card').forEach(el=>{
-      el.style.transition='none'; el.style.opacity='0';
-    });
-
-    // Cambiar tema y datos
+    out.forEach(el=>{el.style.transition='none';el.style.opacity='0';el.style.transform='';});
+    iris.querySelectorAll('.i-product-card').forEach(el=>{el.style.transition='none';el.style.opacity='0';el.style.transform='';});
     iris.className='theme-'+theme;
     iris.classList.remove('is-animating');
-    applyThemeData(theme);
+    apply(theme);
     window.scrollTo(0,0);
-
-    // Entrada: arrancan desde fuera y entran
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      // Reset transforms para que las animaciones CSS funcionen
-      iris.querySelectorAll('.i-hero-banner,.i-nav,.i-section-header,.i-promo,.i-counters,.i-info-banner,.i-footer').forEach(el=>{
-        el.style.transform=''; el.style.transition=''; el.style.opacity='';
-      });
-      iris.querySelectorAll('.i-product-card').forEach(el=>{
-        el.style.transform=''; el.style.transition=''; el.style.opacity='';
-      });
-      iris.style.overflow='';
+      out.forEach(el=>{el.style.transition='';el.style.opacity='';});
+      iris.querySelectorAll('.i-product-card').forEach(el=>{el.style.transition='';el.style.opacity='';});
       iris.classList.add('is-animating');
       setupCounterObserver();
-      isTransitioning=false;
+      busy=false;
     }));
-  }, 200);
+  },170);
 };
 
-applyThemeData('dark');
-
-window.addEventListener('message', function(e){
-  if(e.data&&e.data.type==='SET_THEME') window.setIrisTheme(e.data.theme);
-});
+apply('dark');
+window.addEventListener('message',e=>{if(e.data&&e.data.type==='SET_THEME')window.setIrisTheme(e.data.theme);});
 </script>
 </body>
 </html>
