@@ -584,6 +584,73 @@ function apply(t){
   document.getElementById('navAccount').style.display=show;
 }
 
+// ── MORPH UTILITIES ──────────────────────────────────────
+
+// Flip de texto letra por letra (efecto de ruleta)
+function flipText(el, newText, duration=400) {
+  // Extraer texto plano del nuevo contenido (sin HTML)
+  const tmp = document.createElement('div');
+  tmp.innerHTML = newText;
+  const plain = tmp.textContent;
+  const oldText = el.textContent;
+  const maxLen = Math.max(oldText.length, plain.length);
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const steps = 8;
+  let frame = 0;
+  const totalFrames = steps + maxLen;
+
+  function tick() {
+    let result = '';
+    for (let i = 0; i < maxLen; i++) {
+      const target = i < plain.length ? plain[i] : '';
+      const progress = Math.max(0, frame - i);
+      if (progress >= steps) {
+        result += target;
+      } else if (progress > 0) {
+        result += chars[Math.floor(Math.random() * chars.length)];
+      } else {
+        result += i < oldText.length ? oldText[i] : '';
+      }
+    }
+    el.textContent = result;
+    frame++;
+    if (frame <= totalFrames) {
+      setTimeout(tick, duration / totalFrames);
+    } else {
+      // Al final aplicar el innerHTML real (con spans)
+      el.innerHTML = newText;
+    }
+  }
+  tick();
+}
+
+// Morphing de color CSS (background, color, border-color)
+function morphColor(el, prop, fromColor, toColor, duration=600) {
+  // Parsea rgba
+  function parse(c) {
+    const m = c.match(/[\d.]+/g) || ['0','0','0','1'];
+    return [+m[0],+m[1],+m[2],+(m[3]||1)];
+  }
+  function toRgba(arr) {
+    return `rgba(${Math.round(arr[0])},${Math.round(arr[1])},${Math.round(arr[2])},${arr[3].toFixed(2)})`;
+  }
+  const from = parse(fromColor), to = parse(toColor);
+  const start = performance.now();
+  function step(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const ease = p < 0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+    const cur = from.map((v,i) => v + (to[i]-v)*ease);
+    el.style[prop] = toRgba(cur);
+    if (p < 1) requestAnimationFrame(step);
+    else el.style[prop] = '';
+  }
+  requestAnimationFrame(step);
+}
+
+// Theme accent colors
+const ACCENT = { dark:'rgba(220,64,42,1)', light:'rgba(24,71,232,1)', gold:'rgba(184,146,58,1)' };
+const BG     = { dark:'rgba(9,9,11,1)', light:'rgba(244,244,242,1)', gold:'rgba(250,246,240,1)' };
+
 // COUNTER
 function animateCounters(){
   document.querySelectorAll('.i-count').forEach(el=>{
@@ -598,42 +665,184 @@ function setupCounterObserver(){
   new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting&&!fired){fired=true;animateCounters();}});},{threshold:0.4}).observe(c);
 }
 
-// TRANSITION
-let cur='dark',busy=false;
-window.setIrisTheme=function(theme){
-  if(busy||theme===cur)return;
-  busy=true;cur=theme;
-  const iris=document.getElementById('iris');
-  // Salida: elementos se mueven
-  const out=iris.querySelectorAll('.i-hero-banner,.i-nav,.i-section-header,.i-promo,.i-counters,.i-info-banner,.i-footer');
-  out.forEach((el,i)=>{
-    el.style.transition=`transform 0.15s ease ${i*0.02}s,opacity 0.13s ease ${i*0.02}s`;
-    el.style.transform=i<2?'translateX(-40px)':'translateY(20px)';
-    el.style.opacity='0';
+// ── MORPH TRANSITION ─────────────────────────────────────
+let cur='dark', busy=false;
+
+window.setIrisTheme = function(theme) {
+  if (busy || theme === cur) return;
+  busy = true;
+  const from = cur;
+  cur = theme;
+  const iris = document.getElementById('iris');
+  const d = T[theme];
+
+  // ── 1. CARDS se deslizan hacia la izquierda ──────────
+  const cards = iris.querySelectorAll('.i-product-card');
+  cards.forEach((el, i) => {
+    el.style.transition = `transform 0.35s cubic-bezier(0.4,0,0.2,1) ${i*0.04}s, opacity 0.3s ease ${i*0.04}s`;
+    el.style.transform = 'translateX(-120%)';
+    el.style.opacity = '0';
   });
-  iris.querySelectorAll('.i-product-card').forEach((el,i)=>{
-    el.style.transition=`opacity 0.1s ease ${i*0.01}s,transform 0.1s ease ${i*0.01}s`;
-    el.style.opacity='0';el.style.transform='translateY(12px)';
-  });
-  setTimeout(()=>{
-    out.forEach(el=>{el.style.transition='none';el.style.opacity='0';el.style.transform='';});
-    iris.querySelectorAll('.i-product-card').forEach(el=>{el.style.transition='none';el.style.opacity='0';el.style.transform='';});
-    iris.className='theme-'+theme;
-    iris.classList.remove('is-animating');
-    apply(theme);
-    window.scrollTo(0,0);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      out.forEach(el=>{el.style.transition='';el.style.opacity='';});
-      iris.querySelectorAll('.i-product-card').forEach(el=>{el.style.transition='';el.style.opacity='';});
-      iris.classList.add('is-animating');
-      setupCounterObserver();
-      busy=false;
-    }));
-  },170);
+
+  // ── 2. FONDO hace crossfade suave ────────────────────
+  iris.style.transition = 'background 0.7s ease';
+  iris.style.background = BG[theme];
+
+  // ── 3. OVERLAY del hero cambia de color ──────────────
+  const overlay = iris.querySelector('.i-hero-overlay');
+  if (overlay) {
+    overlay.style.transition = 'opacity 0.5s ease';
+    overlay.style.opacity = '0';
+  }
+
+  // ── 4. LOGO flip letra por letra ─────────────────────
+  const logoEl = document.getElementById('logo-text');
+  if (logoEl) flipText(logoEl, d.logo, 500);
+
+  // ── 5. NAV CTA cambia de color ───────────────────────
+  const cta = document.getElementById('nav-cta');
+  if (cta) {
+    cta.style.transition = 'background 0.5s ease, color 0.5s ease, border-color 0.5s ease';
+    cta.style.background = theme === 'gold' ? 'transparent' : ACCENT[theme].replace(',1)',',1)');
+    cta.style.color = theme === 'gold' ? ACCENT[theme] : '#fff';
+  }
+
+  // ── 6. Hero title flip (a los 200ms) ─────────────────
+  setTimeout(() => {
+    const titleEl = document.getElementById('hero-title');
+    if (titleEl) flipText(titleEl, d.heroTitle, 600);
+
+    const tagEl = document.getElementById('hero-tag');
+    if (tagEl) {
+      tagEl.style.transition = 'opacity 0.3s ease';
+      tagEl.style.opacity = '0';
+      setTimeout(() => { tagEl.textContent = d.heroTag; tagEl.style.opacity = '1'; }, 300);
+    }
+
+    const subEl = document.getElementById('hero-sub');
+    if (subEl) {
+      subEl.style.transition = 'opacity 0.3s ease';
+      subEl.style.opacity = '0';
+      setTimeout(() => { subEl.textContent = d.heroSub; subEl.style.opacity = '1'; }, 400);
+    }
+
+    const ctaEl = document.getElementById('hero-cta');
+    if (ctaEl) {
+      ctaEl.style.transition = 'opacity 0.3s ease';
+      ctaEl.style.opacity = '0';
+      setTimeout(() => { ctaEl.textContent = d.heroCta; ctaEl.style.opacity = '1'; }, 450);
+    }
+  }, 200);
+
+  // ── 7. Hero imagen crossfade ──────────────────────────
+  setTimeout(() => {
+    const hi = document.getElementById('hero-img');
+    const fb = document.getElementById('fluid-bg');
+    const fg = document.getElementById('fluid-grain');
+    if (hi) { hi.style.transition = 'opacity 0.5s ease'; hi.style.opacity = '0'; }
+
+    setTimeout(() => {
+      if (d.heroImg) {
+        hi.src = d.heroImg;
+        hi.style.display = 'block';
+        if (fb) fb.style.display = 'none';
+        if (fg) fg.style.display = 'none';
+        requestAnimationFrame(() => { hi.style.opacity = '1'; });
+      } else {
+        if (hi) hi.style.display = 'none';
+        if (fb) { fb.style.display = 'block'; fb.style.opacity = '0'; fb.style.transition = 'opacity 0.5s ease'; requestAnimationFrame(() => { fb.style.opacity = '0.85'; }); }
+        if (fg) fg.style.display = 'block';
+      }
+      if (overlay) { overlay.style.opacity = '1'; }
+    }, 300);
+  }, 100);
+
+  // ── 8. Resto del contenido: aplica al punto medio ────
+  setTimeout(() => {
+    // Cambiar clase del tema (para CSS)
+    iris.className = 'theme-' + theme;
+    iris.style.background = ''; // dejar al CSS
+    iris.style.transition = '';
+
+    // Aplicar datos restantes (promo, counters, info, footer)
+    // Sin tocar hero ni logo (ya en proceso)
+    const tmpD = T[theme];
+    document.getElementById('nav-mid').textContent = tmpD.navMid;
+    document.getElementById('section-title').textContent = tmpD.secTitle;
+    document.getElementById('section-link').textContent = tmpD.secLink;
+    document.getElementById('promo-brand').innerHTML = tmpD.promoBrand;
+    document.getElementById('promo-tagline').textContent = tmpD.promoTag;
+    document.getElementById('promo-offer-text').innerHTML = tmpD.promoOffer;
+    document.getElementById('promo-cta').textContent = tmpD.promoCta;
+    document.getElementById('promo-badges').innerHTML = tmpD.promoPills.map(b=>`<span class="i-promo-badge-pill">${b}</span>`).join('');
+    const pi = document.getElementById('promo-img'), pd = document.getElementById('promo-deco');
+    if (tmpD.promoImg) { pi.src=tmpD.promoImg; pi.style.display='block'; if(pd) pd.style.display='none'; }
+    else { pi.style.display='none'; if(pd) pd.style.display='block'; }
+    tmpD.counters.forEach((c,i)=>{
+      const el=document.getElementById(`c${i+1}`),lel=document.getElementById(`cl${i+1}`);
+      if(el){el.dataset.target=c.v;el.textContent='0';} if(lel) lel.innerHTML=c.l;
+    });
+    document.getElementById('info-tag').textContent = tmpD.infoTag;
+    document.getElementById('info-title').innerHTML = tmpD.infoTitle;
+    document.getElementById('info-sub').textContent = tmpD.infoSub;
+    document.getElementById('info-badges').innerHTML = tmpD.infoBadges.map(b=>`<span class="i-info-badge">${b}</span>`).join('');
+    document.getElementById('footer-logo').innerHTML = tmpD.footerLogo;
+    document.getElementById('footer-tagline').textContent = tmpD.footerTag;
+    document.getElementById('footer-copy').textContent = tmpD.copy;
+    document.getElementById('footer-contact1').textContent = tmpD.contact;
+    document.getElementById('footer-col2').innerHTML = `<div class="i-footer-col-title">${tmpD.col2Title}</div>` + tmpD.col2Links.map(l=>`<a class="i-footer-link">${l}</a>`).join('');
+
+    // Icones nav
+    const show = (theme !== 'dark') ? 'flex' : 'none';
+    document.getElementById('navCart').style.display = show;
+    document.getElementById('navAccount').style.display = show;
+
+    // Reset nav cta style (dejar a CSS)
+    if (cta) { setTimeout(() => { cta.style.transition=''; cta.style.background=''; cta.style.color=''; }, 600); }
+
+    // ── 9. Cards entran desde la derecha con nuevos productos ──
+    const grid = document.getElementById('products-grid');
+    grid.innerHTML = tmpD.products.map(p=>`
+      <div class="i-product-card" style="transform:translateX(120%);opacity:0">
+        <div class="i-product-img">
+          <img src="${p.img}" alt="" style="object-position:center ${theme==='gold'?'20%':'center'}">
+          ${p.disc?`<span class="i-product-discount">${p.disc}</span>`:''}
+        </div>
+        <div class="i-product-info">
+          <div class="i-product-brand">${p.brand}</div>
+          <div class="i-product-name">${p.name}</div>
+          <div class="i-product-prices">
+            ${p.old?`<div class="i-product-price-old">${p.old}</div>`:''}
+            <div class="i-product-price">${p.price}</div>
+          </div>
+        </div>
+        <div class="i-product-footer">
+          <button class="i-add-cart">
+            <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+            ${theme==='gold'?'Reservar':'Añadir'}
+          </button>
+        </div>
+      </div>`).join('');
+
+    // Animar entrada de cards
+    requestAnimationFrame(() => {
+      iris.querySelectorAll('.i-product-card').forEach((el, i) => {
+        setTimeout(() => {
+          el.style.transition = `transform 0.4s cubic-bezier(0.34,1.1,0.64,1), opacity 0.3s ease`;
+          el.style.transform = 'translateX(0)';
+          el.style.opacity = '1';
+        }, i * 50);
+      });
+    });
+
+    window.scrollTo(0, 0);
+    setupCounterObserver();
+    setTimeout(() => { busy = false; }, 700);
+  }, 350);
 };
 
 apply('dark');
-window.addEventListener('message',e=>{if(e.data&&e.data.type==='SET_THEME')window.setIrisTheme(e.data.theme);});
+window.addEventListener('message', e => { if(e.data && e.data.type==='SET_THEME') window.setIrisTheme(e.data.theme); });
 </script>
 </body>
 </html>
