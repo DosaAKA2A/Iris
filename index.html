@@ -137,9 +137,14 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255,255,255,0.12);
-    transition: border-color .2s;
+    transition: background .25s, border-color .25s;
   }
-  .nav-logo-pill:hover { border-color: rgba(255,255,255,0.25); }
+  .nav-logo-pill:hover {
+    background: #f5f5f5;
+    border-color: #f5f5f5;
+  }
+  .nav-logo-pill:hover .nav-wordmark { color: #dc402a; }
+  .nav-logo-pill:hover img { filter: brightness(0) saturate(100%) invert(28%) sepia(80%) saturate(700%) hue-rotate(340deg); }
 
   .nav-logo-pill svg {
     width: 24px; height: 24px;
@@ -157,6 +162,7 @@
     letter-spacing: .22em;
     color: var(--white);
     text-transform: uppercase;
+    transition: color .25s;
   }
 
   /* Derecha — CTA */
