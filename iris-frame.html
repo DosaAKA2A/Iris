@@ -6,7 +6,7 @@
 <title>IRIS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 @font-face {
   font-family: "Clash Display";
@@ -15,537 +15,545 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; overflow: hidden; }
+html, body { width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; }
 
-/* ── TOKENS POR TEMA ── */
 :root {
-  /* Dark */
-  --d-bg:       #09090b;
-  --d-bg2:      #111113;
-  --d-fg:       #f5f5f5;
-  --d-muted:    rgba(245,245,245,0.35);
-  --d-accent:   #dc402a;
-  --d-border:   rgba(255,255,255,0.07);
-  --d-nav-bg:   rgba(10,10,12,0.85);
-
-  /* Light */
-  --l-bg:       #f8f8f6;
-  --l-bg2:      #eeeeed;
-  --l-fg:       #111111;
-  --l-muted:    rgba(17,17,17,0.4);
-  --l-accent:   #1d5fe8;
-  --l-border:   rgba(0,0,0,0.08);
-  --l-nav-bg:   rgba(248,248,246,0.88);
-
-  /* Gold */
-  --g-bg:       #f9f5ef;
-  --g-bg2:      #ede8e0;
-  --g-fg:       #1a1612;
-  --g-muted:    rgba(26,22,18,0.4);
-  --g-accent:   #b8923a;
-  --g-border:   rgba(184,146,58,0.15);
-  --g-nav-bg:   rgba(249,245,239,0.9);
+  --d-bg: #09090b; --d-fg: #f5f5f5; --d-muted: rgba(245,245,245,0.35);
+  --d-accent: #dc402a; --d-border: rgba(255,255,255,0.07); --d-nav-bg: rgba(10,10,12,0.85);
+  --l-bg: #f4f4f2; --l-fg: #0a0a0a; --l-muted: rgba(10,10,10,0.45);
+  --l-accent: #1847e8; --l-border: rgba(0,0,0,0.08); --l-nav-bg: rgba(255,255,255,0.95);
+  --g-bg: #f9f5ef; --g-fg: #1a1612; --g-muted: rgba(26,22,18,0.4);
+  --g-accent: #b8923a; --g-border: rgba(184,146,58,0.15); --g-nav-bg: rgba(249,245,239,0.95);
 }
 
-/* ── PÁGINA ── */
-#iris {
-  width: 100%; height: 100%;
-  position: relative;
-  overflow: hidden;
-  font-family: 'Inter', system-ui, sans-serif;
-  transition: background 0.7s cubic-bezier(0.4,0,0.2,1);
-}
-
-/* ── TEMAS ── */
+#iris { width: 100%; min-height: 100%; position: relative; font-family: 'Inter', sans-serif; }
 #iris.theme-dark  { background: var(--d-bg); color: var(--d-fg); }
-#iris.theme-light { background: var(--l-bg); color: var(--l-fg); }
+#iris.theme-light { background: var(--l-bg); color: var(--l-fg); font-family: 'Montserrat', sans-serif; }
 #iris.theme-gold  { background: var(--g-bg); color: var(--g-fg); }
 
 /* ── NAV ── */
 .i-nav {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 24px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: background 0.7s cubic-bezier(0.4,0,0.2,1), border-color 0.7s;
-  border-bottom: 1px solid transparent;
+  position: sticky; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 24px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  transition: background 0.7s, border-color 0.7s; border-bottom: 1px solid transparent;
 }
 .theme-dark  .i-nav { background: var(--d-nav-bg); border-color: var(--d-border); }
 .theme-light .i-nav { background: var(--l-nav-bg); border-color: var(--l-border); }
 .theme-gold  .i-nav { background: var(--g-nav-bg); border-color: var(--g-border); }
 
 .i-logo {
-  font-family: 'Clash Display', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: .18em;
-  text-transform: uppercase;
+  font-family: 'Clash Display', sans-serif; font-size: 14px; font-weight: 700;
+  letter-spacing: .18em; text-transform: uppercase; display: flex; align-items: center; gap: 6px;
   transition: color 0.7s;
-  display: flex; align-items: center; gap: 6px;
 }
-.i-logo-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  transition: background 0.7s;
-  flex-shrink: 0;
-}
+.theme-light .i-logo { font-family: 'Montserrat', sans-serif; letter-spacing: .14em; }
+.i-logo-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; transition: background 0.7s; }
 .theme-dark  .i-logo-dot { background: var(--d-accent); }
 .theme-light .i-logo-dot { background: var(--l-accent); }
 .theme-gold  .i-logo-dot { background: var(--g-accent); }
 
-.i-nav-links {
-  display: flex; gap: 20px; align-items: center;
-}
+.i-nav-links { display: flex; gap: 20px; align-items: center; }
 .i-nav-link {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  transition: color 0.7s, opacity 0.7s;
-  text-decoration: none;
+  font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+  transition: color 0.7s, opacity 0.7s; text-decoration: none;
 }
 .theme-dark  .i-nav-link { color: var(--d-muted); }
-.theme-light .i-nav-link { color: var(--l-muted); }
+.theme-light .i-nav-link { color: var(--l-muted); font-weight: 600; }
 .theme-gold  .i-nav-link { color: var(--g-muted); }
-.i-nav-link:hover { opacity: 1 !important; }
-.theme-dark  .i-nav-link:hover { color: var(--d-fg); }
-.theme-light .i-nav-link:hover { color: var(--l-fg); }
-.theme-gold  .i-nav-link:hover { color: var(--g-fg); }
+
+.i-nav-right { display: flex; align-items: center; gap: 8px; }
 
 .i-nav-cta {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  padding: 6px 14px;
-  border-radius: 100px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: background 0.7s, color 0.7s, border-color 0.7s;
-  text-decoration: none;
+  font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  padding: 7px 16px; border-radius: 100px; border: 1px solid transparent;
+  cursor: pointer; transition: background 0.7s, color 0.7s, border-color 0.7s; text-decoration: none;
+  display: inline-flex; align-items: center;
 }
-.theme-dark  .i-nav-cta { background: var(--d-accent); color: #fff; border-color: var(--d-accent); }
-.theme-light .i-nav-cta { background: var(--l-accent); color: #fff; border-color: var(--l-accent); }
+.theme-dark  .i-nav-cta { background: var(--d-accent); color: #fff; }
+.theme-light .i-nav-cta { background: var(--l-accent); color: #fff; font-family: 'Montserrat', sans-serif; }
 .theme-gold  .i-nav-cta { background: transparent; color: var(--g-accent); border-color: var(--g-accent); }
 
-/* ── HERO ── */
+/* Nav icon buttons (cart + account) — solo Light */
+.i-nav-icon {
+  width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; border: 1.5px solid var(--l-border); background: transparent;
+  cursor: pointer; transition: background .2s, border-color .2s; position: relative;
+}
+.i-nav-icon:hover { background: rgba(24,71,232,0.08); border-color: var(--l-accent); }
+.i-nav-icon svg { width: 16px; height: 16px; stroke: var(--l-fg); stroke-width: 1.8; fill: none; }
+.i-cart-badge {
+  position: absolute; top: -4px; right: -4px; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--l-accent); color: #fff; font-size: 8px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif;
+}
+
+/* ── HERO — DARK ── */
 .i-hero {
-  width: 100%; height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 0 32px 40px;
-  position: relative;
-  overflow: hidden;
+  position: relative; overflow: hidden; display: flex;
+  flex-direction: column; justify-content: flex-end; padding: 0 32px 36px;
 }
+.theme-dark  .i-hero { height: 380px; }
+.theme-gold  .i-hero { height: 380px; }
 
-/* Fondo hero — capas */
-.i-hero-bg {
-  position: absolute;
-  inset: 0;
-  transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1);
-  z-index: 0;
-}
-
-/* Dark: textura oscura con luces ambientales */
+.i-hero-bg { position: absolute; inset: 0; transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1); z-index: 0; }
 .i-hero-bg-dark {
-  background:
-    radial-gradient(ellipse 60% 50% at 70% 30%, rgba(220,64,42,0.1) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 60% at 20% 80%, rgba(100,100,120,0.15) 0%, transparent 70%),
-    #09090b;
+  background: radial-gradient(ellipse 60% 50% at 70% 30%, rgba(220,64,42,0.1) 0%, transparent 70%),
+              radial-gradient(ellipse 40% 60% at 20% 80%, rgba(100,100,120,0.15) 0%, transparent 70%), #09090b;
 }
-/* Rejilla decorativa dark */
 .i-hero-bg-dark::after {
-  content: '';
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  content: ''; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
   background-size: 60px 60px;
 }
-
-/* Light: gradiente limpio */
-.i-hero-bg-light {
-  background:
-    radial-gradient(ellipse 70% 50% at 80% 20%, rgba(29,95,232,0.08) 0%, transparent 70%),
-    #f8f8f6;
-}
-.i-hero-bg-light::after {
-  content: '';
-  position: absolute; inset: 0;
-  background-image: radial-gradient(rgba(29,95,232,0.06) 1px, transparent 1px);
-  background-size: 28px 28px;
-}
-
-/* Gold: gradiente cálido con textura sutil */
 .i-hero-bg-gold {
-  background:
-    radial-gradient(ellipse 60% 40% at 75% 25%, rgba(184,146,58,0.12) 0%, transparent 65%),
-    radial-gradient(ellipse 40% 60% at 10% 90%, rgba(184,146,58,0.06) 0%, transparent 60%),
-    #f9f5ef;
-}
-.i-hero-bg-gold::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 40px,
-    rgba(184,146,58,0.03) 40px,
-    rgba(184,146,58,0.03) 41px
-  );
+  background: radial-gradient(ellipse 60% 40% at 75% 25%, rgba(184,146,58,0.12) 0%, transparent 65%),
+              radial-gradient(ellipse 40% 60% at 10% 90%, rgba(184,146,58,0.06) 0%, transparent 60%), #f9f5ef;
 }
 
-/* Opacidad según tema activo */
-.theme-dark  .i-hero-bg-dark  { opacity: 1; }
-.theme-dark  .i-hero-bg-light { opacity: 0; pointer-events: none; }
-.theme-dark  .i-hero-bg-gold  { opacity: 0; pointer-events: none; }
+/* Visibility by theme */
+.theme-dark  .i-hero-bg-dark  { opacity:1; } .theme-dark  .i-hero-bg-gold  { opacity:0; pointer-events:none; }
+.theme-gold  .i-hero-bg-gold  { opacity:1; } .theme-gold  .i-hero-bg-dark  { opacity:0; pointer-events:none; }
 
-.theme-light .i-hero-bg-dark  { opacity: 0; pointer-events: none; }
-.theme-light .i-hero-bg-light { opacity: 1; }
-.theme-light .i-hero-bg-gold  { opacity: 0; pointer-events: none; }
-
-.theme-gold  .i-hero-bg-dark  { opacity: 0; pointer-events: none; }
-.theme-gold  .i-hero-bg-light { opacity: 0; pointer-events: none; }
-.theme-gold  .i-hero-bg-gold  { opacity: 1; }
-
-/* ── CONTENIDO HERO ── */
-.i-hero-content {
-  position: relative; z-index: 1;
-}
-
+.i-hero-content { position: relative; z-index: 1; }
 .i-eyebrow {
-  font-size: 9px;
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  margin-bottom: 14px;
-  font-weight: 500;
-  transition: color 0.7s;
+  font-size: 9px; letter-spacing: .22em; text-transform: uppercase; margin-bottom: 14px;
+  font-weight: 500; transition: color 0.7s;
 }
 .theme-dark  .i-eyebrow { color: var(--d-muted); }
-.theme-light .i-eyebrow { color: var(--l-muted); }
 .theme-gold  .i-eyebrow { color: var(--g-accent); }
-
 .i-headline {
-  font-family: 'Clash Display', sans-serif;
-  font-size: clamp(42px, 10vw, 80px);
-  font-weight: 700;
-  line-height: .9;
-  letter-spacing: -.03em;
-  margin-bottom: 16px;
-  transition: color 0.7s;
-  overflow: hidden;
+  font-family: 'Clash Display', sans-serif; font-size: clamp(40px, 9vw, 72px);
+  font-weight: 700; line-height: .92; letter-spacing: -.03em; margin-bottom: 16px; transition: color 0.7s;
 }
-
-/* Palabra destacada */
-.i-headline-accent {
-  display: inline-block;
-  transition: color 0.7s, -webkit-text-stroke 0.7s;
-}
+.i-headline-accent { display: inline-block; transition: color 0.7s, -webkit-text-stroke 0.7s; }
 .theme-dark  .i-headline-accent { color: var(--d-accent); }
-.theme-light .i-headline-accent { color: var(--l-accent); }
-.theme-gold  .i-headline-accent {
-  color: transparent;
-  -webkit-text-stroke: 1px var(--g-accent);
-}
-
+.theme-gold  .i-headline-accent { color: transparent; -webkit-text-stroke: 1px var(--g-accent); }
 .i-sub {
-  font-size: clamp(11px, 1.8vw, 13px);
-  line-height: 1.7;
-  max-width: 320px;
-  margin-bottom: 24px;
-  font-weight: 400;
-  transition: color 0.7s;
+  font-size: clamp(11px, 1.8vw, 13px); line-height: 1.7; max-width: 320px;
+  margin-bottom: 24px; font-weight: 400; transition: color 0.7s;
 }
 .theme-dark  .i-sub { color: var(--d-muted); }
-.theme-light .i-sub { color: var(--l-muted); }
 .theme-gold  .i-sub { color: var(--g-muted); }
-
-.i-cta-row {
-  display: flex; gap: 10px; align-items: center;
-  flex-wrap: wrap;
-}
-
+.i-cta-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .i-btn-primary {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  padding: 10px 20px;
-  border-radius: 100px;
-  border: none;
-  cursor: pointer;
-  transition: background 0.7s, color 0.7s, transform .2s;
-  text-decoration: none;
+  font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  padding: 10px 20px; border-radius: 100px; border: none; cursor: pointer;
+  transition: background 0.7s, color 0.7s, transform .2s; text-decoration: none;
   display: inline-flex; align-items: center; gap: 6px;
 }
 .i-btn-primary:hover { transform: translateY(-1px); }
 .theme-dark  .i-btn-primary { background: var(--d-accent); color: #fff; }
-.theme-light .i-btn-primary { background: var(--l-accent); color: #fff; }
 .theme-gold  .i-btn-primary { background: var(--g-accent); color: #fff; }
-
 .i-btn-secondary {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  padding: 10px 16px;
-  border-radius: 100px;
-  cursor: pointer;
-  transition: background 0.7s, color 0.7s, border-color 0.7s;
-  background: transparent;
-  text-decoration: none;
+  font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+  padding: 10px 16px; border-radius: 100px; cursor: pointer;
+  transition: background 0.7s, color 0.7s, border-color 0.7s; background: transparent; text-decoration: none;
 }
-.theme-dark  .i-btn-secondary { color: var(--d-fg);  border: 1px solid var(--d-border); }
-.theme-light .i-btn-secondary { color: var(--l-fg);  border: 1px solid var(--l-border); }
+.theme-dark  .i-btn-secondary { color: var(--d-fg); border: 1px solid var(--d-border); }
 .theme-gold  .i-btn-secondary { color: var(--g-muted); border: 1px solid var(--g-border); }
 
-/* ── DECORACIÓN HERO — elemento flotante ── */
-.i-hero-deco {
-  position: absolute;
-  z-index: 1;
-  top: 50%; right: 10%;
-  transform: translateY(-50%);
-  transition: opacity 0.7s;
+/* Decoraciones dark/gold */
+.i-hero-deco { position: absolute; z-index: 1; top: 50%; right: 10%; transform: translateY(-50%); transition: opacity 0.7s; }
+.i-deco-dark { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+.i-deco-dark span { width: 8px; height: 8px; border-radius: 1px; background: rgba(220,64,42,0.4); animation: pixelPulse 2s ease-in-out infinite; }
+.i-deco-dark span:nth-child(odd) { animation-delay: .3s; } .i-deco-dark span:nth-child(3n) { background: rgba(255,255,255,0.12); }
+@keyframes pixelPulse { 0%,100%{opacity:.4}50%{opacity:1} }
+.i-deco-gold { width: 80px; height: 80px; position: relative; display: flex; align-items: center; justify-content: center; }
+.i-deco-gold::before { content:''; position:absolute; width:60px; height:60px; border:1px solid rgba(184,146,58,0.5); transform:rotate(45deg); }
+.i-deco-gold::after { content:''; position:absolute; width:40px; height:40px; border:1px solid rgba(184,146,58,0.25); transform:rotate(45deg); animation:breathe 3s ease-in-out infinite; }
+@keyframes breathe { 0%,100%{transform:rotate(45deg) scale(1)}50%{transform:rotate(45deg) scale(1.12)} }
+.theme-dark  .i-deco-dark { opacity:1; } .theme-dark  .i-deco-gold { opacity:0; pointer-events:none; }
+.theme-gold  .i-deco-dark { opacity:0; pointer-events:none; } .theme-gold  .i-deco-gold { opacity:1; }
+
+/* ── BANNER ECOMMERCE (solo Light) ── */
+.i-banner {
+  display: none; position: relative; overflow: hidden;
+  background: linear-gradient(120deg, #1847e8 0%, #0f2fa3 55%, #0a1f6e 100%);
+  min-height: 280px;
+}
+.theme-light .i-banner { display: flex; }
+
+.i-banner-left {
+  width: 45%; padding: 32px 32px 32px 36px; display: flex; flex-direction: column;
+  justify-content: center; gap: 14px; position: relative; z-index: 2;
+}
+.i-banner-brand {
+  font-family: 'Montserrat', sans-serif; font-size: clamp(32px, 6vw, 52px);
+  font-weight: 800; color: #fff; letter-spacing: -.03em; line-height: 1;
+}
+.i-banner-brand span { color: #ffd166; }
+.i-banner-tagline {
+  font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,0.75); letter-spacing: .08em; text-transform: uppercase;
+}
+.i-banner-offer {
+  display: inline-flex; align-items: center; gap: 14px; flex-wrap: wrap;
+}
+.i-offer-badge {
+  background: #ffd166; color: #0a1f6e; padding: 10px 14px; border-radius: 8px;
+  font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 26px; line-height: 1;
+  display: flex; flex-direction: column; align-items: center;
+}
+.i-offer-badge small { font-size: 9px; font-weight: 700; letter-spacing: .06em; }
+.i-offer-text { font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 600; color: #fff; }
+.i-offer-text span { display: block; font-weight: 400; font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+.i-banner-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.i-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 100px; padding: 5px 10px;
+  font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 600;
+  color: rgba(255,255,255,0.85); letter-spacing: .04em; text-transform: uppercase;
+}
+.i-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #ffd166; flex-shrink: 0; }
+.i-banner-cta {
+  align-self: flex-start; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; padding: 10px 20px; border-radius: 100px;
+  background: #fff; color: #1847e8; border: none; cursor: pointer; transition: transform .2s;
+}
+.i-banner-cta:hover { transform: translateY(-1px); }
+
+.i-banner-right {
+  flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.i-banner-img-placeholder {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+}
+.i-banner-img-placeholder svg { width: 48px; height: 48px; opacity: .25; }
+.i-banner-img-placeholder span { font-size: 10px; color: rgba(255,255,255,0.3); font-family: 'Montserrat', sans-serif; letter-spacing: .08em; }
+/* Slider dots */
+.i-banner-dots {
+  position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; z-index: 3;
+}
+.i-banner-dots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.35); }
+.i-banner-dots span.active { background: #fff; width: 18px; border-radius: 3px; }
+/* Arrows */
+.i-banner-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+  width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 12px; color: #fff;
+}
+.i-banner-arrow.prev { left: 8px; }
+.i-banner-arrow.next { right: 8px; }
+
+/* ── SECTION HEADER ── */
+.i-section-header {
+  display: none; padding: 28px 32px 16px; align-items: center; justify-content: space-between;
+}
+.theme-light .i-section-header { display: flex; }
+.i-section-title {
+  font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 700;
+  color: var(--l-fg); letter-spacing: -.02em;
+}
+.i-section-link {
+  font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600;
+  color: var(--l-accent); letter-spacing: .06em; text-transform: uppercase; text-decoration: none;
 }
 
-/* Dark: cuadrícula de píxeles */
-.i-deco-dark {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 3px;
+/* ── PRODUCT GRID ── */
+.i-products {
+  display: none; padding: 0 24px 40px; gap: 14px;
+  grid-template-columns: repeat(4, 1fr);
 }
-.i-deco-dark span {
-  width: 8px; height: 8px;
-  border-radius: 1px;
-  background: rgba(220,64,42,0.4);
-  animation: pixelPulse 2s ease-in-out infinite;
-}
-.i-deco-dark span:nth-child(odd)  { animation-delay: .3s; }
-.i-deco-dark span:nth-child(3n)   { background: rgba(255,255,255,0.12); }
-@keyframes pixelPulse {
-  0%,100% { opacity: .4; }
-  50%      { opacity: 1; }
-}
+.theme-light .i-products { display: grid; }
 
-/* Light: círculo de datos */
-.i-deco-light {
-  width: 100px; height: 100px;
-  border-radius: 50%;
-  border: 1px solid rgba(29,95,232,0.2);
-  display: flex; align-items: center; justify-content: center;
-  position: relative;
+.i-product-card {
+  background: #fff; border-radius: 14px; overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.06); transition: box-shadow .25s, transform .25s;
+  display: flex; flex-direction: column;
 }
-.i-deco-light::before {
-  content: '';
-  position: absolute;
-  width: 70px; height: 70px;
-  border-radius: 50%;
-  border: 1px dashed rgba(29,95,232,0.3);
-  animation: spin 8s linear infinite;
-}
-.i-deco-light::after {
-  content: '↗';
-  font-size: 24px;
-  color: rgba(29,95,232,0.5);
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+.i-product-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.1); transform: translateY(-3px); }
 
-/* Gold: rombo elegante */
-.i-deco-gold {
-  width: 80px; height: 80px;
-  position: relative;
-  display: flex; align-items: center; justify-content: center;
+.i-product-img {
+  width: 100%; aspect-ratio: 1/1; background: #f0f0ee; position: relative;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
-.i-deco-gold::before {
-  content: '';
-  position: absolute;
-  width: 60px; height: 60px;
-  border: 1px solid rgba(184,146,58,0.5);
-  transform: rotate(45deg);
+.i-product-img svg { width: 36px; height: 36px; opacity: .2; }
+.i-product-discount {
+  position: absolute; top: 10px; left: 10px;
+  background: var(--l-accent); color: #fff; font-family: 'Montserrat', sans-serif;
+  font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 6px;
 }
-.i-deco-gold::after {
-  content: '';
-  position: absolute;
-  width: 40px; height: 40px;
-  border: 1px solid rgba(184,146,58,0.25);
-  transform: rotate(45deg);
-  animation: breathe 3s ease-in-out infinite;
+.i-product-fav {
+  position: absolute; top: 10px; right: 10px; width: 28px; height: 28px;
+  border-radius: 50%; background: #fff; border: 1px solid rgba(0,0,0,0.08);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
 }
-@keyframes breathe {
-  0%,100% { transform: rotate(45deg) scale(1); }
-  50%      { transform: rotate(45deg) scale(1.12); }
-}
+.i-product-fav svg { width: 13px; height: 13px; stroke: #ccc; stroke-width: 1.8; fill: none; }
 
-/* Visibilidad decoraciones */
-.theme-dark  .i-deco-dark  { opacity: 1; }
-.theme-dark  .i-deco-light { opacity: 0; pointer-events: none; }
-.theme-dark  .i-deco-gold  { opacity: 0; pointer-events: none; }
-.theme-light .i-deco-dark  { opacity: 0; pointer-events: none; }
-.theme-light .i-deco-light { opacity: 1; }
-.theme-light .i-deco-gold  { opacity: 0; pointer-events: none; }
-.theme-gold  .i-deco-dark  { opacity: 0; pointer-events: none; }
-.theme-gold  .i-deco-light { opacity: 0; pointer-events: none; }
-.theme-gold  .i-deco-gold  { opacity: 1; }
-
-/* ── DIVISOR ── */
-.i-divider {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 1px;
-  transition: background 0.7s;
+.i-product-info { padding: 12px 12px 14px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.i-product-brand {
+  font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700;
+  color: var(--l-muted); letter-spacing: .1em; text-transform: uppercase;
 }
+.i-product-name {
+  font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600;
+  color: var(--l-fg); line-height: 1.4; flex: 1;
+}
+.i-product-prices { display: flex; flex-direction: column; gap: 1px; margin-top: 4px; }
+.i-product-price-old {
+  font-family: 'Montserrat', sans-serif; font-size: 9px; color: var(--l-muted);
+  text-decoration: line-through;
+}
+.i-product-price {
+  font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 800; color: var(--l-fg);
+}
+.i-product-footer { padding: 0 12px 12px; }
+.i-add-cart {
+  width: 100%; padding: 8px; border-radius: 8px; border: none; cursor: pointer;
+  background: var(--l-accent); color: #fff; font-family: 'Montserrat', sans-serif;
+  font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: opacity .2s;
+}
+.i-add-cart:hover { opacity: .88; }
+.i-add-cart svg { width: 12px; height: 12px; stroke: #fff; stroke-width: 2; fill: none; }
+
+/* ── HERO GOLD/DARK deco ── */
+.i-divider { position: absolute; bottom: 0; left: 0; right: 0; height: 1px; transition: background 0.7s; }
 .theme-dark  .i-divider { background: var(--d-border); }
-.theme-light .i-divider { background: var(--l-border); }
 .theme-gold  .i-divider { background: var(--g-border); }
 
-/* ── TRANSICIÓN GLOBAL: flash overlay ── */
-#theme-flash {
-  position: fixed; inset: 0;
-  pointer-events: none;
-  z-index: 99;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
+/* ── FLASH ── */
+#theme-flash { position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: 0; transition: opacity 0.15s; }
 #theme-flash.active { opacity: 1; }
 
-/* ── TEXTO CAMBIABLE ── */
-/* Los textos tienen span internos por tema */
+/* text visibility by theme */
 .t-dark, .t-light, .t-gold { transition: opacity 0.4s; }
-.theme-dark  .t-dark  { opacity: 1; }
-.theme-dark  .t-light { opacity: 0; position: absolute; pointer-events: none; }
-.theme-dark  .t-gold  { opacity: 0; position: absolute; pointer-events: none; }
-.theme-light .t-dark  { opacity: 0; position: absolute; pointer-events: none; }
-.theme-light .t-light { opacity: 1; }
-.theme-light .t-gold  { opacity: 0; position: absolute; pointer-events: none; }
-.theme-gold  .t-dark  { opacity: 0; position: absolute; pointer-events: none; }
-.theme-gold  .t-light { opacity: 0; position: absolute; pointer-events: none; }
-.theme-gold  .t-gold  { opacity: 1; }
-
-.i-headline-wrap {
-  position: relative;
-  display: inline-block;
-}
+.theme-dark  .t-light,.theme-dark  .t-gold  { opacity:0; position:absolute; pointer-events:none; }
+.theme-dark  .t-dark  { opacity:1; }
+.theme-light .t-dark,.theme-light .t-gold  { opacity:0; position:absolute; pointer-events:none; }
+.theme-light .t-light { opacity:1; }
+.theme-gold  .t-dark,.theme-gold  .t-light { opacity:0; position:absolute; pointer-events:none; }
+.theme-gold  .t-gold  { opacity:1; }
+.i-headline-wrap { position:relative; display:inline-block; }
 </style>
 </head>
 <body>
-
 <div id="iris" class="theme-dark">
+<div id="theme-flash"></div>
 
-  <!-- Flash overlay para transición -->
-  <div id="theme-flash"></div>
-
-  <!-- NAV -->
-  <nav class="i-nav">
-    <div class="i-logo">
-      <span class="i-logo-dot"></span>
-      IRIS
-    </div>
-    <div class="i-nav-links">
-      <a class="i-nav-link" href="#">Servicios</a>
-      <a class="i-nav-link" href="#">Proyectos</a>
-      <a class="i-nav-link" href="#">Nosotros</a>
-    </div>
+<!-- NAV -->
+<nav class="i-nav">
+  <div class="i-logo"><span class="i-logo-dot"></span>IRIS</div>
+  <div class="i-nav-links">
+    <a class="i-nav-link" href="#">Servicios</a>
+    <a class="i-nav-link" href="#">Proyectos</a>
+    <a class="i-nav-link" href="#">Nosotros</a>
+  </div>
+  <div class="i-nav-right">
+    <!-- Carrito y cuenta: solo visibles en Light -->
+    <button class="i-nav-icon" style="display:none" id="navCart" title="Carrito">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="i-cart-badge">3</span>
+    </button>
+    <button class="i-nav-icon" style="display:none" id="navAccount" title="Mi cuenta">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
     <a class="i-nav-cta" href="#">
       <span class="t-dark">Hablemos</span>
       <span class="t-light">Contáctanos</span>
       <span class="t-gold">Reservar cita</span>
     </a>
-  </nav>
+  </div>
+</nav>
 
-  <!-- HERO -->
-  <section class="i-hero">
-
-    <!-- Fondos por tema -->
-    <div class="i-hero-bg i-hero-bg-dark"></div>
-    <div class="i-hero-bg i-hero-bg-light"></div>
-    <div class="i-hero-bg i-hero-bg-gold"></div>
-
-    <!-- Decoración flotante -->
-    <div class="i-hero-deco">
-      <!-- Dark -->
-      <div class="i-deco-dark">
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-      </div>
-      <!-- Light -->
-      <div class="i-deco-light"></div>
-      <!-- Gold -->
-      <div class="i-deco-gold"></div>
+<!-- HERO dark/gold -->
+<section class="i-hero">
+  <div class="i-hero-bg i-hero-bg-dark"></div>
+  <div class="i-hero-bg i-hero-bg-gold"></div>
+  <div class="i-hero-deco">
+    <div class="i-deco-dark">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
     </div>
-
-    <!-- Contenido -->
-    <div class="i-hero-content">
-
-      <div class="i-eyebrow">
-        <span class="t-dark">Diseño · Tecnología · Identidad</span>
-        <span class="t-light">Software · Estrategia · Crecimiento</span>
-        <span class="t-gold">Joyería · Artesanía · Exclusividad</span>
-      </div>
-
-      <h1 class="i-headline">
-        <div class="i-headline-wrap">
-          <span class="t-dark">El diseño<br>que <span class="i-headline-accent">define.</span></span>
-          <span class="t-light">Escala tu<br>negocio <span class="i-headline-accent">hoy.</span></span>
-          <span class="t-gold">Belleza<br>que <span class="i-headline-accent">perdura.</span></span>
-        </div>
-      </h1>
-
-      <p class="i-sub">
-        <span class="t-dark">Creamos identidades visuales y experiencias digitales que no pasan desapercibidas.</span>
-        <span class="t-light">Soluciones digitales que convierten visitantes en clientes con precisión y velocidad.</span>
-        <span class="t-gold">Piezas únicas diseñadas para quienes saben que los detalles lo son todo.</span>
-      </p>
-
-      <div class="i-cta-row">
-        <a class="i-btn-primary" href="#">
-          <span class="t-dark">Ver proyectos →</span>
-          <span class="t-light">Empezar ahora →</span>
-          <span class="t-gold">Explorar colección →</span>
-        </a>
-        <a class="i-btn-secondary" href="#">
-          <span class="t-dark">Sobre nosotros</span>
-          <span class="t-light">Cómo funciona</span>
-          <span class="t-gold">Nuestra historia</span>
-        </a>
-      </div>
-
+    <div class="i-deco-gold"></div>
+  </div>
+  <div class="i-hero-content">
+    <div class="i-eyebrow">
+      <span class="t-dark">Diseño · Tecnología · Identidad</span>
+      <span class="t-gold">Joyería · Artesanía · Exclusividad</span>
     </div>
+    <h1 class="i-headline">
+      <div class="i-headline-wrap">
+        <span class="t-dark">El diseño<br>que <span class="i-headline-accent">define.</span></span>
+        <span class="t-gold">Belleza<br>que <span class="i-headline-accent">perdura.</span></span>
+      </div>
+    </h1>
+    <p class="i-sub">
+      <span class="t-dark">Creamos identidades visuales y experiencias digitales que no pasan desapercibidas.</span>
+      <span class="t-gold">Piezas únicas diseñadas para quienes saben que los detalles lo son todo.</span>
+    </p>
+    <div class="i-cta-row">
+      <a class="i-btn-primary" href="#">
+        <span class="t-dark">Ver proyectos →</span>
+        <span class="t-gold">Explorar colección →</span>
+      </a>
+      <a class="i-btn-secondary" href="#">
+        <span class="t-dark">Sobre nosotros</span>
+        <span class="t-gold">Nuestra historia</span>
+      </a>
+    </div>
+  </div>
+  <div class="i-divider"></div>
+</section>
 
-    <div class="i-divider"></div>
-  </section>
-
+<!-- BANNER ECOMMERCE (Light only) -->
+<div class="i-banner">
+  <div class="i-banner-arrow prev">‹</div>
+  <div class="i-banner-left">
+    <div class="i-banner-brand">Mi<span>Marca</span></div>
+    <div class="i-banner-tagline">Líder en su categoría · Envíos a todo el país</div>
+    <div class="i-banner-offer">
+      <div class="i-offer-badge">
+        <small>Hasta</small>
+        30%
+        <small>dcto.</small>
+      </div>
+      <div class="i-offer-text">
+        Hasta 30% de descuento
+        <span>En selección de productos. Solo hasta agotar stock.</span>
+      </div>
+    </div>
+    <div class="i-banner-badges">
+      <span class="i-badge">Envío gratis</span>
+      <span class="i-badge">Alta calidad</span>
+      <span class="i-badge">Descuentos</span>
+    </div>
+    <button class="i-banner-cta">Ver ofertas →</button>
+  </div>
+  <div class="i-banner-right">
+    <div class="i-banner-img-placeholder">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span>IMAGEN DE PRODUCTO</span>
+    </div>
+    <div class="i-banner-dots">
+      <span class="active"></span><span></span><span></span>
+    </div>
+  </div>
+  <div class="i-banner-arrow next">›</div>
 </div>
 
-<script>
-// API pública para cambiar tema desde el padre
-window.setIrisTheme = function(theme, flashColor) {
-  const iris  = document.getElementById('iris');
-  const flash = document.getElementById('theme-flash');
+<!-- SECTION HEADER productos -->
+<div class="i-section-header">
+  <span class="i-section-title">Productos destacados</span>
+  <a class="i-section-link" href="#">Ver todos →</a>
+</div>
 
-  // Flash rápido del color del tema nuevo
+<!-- PRODUCT GRID -->
+<div class="i-products">
+
+  <!-- Card 1 -->
+  <div class="i-product-card">
+    <div class="i-product-img">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span class="i-product-discount">24%</span>
+      <div class="i-product-fav"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+    </div>
+    <div class="i-product-info">
+      <div class="i-product-brand">Marca A</div>
+      <div class="i-product-name">Producto Premium Modelo XL Edición Especial</div>
+      <div class="i-product-prices">
+        <div class="i-product-price-old">S/ 519.00</div>
+        <div class="i-product-price">S/ 399.00</div>
+      </div>
+    </div>
+    <div class="i-product-footer">
+      <button class="i-add-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>Añadir</button>
+    </div>
+  </div>
+
+  <!-- Card 2 -->
+  <div class="i-product-card">
+    <div class="i-product-img">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span class="i-product-discount">37%</span>
+      <div class="i-product-fav"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+    </div>
+    <div class="i-product-info">
+      <div class="i-product-brand">Marca B</div>
+      <div class="i-product-name">Artículo Deluxe Pro 4.7L Verde Menta</div>
+      <div class="i-product-prices">
+        <div class="i-product-price-old">S/ 2,199.00</div>
+        <div class="i-product-price">S/ 1,399.00</div>
+      </div>
+    </div>
+    <div class="i-product-footer">
+      <button class="i-add-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>Añadir</button>
+    </div>
+  </div>
+
+  <!-- Card 3 -->
+  <div class="i-product-card">
+    <div class="i-product-img">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span class="i-product-discount">31%</span>
+      <div class="i-product-fav"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+    </div>
+    <div class="i-product-info">
+      <div class="i-product-brand">Marca C</div>
+      <div class="i-product-name">Horno Doble Convección Air Fry 28L Negro</div>
+      <div class="i-product-prices">
+        <div class="i-product-price-old">S/ 1,299.00</div>
+        <div class="i-product-price">S/ 899.00</div>
+      </div>
+    </div>
+    <div class="i-product-footer">
+      <button class="i-add-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>Añadir</button>
+    </div>
+  </div>
+
+  <!-- Card 4 -->
+  <div class="i-product-card">
+    <div class="i-product-img">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span class="i-product-discount">22%</span>
+      <div class="i-product-fav"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+    </div>
+    <div class="i-product-info">
+      <div class="i-product-brand">Marca D</div>
+      <div class="i-product-name">Hervidor Eléctrico 1.7L Empire Red</div>
+      <div class="i-product-prices">
+        <div class="i-product-price-old">S/ 699.00</div>
+        <div class="i-product-price">S/ 549.00</div>
+      </div>
+    </div>
+    <div class="i-product-footer">
+      <button class="i-add-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>Añadir</button>
+    </div>
+  </div>
+
+</div><!-- /products -->
+</div><!-- /iris -->
+
+<script>
+window.setIrisTheme = function(theme, flashColor) {
+  const iris = document.getElementById('iris');
+  const flash = document.getElementById('theme-flash');
+  const cart = document.getElementById('navCart');
+  const account = document.getElementById('navAccount');
   flash.style.background = flashColor || 'rgba(255,255,255,0.06)';
   flash.classList.add('active');
-
   setTimeout(() => {
     iris.className = 'theme-' + theme;
+    // Mostrar/ocultar iconos carrito y cuenta
+    const show = theme === 'light' ? 'flex' : 'none';
+    cart.style.display = show;
+    account.style.display = show;
     flash.classList.remove('active');
   }, 120);
 };
-
-// Escucha mensajes del padre (iframe postMessage)
 window.addEventListener('message', function(e) {
-  if (e.data && e.data.type === 'SET_THEME') {
-    window.setIrisTheme(e.data.theme, e.data.flashColor);
-  }
+  if (e.data && e.data.type === 'SET_THEME') window.setIrisTheme(e.data.theme, e.data.flashColor);
 });
 </script>
 </body>
