@@ -74,11 +74,11 @@ html,body{width:100%;height:100%;overflow-x:hidden;overflow-y:auto}
   position:absolute;inset:-20%;
   animation:fluidMove 8s ease-in-out infinite alternate;
   filter:blur(40px);
-  z-index:1;
 }
+/* Gradiente y opacidad por tema — transición suave via JS */
 #fluid-bg { transition: opacity 1.2s ease; }
 
-.i-hero-bg-img{display:none;}@keyframes fluidMove{
+.i-hero-bg-img{display:none;} /* siempre oculto */@keyframes fluidMove{
   0%  {transform:scale(1) rotate(0deg) translate(0,0);}
   25% {transform:scale(1.08) rotate(2deg) translate(2%,3%);}
   50% {transform:scale(1.04) rotate(-1deg) translate(-3%,1%);}
@@ -349,7 +349,7 @@ html,body{width:100%;height:100%;overflow-x:hidden;overflow-y:auto}
 <div class="i-hero-banner">
   <div class="i-fluid-bg" id="fluid-bg"></div>
   <div class="i-fluid-grain" id="fluid-grain"></div>
-  <img id="hero-bg-img" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;display:none;opacity:0;transition:opacity 0.8s ease;z-index:0;">
+  <img id="hero-bg-img" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;display:none;opacity:0;transition:opacity 0.8s ease;">
   <div class="i-hero-overlay">
     <div class="i-hero-content">
       <div class="i-hero-tag" id="hero-tag"></div>
@@ -469,7 +469,7 @@ const T = {
     heroTag:'Soluciones para grandes espacios',
     heroTitle:'Climatización de alto<br>rendimiento para<br><span>tu empresa</span>',
     heroSub:'Diseñamos, instalamos y mantenemos sistemas HVAC para oficinas corporativas e infraestructuras industriales.',
-    heroCta:'Solicitar diagnóstico →',heroImg:'novo-hero.jpg',
+    heroCta:'Solicitar diagnóstico →',heroImg:null,
     secTitle:'Productos destacados',secLink:'Ver todos →',
     promoBrand:'NO<span class="accent">VO</span>',
     promoTag:'Refrigeración Comercial · Oficinas · Soporte 24/7',
@@ -605,10 +605,8 @@ function gatherText(el, html, targetTheme) {
   tmp.innerHTML = html;
 
   // Color blanco para texto normal, acento para spans
-  const navTextColors = { dark:'#f5f5f5', light:'#1847e8', gold:'#1a1410' };
-  const baseColor = (el === document.getElementById('logo-text'))
-    ? navTextColors[targetTheme]
-    : '#ffffff';
+  const accentColors = { dark:'#ff6b35', light:'#ffd166', gold:'#b8923a' };
+  const accentColor = accentColors[targetTheme] || '#fff';
 
   let i = 0;
   function buildHTML(node, isAccent) {
@@ -618,9 +616,7 @@ function gatherText(el, html, targetTheme) {
         const up = Math.random() > 0.5;
         const dist = 30 + Math.random() * 40;
         const delay = i++ * 0.02;
-        const accentColors = { dark:'#ff6b35', light:'#ffd166', gold:'#b8923a' };
-        const accentColor = accentColors[targetTheme] || '#fff';
-        const col = isAccent ? accentColor : baseColor;
+        const col = isAccent ? accentColor : '#ffffff';
         return `<span style="display:inline-block;color:${col};transform:translateY(${up?-dist:dist}px);opacity:0;transition:transform 0.3s cubic-bezier(0.34,1.4,0.64,1) ${delay}s,opacity 0.22s ease ${delay}s">${ch}</span>`;
       }).join('');
     } else if (node.nodeType === 1 && node.tagName === 'BR') {
@@ -692,7 +688,7 @@ function setupCounterObserver(){
 // Gradientes del fluido por tema
 const FLUID_GRADIENTS = {
   dark:  'radial-gradient(ellipse 80% 60% at 20% 50%,#dc402a 0%,transparent 55%),radial-gradient(ellipse 60% 80% at 80% 30%,#ff6b35 0%,transparent 50%),radial-gradient(ellipse 50% 50% at 60% 80%,#c41c00 0%,transparent 50%),#09090b',
-  light: 'radial-gradient(ellipse 80% 60% at 20% 50%,#1847e8 0%,transparent 55%),radial-gradient(ellipse 60% 80% at 80% 30%,#00d4ff 0%,transparent 50%),radial-gradient(ellipse 50% 50% at 60% 80%,#2563eb 0%,transparent 50%),#0f2fa3',
+  light: 'radial-gradient(ellipse 80% 60% at 20% 50%,#1847e8 0%,transparent 55%),radial-gradient(ellipse 60% 80% at 80% 30%,#00d4ff 0%,transparent 50%),radial-gradient(ellipse 50% 50% at 60% 80%,#2563eb 0%,transparent 50%),#1035c0',
   gold:  'radial-gradient(ellipse 80% 60% at 20% 50%,#b8923a 0%,transparent 55%),radial-gradient(ellipse 60% 80% at 80% 30%,#d4af6a 0%,transparent 50%),radial-gradient(ellipse 50% 50% at 60% 80%,#8a6820 0%,transparent 50%),#09090b',
 };
 const FLUID_OPACITY = { dark: 0.85, light: 0.85, gold: 0 };
@@ -735,18 +731,21 @@ window.setIrisTheme = function(theme) {
     fb.style.opacity = FLUID_OPACITY[theme];
   }
 
-  // ── 3b. IMAGEN DE FONDO — aparece 300ms después ───────
+  // ── 3b. IMAGEN DE FONDO — aparece a 300ms debajo del gradiente ──
   const heroBgImg = document.getElementById('hero-bg-img');
   if (heroBgImg) {
-    // Ocultar imagen anterior
+    heroBgImg.style.transition = 'none';
     heroBgImg.style.opacity = '0';
     heroBgImg.style.display = 'none';
-    if (d.heroImg) {
+    const T_heroImg = { light: 'novo-hero.jpg', dark: null, gold: 'celestia-hero.jpg' };
+    const imgSrc = T_heroImg[theme];
+    if (imgSrc) {
       setTimeout(() => {
-        heroBgImg.src = d.heroImg;
+        heroBgImg.src = imgSrc;
         heroBgImg.style.display = 'block';
         requestAnimationFrame(() => requestAnimationFrame(() => {
-          heroBgImg.style.opacity = '0.45';
+          heroBgImg.style.transition = 'opacity 0.8s ease';
+          heroBgImg.style.opacity = '0.35';
         }));
       }, 300);
     }
