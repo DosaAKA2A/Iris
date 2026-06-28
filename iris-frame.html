@@ -605,8 +605,10 @@ function gatherText(el, html, targetTheme) {
   tmp.innerHTML = html;
 
   // Color blanco para texto normal, acento para spans
-  const accentColors = { dark:'#ff6b35', light:'#ffd166', gold:'#b8923a' };
-  const accentColor = accentColors[targetTheme] || '#fff';
+  const navTextColors = { dark:'#f5f5f5', light:'#1847e8', gold:'#1a1410' };
+  const baseColor = (el === document.getElementById('logo-text'))
+    ? navTextColors[targetTheme]
+    : '#ffffff';
 
   let i = 0;
   function buildHTML(node, isAccent) {
@@ -616,7 +618,9 @@ function gatherText(el, html, targetTheme) {
         const up = Math.random() > 0.5;
         const dist = 30 + Math.random() * 40;
         const delay = i++ * 0.02;
-        const col = isAccent ? accentColor : '#ffffff';
+        const accentColors = { dark:'#ff6b35', light:'#ffd166', gold:'#b8923a' };
+        const accentColor = accentColors[targetTheme] || '#fff';
+        const col = isAccent ? accentColor : baseColor;
         return `<span style="display:inline-block;color:${col};transform:translateY(${up?-dist:dist}px);opacity:0;transition:transform 0.3s cubic-bezier(0.34,1.4,0.64,1) ${delay}s,opacity 0.22s ease ${delay}s">${ch}</span>`;
       }).join('');
     } else if (node.nodeType === 1 && node.tagName === 'BR') {
