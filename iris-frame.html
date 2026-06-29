@@ -781,6 +781,12 @@ window.setIrisTheme = function(theme) {
     }
   }
 
+  // ── 3c. Ocultar texto del hero INMEDIATAMENTE para evitar flash ──
+  ['hero-title','hero-tag','hero-sub','hero-cta'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.transition = 'none'; el.style.opacity = '0'; }
+  });
+
   // ── 3b. Aplicar clase del tema al iris YA — para que CSS logo funcione ─
   // (solo cambia colores CSS, el contenido se actualiza en el paso 7)
   iris.className = 'theme-' + theme;
@@ -814,13 +820,13 @@ window.setIrisTheme = function(theme) {
     if (titleEl) scatterText(titleEl, () => gatherText(titleEl, d.heroTitle, theme));
 
     const tagEl = document.getElementById('hero-tag');
-    if (tagEl) { tagEl.style.transition='opacity 0.25s ease'; tagEl.style.opacity='0'; setTimeout(()=>{ tagEl.textContent=d.heroTag; tagEl.style.opacity='1'; }, 250); }
+    if (tagEl) { tagEl.style.transition='none'; tagEl.style.opacity='0'; setTimeout(()=>{ tagEl.textContent=d.heroTag; tagEl.style.transition='opacity 0.25s ease'; tagEl.style.opacity='1'; }, 250); }
 
     const subEl = document.getElementById('hero-sub');
-    if (subEl) { subEl.style.transition='opacity 0.25s ease'; subEl.style.opacity='0'; setTimeout(()=>{ subEl.textContent=d.heroSub; subEl.style.opacity='1'; }, 350); }
+    if (subEl) { subEl.style.transition='none'; subEl.style.opacity='0'; setTimeout(()=>{ subEl.textContent=d.heroSub; subEl.style.transition='opacity 0.25s ease'; subEl.style.opacity='1'; }, 350); }
 
     const ctaEl = document.getElementById('hero-cta');
-    if (ctaEl) { ctaEl.style.transition='opacity 0.25s ease'; ctaEl.style.opacity='0'; setTimeout(()=>{ ctaEl.textContent=d.heroCta; ctaEl.style.opacity='1'; }, 420); }
+    if (ctaEl) { ctaEl.style.transition='none'; ctaEl.style.opacity='0'; setTimeout(()=>{ ctaEl.textContent=d.heroCta; ctaEl.style.transition='opacity 0.25s ease'; ctaEl.style.opacity='1'; }, 420); }
   }, 180);
 
   // ── 7. Resto del contenido al punto medio ────────────
