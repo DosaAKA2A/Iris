@@ -512,12 +512,12 @@ const T = {
     col2Title:'Colección',col2Links:['Anillos','Collares','Aretes'],
     contact:'hola@celestia.co',copy:'© 2026 CELESTIA. Todos los derechos reservados.',
     products:[
-      {img:'celestia-hero.jpg',disc:null,brand:'CELESTIA',name:'Anillo Tanzanita con Diamantes Oro 18k',old:'$2,800',price:'$2,200'},
-      {img:'celestia-hero.jpg',disc:null,brand:'CELESTIA',name:'Aretes Aro Grande Oro 18k',old:'$1,400',price:'$1,100'},
-      {img:'celestia-hero.jpg',disc:null,brand:'CELESTIA',name:'Collar Solitario Diamante Pera',old:'$3,500',price:'$2,900'},
-      {img:'celestia-hero.jpg',disc:null,brand:'CELESTIA',name:'Pulsera Eslabón Oro Blanco 18k',old:'$1,800',price:'$1,450'},
-      {img:'celestia-hero.jpg',disc:null,brand:'CELESTIA',name:'Anillo Eternidad Rubí y Diamantes',old:'$4,200',price:'$3,600'},
-      {img:'celestia-hero.jpg',disc:null,brand:'CELESTIA',name:'Pendientes Esmeralda Talla Pera',old:'$2,200',price:'$1,800'},
+      {img:'cel-img1.jpg',pos:'center center',disc:null,brand:'CELESTIA',name:'Set Collar Eslabón, Anillo y Aretes Oro 18k',old:'2.800€',price:'2.200€'},
+      {img:'cel-img2.jpg',pos:'center 40%',disc:null,brand:'CELESTIA',name:'Collar Diamante Circular Plata 925',old:'1.100€',price:'890€'},
+      {img:'cel-img3.jpg',pos:'center 30%',disc:null,brand:'CELESTIA',name:'Aretes Aro Grande y Anillo Tanzanita Oro 18k',old:'3.500€',price:'2.900€'},
+      {img:'cel-img4.jpg',pos:'center 40%',disc:null,brand:'CELESTIA',name:'Collar Eslabón Fino y Aretes Aro Oro 18k',old:'1.800€',price:'1.450€'},
+      {img:'cel-img5.jpg',pos:'center 35%',disc:null,brand:'CELESTIA',name:'Collar Diamantes Graduados y Anillo Eternidad',old:'4.200€',price:'3.600€'},
+      {img:'cel-img6.jpg',pos:'center 25%',disc:null,brand:'CELESTIA',name:'Aretes Aro Fino y Anillo Diamantes Plata',old:'2.200€',price:'1.800€'},
     ]
   }
 };
@@ -562,7 +562,7 @@ function apply(t){
   document.getElementById('products-grid').innerHTML=d.products.map(p=>`
     <div class="i-product-card">
       <div class="i-product-img">
-        <img src="${p.img}" alt="" style="object-position:center ${t==='gold'?'20%':'center'}">
+        <img src="${p.img}" alt="" style="object-position:${p.pos||'center center'};object-fit:cover;width:100%;height:100%;">
         ${p.disc?`<span class="i-product-discount">${p.disc}</span>`:''}
       </div>
       <div class="i-product-info">
@@ -838,7 +838,7 @@ window.setIrisTheme = function(theme) {
     grid.innerHTML = d.products.map(p=>`
       <div class="i-product-card" style="transform:translateX(120%);opacity:0">
         <div class="i-product-img">
-          <img src="${p.img}" alt="">
+          <img src="${p.img}" alt="" style="object-position:${p.pos||'center center'};object-fit:cover;width:100%;height:100%;">
           ${p.disc?`<span class="i-product-discount">${p.disc}</span>`:''}
         </div>
         <div class="i-product-info">
