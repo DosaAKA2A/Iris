@@ -398,7 +398,7 @@ html,body{width:100%;height:100%;overflow-x:hidden;overflow-y:auto}
   <!-- Imagen de fondo (dark: ocupa todo) -->
   <div class="i-promo-right" id="promo-right-panel">
     <div class="i-promo-dark-deco" id="promo-deco"></div>
-    <img id="promo-img" src="" alt="" style="display:none">
+    <img id="promo-img" src="" alt="" loading="lazy" style="display:none">
   </div>
   <!-- Contenido encima -->
   <div class="i-promo-left">
@@ -606,7 +606,7 @@ function apply(t){
   document.getElementById('products-grid').innerHTML=d.products.map(p=>`
     <div class="i-product-card">
       <div class="i-product-img" style="${t==='dark'?'aspect-ratio:3/4':''}" >
-        <img src="${p.img}" alt="" style="object-position:${p.pos||'center center'};object-fit:cover;width:100%;height:100%;">
+        <img src="${p.img}" alt="" loading="lazy" style="object-position:${p.pos||'center center'};object-fit:cover;width:100%;height:100%;">
         ${p.disc?`<span class="i-product-discount">${p.disc}</span>`:''}
       </div>
       ${t==='dark'?`<div class="i-product-info" style="padding:10px 12px 12px;">
@@ -892,7 +892,7 @@ window.setIrisTheme = function(theme) {
     grid.innerHTML = d.products.map(p=>`
       <div class="i-product-card" style="transform:translateX(120%);opacity:0">
         <div class="i-product-img" style="${theme==='dark'?'aspect-ratio:3/4':''}">
-          <img src="${p.img}" alt="" style="object-position:${p.pos||'center center'};object-fit:cover;width:100%;height:100%;">
+          <img src="${p.img}" alt="" loading="lazy" style="object-position:${p.pos||'center center'};object-fit:cover;width:100%;height:100%;">
           ${p.disc?`<span class="i-product-discount">${p.disc}</span>`:''}
         </div>
         ${theme==='dark'?`<div class="i-product-info" style="padding:10px 12px 12px;">
