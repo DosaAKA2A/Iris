@@ -781,10 +781,10 @@ window.setIrisTheme = function(theme) {
     }
   }
 
-  // ── 3c. Ocultar texto del hero INMEDIATAMENTE para evitar flash ──
+  // ── 3c. Fade out suave del texto del hero antes del scatter ──
   ['hero-title','hero-tag','hero-sub','hero-cta'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) { el.style.transition = 'none'; el.style.opacity = '0'; }
+    if (el) { el.style.transition = 'opacity 0.18s ease'; el.style.opacity = '0'; }
   });
 
   // ── 3b. Aplicar clase del tema al iris YA — para que CSS logo funcione ─
