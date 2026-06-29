@@ -539,16 +539,18 @@ function apply(t){
   const heroBgImgInit = document.getElementById('hero-bg-img');
   if(heroBgImgInit){
     const T_heroPos={light:'center 40%',dark:'center 50%',gold:'right center'};
-    heroBgImgInit.style.zIndex = t === 'dark' ? '0' : '2';
+    heroBgImgInit.style.zIndex = IMG_ZINDEX[t];
     if(d.heroImg){
       heroBgImgInit.src=d.heroImg;
       heroBgImgInit.style.objectPosition=T_heroPos[t]||'center';
       heroBgImgInit.style.display='block';
-      setTimeout(()=>{ heroBgImgInit.style.opacity=t==='gold'?'1':'0.38'; },50);
+      setTimeout(()=>{ heroBgImgInit.style.opacity = IMG_OPACITY[t]; },50);
     } else {
       heroBgImgInit.style.display='none'; heroBgImgInit.style.opacity='0';
     }
   }
+  const fbInit = document.getElementById('fluid-bg');
+  if(fbInit){ fbInit.style.background=FLUID_GRADIENTS[t]; fbInit.style.opacity=FLUID_OPACITY[t]; }
   document.getElementById('section-title').textContent=d.secTitle;
   document.getElementById('section-link').textContent=d.secLink;
   document.getElementById('promo-brand').innerHTML=d.promoBrand;
@@ -713,7 +715,14 @@ const FLUID_GRADIENTS = {
   light: 'radial-gradient(ellipse 80% 60% at 20% 50%,#1847e8 0%,transparent 55%),radial-gradient(ellipse 60% 80% at 80% 30%,#00d4ff 0%,transparent 50%),radial-gradient(ellipse 50% 50% at 60% 80%,#2563eb 0%,transparent 50%),#1035c0',
   gold:  'radial-gradient(ellipse 80% 60% at 20% 50%,#b8923a 0%,transparent 55%),radial-gradient(ellipse 60% 80% at 80% 30%,#d4af6a 0%,transparent 50%),radial-gradient(ellipse 50% 50% at 60% 80%,#8a6820 0%,transparent 50%),#09090b',
 };
-const FLUID_OPACITY = { dark: 0.85, light: 0.85, gold: 0 };
+// dark: fluid es el fondo (imagen debajo velada)
+// light: fluid encima de la imagen como tinte azul suave
+// gold: fluid oculto, imagen visible directo
+const FLUID_OPACITY  = { dark: 0.92, light: 0.55, gold: 0 };
+// z-index imagen: dark debajo del fluid, light/gold encima
+const IMG_ZINDEX     = { dark: 0,     light: 2,    gold: 2 };
+// opacidad imagen: dark velada, light visible, gold visible total
+const IMG_OPACITY    = { dark: 0.38,  light: 1,    gold: 1 };
 const BG_COLOR = { dark:'#09090b', light:'#f4f4f2', gold:'#faf6f0' };
 
 let cur='dark', busy=false;
@@ -753,25 +762,22 @@ window.setIrisTheme = function(theme) {
     fb.style.opacity = FLUID_OPACITY[theme];
   }
 
-  // ── 3b. IMAGEN DE FONDO — aparece a 300ms debajo del gradiente ──
+  // ── 3b. IMAGEN DE FONDO ──────────────────────────────
   const heroBgImg = document.getElementById('hero-bg-img');
   if (heroBgImg) {
     heroBgImg.style.transition = 'none';
     heroBgImg.style.opacity = '0';
     heroBgImg.style.display = 'none';
+    heroBgImg.style.zIndex = IMG_ZINDEX[theme];
     const T_heroPos = { light: 'center 40%', dark: 'center 50%', gold: 'right center' };
-    const imgSrc = d.heroImg;
-    const imgPos = T_heroPos[theme] || 'center';
-    // dark (ARBU): imagen debajo del gradiente. light/gold: encima
-    heroBgImg.style.zIndex = theme === 'dark' ? '0' : '2';
-    if (imgSrc) {
+    if (d.heroImg) {
       setTimeout(() => {
-        heroBgImg.src = imgSrc;
-        heroBgImg.style.objectPosition = imgPos;
+        heroBgImg.src = d.heroImg;
+        heroBgImg.style.objectPosition = T_heroPos[theme] || 'center';
         heroBgImg.style.display = 'block';
         requestAnimationFrame(() => requestAnimationFrame(() => {
           heroBgImg.style.transition = 'opacity 0.8s ease';
-          heroBgImg.style.opacity = theme === 'gold' ? '1' : '0.38';
+          heroBgImg.style.opacity = IMG_OPACITY[theme];
         }));
       }, 300);
     }
