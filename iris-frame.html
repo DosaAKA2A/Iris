@@ -538,7 +538,8 @@ function apply(t){
   if(fg) fg.style.display='block';
   const heroBgImgInit = document.getElementById('hero-bg-img');
   if(heroBgImgInit){
-    const T_heroPos={light:'center 40%',dark:'center 60%',gold:'right center'};
+    const T_heroPos={light:'center 40%',dark:'center 50%',gold:'right center'};
+    heroBgImgInit.style.zIndex = t === 'dark' ? '0' : '2';
     if(d.heroImg){
       heroBgImgInit.src=d.heroImg;
       heroBgImgInit.style.objectPosition=T_heroPos[t]||'center';
@@ -758,9 +759,11 @@ window.setIrisTheme = function(theme) {
     heroBgImg.style.transition = 'none';
     heroBgImg.style.opacity = '0';
     heroBgImg.style.display = 'none';
-    const T_heroPos = { light: 'center 40%', dark: 'center 60%', gold: 'right center' };
+    const T_heroPos = { light: 'center 40%', dark: 'center 50%', gold: 'right center' };
     const imgSrc = d.heroImg;
     const imgPos = T_heroPos[theme] || 'center';
+    // dark (ARBU): imagen debajo del gradiente. light/gold: encima
+    heroBgImg.style.zIndex = theme === 'dark' ? '0' : '2';
     if (imgSrc) {
       setTimeout(() => {
         heroBgImg.src = imgSrc;
