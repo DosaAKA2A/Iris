@@ -729,10 +729,13 @@ function animateCounters(){
     requestAnimationFrame(u);
   });
 }
+let counterObserver=null;
 function setupCounterObserver(){
   const c=document.querySelector('.i-counters');if(!c)return;
+  if(counterObserver) counterObserver.disconnect();
   let fired=false;
-  new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting&&!fired){fired=true;animateCounters();}});},{threshold:0.4}).observe(c);
+  counterObserver=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting&&!fired){fired=true;animateCounters();}});},{threshold:0.3});
+  counterObserver.observe(c);
 }
 
 // ── MORPH TRANSITION ─────────────────────────────────────
