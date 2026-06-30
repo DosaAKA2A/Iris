@@ -817,6 +817,9 @@ window.setIrisTheme = function(theme) {
     const el = document.getElementById(id);
     if (el) { el.style.transition = 'none'; el.style.opacity = '0'; }
   });
+  // Promo también se oculta al mismo tiempo
+  const promoEl = document.querySelector('.i-promo');
+  if (promoEl) { promoEl.style.transition = 'none'; promoEl.style.opacity = '0'; }
 
   // ── 3b. Aplicar clase del tema al iris YA — para que CSS logo funcione ─
   // (solo cambia colores CSS, el contenido se actualiza en el paso 7)
@@ -870,9 +873,9 @@ window.setIrisTheme = function(theme) {
     document.getElementById('nav-mid').textContent = d.navMid;
     document.getElementById('section-title').textContent = d.secTitle;
     document.getElementById('section-link').textContent = d.secLink;
-    // ── Promo banner: fade out → swap → fade in ─────────
+    // ── Promo banner: mismo timing que hero ─────────────
     const promoEl = document.querySelector('.i-promo');
-    if (promoEl) { promoEl.style.transition='opacity 0.2s ease'; promoEl.style.opacity='0'; }
+    if (promoEl) { promoEl.style.transition='none'; promoEl.style.opacity='0'; }
 
     setTimeout(() => {
       document.getElementById('promo-brand').innerHTML = d.promoBrand;
@@ -884,8 +887,8 @@ window.setIrisTheme = function(theme) {
       const pi=document.getElementById('promo-img'), pd=document.getElementById('promo-deco');
       if(d.promoImg){pi.src=d.promoImg;pi.style.display='block';if(pd)pd.style.display='none';}
       else{pi.style.display='none';if(pd)pd.style.display='block';}
-      if (promoEl) { promoEl.style.transition='opacity 0.35s ease'; promoEl.style.opacity='1'; }
-    }, 220);
+      if (promoEl) { promoEl.style.transition='opacity 0.25s ease'; promoEl.style.opacity='1'; }
+    }, 180);
     d.counters.forEach((c,i)=>{ const el=document.getElementById(`c${i+1}`),lel=document.getElementById(`cl${i+1}`); if(el){el.dataset.target=c.v;el.textContent='0';}if(lel)lel.innerHTML=c.l; });
     document.getElementById('info-tag').textContent = d.infoTag;
     document.getElementById('info-title').innerHTML = d.infoTitle;
