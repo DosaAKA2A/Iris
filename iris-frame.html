@@ -870,15 +870,22 @@ window.setIrisTheme = function(theme) {
     document.getElementById('nav-mid').textContent = d.navMid;
     document.getElementById('section-title').textContent = d.secTitle;
     document.getElementById('section-link').textContent = d.secLink;
-    document.getElementById('promo-brand').innerHTML = d.promoBrand;
-    document.getElementById('promo-tagline').textContent = d.promoTag;
-    document.getElementById('promo-offer-text').innerHTML = d.promoOffer;
-    document.getElementById('promo-cta').textContent = d.promoCta;
-    document.getElementById('promo-badges').innerHTML = d.promoPills.map(b=>`<span class="i-promo-badge-pill">${b}</span>`).join('');
-    document.getElementById('promo-badge').style.display=(theme==='dark')?'none':'flex';
-    const pi=document.getElementById('promo-img'), pd=document.getElementById('promo-deco');
-    if(d.promoImg){pi.src=d.promoImg;pi.style.display='block';if(pd)pd.style.display='none';}
-    else{pi.style.display='none';if(pd)pd.style.display='block';}
+    // ── Promo banner: fade out → swap → fade in ─────────
+    const promoEl = document.querySelector('.i-promo');
+    if (promoEl) { promoEl.style.transition='opacity 0.2s ease'; promoEl.style.opacity='0'; }
+
+    setTimeout(() => {
+      document.getElementById('promo-brand').innerHTML = d.promoBrand;
+      document.getElementById('promo-tagline').textContent = d.promoTag;
+      document.getElementById('promo-offer-text').innerHTML = d.promoOffer;
+      document.getElementById('promo-cta').textContent = d.promoCta;
+      document.getElementById('promo-badges').innerHTML = d.promoPills.map(b=>`<span class="i-promo-badge-pill">${b}</span>`).join('');
+      document.getElementById('promo-badge').style.display=(theme==='dark')?'none':'flex';
+      const pi=document.getElementById('promo-img'), pd=document.getElementById('promo-deco');
+      if(d.promoImg){pi.src=d.promoImg;pi.style.display='block';if(pd)pd.style.display='none';}
+      else{pi.style.display='none';if(pd)pd.style.display='block';}
+      if (promoEl) { promoEl.style.transition='opacity 0.35s ease'; promoEl.style.opacity='1'; }
+    }, 220);
     d.counters.forEach((c,i)=>{ const el=document.getElementById(`c${i+1}`),lel=document.getElementById(`cl${i+1}`); if(el){el.dataset.target=c.v;el.textContent='0';}if(lel)lel.innerHTML=c.l; });
     document.getElementById('info-tag').textContent = d.infoTag;
     document.getElementById('info-title').innerHTML = d.infoTitle;
