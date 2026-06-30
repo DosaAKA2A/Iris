@@ -220,22 +220,32 @@ html,body{width:100%;height:100%;overflow-x:hidden;overflow-y:auto}
 .theme-light .i-promo-tagline{color:rgba(255,255,255,.6);letter-spacing:.16em;border-left:2px solid rgba(255,220,80,.6);padding-left:8px;}
 .theme-gold .i-promo-tagline{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.18em;font-style:italic;}
 
-.i-promo-offer{display:flex;align-items:center;gap:16px;}
+.i-promo-offer{display:flex;align-items:flex-start;gap:16px;}
 .theme-dark .i-promo-offer{display:none;}
-/* Badge: solo para gold si aplica, en light lo ocultamos y usamos el texto */
-.i-promo-badge{display:none;}
-/* Diseño profesional del descuento para light: barra + porcentaje + texto */
 .theme-light .i-promo-offer{
-  border-left:3px solid rgba(255,220,80,.7);
-  padding-left:14px;
-  flex-direction:column;
-  align-items:flex-start;
-  gap:2px;
+  flex-direction:row;
+  align-items:center;
+  gap:20px;
+  padding:12px 16px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;
+  margin-top:4px;
 }
-.i-promo-offer-text{font-size:13px;font-weight:700;color:#fff;font-family:'Montserrat',sans-serif;letter-spacing:-.01em;}
-.i-promo-offer-text span{display:block;font-weight:400;font-size:11px;color:rgba(255,255,255,.6);margin-top:3px;letter-spacing:0;}
+/* Número grande como elemento visual */
+.theme-light .i-promo-offer::before{
+  content:'30%';
+  font-family:'Montserrat',sans-serif;
+  font-weight:900;
+  font-size:36px;
+  color:#fff;
+  line-height:1;
+  flex-shrink:0;
+  letter-spacing:-.03em;
+}
+.i-promo-offer-text{font-size:12px;font-weight:600;color:#fff;font-family:'Montserrat',sans-serif;letter-spacing:-.01em;}
+.i-promo-offer-text span{display:block;font-weight:400;font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;letter-spacing:0;}
 .theme-gold .i-promo-offer-text{font-family:'Cormorant Garamond',serif;font-size:14px;}
-.theme-light .i-promo-offer-text em{font-style:normal;color:rgba(255,220,80,.9);font-weight:800;font-size:15px;}
 
 .i-promo-badges{display:flex;gap:6px;flex-wrap:wrap;}
 .i-promo-badge-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:100px;padding:4px 10px;font-size:9px;font-weight:600;color:rgba(255,255,255,.8);letter-spacing:.04em;text-transform:uppercase;font-family:'Montserrat',sans-serif;}
@@ -414,7 +424,6 @@ html,body{width:100%;height:100%;overflow-x:hidden;overflow-y:auto}
     <div class="i-promo-tagline" id="promo-tagline"></div>
     <div class="i-promo-brand" id="promo-brand"></div>
     <div class="i-promo-offer">
-      <div class="i-promo-badge" id="promo-badge"><small>Hasta</small>30%<small>dcto.</small></div>
       <div class="i-promo-offer-text" id="promo-offer-text"></div>
     </div>
   </div>
@@ -508,7 +517,7 @@ const T = {
     secTitle:'Productos destacados',secLink:'Ver todos →',
     promoBrand:'NO<span class="accent">VO</span>',
     promoTag:'Refrigeración Comercial · Oficinas · Soporte 24/7',
-    promoOffer:'<em>Hasta 30% de ahorro</em> en sistemas de climatización<span>Instalación incluida · Financiamiento disponible · Sin coste de diagnóstico</span>',
+    promoOffer:'de descuento en climatización comercial<span>Instalación incluida · Financiamiento disponible · Sin coste de diagnóstico</span>',
     promoPills:['Instalación incluida','Inverter A+++','Mantenimiento'],
     promoCta:'Ver sistemas →',promoImg:'novo-img1.jpg',
     counters:[{v:210,l:'Empresas confían en<br>los sistemas NOVO'},{v:520,l:'Proyectos de climatización<br>completados'},{v:800,l:'Equipos en nuestro<br>portafolio técnico'}],
@@ -594,7 +603,7 @@ function apply(t){
   document.getElementById('promo-offer-text').innerHTML=d.promoOffer;
   document.getElementById('promo-cta').textContent=d.promoCta;
   document.getElementById('promo-badges').innerHTML=d.promoPills.map(b=>`<span class="i-promo-badge-pill">${b}</span>`).join('');
-  document.getElementById('promo-badge').style.display=(t==='dark')?'none':'flex';
+  // promo-badge removed
   const pi=document.getElementById('promo-img'),pd=document.getElementById('promo-deco');
   if(d.promoImg){pi.src=d.promoImg;pi.style.display='block';pd.style.display='none';}
   else{pi.style.display='none';pd.style.display='block';}
@@ -889,7 +898,7 @@ window.setIrisTheme = function(theme) {
       document.getElementById('promo-offer-text').innerHTML = d.promoOffer;
       document.getElementById('promo-cta').textContent = d.promoCta;
       document.getElementById('promo-badges').innerHTML = d.promoPills.map(b=>`<span class="i-promo-badge-pill">${b}</span>`).join('');
-      document.getElementById('promo-badge').style.display=(theme==='dark')?'none':'flex';
+      // promo-badge removed
       const pi=document.getElementById('promo-img'), pd=document.getElementById('promo-deco');
       if(d.promoImg){pi.src=d.promoImg;pi.style.display='block';if(pd)pd.style.display='none';}
       else{pi.style.display='none';if(pd)pd.style.display='block';}
