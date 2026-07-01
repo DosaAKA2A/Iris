@@ -22,11 +22,21 @@
   html{scroll-behavior:smooth;}
 
   body{
-    background:var(--white);
+    background:var(--carbon);
     color:var(--black);
     font-family:'Inter',sans-serif;
     -webkit-font-smoothing:antialiased;
     overflow-x:hidden;
+  }
+
+  /* ── Frame fijo 1920px (FHD) — no se estira en pantallas mayores ── */
+  #site-frame{
+    max-width:1920px;
+    width:100%;
+    margin:0 auto;
+    background:var(--white);
+    position:relative;
+    overflow:hidden;
   }
 
   .mono{
@@ -44,9 +54,9 @@
   .progress-line{
     position:fixed;
     top:0;
-    left:0;
+    left:max(0px, calc(50% - 960px));
     height:3px;
-    width:0%;
+    width:0;
     background:var(--red);
     z-index:1000;
     transition:width 0.05s linear;
@@ -56,8 +66,10 @@
   header{
     position:fixed;
     top:0;
-    left:0;
+    left:50%;
+    transform:translateX(-50%);
     width:100%;
+    max-width:1920px;
     padding:28px 48px;
     display:flex;
     justify-content:space-between;
@@ -316,6 +328,24 @@
 </head>
 <body>
 
+<script>
+(function() {
+  var key = 'velaroAccess';
+  var ok = false;
+  if (sessionStorage.getItem(key)) { ok = true; }
+  if (!ok) {
+    try {
+      var item = localStorage.getItem(key);
+      if (item) {
+        var data = JSON.parse(item);
+        if ((Date.now() - data.ts) < 86400000) { sessionStorage.setItem(key, '1'); ok = true; }
+      }
+    } catch(e) {}
+  }
+  if (!ok) window.location.href = 'index.html';
+})();
+</script>
+
 <div class="progress-line" id="progressLine"></div>
 
 <header>
@@ -327,6 +357,8 @@
     <a href="#specs">Ficha</a>
   </nav>
 </header>
+
+<div id="site-frame">
 
 <section class="hero">
   <div class="hero-copy">
@@ -424,6 +456,8 @@
   <div>ESTUDIO CONCEPTUAL, NO AFILIADO A DEUTSCHE BAHN AG</div>
 </footer>
 
+</div><!-- /site-frame -->
+
 <div class="build-note">
   BORRADOR EN CONSTRUCCIÓN — revisar hero, spec-strip y gallery. Sección 03 pendiente de contenido.
 </div>
@@ -432,7 +466,8 @@
   window.addEventListener('scroll', function(){
     var h = document.documentElement;
     var scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
-    document.getElementById('progressLine').style.width = scrolled + '%';
+    var frameWidth = Math.min(window.innerWidth, 1920);
+    document.getElementById('progressLine').style.width = (scrolled / 100 * frameWidth) + 'px';
   });
 </script>
 
