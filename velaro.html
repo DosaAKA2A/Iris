@@ -240,6 +240,62 @@
     .status-dot,.hero-badge{animation:none;}
   }
 
+  /* ---------- Word-reveal en títulos de sección (scroll-triggered) ---------- */
+  .word-title{
+    display:inline-block;
+    transform:translateY(110%);
+    animation:wordUpTitle .7s cubic-bezier(.16,.84,.44,1) forwards;
+    animation-play-state:paused;
+  }
+  .section-head.visible .word-title{animation-play-state:running;}
+  @keyframes wordUpTitle{to{transform:translateY(0);}}
+
+  /* ---------- Líneas que se dibujan (line-draw) ---------- */
+  .draw-line{
+    height:1px;
+    background:var(--hairline);
+    width:0;
+    transition:width 1s cubic-bezier(.4,0,.2,1) .15s;
+    margin:16px 0;
+  }
+  .reveal.visible .draw-line{width:100%;}
+
+  /* ---------- Marquee / ticker horizontal ---------- */
+  .marquee{
+    overflow:hidden;
+    white-space:nowrap;
+    border-top:1px solid var(--hairline);
+    border-bottom:1px solid var(--hairline);
+    padding:16px 0;
+    background:var(--carbon);
+  }
+  .marquee-track{
+    display:inline-flex;
+    gap:36px;
+    animation:marqueeScroll 24s linear infinite;
+  }
+  .marquee-track span{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.6);
+  }
+  .marquee-track span.accent{color:var(--red);}
+  @keyframes marqueeScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ---------- Spec-strip: reveal + count-up ---------- */
+  .spec-strip .reveal:nth-child(1){transition-delay:0s;}
+  .spec-strip .reveal:nth-child(2){transition-delay:0.08s;}
+  .spec-strip .reveal:nth-child(3){transition-delay:0.16s;}
+  .spec-strip .reveal:nth-child(4){transition-delay:0.24s;}
+
+  @media (prefers-reduced-motion: reduce){
+    .word-title{animation:none;transform:none;}
+    .draw-line{transition:none;width:100%;}
+    .marquee-track{animation:none;}
+  }
+
   /* ---------- SPEC STRIP ---------- */
   .spec-strip{
     display:grid;
@@ -933,19 +989,19 @@
 </section>
 
 <div class="spec-strip mono">
-  <div class="spec-item">
-    <div class="spec-value">300<span style="font-size:14px;color:var(--steel)"> km/h</span></div>
+  <div class="spec-item reveal">
+    <div class="spec-value"><span class="count" data-target="300">0</span><span style="font-size:14px;color:var(--steel)"> km/h</span></div>
     <div class="spec-label">Velocidad de servicio</div>
   </div>
-  <div class="spec-item">
-    <div class="spec-value">8.000<span style="font-size:14px;color:var(--steel)"> kW</span></div>
+  <div class="spec-item reveal">
+    <div class="spec-value"><span class="count" data-target="8000">0</span><span style="font-size:14px;color:var(--steel)"> kW</span></div>
     <div class="spec-label">Potencia de tracción</div>
   </div>
-  <div class="spec-item">
-    <div class="spec-value">200<span style="font-size:14px;color:var(--steel)"> m</span></div>
+  <div class="spec-item reveal">
+    <div class="spec-value"><span class="count" data-target="200">0</span><span style="font-size:14px;color:var(--steel)"> m</span></div>
     <div class="spec-label">Longitud de composición</div>
   </div>
-  <div class="spec-item">
+  <div class="spec-item reveal">
     <div class="spec-value">Al</div>
     <div class="spec-label">Carrocería, aluminio</div>
   </div>
@@ -955,7 +1011,7 @@
   <div class="section-head reveal">
     <div>
       <div class="section-number mono">01 — ESTUDIO</div>
-      <h2 class="section-title display">EL OBJETO</h2>
+      <h2 class="section-title display"><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">EL</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">OBJETO</span></span></h2>
     </div>
   </div>
   <div class="manifesto">
@@ -971,7 +1027,7 @@
   <div class="section-head reveal">
     <div>
       <div class="section-number mono">02 — ARCHIVO</div>
-      <h2 class="section-title display">EN ESTACIÓN</h2>
+      <h2 class="section-title display"><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">EN</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">ESTACIÓN</span></span></h2>
     </div>
   </div>
   <div class="gallery">
@@ -1002,35 +1058,46 @@
   </div>
 </section>
 
+<div class="marquee">
+  <div class="marquee-track">
+    <span>ICE 3</span><span class="accent">·</span><span>SIEMENS VELARO</span><span class="accent">·</span><span>CLASE 403</span><span class="accent">·</span><span>300 KM/H</span><span class="accent">·</span><span>TRACCIÓN DISTRIBUIDA</span><span class="accent">·</span>
+    <span>ICE 3</span><span class="accent">·</span><span>SIEMENS VELARO</span><span class="accent">·</span><span>CLASE 403</span><span class="accent">·</span><span>300 KM/H</span><span class="accent">·</span><span>TRACCIÓN DISTRIBUIDA</span><span class="accent">·</span>
+  </div>
+</div>
+
 <section id="specs">
   <div class="section-head reveal">
     <div>
       <div class="section-number mono">03 — ESPECIFICACIONES</div>
-      <h2 class="section-title display">CADA PIEZA<br>TIENE UN MOTIVO</h2>
+      <h2 class="section-title display"><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">CADA</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">PIEZA</span></span><br><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">TIENE</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">UN</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.1s">MOTIVO</span></span></h2>
     </div>
   </div>
   <div class="spec-cards">
     <div class="spec-card reveal">
       <div class="spec-card-num mono">01</div>
       <div class="spec-card-title">Aerodinámica</div>
+      <div class="draw-line"></div>
       <div class="spec-card-desc">El perfil del morro se alarga hacia el techo para evitar el "tunnel boom" — el estampido que produce el aire comprimido al entrar en un túnel a alta velocidad.</div>
       <div class="spec-card-value mono">Cd optimizado</div>
     </div>
     <div class="spec-card reveal">
       <div class="spec-card-num mono">02</div>
       <div class="spec-card-title">Tracción distribuida</div>
+      <div class="draw-line"></div>
       <div class="spec-card-desc">Sin locomotora: los motores viven bajo los bogies, repartidos a lo largo del tren. Todo el espacio, incluido el primer coche, queda libre para pasajeros.</div>
       <div class="spec-card-value mono">+20% espacio útil</div>
     </div>
     <div class="spec-card reveal">
       <div class="spec-card-num mono">03</div>
       <div class="spec-card-title">Frenado regenerativo</div>
+      <div class="draw-line"></div>
       <div class="spec-card-desc">La energía cinética de la frenada se devuelve a la catenaria en vez de disiparse como calor. Menos desgaste, menos consumo.</div>
       <div class="spec-card-value mono">−10% consumo</div>
     </div>
     <div class="spec-card reveal">
       <div class="spec-card-num mono">04</div>
       <div class="spec-card-title">Materiales</div>
+      <div class="draw-line"></div>
       <div class="spec-card-desc">Carrocería de aluminio: reduce el peso sin sacrificar rigidez estructural. Al final de su vida útil, la mayor parte del tren es reciclable.</div>
       <div class="spec-card-value mono">98% reciclable</div>
     </div>
@@ -1041,7 +1108,7 @@
   <div class="section-head reveal">
     <div>
       <div class="section-number mono">04 — RAZONES</div>
-      <h2 class="section-title display">POR QUÉ<br>ESTA FORMA</h2>
+      <h2 class="section-title display"><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">POR</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">QUÉ</span></span><br><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">ESTA</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">FORMA</span></span></h2>
     </div>
   </div>
   <div class="benefits">
@@ -1067,7 +1134,7 @@
   <div class="section-head reveal">
     <div>
       <div class="section-number mono">05 — VOCES TÉCNICAS</div>
-      <h2 class="section-title display">LECTURAS<br>DEL OBJETO</h2>
+      <h2 class="section-title display"><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">LECTURAS</span></span><br><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">DEL</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">OBJETO</span></span></h2>
     </div>
   </div>
   <div class="quotes">
@@ -1099,7 +1166,7 @@
   <div class="section-head reveal">
     <div>
       <div class="section-number mono">06 — CRÉDITOS</div>
-      <h2 class="section-title display">QUIÉN<br>LO HIZO</h2>
+      <h2 class="section-title display"><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">QUIÉN</span></span><br><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">LO</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">HIZO</span></span></h2>
     </div>
   </div>
   <div class="credits">
@@ -1130,7 +1197,7 @@
   <div class="section-head reveal">
     <div>
       <div class="section-number mono">07 — GENERACIONES</div>
-      <h2 class="section-title display">CUATRO<br>DECISIONES</h2>
+      <h2 class="section-title display"><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">CUATRO</span></span><br><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">DECISIONES</span></span></h2>
     </div>
   </div>
 
@@ -1198,7 +1265,7 @@
   <div class="section-head reveal">
     <div>
       <div class="section-number mono">08 — PREGUNTAS TÉCNICAS</div>
-      <h2 class="section-title display">DUDAS<br>FRECUENTES</h2>
+      <h2 class="section-title display"><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">DUDAS</span></span><br><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">FRECUENTES</span></span></h2>
     </div>
   </div>
   <div class="accordion reveal">
@@ -1229,7 +1296,7 @@
   <div class="section-head reveal">
     <div>
       <div class="section-number mono">09 — CRONOLOGÍA</div>
-      <h2 class="section-title display">LÍNEA DE<br>TIEMPO</h2>
+      <h2 class="section-title display"><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">LÍNEA</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">DE</span></span><br><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">TIEMPO</span></span></h2>
     </div>
   </div>
   <div class="timeline">
@@ -1357,6 +1424,36 @@
       heroImg.style.transform = 'translateY(' + (y * 0.15) + 'px) scale(1.08)';
     }
   });
+  // Count-up animado para los números del spec-strip
+  var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var countEls = document.querySelectorAll('.count');
+  function animateCount(el){
+    var target = parseFloat(el.getAttribute('data-target'), 10);
+    if(reducedMotion){ el.textContent = target.toLocaleString('de-DE'); return; }
+    var duration = 1300;
+    var start = null;
+    function step(ts){
+      if(!start) start = ts;
+      var progress = Math.min((ts - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var value = Math.round(target * eased);
+      el.textContent = value.toLocaleString('de-DE');
+      if(progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  if('IntersectionObserver' in window && countEls.length){
+    var countObserver = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          animateCount(entry.target);
+          countObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    countEls.forEach(function(el){ countObserver.observe(el); });
+  }
+
   // Reloj en vivo del hero (hora de Fráncfort)
   function updateHeroClock(){
     var el = document.getElementById('heroClock');
