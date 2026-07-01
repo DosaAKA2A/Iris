@@ -688,8 +688,11 @@
 
   .cards {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 14px;
+  }
+  @media (max-width: 1100px) {
+    .cards { grid-template-columns: 1fr 1fr; }
   }
 
   .card {
@@ -732,6 +735,18 @@
     background: rgba(63,185,80,0.12);
     bottom: -60px; left: -60px;
   }
+  /* Velaro — blanco / rojo */
+  .card--velaro {
+    border: 1px solid rgba(255,255,255,0.16);
+  }
+  .card--velaro:hover {
+    border-color: rgba(255,255,255,0.32);
+  }
+  .card--velaro .card-glow {
+    width: 240px; height: 240px;
+    background: rgba(231,19,26,0.16);
+    top: -60px; left: -60px;
+  }
 
   .card-num {
     font-size: 10px;
@@ -763,6 +778,10 @@
   .card--design .card-icon {
     background: rgba(63,185,80,0.08);
     border: 1px solid rgba(63,185,80,0.18);
+  }
+  .card--velaro .card-icon {
+    background: rgba(231,19,26,0.1);
+    border: 1px solid rgba(231,19,26,0.3);
   }
 
   .card-title {
@@ -812,6 +831,7 @@
   .card:hover .card-cta { gap: 13px; }
   .card--corlima .card-cta { color: var(--blue2); }
   .card--design  .card-cta { color: var(--green); }
+  .card--velaro  .card-cta { color: #E7131A; }
 
   .cta-arr {
     width: 26px; height: 26px;
@@ -1244,6 +1264,30 @@
         <span class="pill">ASCII Art</span>
         <span class="pill">Procesamiento</span>
         <span class="pill">Experimental</span>
+      </div>
+      <div class="card-cta">
+        Acceder
+        <span class="cta-arr">&#8599;</span>
+      </div>
+    </div>
+
+    <!-- VELARO — blanco / rojo -->
+    <div class="card card--velaro" onclick="window.location.href='velaro.html'">
+      <div class="card-glow"></div>
+      <div class="card-num">03</div>
+      <div class="card-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M4 15c0-5 3-9 8-9s8 4 8 9" stroke="#E7131A" stroke-width="1.4" stroke-linecap="round"/>
+          <path d="M4 15h16" stroke="#E7131A" stroke-width="1.4" stroke-linecap="round"/>
+          <path d="M3 18.5h18" stroke="#E7131A" stroke-width="1.4" stroke-linecap="round" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="card-title">403 / Velaro</div>
+      <div class="card-desc">Estudio conceptual del ICE 3 como objeto de diseño industrial: la forma que resulta de eliminar todo lo que no reduce la resistencia del aire.</div>
+      <div class="card-pills">
+        <span class="pill">Object Study</span>
+        <span class="pill">Diseño Industrial</span>
+        <span class="pill">Editorial</span>
       </div>
       <div class="card-cta">
         Acceder
