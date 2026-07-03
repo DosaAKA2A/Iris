@@ -98,10 +98,17 @@
   }
 
   /* ---------- HERO (split sidebar + imagen, estructura Rama) ---------- */
+  .hero-scrub-wrapper{
+    height:300vh;
+    position:relative;
+  }
+
   .hero{
     min-height:100vh;
+    height:100vh;
     display:flex;
-    position:relative;
+    position:sticky;
+    top:0;
     align-items:stretch;
     background:var(--white);
     border-bottom:1px solid var(--hairline);
@@ -204,14 +211,28 @@
     overflow:hidden;
   }
 
-  .hero-image img{
+  .hero-image canvas{
     width:100%;
     height:100%;
-    object-fit:cover;
-    object-position:center 22%;
+    display:block;
     filter:grayscale(20%) contrast(1.1) brightness(0.92);
-    transform:scale(1.04);
   }
+
+  .scrub-hint{
+    position:absolute;
+    bottom:28px;
+    right:28px;
+    font-size:10px;
+    letter-spacing:0.12em;
+    color:var(--white);
+    background:rgba(10,10,11,0.5);
+    backdrop-filter:blur(6px);
+    padding:8px 14px;
+    z-index:3;
+    opacity:1;
+    transition:opacity .4s ease;
+  }
+  .hero-scrub-wrapper.scrub-done .scrub-hint{opacity:0;}
 
   .hero-image::after{
     content:'';
@@ -862,7 +883,7 @@
   @keyframes fadeUp{to{opacity:1;transform:none;}}
 
   /* Parallax sutil en la imagen del hero */
-  .hero-image img{will-change:transform;}
+  .hero-image canvas{will-change:auto;}
 
   @media (prefers-reduced-motion: reduce){
     .reveal,.word,.hero-eyebrow,.hero-desc{
@@ -1066,6 +1087,9 @@
   @media (max-width:900px){
     .hero{clip-path:none;}
     .sec-watermark{display:none;}
+    .hero-scrub-wrapper{height:auto;}
+    .hero{position:relative;top:auto;height:auto;min-height:100vh;}
+    .scrub-hint{display:none;}
   }
   @media (max-width:900px){
     .hero{flex-direction:column;}
@@ -1153,6 +1177,7 @@
 
 <div id="site-frame">
 
+<div class="hero-scrub-wrapper">
 <section class="hero">
   <div class="hero-sidebar">
     <div class="hero-status">
@@ -1176,12 +1201,14 @@
     </div>
   </div>
   <div class="hero-image">
-    <img src="velaro-hero.jpg" alt="Morro del ICE 3 en andén, luz roja de posición encendida">
+    <canvas id="heroCanvas" aria-label="Video del ICE 3 controlado por scroll"></canvas>
+    <div class="scrub-hint mono">SCROLL PARA REPRODUCIR</div>
     <div class="hero-badge badge-1">ICE 3</div>
     <div class="hero-badge badge-2">DB · CLASE 403</div>
     <div class="stamp" style="top:56%;left:6%;">OBJETO<br>VERIFICADO<br>N.º 403</div>
   </div>
 </section>
+</div>
 
 <div class="spec-strip mono">
   <div class="spec-item reveal">
@@ -1641,17 +1668,68 @@
     revealItems.forEach(function(el){ el.classList.add('visible'); });
   }
 
-  // Parallax sutil en la imagen del hero
-  var heroImg = document.querySelector('.hero-image img');
-  window.addEventListener('scroll', function(){
-    if(!heroImg) return;
-    var y = window.scrollY;
-    if(y < window.innerHeight){
-      heroImg.style.transform = 'translateY(' + (y * 0.15) + 'px) scale(1.08)';
-    }
-  });
   // Count-up animado para los números del spec-strip
   var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Scroll-scrubbing del hero: dibuja el frame del video correspondiente al scroll
+  (function(){
+    var wrapper = document.querySelector('.hero-scrub-wrapper');
+    var canvas = document.getElementById('heroCanvas');
+    if(!wrapper || !canvas) return;
+    var ctx = canvas.getContext('2d');
+    var totalFrames = 60;
+    var frames = [];
+    var loaded = 0;
+    var currentIndex = -1;
+
+    function pad(n){ return String(n).padStart(3,'0'); }
+
+    for(var i = 1; i <= totalFrames; i++){
+      var img = new Image();
+      img.src = 'velaro-frame-' + pad(i) + '.jpg';
+      img.onload = function(){
+        loaded++;
+        if(loaded === 1) drawFrame(0);
+      };
+      frames.push(img);
+    }
+
+    function resizeCanvas(){
+      var rect = canvas.getBoundingClientRect();
+      var dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+    }
+
+    function drawFrame(index){
+      var img = frames[index];
+      if(!img || !img.complete || !img.naturalWidth) return;
+      resizeCanvas();
+      var cw = canvas.width, ch = canvas.height;
+      var iw = img.naturalWidth, ih = img.naturalHeight;
+      var scale = Math.max(cw / iw, ch / ih);
+      var dw = iw * scale, dh = ih * scale;
+      var dx = (cw - dw) / 2, dy = (ch - dh) / 2;
+      ctx.clearRect(0,0,cw,ch);
+      ctx.drawImage(img, dx, dy, dw, dh);
+      currentIndex = index;
+    }
+
+    function onScroll(){
+      var rect = wrapper.getBoundingClientRect();
+      var scrollable = wrapper.offsetHeight - window.innerHeight;
+      var progress = scrollable > 0 ? (-rect.top) / scrollable : 0;
+      progress = Math.min(1, Math.max(0, progress));
+      var index = Math.min(totalFrames - 1, Math.floor(progress * totalFrames));
+      if(index !== currentIndex) drawFrame(index);
+      wrapper.classList.toggle('scrub-done', progress > 0.03);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', function(){ drawFrame(Math.max(0,currentIndex)); });
+    onScroll();
+  })();
+
   var countEls = document.querySelectorAll('.count');
   function animateCount(el){
     var target = parseFloat(el.getAttribute('data-target'), 10);
