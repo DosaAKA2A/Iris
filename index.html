@@ -736,13 +736,13 @@
     bottom: -60px; left: -60px;
   }
   /* Velaro — blanco / rojo */
-  .card--velaro {
+  .card--spacio {
     border: 1px solid rgba(255,255,255,0.16);
   }
-  .card--velaro:hover {
+  .card--spacio:hover {
     border-color: rgba(255,255,255,0.32);
   }
-  .card--velaro .card-glow {
+  .card--spacio .card-glow {
     width: 240px; height: 240px;
     background: rgba(231,19,26,0.16);
     top: -60px; left: -60px;
@@ -779,7 +779,7 @@
     background: rgba(63,185,80,0.08);
     border: 1px solid rgba(63,185,80,0.18);
   }
-  .card--velaro .card-icon {
+  .card--spacio .card-icon {
     background: rgba(231,19,26,0.1);
     border: 1px solid rgba(231,19,26,0.3);
   }
@@ -831,7 +831,7 @@
   .card:hover .card-cta { gap: 13px; }
   .card--corlima .card-cta { color: var(--blue2); }
   .card--design  .card-cta { color: var(--green); }
-  .card--velaro  .card-cta { color: #E7131A; }
+  .card--spacio  .card-cta { color: #E7131A; }
 
   .cta-arr {
     width: 26px; height: 26px;
@@ -1272,7 +1272,7 @@
     </div>
 
     <!-- VELARO — blanco / rojo -->
-    <div class="card card--velaro" onclick="openModal('velaro')">
+    <div class="card card--spacio" onclick="openModal('spacio')">
       <div class="card-glow"></div>
       <div class="badge-lock">
         <svg width="9" height="11" viewBox="0 0 9 11" fill="none"><rect x="1" y="4.5" width="7" height="6" rx="1" stroke="currentColor" stroke-width="1"/><path d="M2.5 4.5V3a2 2 0 014 0v1.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
@@ -1281,16 +1281,16 @@
       <div class="card-num">03</div>
       <div class="card-icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M4 15c0-5 3-9 8-9s8 4 8 9" stroke="#E7131A" stroke-width="1.4" stroke-linecap="round"/>
-          <path d="M4 15h16" stroke="#E7131A" stroke-width="1.4" stroke-linecap="round"/>
-          <path d="M3 18.5h18" stroke="#E7131A" stroke-width="1.4" stroke-linecap="round" opacity="0.5"/>
+          <path d="M12 2c2.3 2.1 3.6 5.4 3.6 9 0 2-.4 3.8-1 5.3l-2.6 2.7-2.6-2.7c-.6-1.5-1-3.3-1-5.3 0-3.6 1.3-6.9 3.6-9z" stroke="#E7131A" stroke-width="1.4" stroke-linejoin="round"/>
+          <circle cx="12" cy="9.5" r="1.5" stroke="#E7131A" stroke-width="1.2"/>
+          <path d="M9 16.5l-2.2 3.8M15 16.5l2.2 3.8" stroke="#E7131A" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
         </svg>
       </div>
-      <div class="card-title">403 / Velaro</div>
-      <div class="card-desc">Estudio conceptual del ICE 3 como objeto de diseño industrial: la forma que resulta de eliminar todo lo que no reduce la resistencia del aire.</div>
+      <div class="card-title">SPACIO&#178;</div>
+      <div class="card-desc">Estudio conceptual de una nave de soporte vital autónoma: la forma que resulta de transportar oxígeno a través del vacío, sin nada de más.</div>
       <div class="card-pills">
         <span class="pill">Object Study</span>
-        <span class="pill">Diseño Industrial</span>
+        <span class="pill">Diseño Aeroespacial</span>
         <span class="pill">Editorial</span>
       </div>
       <div class="card-cta">
@@ -1389,16 +1389,16 @@
 </div>
 
 <!-- MODAL VELARO -->
-<div class="modal-overlay" id="modalVelaro">
+<div class="modal-overlay" id="modalSpacio">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('velaro')">&#215;</button>
-    <div class="modal-label">403 / Velaro</div>
+    <button class="modal-close" onclick="closeModal('spacio')">&#215;</button>
+    <div class="modal-label">SPACIO&#178;</div>
     <div class="modal-title">Acceso privado</div>
     <div class="modal-sub">Introduce el PIN para acceder al estudio.</div>
-    <input class="modal-input" type="password" inputmode="numeric" maxlength="6" id="pwdVelaro" placeholder="PIN"
-           onkeydown="if(event.key==='Enter') checkPwd('velaro')">
-    <div class="modal-err" id="errVelaro"></div>
-    <button class="modal-btn" onclick="checkPwd('velaro')">Entrar</button>
+    <input class="modal-input" type="password" inputmode="numeric" maxlength="6" id="pwdSpacio" placeholder="PIN"
+           onkeydown="if(event.key==='Enter') checkPwd('spacio')">
+    <div class="modal-err" id="errSpacio"></div>
+    <button class="modal-btn" onclick="checkPwd('spacio')">Entrar</button>
   </div>
 </div>
 
@@ -1427,17 +1427,17 @@ function setUnlocked(key) {
 const PASSWORDS = {
   corlima: 'Corlima2026',
   diseno:  'Socrates99@',
-  velaro:  '455211'
+  spacio:  '455211'
 };
 const DESTINATIONS = {
   corlima: 'herramientas_corlima.html',
   diseno:  'herramientas_diseno.html',
-  velaro:  'velaro.html?v=20260703f'
+  spacio:  'spacio2.html?v=20260703a'
 };
 const STORAGE_KEYS = {
   corlima: 'corlimaAccess',
   diseno:  'disenoAccess',
-  velaro:  'velaroAccess'
+  spacio:  'spacioAccess'
 };
 
 function openModal(which) {
