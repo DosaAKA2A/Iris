@@ -896,30 +896,60 @@
     letter-spacing:-0.04em;
   }
 
-  /* Cursor HUD tipo mira técnica sobre imágenes */
-  .hero-image, .gallery-item{cursor:none;}
-  #cursor-hud{
+  /* ---------- Cursor personalizado global: cruz → burbuja "VER" ---------- */
+  html.has-custom-cursor, html.has-custom-cursor *{cursor:none !important;}
+
+  #custom-cursor{
     position:fixed;
     top:0;left:0;
-    width:1px;height:1px;
+    width:0;height:0;
     pointer-events:none;
-    z-index:2000;
-    opacity:0;
-    transition:opacity .15s;
+    z-index:3000;
   }
-  #cursor-hud.active{opacity:1;}
-  #cursor-hud svg{position:absolute;top:-16px;left:-16px;}
-  #cursor-hud .coord{
+
+  .cursor-cross{
     position:absolute;
-    top:16px;left:16px;
+    top:0;left:0;
+    width:22px;height:22px;
+    transform:translate(-50%,-50%);
+    transition:opacity .15s ease, transform .15s ease;
+  }
+  .cursor-cross::before,.cursor-cross::after{
+    content:'';
+    position:absolute;
+    background:var(--red);
+  }
+  .cursor-cross::before{top:50%;left:0;width:100%;height:1.5px;transform:translateY(-50%);}
+  .cursor-cross::after{left:50%;top:0;height:100%;width:1.5px;transform:translateX(-50%);}
+
+  .cursor-bubble{
+    position:absolute;
+    top:0;left:0;
+    width:64px;height:64px;
+    border-radius:50%;
+    background:var(--red);
+    display:flex;
+    align-items:center;
+    justify-content:center;
     font-family:'IBM Plex Mono',monospace;
-    font-size:10px;
-    letter-spacing:0.03em;
-    color:var(--red);
-    white-space:nowrap;
-    background:rgba(250,250,248,0.92);
-    padding:3px 7px;
-    border:1px solid var(--red);
+    font-size:11.5px;
+    letter-spacing:0.06em;
+    color:var(--white);
+    opacity:0;
+    transform:translate(-50%,-50%) scale(0);
+    transition:opacity .2s ease, transform .28s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  #custom-cursor.active .cursor-cross{opacity:0;transform:translate(-50%,-50%) scale(0.4);}
+  #custom-cursor.active .cursor-bubble{opacity:1;transform:translate(-50%,-50%) scale(1);animation:bubblePulse 1.6s ease-in-out infinite;}
+
+  @keyframes bubblePulse{
+    0%,100%{transform:translate(-50%,-50%) scale(1);}
+    50%{transform:translate(-50%,-50%) scale(1.08);}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #custom-cursor.active .cursor-bubble{animation:none;}
   }
 
   /* Perforación tipo ticket en el marquee */
@@ -1493,15 +1523,9 @@
   BORRADOR EN CONSTRUCCIÓN — estructura completa (09 secciones) aplicada. Revisar copy y ajustar sección por sección.
 </div>
 
-<div id="cursor-hud">
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-    <circle cx="16" cy="16" r="10" stroke="#E7131A" stroke-width="1"/>
-    <line x1="16" y1="0" x2="16" y2="8" stroke="#E7131A" stroke-width="1"/>
-    <line x1="16" y1="24" x2="16" y2="32" stroke="#E7131A" stroke-width="1"/>
-    <line x1="0" y1="16" x2="8" y2="16" stroke="#E7131A" stroke-width="1"/>
-    <line x1="24" y1="16" x2="32" y2="16" stroke="#E7131A" stroke-width="1"/>
-  </svg>
-  <div class="coord mono" id="hudCoord">X:0000 Y:0000</div>
+<div id="custom-cursor">
+  <div class="cursor-cross"></div>
+  <div class="cursor-bubble mono">VER</div>
 </div>
 
 <script>
@@ -1581,24 +1605,28 @@
     countEls.forEach(function(el){ countObserver.observe(el); });
   }
 
-  // Cursor HUD técnico sobre imágenes
-  var hud = document.getElementById('cursor-hud');
-  var hudCoord = document.getElementById('hudCoord');
-  var hudTargets = document.querySelectorAll('.hero-image, .gallery-item');
-  if(hud && !reducedMotion){
+  // Cursor personalizado global: cruz → burbuja "VER" al pasar sobre elementos activos
+  (function(){
+    var isFinePointer = window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+    var cursor = document.getElementById('custom-cursor');
+    if(!isFinePointer || !cursor) return;
+
+    document.documentElement.classList.add('has-custom-cursor');
+
     document.addEventListener('mousemove', function(e){
-      hud.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)';
-      if(hudCoord){
-        var x = String(e.clientX).padStart(4,'0');
-        var y = String(e.clientY).padStart(4,'0');
-        hudCoord.textContent = 'X:' + x + ' Y:' + y;
-      }
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
     });
-    hudTargets.forEach(function(el){
-      el.addEventListener('mouseenter', function(){ hud.classList.add('active'); });
-      el.addEventListener('mouseleave', function(){ hud.classList.remove('active'); });
+
+    var interactiveSelector = 'a, button, .gallery-item, .spec-card, .quote-card, .credit-card, .gen-tab, .accordion-q, .hero-cta, [onclick]';
+    document.querySelectorAll(interactiveSelector).forEach(function(el){
+      el.addEventListener('mouseenter', function(){ cursor.classList.add('active'); });
+      el.addEventListener('mouseleave', function(){ cursor.classList.remove('active'); });
     });
-  }
+
+    document.addEventListener('mouseleave', function(){ cursor.style.opacity = '0'; });
+    document.addEventListener('mouseenter', function(){ cursor.style.opacity = '1'; });
+  })();
 
   // Reloj en vivo del hero (hora de Fráncfort)
   function updateHeroClock(){
