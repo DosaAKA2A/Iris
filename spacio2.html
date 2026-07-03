@@ -424,8 +424,35 @@
   /* ---------- MANIFESTO ---------- */
   .manifesto{
     display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:80px;
+    grid-template-columns:0.85fr 0.85fr 0.7fr;
+    gap:56px;
+    align-items:start;
+  }
+
+  .manifesto-figure{
+    position:relative;
+  }
+  .manifesto-figure img{
+    width:100%;
+    height:auto;
+    display:block;
+    aspect-ratio:2/3;
+    object-fit:contain;
+    background:var(--white);
+    border:1px solid var(--hairline);
+  }
+  .manifesto-figure-caption{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    color:var(--steel);
+    margin-top:10px;
+    text-transform:uppercase;
+  }
+
+  @media (max-width:1100px){
+    .manifesto{grid-template-columns:1fr 1fr;}
+    .manifesto-figure{grid-column:1/3;max-width:320px;}
   }
 
   .manifesto-lead{
@@ -457,10 +484,10 @@
 
   .gallery-parallax{
     position:absolute;
-    top:-15%;
+    top:-32%;
     left:0;
     width:100%;
-    height:130%;
+    height:164%;
     will-change:transform;
   }
 
@@ -468,7 +495,7 @@
     width:100%;
     height:100%;
     object-fit:cover;
-    filter:grayscale(30%);
+    filter:grayscale(8%);
     transition:filter 0.4s ease, transform 0.6s ease;
     display:block;
   }
@@ -480,10 +507,8 @@
 
   .gallery-item.g1{grid-column:1/4;grid-row:1/5;}
   .gallery-item.g2{grid-column:4/7;grid-row:1/3;}
-  .gallery-item.g3{grid-column:4/6;grid-row:3/5;}
-  .gallery-item.g4{grid-column:6/7;grid-row:3/5;}
-  .gallery-item.g5{grid-column:1/3;grid-row:5/8;}
-  .gallery-item.g6{grid-column:3/7;grid-row:5/8;}
+  .gallery-item.g3{grid-column:4/7;grid-row:3/5;}
+  .gallery-item.g4{grid-column:1/7;grid-row:5/7;}
 
   .gallery-caption{
     position:absolute;
@@ -646,12 +671,42 @@
   }
 
   /* ---------- 06 · CRÉDITOS (Team) ---------- */
+  .credits-layout{
+    display:grid;
+    grid-template-columns:0.55fr 1.45fr;
+    gap:56px;
+    align-items:start;
+  }
+
+  .credits-figure img{
+    width:100%;
+    height:auto;
+    display:block;
+    aspect-ratio:3/4;
+    object-fit:contain;
+    background:var(--white);
+    border:1px solid var(--hairline);
+  }
+  .credits-figure-caption{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    color:var(--steel);
+    margin-top:10px;
+    text-transform:uppercase;
+  }
+
   .credits{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(2,1fr);
     gap:1px;
     background:var(--hairline);
     border:1px solid var(--hairline);
+  }
+
+  @media (max-width:1100px){
+    .credits-layout{grid-template-columns:1fr;}
+    .credits-figure{max-width:280px;}
   }
 
   .credit-card{
@@ -1352,6 +1407,10 @@
       <p>SPACIO² elimina lo que no es carga: sin cabinas, sin ventanas, sin espacio habitable. Cada metro cúbico del casco es tanque o estructura. La forma no es estilo — es la consecuencia directa de mover 2,4 millones de litros de oxígeno líquido a través del vacío interestelar, minimizando la sección expuesta a radiación y micrometeoritos.</p>
       <p>Este estudio documenta esa lógica: superficies que existen porque tienen una función, un rojo que aparece solo donde señala algo activo, y un blanco que es en realidad la aleación de titanio-grafeno vista de cerca.</p>
     </div>
+    <div class="manifesto-figure reveal">
+      <img src="spacio-scan1.jpg" alt="Lanzador vertical, referencia de archivo del programa ARCA">
+      <div class="manifesto-figure-caption">ARCHIVO — REFERENCIA ARCA-01</div>
+    </div>
   </div>
 </section>
 
@@ -1365,26 +1424,18 @@
   </div>
   <div class="gallery">
     <div class="gallery-item g1 reveal">
-      <div class="gallery-parallax"><img src="spacio-scan1.jpg" alt="Lanzador vertical de referencia, archivo del programa"></div>
-      <div class="gallery-caption mono">ARCHIVO — REFERENCIA ARCA-01</div>
-    </div>
-    <div class="gallery-item g2 reveal">
       <div class="gallery-parallax"><img src="spacio-scan4.jpg" alt="Detalle de turbina de propulsión"></div>
       <div class="gallery-caption mono">TELEMETRÍA — PROPULSIÓN</div>
     </div>
-    <div class="gallery-item g3 reveal">
+    <div class="gallery-item g2 reveal">
       <div class="gallery-parallax"><img src="spacio-scan3.jpg" alt="Inspección de motor previo al lanzamiento"></div>
       <div class="gallery-caption mono">INSPECCIÓN — PREVUELO</div>
     </div>
-    <div class="gallery-item g4 reveal">
-      <div class="gallery-parallax"><img src="spacio-scan2.jpg" alt="Ensamblaje de lanzador en bahía de carga"></div>
-      <div class="gallery-caption mono">ENSAMBLAJE — BAHÍA DE CARGA</div>
-    </div>
-    <div class="gallery-item g5 reveal">
+    <div class="gallery-item g3 reveal">
       <div class="gallery-parallax"><img src="spacio-scan5.jpg" alt="Torre de enlace de telemetría orbital"></div>
       <div class="gallery-caption mono">ENLACE — TELEMETRÍA ORBITAL</div>
     </div>
-    <div class="gallery-item g6 reveal">
+    <div class="gallery-item g4 reveal">
       <div class="gallery-parallax"><img src="spacio-scan6.jpg" alt="Antena de recepción en Estación Helion"></div>
       <div class="gallery-caption mono">RECEPCIÓN — ESTACIÓN HELION</div>
     </div>
@@ -1393,8 +1444,10 @@
 
 <div class="marquee">
   <div class="marquee-track">
-    <span>SPACIO&#178;</span><span class="accent">·</span><span>PROGRAMA ARCA</span><span class="accent">·</span><span>CLASE MERIDIAN</span><span class="accent">·</span><span>0,12C</span><span class="accent">·</span><span>PROPULSIÓN DE FUSIÓN PULSADA</span><span class="accent">·</span>
-    <span>SPACIO&#178;</span><span class="accent">·</span><span>PROGRAMA ARCA</span><span class="accent">·</span><span>CLASE MERIDIAN</span><span class="accent">·</span><span>0,12C</span><span class="accent">·</span><span>PROPULSIÓN DE FUSIÓN PULSADA</span><span class="accent">·</span>
+    <span>SPACIO&#178;</span><span class="accent">·</span><span>PROGRAMA ARCA</span><span class="accent">·</span><span>CLASE MERIDIAN</span><span class="accent">·</span><span>0,12C</span><span class="accent">·</span>
+    <span>SPACIO&#178;</span><span class="accent">·</span><span>PROGRAMA ARCA</span><span class="accent">·</span><span>CLASE MERIDIAN</span><span class="accent">·</span><span>0,12C</span><span class="accent">·</span>
+    <span>SPACIO&#178;</span><span class="accent">·</span><span>PROGRAMA ARCA</span><span class="accent">·</span><span>CLASE MERIDIAN</span><span class="accent">·</span><span>0,12C</span><span class="accent">·</span>
+    <span>SPACIO&#178;</span><span class="accent">·</span><span>PROGRAMA ARCA</span><span class="accent">·</span><span>CLASE MERIDIAN</span><span class="accent">·</span><span>0,12C</span><span class="accent">·</span>
   </div>
 </div>
 
@@ -1506,7 +1559,12 @@
       <h2 class="section-title display"><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">QUIÉN</span></span><br><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">LO</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">HIZO</span></span></h2>
     </div>
   </div>
-  <div class="credits">
+  <div class="credits-layout">
+    <div class="credits-figure reveal">
+      <img src="spacio-scan2.jpg" alt="Ensamblaje de lanzador en bahía de carga, referencia de archivo">
+      <div class="credits-figure-caption">ENSAMBLAJE — BAHÍA DE CARGA</div>
+    </div>
+    <div class="credits">
     <div class="credit-card reveal">
       <div class="credit-role mono">Diseño exterior</div>
       <div class="credit-name">Kessler & Vann</div>
@@ -1526,6 +1584,7 @@
       <div class="credit-role mono">Operador</div>
       <div class="credit-name">Programa ARCA</div>
       <div class="credit-desc">Opera la flota de transporte de soporte vital entre Estación Helion y las bases de la galaxia exterior.</div>
+    </div>
     </div>
   </div>
 </section>
@@ -1880,7 +1939,7 @@
         var rect = parent.getBoundingClientRect();
         var center = rect.top + rect.height/2;
         var progress = (center - vh/2) / (vh/2 + rect.height/2);
-        var maxShift = rect.height * 0.12;
+        var maxShift = rect.height * 0.30;
         var shift = Math.max(-maxShift, Math.min(maxShift, -progress * maxShift));
         el.style.transform = 'translateY(' + shift.toFixed(1) + 'px)';
       });
