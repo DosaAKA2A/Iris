@@ -105,7 +105,7 @@
     align-items:stretch;
     background:var(--white);
     border-bottom:1px solid var(--hairline);
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 64px));
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 44px));
     overflow:hidden;
   }
 
@@ -125,8 +125,8 @@
     z-index:1;
     pointer-events:none;
     background:
-      linear-gradient(180deg, transparent 62%, rgba(250,250,248,0.55) 85%, var(--white) 100%),
-      linear-gradient(90deg, rgba(250,250,248,0.25) 0%, transparent 10%, transparent 90%, rgba(250,250,248,0.25) 100%);
+      linear-gradient(180deg, transparent 42%, rgba(250,250,248,0.6) 65%, rgba(250,250,248,0.92) 80%, var(--white) 90%),
+      linear-gradient(90deg, rgba(250,250,248,0.3) 0%, transparent 12%, transparent 88%, rgba(250,250,248,0.3) 100%);
   }
 
   /* ---------- Liquid glass sidebar ---------- */
@@ -140,14 +140,15 @@
     position:relative;
     z-index:3;
     background:
-      linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.32) 100%);
-    backdrop-filter:blur(20px) saturate(160%);
-    -webkit-backdrop-filter:blur(20px) saturate(160%);
-    border-right:1px solid rgba(255,255,255,0.6);
+      linear-gradient(155deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.38) 45%, rgba(255,255,255,0.3) 100%);
+    backdrop-filter:blur(28px) saturate(180%);
+    -webkit-backdrop-filter:blur(28px) saturate(180%);
+    border-right:1px solid rgba(255,255,255,0.7);
     box-shadow:
-      inset 1px 0 0 rgba(255,255,255,0.8),
-      inset -40px 0 60px -40px rgba(255,255,255,0.4),
-      inset 0 -1px 0 rgba(10,10,11,0.04);
+      inset 1px 0 0 rgba(255,255,255,0.9),
+      inset -50px 0 70px -45px rgba(255,255,255,0.55),
+      inset 0 1px 0 rgba(255,255,255,0.5),
+      inset 0 -1px 0 rgba(10,10,11,0.05);
   }
   .hero-sidebar::before{
     content:'';
@@ -475,6 +476,25 @@
   }
 
   .gallery-item:hover .gallery-caption{opacity:1;}
+
+  .gallery-placeholder{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 10px),
+      var(--carbon);
+    border:1px dashed rgba(255,255,255,0.18);
+  }
+  .gallery-placeholder span{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    color:rgba(255,255,255,0.4);
+    text-transform:uppercase;
+  }
 
   /* ---------- 03 · SPEC CARDS (Services) ---------- */
   .spec-cards{
@@ -1242,7 +1262,6 @@
       <div class="tm-row"><span class="tm-label">O&#8322; CARGA</span><span>2,4M L</span></div>
       <div class="tm-row"><span class="tm-label">RUMBO</span><span>KESS-9B</span></div>
     </div>
-    <div class="hero-badge badge-1">SPACIO&#178;</div>
     <div class="hero-badge badge-2">ARCA · CLASE MERIDIAN</div>
     <div class="stamp" style="top:56%;left:6%;">TRÁNSITO<br>VERIFICADO<br>ARCA-02</div>
   </div>
@@ -1294,27 +1313,27 @@
   </div>
   <div class="gallery">
     <div class="gallery-item g1 reveal">
-      <img src="spacio-scan1.jpg" alt="Escaneo de casco, sector de proa">
+      <div class="gallery-placeholder"><span>Imagen pendiente</span></div>
       <div class="gallery-caption mono">ESCANEO DE CASCO — SECTOR 04</div>
     </div>
     <div class="gallery-item g2 reveal">
-      <img src="spacio-scan2.jpg" alt="Telemetría de propulsión">
+      <div class="gallery-placeholder"><span>Imagen pendiente</span></div>
       <div class="gallery-caption mono">TELEMETRÍA — PROPULSIÓN</div>
     </div>
     <div class="gallery-item g3 reveal">
-      <img src="spacio-scan3.jpg" alt="Diagnóstico térmico del blindaje">
+      <div class="gallery-placeholder"><span>Imagen pendiente</span></div>
       <div class="gallery-caption mono">DIAGNÓSTICO — BLINDAJE TÉRMICO</div>
     </div>
     <div class="gallery-item g4 reveal">
-      <img src="spacio-scan4.jpg" alt="Detalle de la aleación del casco">
+      <div class="gallery-placeholder"><span>Imagen pendiente</span></div>
       <div class="gallery-caption mono">DETALLE — ALEACIÓN TI-G</div>
     </div>
     <div class="gallery-item g5 reveal">
-      <img src="spacio-scan5.jpg" alt="Patrón de radiación en el campo de navegación">
+      <div class="gallery-placeholder"><span>Imagen pendiente</span></div>
       <div class="gallery-caption mono">CAMPO DE NAVEGACIÓN</div>
     </div>
     <div class="gallery-item g6 reveal">
-      <img src="spacio-scan6.jpg" alt="Superficie del tanque de oxígeno">
+      <div class="gallery-placeholder"><span>Imagen pendiente</span></div>
       <div class="gallery-caption mono">TANQUE DE O&#8322; — EXTERIOR</div>
     </div>
   </div>
