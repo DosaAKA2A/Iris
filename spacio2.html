@@ -471,9 +471,9 @@
   /* ---------- GALLERY ---------- */
   .gallery{
     display:grid;
-    grid-template-columns:repeat(6,1fr);
-    grid-auto-rows:120px;
-    gap:2px;
+    grid-template-columns:repeat(12,1fr);
+    gap:8px;
+    align-items:start;
   }
 
   .gallery-item{
@@ -505,10 +505,19 @@
     transform:scale(1.04);
   }
 
-  .gallery-item.g1{grid-column:1/4;grid-row:1/5;}
-  .gallery-item.g2{grid-column:4/7;grid-row:1/3;}
-  .gallery-item.g3{grid-column:4/7;grid-row:3/5;}
-  .gallery-item.g4{grid-column:1/7;grid-row:5/7;}
+  /* Cada placa fija su propia proporción: la imagen nunca se estira
+     ni se fuerza más allá de su resolución. Los offsets dan la deriva editorial. */
+  .gallery-item.g1{grid-column:span 5;aspect-ratio:4/5;}
+  .gallery-item.g2{grid-column:span 7;aspect-ratio:16/9;margin-top:72px;}
+  .gallery-item.g3{grid-column:span 4;aspect-ratio:3/4;}
+  .gallery-item.g4{grid-column:span 4;aspect-ratio:1/1;margin-top:48px;}
+  .gallery-item.g5{grid-column:span 4;aspect-ratio:4/5;margin-top:96px;}
+  /* etiqueta de proporción siempre visible en la placa vacía */
+  .gallery-ratio{
+    position:absolute;top:14px;left:14px;z-index:2;
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.1em;
+    color:var(--red);
+  }
 
   .gallery-caption{
     position:absolute;
@@ -1254,8 +1263,8 @@
     .spec-item:nth-child(3){border-left:none;}
     section{padding:80px 24px;}
     .manifesto{grid-template-columns:1fr;gap:32px;}
-    .gallery{grid-template-columns:repeat(2,1fr);grid-auto-rows:160px;}
-    .gallery-item.g1,.gallery-item.g2,.gallery-item.g3,.gallery-item.g4,.gallery-item.g5,.gallery-item.g6{grid-column:auto;grid-row:auto;}
+    .gallery{grid-template-columns:1fr;gap:8px;}
+    .gallery-item.g1,.gallery-item.g2,.gallery-item.g3,.gallery-item.g4,.gallery-item.g5,.gallery-item.g6{grid-column:auto;margin-top:0;}
     .spec-cards{grid-template-columns:1fr 1fr;}
     .benefits{grid-template-columns:1fr;}
     .benefit{border-right:none;border-bottom:1px solid var(--hairline);padding:32px 0;}
@@ -1422,21 +1431,34 @@
       <h2 class="section-title display"><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">EN</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">TRÁNSITO</span></span></h2>
     </div>
   </div>
+  <!-- Cada placa está bloqueada a una proporción fija. Cuando tengas la imagen,
+       reemplaza el bloque .gallery-placeholder por:
+       <div class="gallery-parallax"><img src="TU-IMAGEN.jpg" alt="descripción"></div>
+       La imagen llenará la placa por 'cover' sin estirarse. -->
   <div class="gallery">
     <div class="gallery-item g1 reveal">
-      <div class="gallery-parallax"><img src="spacio-scan4.jpg" alt="Detalle de turbina de propulsión"></div>
+      <span class="gallery-ratio">4:5</span>
+      <div class="gallery-placeholder"><span>ARCHIVO · A-01<br>RATIO 4:5 · ~1080 × 1350</span></div>
       <div class="gallery-caption mono">TELEMETRÍA — PROPULSIÓN</div>
     </div>
     <div class="gallery-item g2 reveal">
-      <div class="gallery-parallax"><img src="spacio-scan3.jpg" alt="Inspección de motor previo al lanzamiento"></div>
-      <div class="gallery-caption mono">INSPECCIÓN — PREVUELO</div>
+      <span class="gallery-ratio">16:9</span>
+      <div class="gallery-placeholder"><span>ARCHIVO · A-02<br>RATIO 16:9 · ~1600 × 900</span></div>
+      <div class="gallery-caption mono">APROXIMACIÓN — BASE MERIDIAN</div>
     </div>
     <div class="gallery-item g3 reveal">
-      <div class="gallery-parallax"><img src="spacio-scan5.jpg" alt="Torre de enlace de telemetría orbital"></div>
-      <div class="gallery-caption mono">ENLACE — TELEMETRÍA ORBITAL</div>
+      <span class="gallery-ratio">3:4</span>
+      <div class="gallery-placeholder"><span>ARCHIVO · A-03<br>RATIO 3:4 · ~1080 × 1440</span></div>
+      <div class="gallery-caption mono">INSPECCIÓN — PREVUELO</div>
     </div>
     <div class="gallery-item g4 reveal">
-      <div class="gallery-parallax"><img src="spacio-scan6.jpg" alt="Antena de recepción en Estación Helion"></div>
+      <span class="gallery-ratio">1:1</span>
+      <div class="gallery-placeholder"><span>ARCHIVO · A-04<br>RATIO 1:1 · ~1080 × 1080</span></div>
+      <div class="gallery-caption mono">ENLACE — TELEMETRÍA ORBITAL</div>
+    </div>
+    <div class="gallery-item g5 reveal">
+      <span class="gallery-ratio">4:5</span>
+      <div class="gallery-placeholder"><span>ARCHIVO · A-05<br>RATIO 4:5 · ~1080 × 1350</span></div>
       <div class="gallery-caption mono">RECEPCIÓN — ESTACIÓN HELION</div>
     </div>
   </div>
