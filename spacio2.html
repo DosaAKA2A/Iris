@@ -1121,13 +1121,6 @@
   .gallery-item.reveal:nth-child(5){transition-delay:0.24s;}
   .gallery-item.reveal:nth-child(6){transition-delay:0.3s;}
 
-  .timeline-item.reveal:nth-child(1){transition-delay:0s;}
-  .timeline-item.reveal:nth-child(2){transition-delay:0.05s;}
-  .timeline-item.reveal:nth-child(3){transition-delay:0.1s;}
-  .timeline-item.reveal:nth-child(4){transition-delay:0.15s;}
-  .timeline-item.reveal:nth-child(5){transition-delay:0.2s;}
-  .timeline-item.reveal:nth-child(6){transition-delay:0.25s;}
-  .timeline-item.reveal:nth-child(7){transition-delay:0.3s;}
 
   /* Reveal de palabras del titular hero, al cargar la página */
   .word-wrap{display:inline-block;overflow:hidden;vertical-align:top;}
@@ -1392,6 +1385,59 @@
     color:var(--steel);
   }
 
+
+  /* ---------- LOADING SCREEN ---------- */
+  #load-screen{
+    position:fixed;inset:0;z-index:9999;
+    background:var(--carbon);
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    gap:32px;
+    transition:opacity .7s ease, visibility .7s ease;
+  }
+  #load-screen.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+  .load-logo{
+    font-family:'Archivo Expanded',sans-serif;
+    font-weight:900;font-size:clamp(2rem,8vw,5.5rem);
+    letter-spacing:-.04em;color:var(--white);
+    opacity:0;transform:translateY(14px);
+    animation:loadIn .6s cubic-bezier(.16,1,.3,1) .1s forwards;
+  }
+  .load-logo sup{font-size:.45em;vertical-align:super;}
+  .load-bar-wrap{
+    width:min(260px,60vw);height:1px;
+    background:rgba(255,255,255,.15);
+    overflow:hidden;opacity:0;animation:loadIn .4s ease .3s forwards;
+  }
+  .load-bar{height:100%;width:0%;background:var(--red);
+    transition:width .9s cubic-bezier(.16,1,.3,1);}
+  .load-status{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;
+    letter-spacing:.08em;text-transform:uppercase;
+    color:rgba(255,255,255,.35);
+    opacity:0;animation:loadIn .4s ease .4s forwards;
+  }
+  @keyframes loadIn{to{opacity:1;transform:translateY(0px);}}
+
+  /* ---------- PARALLAX FIGURES ---------- */
+  .parallax-figure{position:relative;overflow:hidden;border-radius:2px;}
+  .parallax-figure img{
+    width:100%;display:block;will-change:transform;
+    transform:scale(1.18) translateY(0px);
+  }
+
+  /* ---------- TIMELINE SCROLL-DRIVEN ---------- */
+  .timeline-item{
+    opacity:0;transform:translateX(24px);
+    transition:opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+  }
+  .timeline-item.tl-visible{opacity:1;transform:translateX(0);}
+  @media(prefers-reduced-motion:reduce){
+    #load-screen{transition:none;}
+    .parallax-figure img{transform:scale(1)!important;}
+    .timeline-item{opacity:1!important;transform:none!important;}
+  }
+
   /* ---------- PLACEHOLDER NOTE ---------- */
   .build-note{
     position:fixed;
@@ -1410,6 +1456,12 @@
 </style>
 </head>
 <body>
+
+<div id="load-screen" aria-hidden="true">
+  <div class="load-logo">SPACIO<sup>²</sup></div>
+  <div class="load-bar-wrap"><div class="load-bar" id="loadBar"></div></div>
+  <div class="load-status" id="loadStatus">Iniciando sistema</div>
+</div>
 
 <script>
 (function() {
@@ -1519,7 +1571,7 @@
       <p>SPACIO² elimina lo que no es carga: sin cabinas, sin ventanas, sin espacio habitable. Cada metro cúbico del casco es tanque o estructura. La forma no es estilo — es la consecuencia directa de mover 2,4 millones de litros de oxígeno líquido a través del vacío interestelar, minimizando la sección expuesta a radiación y micrometeoritos.</p>
       <p>Este estudio documenta esa lógica: superficies que existen porque tienen una función, un rojo que aparece solo donde señala algo activo, y un blanco que es en realidad la aleación de titanio-grafeno vista de cerca.</p>
     </div>
-    <div class="manifesto-figure reveal">
+    <div class="manifesto-figure reveal parallax-figure" id="plx1">
       <img src="spacio-scan1.jpg" alt="Lanzador vertical, referencia de archivo del programa ARCA">
       <div class="manifesto-figure-caption">ARCHIVO — REFERENCIA ARCA-01</div>
     </div>
@@ -1704,7 +1756,7 @@
     </div>
   </div>
   <div class="credits-layout">
-    <div class="credits-figure reveal">
+    <div class="credits-figure reveal parallax-figure" id="plx2">
       <img src="spacio-scan2.jpg" alt="Ensamblaje de lanzador en bahía de carga, referencia de archivo">
       <div class="credits-figure-caption">ENSAMBLAJE — BAHÍA DE CARGA</div>
     </div>
@@ -2157,6 +2209,160 @@
   }
   updateHeroClock();
   setInterval(updateHeroClock, 30000);
+
+  // ══════════════════════════════════════════
+  // AUDIO ENGINE (Web Audio API — sin archivos)
+  // ══════════════════════════════════════════
+  var _audioCtx = null;
+  function getAudio(){
+    if(!_audioCtx) _audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    if(_audioCtx.state === 'suspended') _audioCtx.resume();
+    return _audioCtx;
+  }
+
+  // Tono de acceso — sine sweep 220→440 Hz (gate abierto / loading complete)
+  function sndAccess(){
+    try{
+      var c=getAudio(), o=c.createOscillator(), g=c.createGain();
+      o.connect(g); g.connect(c.destination);
+      o.type='sine';
+      o.frequency.setValueAtTime(220, c.currentTime);
+      o.frequency.exponentialRampToValueAtTime(440, c.currentTime+0.16);
+      g.gain.setValueAtTime(0.16, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+0.24);
+      o.start(); o.stop(c.currentTime+0.25);
+    }catch(e){}
+  }
+
+  // Cursor → pill VER (morph tone 600→820 Hz muy suave)
+  function sndCursorMorph(){
+    try{
+      var c=getAudio(), o=c.createOscillator(), g=c.createGain();
+      o.connect(g); g.connect(c.destination);
+      o.type='sine';
+      o.frequency.setValueAtTime(580, c.currentTime);
+      o.frequency.linearRampToValueAtTime(820, c.currentTime+0.14);
+      g.gain.setValueAtTime(0.055, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+0.17);
+      o.start(); o.stop(c.currentTime+0.18);
+    }catch(e){}
+  }
+
+  // ══════════════════════════════════════════
+  // LOADING SCREEN
+  // ══════════════════════════════════════════
+  (function(){
+    var screen = document.getElementById('load-screen');
+    var bar    = document.getElementById('loadBar');
+    var status = document.getElementById('loadStatus');
+    if(!screen) return;
+
+    var messages = ['Iniciando sistema','Verificando acceso','Cargando archivo'];
+    var mi = 0;
+    var msgInterval = setInterval(function(){
+      mi = (mi+1) % messages.length;
+      if(status) status.textContent = messages[mi];
+    }, 500);
+
+    // Arrancar barra tras pintar primer frame
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        if(bar) bar.style.width = '100%';
+      });
+    });
+
+    // Dismiss tras 1.1s (barra llena) + sonido
+    setTimeout(function(){
+      clearInterval(msgInterval);
+      if(status) status.textContent = 'Acceso confirmado';
+      sndAccess();
+      setTimeout(function(){
+        screen.classList.add('hidden');
+      }, 300);
+    }, 1100);
+  })();
+
+  // ══════════════════════════════════════════
+  // PARALLAX EN FIGURAS (manifesto + créditos)
+  // ══════════════════════════════════════════
+  (function(){
+    if(reducedMotion) return;
+    var figures = Array.prototype.slice.call(document.querySelectorAll('.parallax-figure'));
+    if(!figures.length) return;
+    var ticking = false;
+    function update(){
+      var vh = window.innerHeight;
+      figures.forEach(function(fig){
+        var img = fig.querySelector('img');
+        if(!img) return;
+        var rect = fig.getBoundingClientRect();
+        // progreso: -1 (sobre viewport) → 0 (centrado) → +1 (bajo viewport)
+        var progress = (rect.top + rect.height/2 - vh/2) / (vh/2 + rect.height/2);
+        var shift = Math.max(-12, Math.min(12, progress * 14));
+        img.style.transform = 'scale(1.18) translateY(' + shift.toFixed(2) + '%)';
+      });
+      ticking = false;
+    }
+    window.addEventListener('scroll', function(){
+      if(!ticking){ requestAnimationFrame(update); ticking=true; }
+    }, {passive:true});
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+  // ══════════════════════════════════════════
+  // TIMELINE SCRUB POR SCROLL
+  // Los items aparecen uno a uno a medida que
+  // el usuario baja por la sección, no todos a la vez
+  // ══════════════════════════════════════════
+  (function(){
+    var section = document.getElementById('timeline');
+    var items   = section ? Array.prototype.slice.call(section.querySelectorAll('.timeline-item')) : [];
+    if(!items.length) return;
+
+    // Quitar la clase reveal para que no la active el IntersectionObserver genérico
+    items.forEach(function(el){ el.classList.remove('reveal'); });
+
+    var ticking = false;
+    function update(){
+      var vh = window.innerHeight;
+      var sRect = section.getBoundingClientRect();
+      // La sección entra en viewport
+      if(sRect.bottom < 0 || sRect.top > vh){ ticking=false; return; }
+
+      // Progreso dentro de la sección: 0 (sección entra por abajo) → 1 (sección sale por arriba)
+      // Cada item aparece escalonado según su índice
+      var sectionProgress = 1 - (sRect.bottom / (sRect.height + vh));
+      var N = items.length;
+
+      items.forEach(function(el, i){
+        // Cada item tiene su umbral: el item i aparece cuando el progreso supera i/N * 0.85
+        var threshold = (i / N) * 0.75;
+        if(sectionProgress >= threshold){
+          el.classList.add('tl-visible');
+        }
+        // No quitamos la clase al subir — quedan visibles
+      });
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', function(){
+      if(!ticking){ requestAnimationFrame(update); ticking=true; }
+    }, {passive:true});
+    update();
+  })();
+
+  // ══════════════════════════════════════════
+  // SONIDO EN CURSOR → pill VER
+  // ══════════════════════════════════════════
+  (function(){
+    var isFine = window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+    if(!isFine) return;
+    var selector = 'a, button, .gallery-item, .spec-card, .quote-card, .credit-card, .gen-card, .accordion-q, .hero-cta, [onclick], .bv-col';
+    document.querySelectorAll(selector).forEach(function(el){
+      el.addEventListener('mouseenter', function(){ sndCursorMorph(); });
+    });
+  })();
 </script>
 
 </body>
