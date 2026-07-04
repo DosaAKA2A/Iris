@@ -621,16 +621,17 @@
     border-right:1px solid rgba(0,0,0,.10);
     cursor:default;
     overflow:hidden;
-    background:#fff;
-    transition:flex .6s cubic-bezier(.16,1,.3,1);
+    /* velo blanco semitransparente en reposo — imagen se ve a través */
+    background:rgba(248,248,247,.72);
+    transition:flex .6s cubic-bezier(.16,1,.3,1), background .5s ease;
   }
   .bv-col:last-child{border-right:none;}
 
-  /* imagen de cada columna: siempre presente, tapada por el blanco */
+  /* imagen de cada columna: siempre presente, baja opacidad en reposo */
   .bv-col-img{
     position:absolute;inset:0;z-index:0;
     transition:opacity .55s ease, transform .7s cubic-bezier(.16,1,.3,1);
-    opacity:0;
+    opacity:.28;           /* imagen visible en reposo */
     transform:scale(1.06);
   }
   .bv-col-img img{
@@ -702,20 +703,20 @@
     color:#fff;font-size:16px;
   }
 
-  /* ── HOVER: columna activa ── */
-  .bv-col:hover{ flex:1.6; background:var(--carbon); }
+  /* ── HOVER: columna activa — imagen plena, velo quitado ── */
+  .bv-col:hover{ flex:1.6; background:rgba(10,10,11,.04); }
   .bv-col:hover .bv-col-img{ opacity:1; transform:scale(1); }
   .bv-col:hover .bv-col-num{ color:var(--red); }
   .bv-col:hover .bv-col-title{ color:#fff; transform:translateY(-4px); }
   .bv-col:hover .bv-col-desc{ opacity:1; transform:translateY(0); }
   .bv-col:hover .bv-col-arrow{ opacity:1; transform:translateY(0); }
 
-  /* ── HOVER: columnas NO activas — blanco intenso tapa imagen ── */
+  /* ── HOVER: columnas NO activas — velo más opaco, imagen más tenue ── */
   .bv-scene:has(.bv-col:hover) .bv-col:not(:hover){
-    background:#fff;
+    background:rgba(248,248,247,.88);
   }
   .bv-scene:has(.bv-col:hover) .bv-col:not(:hover) .bv-col-img{
-    opacity:0;
+    opacity:.12;
   }
   .bv-scene:has(.bv-col:hover) .bv-col:not(:hover) .bv-col-title{
     color:rgba(23,23,23,.25);
