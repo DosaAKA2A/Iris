@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="icon" href="IRIS_ROJO.svg" type="image/svg+xml">
+<link rel="icon" href="assets/IRIS_ROJO.svg" type="image/svg+xml">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,7 +62,7 @@
   /* Grano */
   .grain {
     position: fixed; inset: 0; z-index: 6; pointer-events: none;
-    background-image: url("grain.jpg"); background-size: 320px; opacity: 0.045; mix-blend-mode: overlay;
+    background-image: url("assets/grain.jpg"); background-size: 320px; opacity: 0.045; mix-blend-mode: overlay;
   }
 
   .wrap { max-width: 1520px; margin: 0 auto; padding: 0 var(--inset); }
@@ -395,7 +395,7 @@
       <p class="hero-v1-sub">Diseño, tecnología e identidad para proyectos que exigen precisión.</p>
     </div>
     <div class="hero-v1-figure h-anim" style="animation-delay:.38s">
-      <img id="heroBannerImg" src="hero_bg.jpg" alt="" aria-hidden="true">
+      <img id="heroBannerImg" src="assets/hero_bg.jpg" alt="" aria-hidden="true">
       <div class="hero-v1-figcap"><span class="hero-v1-dot"></span> Selected work — 2024/2026</div>
       <div class="hero-v1-scroll">(Scroll)</div>
     </div>
@@ -445,7 +445,7 @@
       </div>
       <!-- Clientes -->
       <div class="svc-card svc-photo">
-        <div class="ph-img"><img src="arbu-hero.jpg" alt="" aria-hidden="true"></div>
+        <div class="ph-img"><img src="iris-studio/arbu-hero.jpg" alt="" aria-hidden="true"></div>
         <div class="ph-inner">
           <div class="svc-tag">Clientes satisfechos</div>
           <div class="badge-lime"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l6-6 4 4 6-8"/></svg></div>
@@ -542,7 +542,7 @@
       </div>
       <div class="browser">
         <div class="browser-bar"><span class="wm">IRIS STUDIO</span></div>
-        <div class="browser-body"><iframe id="irisFrame" src="iris-frame.html?v=20260704a" scrolling="yes" frameborder="0"></iframe></div>
+        <div class="browser-body"><iframe id="irisFrame" src="iris-studio/iris-frame.html?v=20260704a" scrolling="yes" frameborder="0"></iframe></div>
       </div>
     </div>
   </div>
@@ -651,7 +651,7 @@
 <div id="cvPinModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.8); backdrop-filter:blur(10px); align-items:center; justify-content:center;">
   <div style="background:#111; border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:40px 36px; width:300px; display:flex; flex-direction:column; align-items:center; gap:20px; box-shadow:0 24px 64px rgba(0,0,0,0.6);">
     <div style="font-family:'Clash Display',sans-serif;font-size:20px;font-weight:700;color:#f5f5f5;letter-spacing:-.02em;display:flex;align-items:center;gap:8px;">
-      <img src="IRIS_BLANCO.svg" alt="IRIS" style="width:28px;height:28px;"> IRIS
+      <img src="assets/IRIS_BLANCO.svg" alt="IRIS" style="width:28px;height:28px;"> IRIS
     </div>
     <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);font-family:'Inter',sans-serif;">Acceso restringido</div>
     <div style="display:flex;gap:10px;">
@@ -689,7 +689,7 @@ function isUnlocked(key) {
 }
 function setUnlocked(key) { localStorage.setItem(key, JSON.stringify({ ts: Date.now() })); sessionStorage.setItem(key, '1'); }
 const PASSWORDS = { corlima: 'Corlima2026', diseno: 'Socrates99@', spacio: '455211' };
-const DESTINATIONS = { corlima: 'herramientas_corlima.html', diseno: 'herramientas_diseno.html', spacio: 'spacio2.html?v=20260704a' };
+const DESTINATIONS = { corlima: 'corlima/herramientas_corlima.html', diseno: 'diseno/herramientas_diseno.html', spacio: 'spacio/spacio2.html?v=20260704a' };
 const STORAGE_KEYS = { corlima: 'corlimaAccess', diseno: 'disenoAccess', spacio: 'spacioAccess' };
 function openModal(which) {
   if (isUnlocked(STORAGE_KEYS[which])) { setUnlocked(STORAGE_KEYS[which]); window.location.href = DESTINATIONS[which]; return; }
@@ -760,7 +760,7 @@ var _correct = '4552';
 function openCvPin(e) {
   e.preventDefault();
   var saved = localStorage.getItem('cv_access');
-  if (saved && Date.now() < parseInt(saved)) { window.location.href = 'dosa-cv.html'; return; }
+  if (saved && Date.now() < parseInt(saved)) { window.location.href = 'cv/dosa-cv.html'; return; }
   _pin = ''; updateDots();
   document.getElementById('pinError').textContent = '';
   document.getElementById('cvPinModal').style.display = 'flex';
@@ -771,7 +771,7 @@ function pinKey(n) { if (_pin.length >= 4) return; _pin += n; updateDots(); if (
 function pinClear() { _pin = _pin.slice(0, -1); updateDots(); document.getElementById('pinError').textContent = ''; }
 function updateDots() { for (var i = 0; i < 4; i++) { var d = document.getElementById('pd' + i); d.classList.toggle('filled', i < _pin.length); d.classList.remove('error'); } }
 function pinSubmit() {
-  if (_pin === _correct) { localStorage.setItem('cv_access', Date.now() + 86400000); closeCvPin(); window.location.href = 'dosa-cv.html'; }
+  if (_pin === _correct) { localStorage.setItem('cv_access', Date.now() + 86400000); closeCvPin(); window.location.href = 'cv/dosa-cv.html'; }
   else { for (var i = 0; i < 4; i++) document.getElementById('pd' + i).classList.add('error'); document.getElementById('pinError').textContent = 'PIN incorrecto'; setTimeout(function(){ _pin = ''; updateDots(); document.getElementById('pinError').textContent = ''; }, 1000); }
 }
 document.addEventListener('keydown', function(e){
