@@ -6,7 +6,7 @@
 <title>SPACIO² — Object Study</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;900&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;900&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --white:#FAFAF8;
@@ -231,13 +231,49 @@
   .status-city{color:var(--steel);}
 
   .hero-eyebrow{
-    font-family:'IBM Plex Mono',monospace;
-    font-style:italic;
-    font-size:13px;
-    letter-spacing:0.06em;
+    font-family:'Geist Mono','IBM Plex Mono',monospace;
+    font-weight:500;
+    font-size:12px;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
     color:var(--red);
     margin-bottom:20px;
+    display:flex;
+    align-items:center;
+    gap:10px;
   }
+  .hero-eyebrow .eb-mark{opacity:.55;}
+  /* target scramble/glitch del eyebrow */
+  .hero-eyebrow .scr{
+    position:relative;
+    display:inline-block;
+  }
+  @media(min-width:600px){ .hero-eyebrow .scr{white-space:nowrap;} }
+  /* micro-flicker RGB persistente estilo Sanjaya */
+  .hero-eyebrow .scr::before,
+  .hero-eyebrow .scr::after{
+    content:attr(data-text);
+    position:absolute;inset:0;
+    pointer-events:none;opacity:0;
+    clip-path:inset(0 0 0 0);
+  }
+  .hero-eyebrow.glitch-live .scr::before{
+    color:rgba(0,180,255,.85);left:-1.5px;
+    animation:eb-glitch .12s steps(1) infinite;
+  }
+  .hero-eyebrow.glitch-live .scr::after{
+    color:rgba(255,42,42,.9);left:1.5px;
+    animation:eb-glitch .12s steps(1) infinite reverse;
+  }
+  @keyframes eb-glitch{
+    0%,92%{opacity:0;clip-path:inset(100% 0 0 0);}
+    93%{opacity:.7;clip-path:inset(20% 0 55% 0);transform:translateX(1px);}
+    96%{opacity:.7;clip-path:inset(60% 0 12% 0);transform:translateX(-1px);}
+    100%{opacity:0;transform:none;}
+  }
+  /* caracteres 'basura' del decode */
+  .scramble-dud{color:var(--red);opacity:.9;}
+  .hero-title .scramble-dud{color:var(--red);opacity:.85;}
 
   .hero-sidebar .hero-title{
     color:var(--black);
@@ -1701,8 +1737,8 @@
       </div>
     </div>
     <div class="hero-bottom">
-      <div class="hero-eyebrow">— Estudio de diseño aeroespacial</div>
-      <h1 class="hero-title display"><span class="word-wrap"><span class="word">VACÍO</span></span><br><span class="word-wrap"><span class="word">Y&nbsp;<span class="red">CARGA</span></span></span></h1>
+      <div class="hero-eyebrow"><span class="eb-mark">—</span><span class="scr" data-final="ESTUDIO DE DISEÑO AEROESPACIAL" data-text="ESTUDIO DE DISEÑO AEROESPACIAL">ESTUDIO DE DISEÑO AEROESPACIAL</span></div>
+      <h1 class="hero-title display"><span class="scr scr-line" data-final="VACÍO">VACÍO</span><br><span class="scr scr-line" data-final="Y CARGA" data-red="CARGA">Y&nbsp;<span class="red">CARGA</span></span></h1>
       <p class="hero-desc">Un estudio de SPACIO² como objeto: la geometría que resulta de transportar lo esencial a través del vacío, sin nada de más.</p>
       <a href="#manifesto" class="hero-cta">
         Ver el objeto
@@ -2149,10 +2185,6 @@
 
 </div><!-- /site-frame -->
 
-<div class="build-note">
-  BORRADOR EN CONSTRUCCIÓN — SPACIO² (rebrand completo desde 403/Velaro). Galería con 6 imágenes reales (procesadas para tono neutro), ajustar según se sumen más.
-</div>
-
 <div id="custom-cursor">
   <div class="cursor-cross"></div>
   <div class="cursor-goo-wrap">
@@ -2479,6 +2511,7 @@
       sndAccess();
       setTimeout(function(){
         screen.classList.add('hidden');
+        if(window.runHeroScramble) window.runHeroScramble();
       }, 300);
     }, 1100);
   })();
@@ -2564,6 +2597,69 @@
     document.querySelectorAll(selector).forEach(function(el){
       el.addEventListener('mouseenter', function(){ sndCursorMorph(); });
     });
+  })();
+
+  // ══════════════════════════════════════════
+  // HERO GLITCH / TEXT SCRAMBLE (decode estilo Sanjaya)
+  // ══════════════════════════════════════════
+  (function(){
+    var CHARS = '!<>-_\\/[]{}=+*^?#/\\|01_0123456789ABCDEF';
+    function scrambleEl(el, done){
+      var finalText = el.getAttribute('data-final') || el.textContent;
+      var from = el.textContent;
+      var len = Math.max(from.length, finalText.length);
+      var queue = [];
+      for(var i=0;i<len;i++){
+        var start = Math.floor(Math.random()*16);
+        var end   = start + 14 + Math.floor(Math.random()*20);
+        queue.push({from:from[i]||'',to:finalText[i]||'',start:start,end:end,char:null});
+      }
+      var frame = 0;
+      (function update(){
+        var out='', complete=0;
+        for(var i=0;i<queue.length;i++){
+          var q=queue[i];
+          if(frame>=q.end){ complete++; out+=q.to; }
+          else if(frame>=q.start){
+            if(!q.char || Math.random()<0.28){ q.char = CHARS[Math.floor(Math.random()*CHARS.length)]; }
+            out += '<span class="scramble-dud">'+q.char+'</span>';
+          } else { out += q.from; }
+        }
+        el.innerHTML = out;
+        if(complete===queue.length){ if(done) done(el, finalText); }
+        else { frame++; requestAnimationFrame(update); }
+      })();
+    }
+    function finishLine(el, finalText){
+      var red = el.getAttribute('data-red');
+      if(red && finalText.indexOf(red)!==-1){
+        var idx=finalText.indexOf(red);
+        el.innerHTML = finalText.slice(0,idx) + '<span class="red">' + red + '</span>' + finalText.slice(idx+red.length);
+      } else { el.textContent = finalText; }
+    }
+    var fired=false;
+    window.runHeroScramble = function(){
+      if(fired) return; fired=true;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var eyebrow = document.querySelector('.hero-eyebrow');
+      var ebScr   = document.querySelector('.hero-eyebrow .scr');
+      var lines   = document.querySelectorAll('.hero-title .scr-line');
+      if(reduce){
+        if(ebScr) ebScr.textContent = ebScr.getAttribute('data-final');
+        Array.prototype.forEach.call(lines,function(l){ finishLine(l,l.getAttribute('data-final')); });
+        if(eyebrow) eyebrow.classList.add('glitch-live');
+        return;
+      }
+      if(ebScr){
+        scrambleEl(ebScr, function(el, ft){
+          el.textContent = ft; el.setAttribute('data-text', ft);
+          if(eyebrow) eyebrow.classList.add('glitch-live');
+        });
+      }
+      Array.prototype.forEach.call(lines,function(line, i){
+        setTimeout(function(){ scrambleEl(line, finishLine); }, 140 + i*190);
+      });
+    };
   })();
 
   // ══ COUNTDOWN 2084 ══
