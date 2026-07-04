@@ -601,8 +601,7 @@
     border-top:1px solid var(--hairline);
   }
 
-  /* ---------- 04 · POR QUÉ ESTA FORMA (Benefits) ---------- */
-  /* ---------- 04 · POR QUÉ ESTA FORMA — Bellavista split columns ---------- */
+  /* ---------- 04 · BASES DE OPERACIÓN — Bellavista split columns ---------- */
   .bv-scene{
     position:relative;
     height:90vh;
@@ -611,8 +610,6 @@
     display:flex;
   }
 
-  /* imagen compartida detrás de todas las columnas */
-  /* cada columna tiene fondo negro propio + su imagen visible desde el inicio */
   .bv-col{
     position:relative;
     z-index:2;
@@ -621,39 +618,39 @@
     flex-direction:column;
     justify-content:flex-end;
     padding:40px 28px;
-    border-right:1px solid rgba(255,255,255,.13);
+    border-right:1px solid rgba(0,0,0,.10);
     cursor:default;
     overflow:hidden;
-    background:var(--carbon);
+    background:#fff;
     transition:flex .6s cubic-bezier(.16,1,.3,1);
   }
   .bv-col:last-child{border-right:none;}
 
-  /* imagen de cada columna: visible desde el inicio en opacidad baja */
+  /* imagen de cada columna: siempre presente, tapada por el blanco */
   .bv-col-img{
     position:absolute;inset:0;z-index:0;
     transition:opacity .55s ease, transform .7s cubic-bezier(.16,1,.3,1);
-    opacity:0.22;          /* visible pero sutil en reposo */
+    opacity:0;
     transform:scale(1.06);
   }
   .bv-col-img img{
     width:100%;height:100%;
     object-fit:cover;
+    object-position:center 30%;
     display:block;
   }
-  /* crop narrativo: cada foto muestra la parte más representativa */
-  .bv-col:nth-child(1) .bv-col-img img{ object-position:center 25%; } /* cohete: cuerpo */
-  .bv-col:nth-child(2) .bv-col-img img{ object-position:center 35%; } /* torre: estructura */
-  .bv-col:nth-child(3) .bv-col-img img{ object-position:center 55%; } /* interior: arco */
+  .bv-col:nth-child(1) .bv-col-img img{ object-position:center 25%; }
+  .bv-col:nth-child(2) .bv-col-img img{ object-position:center 35%; }
+  .bv-col:nth-child(3) .bv-col-img img{ object-position:center 55%; }
 
-  /* gradiente oscuro en la parte inferior para que el texto sea legible */
+  /* overlay oscuro sobre imagen para legibilidad del texto blanco al hover */
   .bv-col-img::after{
     content:"";position:absolute;inset:0;
     background:linear-gradient(
       0deg,
-      rgba(10,10,11,.88) 0%,
-      rgba(10,10,11,.35) 50%,
-      rgba(10,10,11,.10) 100%
+      rgba(10,10,11,.85) 0%,
+      rgba(10,10,11,.30) 55%,
+      rgba(10,10,11,.08) 100%
     );
   }
 
@@ -661,13 +658,13 @@
   .bv-col-num{
     font-family:'IBM Plex Mono',monospace;
     font-size:11px;letter-spacing:.1em;
-    color:rgba(255,255,255,.55);
+    color:var(--steel);
     margin-bottom:18px;
     position:relative;z-index:2;
     transition:color .4s;
   }
 
-  /* título: SIEMPRE blanco */
+  /* título: oscuro en reposo, blanco al hover */
   .bv-col-title{
     font-family:'Archivo Expanded',sans-serif;
     font-weight:900;
@@ -675,15 +672,15 @@
     text-transform:uppercase;
     line-height:.95;
     letter-spacing:-.02em;
-    color:#ffffff;
+    color:var(--carbon);
     position:relative;z-index:2;
-    transition:transform .5s cubic-bezier(.16,1,.3,1);
+    transition:color .4s, transform .5s cubic-bezier(.16,1,.3,1);
   }
 
-  /* descripción: aparece solo al hover */
+  /* descripción */
   .bv-col-desc{
     font-size:13px;line-height:1.6;
-    color:rgba(255,255,255,.72);
+    color:rgba(255,255,255,.75);
     max-width:28ch;
     position:relative;z-index:2;
     margin-top:14px;
@@ -697,7 +694,7 @@
     position:relative;z-index:2;
     margin-top:28px;
     width:36px;height:36px;border-radius:50%;
-    border:1px solid rgba(255,255,255,.3);
+    border:1px solid rgba(255,255,255,.35);
     display:flex;align-items:center;justify-content:center;
     opacity:0;
     transform:translateY(10px);
@@ -706,26 +703,28 @@
   }
 
   /* ── HOVER: columna activa ── */
-  .bv-col:hover{ flex:1.6; }
-  /* imagen: zoom-out + opacidad completa */
+  .bv-col:hover{ flex:1.6; background:var(--carbon); }
   .bv-col:hover .bv-col-img{ opacity:1; transform:scale(1); }
   .bv-col:hover .bv-col-num{ color:var(--red); }
-  .bv-col:hover .bv-col-title{ transform:translateY(-4px); }
+  .bv-col:hover .bv-col-title{ color:#fff; transform:translateY(-4px); }
   .bv-col:hover .bv-col-desc{ opacity:1; transform:translateY(0); }
   .bv-col:hover .bv-col-arrow{ opacity:1; transform:translateY(0); }
 
-  /* ── HOVER: columnas NO activas se atenúan ── */
+  /* ── HOVER: columnas NO activas — blanco intenso tapa imagen ── */
+  .bv-scene:has(.bv-col:hover) .bv-col:not(:hover){
+    background:#fff;
+  }
   .bv-scene:has(.bv-col:hover) .bv-col:not(:hover) .bv-col-img{
-    opacity:0.08;    /* imagen casi invisible en las no-hover */
+    opacity:0;
   }
   .bv-scene:has(.bv-col:hover) .bv-col:not(:hover) .bv-col-title{
-    color:rgba(255,255,255,.22);
+    color:rgba(23,23,23,.25);
   }
   .bv-scene:has(.bv-col:hover) .bv-col:not(:hover) .bv-col-num{
-    color:rgba(255,255,255,.15);
+    color:rgba(23,23,23,.2);
   }
 
-  /* línea roja que se dibuja verticalmente al hover */
+  /* línea roja vertical al hover */
   .bv-col::before{
     content:"";
     position:absolute;top:0;left:0;
@@ -740,7 +739,6 @@
     .bv-col,.bv-col-img,.bv-col-title,.bv-col-desc,.bv-col-arrow,.bv-col::before{
       transition:none!important;
     }
-    .bv-col-img{ opacity:0.22!important; transform:none!important; }
   }
 
   /* ---------- 05 · VOCES TÉCNICAS (Testimonials) ---------- */
@@ -1369,9 +1367,9 @@
     .gallery-item.g1,.gallery-item.g2,.gallery-item.g3,.gallery-item.g4,.gallery-item.g5,.gallery-item.g6{grid-column:auto;margin-top:0;}
     .spec-cards{grid-template-columns:1fr 1fr;}
     .bv-scene{flex-direction:column;height:auto;}
-    .bv-col{min-height:220px;border-right:none;border-bottom:1px solid rgba(255,255,255,.13);}
+    .bv-col{min-height:220px;border-right:none;border-bottom:1px solid rgba(0,0,0,.08);}
     .bv-col:last-child{border-bottom:none;}
-    .bv-scene:has(.bv-col:hover) .bv-col:not(:hover) .bv-col-title{color:rgba(255,255,255,.55);}
+    .bv-scene:has(.bv-col:hover) .bv-col:not(:hover) .bv-col-title{color:rgba(23,23,23,.25);}
     .bv-col:hover{flex:1;}
     .quotes{grid-template-columns:1fr;}
     .credits{grid-template-columns:1fr 1fr;}
@@ -1621,45 +1619,42 @@
   <div class="sec-watermark">04</div>
   <div class="section-head reveal">
     <div>
-      <div class="section-number mono">04 — RAZONES</div>
-      <h2 class="section-title display"><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">POR</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">QUÉ</span></span><br><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">ESTA</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">FORMA</span></span></h2>
+      <div class="section-number mono">04 — BASES DE OPERACIÓN</div>
+      <h2 class="section-title display"><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">DONDE</span></span><br><span class="word-wrap"><span class="word-title" style="animation-delay:0.0s">OPERA</span></span> <span class="word-wrap"><span class="word-title" style="animation-delay:0.05s">SPACIO²</span></span></h2>
     </div>
   </div>
   <div class="bv-scene">
 
-    <!-- columna 1: cohete CZ-5 -->
+    <!-- BASE MERIDIAN — columna 1 -->
     <div class="bv-col">
       <div class="bv-col-img">
-        <img src="spacio-bv1.jpg" alt="Lanzador CZ-5 en ensamblaje">
-        <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,11,.78) 0%,transparent 55%)"></div>
+        <img src="spacio-bv1.jpg" alt="Base Meridian — plataforma de lanzamiento">
       </div>
-      <div class="bv-col-num">01 — RAZONES</div>
-      <div class="bv-col-title">Menor<br>sección<br>expuesta</div>
-      <div class="bv-col-desc">Un casco alargado y cilíndrico reduce el área expuesta a radiación cósmica y a impactos de micrometeoritos durante el tránsito.</div>
+      <div class="bv-col-num">01 — BASE MERIDIAN</div>
+      <div class="bv-col-title">Plataforma<br>de<br>lanzamiento</div>
+      <div class="bv-col-desc">Estructura de despegue vertical en órbita baja. Punto de origen de todas las misiones de la clase Meridian desde el año 2187.</div>
       <div class="bv-col-arrow">↗</div>
     </div>
 
-    <!-- columna 2: torre observatorio B&W -->
+    <!-- ESTACIÓN HELION — columna 2 -->
     <div class="bv-col">
       <div class="bv-col-img">
-        <img src="spacio-bv2.jpg" alt="Torre de telemetría orbital">
-        <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,11,.78) 0%,transparent 55%)"></div>
+        <img src="spacio-bv2.jpg" alt="Estación Helion — torre de telemetría orbital">
       </div>
-      <div class="bv-col-num">02 — RAZONES</div>
-      <div class="bv-col-title">Más carga,<br>menos<br>nave</div>
-      <div class="bv-col-desc">Al eliminar cabinas y sistemas de soporte vital tripulado, una nave del mismo tamaño transporta más oxígeno real.</div>
+      <div class="bv-col-num">02 — ESTACIÓN HELION</div>
+      <div class="bv-col-title">Torre de<br>telemetría<br>orbital</div>
+      <div class="bv-col-desc">Nodo de comunicación y seguimiento en el punto de Lagrange L2. Coordina el tráfico de naves autónomas en la galaxia exterior.</div>
       <div class="bv-col-arrow">↗</div>
     </div>
 
-    <!-- columna 3: interior estructural -->
+    <!-- BAHÍA ARCA — columna 3 -->
     <div class="bv-col">
       <div class="bv-col-img">
-        <img src="spacio-bv3.jpg" alt="Interior estructural de módulo de carga">
-        <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,11,.78) 0%,transparent 55%)"></div>
+        <img src="spacio-bv3.jpg" alt="Bahía ARCA — módulo de carga y mantenimiento">
       </div>
-      <div class="bv-col-num">03 — RAZONES</div>
-      <div class="bv-col-title">Menos<br>energía<br>por año-luz</div>
-      <div class="bv-col-desc">La masa reducida y la propulsión de fusión pulsada bajan el consumo energético frente a la generación anterior de naves de soporte.</div>
+      <div class="bv-col-num">03 — BAHÍA ARCA</div>
+      <div class="bv-col-title">Módulo de<br>carga y<br>mantenimiento</div>
+      <div class="bv-col-desc">Instalación de ensamblaje en órbita polar. Aquí se revisan, cargan y redesplegan las unidades SPACIO² entre misiones de larga duración.</div>
       <div class="bv-col-arrow">↗</div>
     </div>
 
