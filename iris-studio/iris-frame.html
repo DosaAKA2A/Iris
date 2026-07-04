@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family:"Clash Display";
+  src:url("https://framerusercontent.com/third-party-assets/fontshare/wf/BFBSY7LX5W2U2EROCLVVTQP4VS7S4PC3/IIUX4FGTMD2LK2VWD3RVTAS4SSMUN7B5/53RZKGODFYDW3QHTIL7IPOWTBCSUEZK7.woff2");
+  font-weight:700;font-style:normal;font-display:swap;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow-x:hidden;overflow-y:auto}
+#iris{width:100%;min-height:100%;font-family:'Inter',sans-serif;}
+.theme-dark {background:#09090b;color:#f5f5f5;}
+.theme-light{background:#f4f4f2;color:#0a0a0a;}
+.theme-gold {background:#faf6f0;color:#1a1410;}
+
+/* ─── NAV ─────────────────────────────────────────── */
+.i-nav {
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 24px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.theme-dark  .i-nav{background:rgba(9,9,11,.88);border-bottom:1px solid rgba(255,255,255,.07);}
+.theme-light .i-nav{background:rgba(255,255,255,.96);border-bottom:1px solid rgba(0,0,0,.07);}
+.theme-gold  .i-nav{background:rgba(250,246,240,.95);border-bottom:1px solid rgba(184,146,58,.15);}
+
+.i-logo{font-weight:800;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:7px;font-size:15px;}
+.theme-dark  .i-logo{font-family:'Clash Display',sans-serif;letter-spacing:.2em;color:#f5f5f5;}
+.theme-light .i-logo{font-family:'Montserrat',sans-serif;color:#1847e8;}
+.theme-gold  .i-logo{font-family:'Cormorant Garamond',serif;letter-spacing:.18em;font-size:17px;color:#1a1410;font-weight:700;}
+
+.i-logo-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.theme-dark  .i-logo-dot{background:#dc402a;}
+.theme-light .i-logo-dot{background:#1847e8;}
+.theme-gold  .i-logo-dot{background:#b8923a;}
+
+.i-nav-links{display:flex;gap:22px;}
+.i-nav-link{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:color .2s;}
+.theme-dark  .i-nav-link{color:rgba(245,245,245,.38);}
+.theme-light .i-nav-link{color:rgba(10,10,10,.45);font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-nav-link{color:rgba(26,20,16,.42);font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.12em;}
+
+.i-nav-right{display:flex;align-items:center;gap:8px;}
+.i-nav-cta{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:8px 18px;border-radius:100px;border:none;cursor:pointer;transition:opacity .2s;}
+.theme-dark  .i-nav-cta{background:#dc402a;color:#fff;font-family:'Inter',sans-serif;}
+.theme-light .i-nav-cta{background:#1847e8;color:#fff;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-nav-cta{background:transparent;color:#b8923a;border:1.5px solid #b8923a;font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:.1em;}
+
+.i-nav-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:transparent;cursor:pointer;position:relative;transition:border-color .2s;}
+.theme-light .i-nav-icon{border:1.5px solid rgba(0,0,0,.08);}
+.theme-gold  .i-nav-icon{border:1.5px solid rgba(184,146,58,.2);}
+.i-nav-icon svg{width:15px;height:15px;stroke-width:1.8;fill:none;}
+.theme-light .i-nav-icon svg{stroke:#0a0a0a;}
+.theme-gold  .i-nav-icon svg{stroke:#1a1410;}
+.i-cart-badge{position:absolute;top:-4px;right:-4px;width:15px;height:15px;border-radius:50%;color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;}
+.theme-light .i-cart-badge{background:#1847e8;}
+.theme-gold  .i-cart-badge{background:#b8923a;}
+
+/* ─── HERO BANNER ─────────────────────────────────── */
+.i-hero-banner{position:relative;overflow:hidden;height:420px;}
+
+/* Imagen de fondo — sin z-index, orden DOM la sitúa entre fluid-bg y overlay */
+.i-hero-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;display:none;opacity:0;transition:opacity 0.8s ease;}
+
+/* Gradiente fluido animado */
+.i-fluid-bg{
+  position:absolute;inset:-20%;
+  animation:fluidMove 8s ease-in-out infinite alternate;
+  filter:blur(40px);
+}
+#fluid-bg { transition: opacity 1.2s ease; }
+
+@keyframes fluidMove{
+  0%  {transform:scale(1) rotate(0deg) translate(0,0);}
+  25% {transform:scale(1.08) rotate(2deg) translate(2%,3%);}
+  50% {transform:scale(1.04) rotate(-1deg) translate(-3%,1%);}
+  75% {transform:scale(1.1) rotate(3deg) translate(1%,-2%);}
+  100%{transform:scale(1.06) rotate(-2deg) translate(-2%,2%);}
+}
+.i-fluid-grain{position:absolute;inset:0;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Overlay */
+.i-hero-overlay{position:absolute;inset:0;display:flex;align-items:center;}
+.theme-dark  .i-hero-overlay{background:linear-gradient(90deg,rgba(9,9,11,.60) 0%,rgba(9,9,11,.15) 35%,rgba(9,9,11,.0) 60%);}
+.theme-light .i-hero-overlay{background:linear-gradient(100deg,rgba(10,31,110,.82) 0%,rgba(24,71,232,.5) 40%,rgba(0,0,0,.0) 65%);}
+.theme-gold  .i-hero-overlay{background:linear-gradient(90deg,rgba(10,7,4,.55) 0%,rgba(10,7,4,.15) 38%,rgba(0,0,0,.0) 52%);}
+
+.i-hero-content{padding:0 52px;display:flex;flex-direction:column;gap:14px;max-width:560px;position:relative;z-index:1;}
+
+.i-hero-tag{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;}
+.theme-dark  .i-hero-tag{color:#ff6b35;font-family:'Inter',sans-serif;}
+.theme-light .i-hero-tag{color:#ffd166;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-hero-tag{color:#b8923a;font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:.28em;font-style:italic;}
+
+.i-hero-title{line-height:1.1;color:#fff;}
+.theme-dark  .i-hero-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(44px,7vw,72px);font-weight:900;line-height:0.95;text-transform:uppercase;letter-spacing:-0.01em;}
+.theme-light .i-hero-title{font-family:'Montserrat',sans-serif;font-size:clamp(24px,3.2vw,38px);font-weight:800;}
+.theme-gold  .i-hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5.5vw,58px);font-weight:600;line-height:1.05;}
+
+.i-hero-title span{display:inline;}
+.theme-dark  .i-hero-title span{color:#ff6b35;}
+.theme-light .i-hero-title span{color:#ffd166;}
+.theme-gold  .i-hero-title span{color:#b8923a;font-style:italic;}
+
+.i-hero-sub{font-size:12px;line-height:1.7;color:rgba(255,255,255,.72);max-width:380px;}
+.theme-gold .i-hero-sub{font-family:'Cormorant Garamond',serif;font-size:15px;}
+
+.i-hero-cta{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:11px 24px;border-radius:100px;border:none;cursor:pointer;transition:transform .2s;margin-top:4px;}
+.i-hero-cta:hover{transform:translateY(-2px);}
+.theme-dark  .i-hero-cta{background:#dc402a;color:#fff;font-family:'Inter',sans-serif;}
+.theme-light .i-hero-cta{background:#fff;color:#1847e8;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-hero-cta{background:#b8923a;color:#fff;font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.12em;}
+
+/* ─── SECTION HEADER ──────────────────────────────── */
+.i-section-header{display:flex;padding:22px 28px 12px;align-items:center;justify-content:space-between;}
+.i-section-title{font-size:16px;font-weight:700;letter-spacing:-.02em;}
+.theme-dark  .i-section-title{color:#f5f5f5;font-family:'Clash Display',sans-serif;}
+.theme-light .i-section-title{color:#0a0a0a;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-section-title{color:#1a1410;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;letter-spacing:.02em;}
+.i-section-link{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;}
+.theme-dark  .i-section-link{color:#dc402a;}
+.theme-light .i-section-link{color:#1847e8;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-section-link{color:#b8923a;font-family:'Cormorant Garamond',serif;font-size:12px;}
+
+/* ─── PRODUCTS ────────────────────────────────────── */
+.i-products{display:grid;padding:0 24px 28px;gap:14px;grid-template-columns:repeat(6,minmax(160px,1fr));overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;}
+.i-products::-webkit-scrollbar{display:none;}
+.i-product-card{border-radius:14px;overflow:hidden;transition:box-shadow .25s,transform .25s;display:flex;flex-direction:column;scroll-snap-align:start;}
+.theme-dark  .i-product-card{background:#161618;border:1px solid rgba(255,255,255,.08);}
+.theme-light .i-product-card{background:#fff;border:1px solid rgba(0,0,0,.07);}
+.theme-gold  .i-product-card{background:#fff;border:1px solid rgba(184,146,58,.15);border-radius:4px;}
+.i-product-card:hover{box-shadow:0 12px 40px rgba(0,0,0,.12);transform:translateY(-3px);}
+
+.i-product-img{width:100%;aspect-ratio:4/3;position:relative;overflow:hidden;}
+.theme-dark  .i-product-img{background:#111113;}
+.theme-light .i-product-img{background:#f0f0ee;}
+.theme-gold  .i-product-img{background:#f5f0e8;}
+.i-product-img img{width:100%;height:100%;object-fit:cover;}
+.i-product-discount{position:absolute;top:10px;left:10px;color:#fff;font-size:10px;font-weight:700;padding:3px 7px;border-radius:6px;font-family:'Montserrat',sans-serif;}
+.theme-dark  .i-product-discount{background:#dc402a;}
+.theme-light .i-product-discount{background:#1847e8;}
+.theme-gold  .i-product-discount{background:#1a1410;border-radius:0;font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.06em;}
+
+.i-product-info{padding:12px 12px 0;flex:1;display:flex;flex-direction:column;gap:4px;}
+.i-product-brand{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+.theme-dark  .i-product-brand{color:rgba(245,245,245,.38);font-family:'Inter',sans-serif;}
+.theme-light .i-product-brand{color:rgba(10,10,10,.45);font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-product-brand{color:rgba(26,20,16,.42);font-family:'Cormorant Garamond',serif;font-size:10px;letter-spacing:.2em;font-weight:400;}
+.i-product-name{font-size:10px;font-weight:600;line-height:1.4;flex:1;}
+.theme-dark  .i-product-name{color:#f5f5f5;font-family:'Inter',sans-serif;}
+.theme-light .i-product-name{color:#0a0a0a;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-product-name{color:#1a1410;font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:500;}
+.i-product-prices{display:flex;flex-direction:column;gap:1px;margin-top:4px;}
+.i-product-price-old{font-size:9px;text-decoration:line-through;font-family:'Montserrat',sans-serif;}
+.theme-dark  .i-product-price-old{color:rgba(245,245,245,.38);}
+.theme-light .i-product-price-old{color:rgba(10,10,10,.45);}
+.theme-gold  .i-product-price-old{color:rgba(26,20,16,.42);}
+.i-product-price{font-size:14px;font-weight:800;font-family:'Montserrat',sans-serif;}
+.theme-dark  .i-product-price{color:#f5f5f5;}
+.theme-light .i-product-price{color:#0a0a0a;}
+.theme-gold  .i-product-price{color:#1a1410;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;}
+.i-product-footer{padding:10px 12px 12px;}
+.i-add-cart{width:100%;padding:8px;cursor:pointer;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s,color .2s;border-radius:8px;font-family:'Montserrat',sans-serif;}
+.theme-dark  .i-add-cart{background:#dc402a;color:#fff;border:1.5px solid #dc402a;}
+.theme-light .i-add-cart{background:transparent;color:#1847e8;border:1.5px solid #1847e8;}
+.theme-light .i-add-cart:hover{background:#1847e8;color:#fff;}
+.theme-gold  .i-add-cart{background:transparent;color:#1a1410;border:1.5px solid #1a1410;border-radius:0;font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.1em;}
+.theme-gold  .i-add-cart:hover{background:#1a1410;color:#fff;}
+.i-add-cart svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0;}
+
+/* ─── PROMO BANNER ────────────────────────────────── */
+.i-promo{display:flex;overflow:hidden;position:relative;height:280px;}
+.theme-dark  .i-promo{background:#09090b;}
+.theme-light .i-promo{background:#0a1f6e;}
+.theme-gold  .i-promo{background:linear-gradient(120deg,#1a1410 0%,#2a1f0f 55%,#1a1410 100%);}
+
+/* DARK/LIGHT: imagen ocupa todo el banner, contenido encima */
+.theme-dark .i-promo-right,
+.theme-light .i-promo-right{position:absolute;inset:0;width:100%;height:100%;z-index:0;}
+.theme-dark .i-promo-right img,
+.theme-light .i-promo-right img{width:100%;height:100%;object-fit:cover;object-position:center 40%;}
+.theme-dark .i-promo-right::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,9,11,.85) 0%,rgba(9,9,11,.5) 45%,rgba(180,30,0,.25) 100%);z-index:1;pointer-events:none;}
+.theme-light .i-promo-right::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,31,110,.92) 0%,rgba(15,47,163,.55) 45%,rgba(24,71,232,.2) 100%);z-index:1;pointer-events:none;}
+
+/* GOLD: columnas originales */
+.theme-gold  .i-promo-right{flex:1;position:relative;overflow:hidden;}
+.theme-gold  .i-promo-right img{width:100%;height:100%;object-fit:cover;object-position:center 35%;}
+
+/* LEFT: en dark/light ocupa la mitad con padding generoso */
+.i-promo-left{padding:28px 32px;display:flex;flex-direction:column;justify-content:center;gap:8px;position:relative;z-index:2;}
+.theme-dark  .i-promo-left{width:52%;}
+.theme-light .i-promo-left{width:52%;}
+.theme-gold  .i-promo-left{width:36%;flex-shrink:0;}
+
+/* BOTTOM: pills + CTA en esquina inferior derecha (dark + light) */
+.i-promo-bottom{display:none;}
+.theme-dark .i-promo-bottom,
+.theme-light .i-promo-bottom{display:flex;align-items:center;gap:10px;position:absolute;bottom:20px;right:24px;z-index:2;}
+
+.i-promo-brand{font-weight:800;line-height:1;}
+.theme-dark  .i-promo-brand{font-family:'Barlow Condensed',sans-serif;font-size:clamp(36px,5.5vw,58px);color:#fff;letter-spacing:-.01em;font-weight:900;text-transform:uppercase;line-height:.92;}
+.theme-light .i-promo-brand{font-family:'Montserrat',sans-serif;font-size:clamp(32px,4.5vw,52px);color:#fff;font-weight:800;letter-spacing:-.02em;line-height:.9;}
+.theme-gold  .i-promo-brand{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,44px);color:#fff;letter-spacing:.05em;font-weight:600;}
+.i-promo-brand .accent{color:#ffd166;}
+.theme-dark  .i-promo-brand .accent{color:#ff6b35;}
+.theme-gold  .i-promo-brand .accent{color:#b8923a;font-style:italic;}
+
+.i-promo-tagline{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);}
+.theme-light .i-promo-tagline{color:rgba(255,255,255,.6);letter-spacing:.16em;border-left:2px solid rgba(255,220,80,.6);padding-left:8px;}
+.theme-gold .i-promo-tagline{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.18em;font-style:italic;}
+
+.i-promo-offer{display:flex;align-items:flex-start;gap:16px;}
+.theme-dark .i-promo-offer{display:none;}
+.theme-light .i-promo-offer{
+  flex-direction:row;
+  align-items:center;
+  gap:20px;
+  padding:12px 16px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;
+  margin-top:4px;
+}
+/* Número grande como elemento visual */
+.theme-light .i-promo-offer::before{
+  content:'30%';
+  font-family:'Montserrat',sans-serif;
+  font-weight:900;
+  font-size:36px;
+  color:#fff;
+  line-height:1;
+  flex-shrink:0;
+  letter-spacing:-.03em;
+}
+.i-promo-offer-text{font-size:12px;font-weight:600;color:#fff;font-family:'Montserrat',sans-serif;letter-spacing:-.01em;}
+.i-promo-offer-text span{display:block;font-weight:400;font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;letter-spacing:0;}
+.theme-gold .i-promo-offer-text{font-family:'Cormorant Garamond',serif;font-size:14px;}
+
+.i-promo-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.i-promo-badge-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:100px;padding:4px 10px;font-size:9px;font-weight:600;color:rgba(255,255,255,.8);letter-spacing:.04em;text-transform:uppercase;font-family:'Montserrat',sans-serif;}
+.theme-dark .i-promo-badge-pill{background:#dc402a;border-color:#dc402a;color:#fff;}
+
+.i-promo-cta{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:9px 20px;border-radius:100px;background:#fff;border:none;cursor:pointer;transition:transform .2s;}
+.i-promo-cta:hover{transform:translateY(-1px);}
+.theme-dark  .i-promo-cta{color:#dc402a;font-family:'Inter',sans-serif;}
+.theme-light .i-promo-cta{color:#1847e8;font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-promo-cta{color:#b8923a;font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:.1em;}
+
+.i-promo-right{flex:1;position:relative;overflow:hidden;}
+.i-promo-right img{width:100%;height:100%;object-fit:cover;object-position:center 35%;}
+.theme-dark .i-promo-right::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,rgba(9,9,11,.65) 0%,rgba(9,9,11,.1) 25%,rgba(220,64,42,.15) 65%,rgba(180,30,0,.4) 100%);z-index:1;pointer-events:none;}
+.i-promo-dark-deco{position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 70% 40%,rgba(220,64,42,.35) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 90% 80%,rgba(255,107,53,.2) 0%,transparent 55%);animation:fluidMove 6s ease-in-out infinite alternate;}
+.i-promo-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:#fff;}
+.i-promo-arrow.prev{left:calc(36% + 8px);}
+.i-promo-arrow.next{right:12px;}
+.i-promo-dots{position:absolute;bottom:10px;left:68%;transform:translateX(-50%);display:flex;gap:5px;z-index:3;}
+.i-promo-dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.35);}
+.i-promo-dots span.active{background:#fff;width:14px;border-radius:3px;}
+
+/* ─── COUNTERS ────────────────────────────────────── */
+.i-counters{display:flex;align-items:center;justify-content:space-around;padding:36px 48px;border-top:1px solid;border-bottom:1px solid;}
+.theme-dark  .i-counters{background:#111113;border-color:rgba(255,255,255,.07);}
+.theme-light .i-counters{background:#fff;border-color:rgba(0,0,0,.06);}
+.theme-gold  .i-counters{background:#faf6f0;border-color:rgba(184,146,58,.12);}
+.i-counter{flex:1;display:flex;flex-direction:column;gap:8px;padding:0 20px;}
+.i-counter-num{font-size:clamp(36px,4.5vw,58px);font-weight:800;letter-spacing:-.04em;line-height:1;display:flex;align-items:baseline;gap:2px;font-family:'Montserrat',sans-serif;}
+.theme-dark  .i-counter-num{color:#f5f5f5;}
+.theme-light .i-counter-num{color:#0a0a0a;}
+.theme-gold  .i-counter-num{color:#1a1410;font-family:'Cormorant Garamond',serif;font-weight:600;}
+.i-counter-label{font-size:11px;font-weight:400;line-height:1.5;font-family:'Inter',sans-serif;}
+.theme-dark  .i-counter-label{color:rgba(245,245,245,.38);}
+.theme-light .i-counter-label{color:rgba(10,10,10,.45);}
+.theme-gold  .i-counter-label{color:rgba(26,20,16,.42);font-family:'Cormorant Garamond',serif;font-size:13px;}
+.i-counter-divider{width:1px;height:56px;flex-shrink:0;}
+.theme-dark  .i-counter-divider{background:rgba(255,255,255,.07);}
+.theme-light .i-counter-divider{background:rgba(0,0,0,.08);}
+.theme-gold  .i-counter-divider{background:rgba(184,146,58,.2);}
+
+/* ─── INFO BANNER ─────────────────────────────────── */
+.i-info-banner{display:flex;align-items:center;gap:28px;padding:32px 48px;min-height:130px;position:relative;overflow:hidden;}
+.theme-dark  .i-info-banner{background:linear-gradient(120deg,#1a0500 0%,#2d0a00 60%,#0a0500 100%);}
+.theme-light .i-info-banner{background:linear-gradient(120deg,#1847e8 0%,#0f2fa3 60%,#0a1f6e 100%);}
+.theme-gold  .i-info-banner{background:linear-gradient(120deg,#1a1410 0%,#2a1f0f 60%,#1a1410 100%);}
+.i-info-icon{flex-shrink:0;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;color:#fff;}
+.i-info-icon svg{width:22px;height:22px;}
+.i-info-body{flex:1;}
+.i-info-tag{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#ffd166;margin-bottom:5px;font-family:'Montserrat',sans-serif;}
+.theme-dark .i-info-tag{color:#ff6b35;}
+.theme-gold .i-info-tag{color:#b8923a;font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.22em;font-style:italic;}
+.i-info-title{font-size:clamp(16px,2.2vw,22px);font-weight:800;color:#fff;margin-bottom:6px;}
+.theme-dark  .i-info-title{font-family:'Clash Display',sans-serif;}
+.theme-light .i-info-title{font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-info-title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:clamp(18px,2.4vw,26px);}
+.i-info-title span{color:#ffd166;}
+.theme-dark  .i-info-title span{color:#ff6b35;}
+.theme-gold  .i-info-title span{color:#b8923a;font-style:italic;}
+.i-info-sub{font-size:11px;color:rgba(255,255,255,.65);line-height:1.65;max-width:480px;margin-bottom:12px;font-family:'Inter',sans-serif;}
+.theme-gold .i-info-sub{font-family:'Cormorant Garamond',serif;font-size:14px;}
+.i-info-badges{display:flex;gap:8px;flex-wrap:wrap;}
+.i-info-badge{font-size:10px;font-weight:600;color:rgba(255,255,255,.8);background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);border-radius:100px;padding:4px 12px;font-family:'Montserrat',sans-serif;}
+.theme-gold .i-info-badge{font-family:'Cormorant Garamond',serif;font-size:12px;}
+
+/* ─── FOOTER ──────────────────────────────────────── */
+.i-footer{padding:32px 36px 24px;display:flex;flex-direction:column;gap:24px;}
+.theme-dark  .i-footer{background:#09090b;}
+.theme-light .i-footer{background:#0a0a0a;}
+.theme-gold  .i-footer{background:#1a1410;}
+.i-footer-top{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;}
+.i-footer-brand{display:flex;flex-direction:column;gap:10px;}
+.i-footer-logo{font-size:16px;font-weight:800;color:#fff;letter-spacing:.06em;}
+.theme-dark  .i-footer-logo{font-family:'Clash Display',sans-serif;letter-spacing:.2em;}
+.theme-light .i-footer-logo{font-family:'Montserrat',sans-serif;}
+.theme-gold  .i-footer-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;letter-spacing:.1em;}
+.i-footer-logo .accent{color:#ff6b35;}
+.theme-light .i-footer-logo .accent{color:#1847e8;}
+.theme-light .i-footer-logo{color:#1847e8;}
+.theme-gold  .i-footer-logo .accent{color:#b8923a;font-style:italic;}
+.i-footer-tagline{font-size:10px;color:rgba(255,255,255,.3);font-weight:400;line-height:1.6;max-width:200px;font-family:'Inter',sans-serif;}
+.theme-gold .i-footer-tagline{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;}
+.i-footer-cols{display:flex;gap:40px;}
+.i-footer-col{display:flex;flex-direction:column;gap:10px;}
+.i-footer-col-title{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);font-family:'Inter',sans-serif;}
+.i-footer-link{font-size:11px;color:rgba(255,255,255,.5);text-decoration:none;cursor:pointer;transition:color .2s;font-family:'Inter',sans-serif;}
+.theme-gold .i-footer-link{font-family:'Cormorant Garamond',serif;font-size:13px;}
+.i-footer-link:hover{color:#fff;}
+.i-footer-bottom{border-top:1px solid rgba(255,255,255,.07);padding-top:18px;display:flex;justify-content:space-between;align-items:center;}
+.i-footer-copy{font-size:10px;color:rgba(255,255,255,.2);font-family:'Inter',sans-serif;}
+.i-footer-legal{display:flex;gap:16px;}
+.i-footer-legal span{font-size:10px;color:rgba(255,255,255,.2);cursor:pointer;font-family:'Inter',sans-serif;}
+
+/* ─── ANIMATIONS ──────────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideCards{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:translateX(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+
+#iris.is-animating .i-hero-banner         {animation:scaleIn .4s ease both;}
+#iris.is-animating .i-hero-tag            {animation:fadeUp .28s ease .05s both;}
+#iris.is-animating .i-hero-title          {animation:fadeUp .35s cubic-bezier(.34,1.56,.64,1) .12s both;}
+#iris.is-animating .i-hero-sub            {animation:fadeUp .28s ease .2s both;}
+#iris.is-animating .i-hero-cta            {animation:fadeUp .25s ease .28s both;}
+#iris.is-animating .i-section-header      {animation:fadeUp .28s ease .32s both;}
+#iris.is-animating .i-product-card:nth-child(1){animation:slideCards .25s ease .34s both;}
+#iris.is-animating .i-product-card:nth-child(2){animation:slideCards .25s ease .40s both;}
+#iris.is-animating .i-product-card:nth-child(3){animation:slideCards .25s ease .46s both;}
+#iris.is-animating .i-product-card:nth-child(4){animation:slideCards .25s ease .52s both;}
+#iris.is-animating .i-product-card:nth-child(5){animation:slideCards .25s ease .58s both;}
+#iris.is-animating .i-product-card:nth-child(6){animation:slideCards .25s ease .64s both;}
+#iris.is-animating .i-promo               {animation:fadeUp .3s ease .66s both;}
+#iris.is-animating .i-counter:nth-child(1){animation:fadeUp .28s ease .72s both;}
+#iris.is-animating .i-counter:nth-child(3){animation:fadeUp .28s ease .78s both;}
+#iris.is-animating .i-counter:nth-child(5){animation:fadeUp .28s ease .84s both;}
+#iris.is-animating .i-info-banner         {animation:fadeUp .3s ease .86s both;}
+#iris.is-animating .i-footer              {animation:fadeIn .3s ease .95s both;}
+</style>
+</head>
+<body>
+<div id="iris" class="theme-dark">
+
+<!-- NAV -->
+<nav class="i-nav">
+  <div class="i-logo"><span class="i-logo-dot"></span><span id="logo-text">DOSA</span></div>
+  <div class="i-nav-links">
+    <a class="i-nav-link" href="#">Servicios</a>
+    <a class="i-nav-link" id="nav-mid" href="#">Proyectos</a>
+    <a class="i-nav-link" href="#">Nosotros</a>
+  </div>
+  <div class="i-nav-right">
+    <button class="i-nav-icon" id="navCart" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="i-cart-badge">3</span>
+    </button>
+    <button class="i-nav-icon" id="navAccount" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
+    <button class="i-nav-cta" id="nav-cta">Hablemos</button>
+  </div>
+</nav>
+
+<!-- HERO BANNER -->
+<div class="i-hero-banner">
+  <div class="i-fluid-bg" id="fluid-bg"></div>
+  <div class="i-fluid-grain" id="fluid-grain"></div>
+  <img id="hero-bg-img" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;display:none;opacity:0;transition:opacity 0.8s ease;">
+  <div class="i-hero-overlay">
+    <div class="i-hero-content">
+      <div class="i-hero-tag" id="hero-tag"></div>
+      <h1 class="i-hero-title" id="hero-title"></h1>
+      <p class="i-hero-sub" id="hero-sub"></p>
+      <button class="i-hero-cta" id="hero-cta"></button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION HEADER -->
+<div class="i-section-header">
+  <span class="i-section-title" id="section-title"></span>
+  <a class="i-section-link" href="#" id="section-link"></a>
+</div>
+
+<!-- PRODUCTS -->
+<div class="i-products" id="products-grid"></div>
+
+<!-- PROMO BANNER -->
+<div class="i-promo">
+  <!-- Imagen de fondo (dark: ocupa todo) -->
+  <div class="i-promo-right" id="promo-right-panel">
+    <div class="i-promo-dark-deco" id="promo-deco"></div>
+    <img id="promo-img" src="" alt="" loading="lazy" style="display:none">
+  </div>
+  <!-- Contenido encima -->
+  <div class="i-promo-left">
+    <div class="i-promo-tagline" id="promo-tagline"></div>
+    <div class="i-promo-brand" id="promo-brand"></div>
+    <div class="i-promo-offer">
+      <div class="i-promo-offer-text" id="promo-offer-text"></div>
+    </div>
+  </div>
+  <!-- Pills + CTA en esquina inferior derecha -->
+  <div class="i-promo-bottom" id="promo-bottom">
+    <div class="i-promo-badges" id="promo-badges"></div>
+    <button class="i-promo-cta" id="promo-cta"></button>
+  </div>
+</div>
+
+<!-- COUNTERS -->
+<div class="i-counters">
+  <div class="i-counter"><div class="i-counter-num"><span class="i-count" id="c1" data-target="0">0</span>+</div><div class="i-counter-label" id="cl1"></div></div>
+  <div class="i-counter-divider"></div>
+  <div class="i-counter"><div class="i-counter-num"><span class="i-count" id="c2" data-target="0">0</span>+</div><div class="i-counter-label" id="cl2"></div></div>
+  <div class="i-counter-divider"></div>
+  <div class="i-counter"><div class="i-counter-num"><span class="i-count" id="c3" data-target="0">0</span>+</div><div class="i-counter-label" id="cl3"></div></div>
+</div>
+
+<!-- INFO BANNER -->
+<div class="i-info-banner">
+  <div class="i-info-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" id="info-icon-svg">
+      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11.5 19.79 19.79 0 01.5 2.82 2 2 0 012.5.82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.18a16 16 0 006 6l.76-.76a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+    </svg>
+  </div>
+  <div class="i-info-body">
+    <div class="i-info-tag" id="info-tag"></div>
+    <div class="i-info-title" id="info-title"></div>
+    <div class="i-info-sub" id="info-sub"></div>
+    <div class="i-info-badges" id="info-badges"></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="i-footer">
+  <div class="i-footer-top">
+    <div class="i-footer-brand">
+      <div class="i-footer-logo" id="footer-logo"></div>
+      <div class="i-footer-tagline" id="footer-tagline"></div>
+    </div>
+    <div class="i-footer-cols">
+      <div class="i-footer-col"><div class="i-footer-col-title">Empresa</div><a class="i-footer-link">Sobre nosotros</a><a class="i-footer-link">Portafolio</a><a class="i-footer-link">Premios</a></div>
+      <div class="i-footer-col" id="footer-col2"></div>
+      <div class="i-footer-col"><div class="i-footer-col-title">Contacto</div><a class="i-footer-link" id="footer-contact1"></a><a class="i-footer-link" id="footer-contact2">iris.studio</a></div>
+    </div>
+  </div>
+  <div class="i-footer-bottom">
+    <div class="i-footer-copy" id="footer-copy"></div>
+    <div class="i-footer-legal"><span>Privacidad</span><span>Términos</span></div>
+  </div>
+</footer>
+
+</div><!-- /iris -->
+<script>
+const T = {
+  dark:{
+    logo:'ARBU',navMid:'Proyectos',navCta:'Contacto',
+    heroTag:'Urbanismo · Territorio · Ciudad',
+    heroTitle:'La ciudad<br><span>como materia.</span>',
+    heroSub:'Investigamos, proyectamos y transformamos el espacio urbano. Intervenciones que redefinen cómo vivimos la ciudad.',
+    heroCta:'Ver proyectos →',heroImg:'arbu-hero.jpg',
+    secTitle:'Proyectos urbanos',secLink:'Ver todos →',
+    promoBrand:'Transforma<br><span class="accent">tu ciudad.</span>',
+    promoTag:'Urbanismo · Territorio · Impacto real',
+    promoOffer:'Trabajamos con administraciones y estudios<span>Diagnóstico territorial, planeamiento y ejecución de proyectos urbanos.</span>',
+    promoPills:['Municipios','Estudios de arquitectura','Promotoras públicas'],
+    promoCta:'Hablar con el equipo →',promoImg:'arbu-img5.jpg',
+    counters:[{v:38,l:'Ciudades donde<br>hemos intervenido'},{v:210,l:'Proyectos urbanos<br>completados'},{v:15,l:'Años transformando<br>el espacio público'}],
+    infoTag:'Metodología ARBU',infoTitle:'Diagnóstico, <span>proyecto</span> e impacto',
+    infoSub:'Analizamos el territorio, diseñamos intervenciones con sentido y acompañamos cada fase hasta la ejecución. Urbanismo que funciona.',
+    infoBadges:['Análisis territorial','Participación ciudadana','Entrega ejecutiva'],
+    footerLogo:'AR<span class="accent">BU</span>',footerTag:'Urbanismo y territorio para ciudades que quieren evolucionar.',
+    col2Title:'Áreas',col2Links:['Planeamiento','Espacio público','Paisajismo'],
+    contact:'hola@arbu.studio',copy:'© 2026 ARBU. Todos los derechos reservados.',
+    products:[
+      {img:'arbu-img1.jpg',pos:'center 30%',disc:null,brand:null,name:'Ciudad nocturna',old:null,price:null},
+      {img:'arbu-img2.jpg',pos:'center 40%',disc:null,brand:null,name:'Espacio comercial urbano',old:null,price:null},
+      {img:'arbu-img3.jpg',pos:'center center',disc:null,brand:null,name:'Fachada y espacio público',old:null,price:null},
+      {img:'arbu-img4.jpg',pos:'center 50%',disc:null,brand:null,name:'Movilidad en superficie',old:null,price:null},
+      {img:'arbu-img6.jpg',pos:'center 40%',disc:null,brand:null,name:'Infraestructura viaria',old:null,price:null},
+      {img:'arbu-img7.jpg',pos:'center 50%',disc:null,brand:null,name:'Microurbanismo comercial',old:null,price:null},
+    ]
+  },
+  light:{
+    logo:'NOVO',navMid:'Cotizaciones',navCta:'Contáctanos',
+    heroTag:'Soluciones para grandes espacios',
+    heroTitle:'Climatización de alto<br>rendimiento para<br><span>tu empresa</span>',
+    heroSub:'Diseñamos, instalamos y mantenemos sistemas HVAC para oficinas corporativas e infraestructuras industriales.',
+    heroCta:'Solicitar diagnóstico →',heroImg:null,
+    secTitle:'Productos destacados',secLink:'Ver todos →',
+    promoBrand:'NO<span class="accent">VO</span>',
+    promoTag:'Refrigeración Comercial · Oficinas · Soporte 24/7',
+    promoOffer:'de descuento en climatización comercial<span>Instalación incluida · Financiamiento disponible · Sin coste de diagnóstico</span>',
+    promoPills:['Instalación incluida','Inverter A+++','Mantenimiento'],
+    promoCta:'Ver sistemas →',promoImg:'novo-img1.jpg',
+    counters:[{v:210,l:'Empresas confían en<br>los sistemas NOVO'},{v:520,l:'Proyectos de climatización<br>completados'},{v:800,l:'Equipos en nuestro<br>portafolio técnico'}],
+    infoTag:'Soporte 24/7',infoTitle:'Atención al cliente <span>personalizada</span>',
+    infoSub:'Un ingeniero NOVO dedicado a tu proyecto desde el primer contacto. Siempre disponibles, con respuesta en menos de 2 horas.',
+    infoBadges:['Línea directa 24/7','Ingeniero asignado','Plan de mantenimiento','Respuesta en menos de 2h'],
+    footerLogo:'NO<span class="accent">VO</span>',footerTag:'Refrigeración comercial de alto rendimiento.',
+    col2Title:'Servicios',col2Links:['Instalación','Mantenimiento','Cotizaciones'],
+    contact:'info@novo.pe',copy:'© 2026 NOVO. Todos los derechos reservados.',
+    products:[
+      {img:'novo-img4.jpg',disc:'-24%',brand:'NOVO',name:'Condensadora Exterior 48,000 BTU',old:'$3,299',price:'$2,499'},
+      {img:'novo-img5.jpg',disc:'-37%',brand:'NOVO',name:'Mini Split Inverter 12,000 BTU',old:'$1,190',price:'$749'},
+      {img:'novo-img1.jpg',disc:'-31%',brand:'NOVO',name:'Cassette Techo 24,000 BTU',old:'$3,299',price:'$2,499'},
+      {img:'novo-img6.jpg',disc:'-28%',brand:'NOVO',name:'Ducto Ventilación Azotea 36,000 BTU',old:'$2,100',price:'$1,499'},
+      {img:'novo-img2.jpg',disc:'-22%',brand:'NOVO',name:'Fan Coil Piso-Techo 18,000 BTU',old:'$699',price:'$549'},
+      {img:'novo-img7.jpg',disc:'-35%',brand:'NOVO',name:'Ducto Galvanizado 24,000 BTU',old:'$1,850',price:'$1,199'},
+    ]
+  },
+  gold:{
+    logo:'CELESTIA',navMid:'Colección',navCta:'Reservar cita',
+    heroTag:'Joyería · Artesanía · Exclusividad',
+    heroTitle:'Belleza que<br><span>perdura.</span>',
+    heroSub:'Piezas únicas diseñadas para quienes saben que los detalles lo son todo. Oro, plata y gemas seleccionadas a mano.',
+    heroCta:'Explorar colección →',heroImg:null,
+    secTitle:'Colección exclusiva',secLink:'Ver colección →',
+    promoBrand:'CELES<span class="accent">TIA</span>',
+    promoTag:'Alta Joyería · Piezas únicas · Envío asegurado',
+    promoOffer:'Piezas seleccionadas en oferta<span>Colección de temporada. Unidades limitadas.</span>',
+    promoPills:['Oro 18k garantizado','Certificado de autenticidad','Envío asegurado'],
+    promoCta:'Ver colección →',promoImg:'celestia-hero.jpg',
+    counters:[{v:1200,l:'Piezas únicas<br>creadas a mano'},{v:98,l:'Clientes satisfechos<br>en todo el mundo'},{v:15,l:'Años de experiencia<br>en alta joyería'}],
+    infoTag:'Nuestra promesa',infoTitle:'Cada pieza, una <span>obra de arte</span>',
+    infoSub:'Cada joya CELESTIA es creada a mano por artesanos con más de 20 años de experiencia. Materiales certificados y acabados impecables.',
+    infoBadges:['Oro 18k','Plata 925','Gemas certificadas','Garantía de por vida'],
+    footerLogo:'CELES<span class="accent">TIA</span>',footerTag:'Alta joyería para momentos que perduran.',
+    col2Title:'Colección',col2Links:['Anillos','Collares','Aretes'],
+    contact:'hola@celestia.co',copy:'© 2026 CELESTIA. Todos los derechos reservados.',
+    products:[
+      {img:'cel-img1.jpg',pos:'center center',disc:null,brand:'CELESTIA',name:'Set Collar Eslabón, Anillo y Aretes Oro 18k',old:'2.800€',price:'2.200€'},
+      {img:'cel-img2.jpg',pos:'center 40%',disc:null,brand:'CELESTIA',name:'Collar Diamante Circular Plata 925',old:'1.100€',price:'890€'},
+      {img:'cel-img3.jpg',pos:'center 30%',disc:null,brand:'CELESTIA',name:'Aretes Aro Grande y Anillo Tanzanita Oro 18k',old:'3.500€',price:'2.900€'},
+      {img:'cel-img4.jpg',pos:'center 40%',disc:null,brand:'CELESTIA',name:'Collar Eslabón Fino y Aretes Aro Oro 18k',old:'1.800€',price:'1.450€'},
+      {img:'cel-img5.jpg',pos:'center 35%',disc:null,brand:'CELESTIA',name:'Collar Diamantes Graduados y Anillo Eternidad',old:'4.200€',price:'3.600€'},
+      {img:'cel-img6.jpg',pos:'center 25%',disc:null,brand:'CELESTIA',name:'Aretes Aro Fino y Anillo Diamantes Plata',old:'2.200€',price:'1.800€'},
+    ]
+  }
+};
+
+function apply(t){
+  const d=T[t], iris=document.getElementById('iris');
+  document.getElementById('logo-text').innerHTML=d.logo;
+  document.getElementById('nav-mid').textContent=d.navMid;
+  document.getElementById('nav-cta').textContent=d.navCta;
+  document.getElementById('hero-tag').textContent=d.heroTag;
+  document.getElementById('hero-title').innerHTML=d.heroTitle;
+  document.getElementById('hero-sub').textContent=d.heroSub;
+  document.getElementById('hero-cta').textContent=d.heroCta;
+  // fluid-bg always shown, hero-bg-img handled by theme
+  const fb=document.getElementById('fluid-bg'),fg=document.getElementById('fluid-grain');
+  if(fb) fb.style.display='block';
+  if(fg) fg.style.display='block';
+  const heroBgImgInit = document.getElementById('hero-bg-img');
+  if(heroBgImgInit){
+    const T_heroImg={light:'novo-hero.jpg', dark:'arbu-hero.jpg', gold:'celestia-hero.jpg'};
+    const T_heroPos={light:'center 40%', dark:'center 50%', gold:'right center'};
+    heroBgImgInit.style.zIndex = '';
+    const imgSrc = T_heroImg[t];
+    if(imgSrc){
+      heroBgImgInit.src=imgSrc;
+      heroBgImgInit.style.objectPosition=T_heroPos[t]||'center';
+      heroBgImgInit.style.display='block';
+      setTimeout(()=>{ heroBgImgInit.style.opacity = t === 'gold' ? '1' : t === 'dark' ? '0.55' : '0.35'; },50);
+    } else {
+      heroBgImgInit.style.display='none'; heroBgImgInit.style.opacity='0';
+    }
+  }
+  const fbInit = document.getElementById('fluid-bg');
+  if(fbInit){ fbInit.style.background=FLUID_GRADIENTS[t]; fbInit.style.opacity=FLUID_OPACITY[t]; }
+  document.getElementById('section-title').textContent=d.secTitle;
+  document.getElementById('section-link').textContent=d.secLink;
+  document.getElementById('promo-brand').innerHTML=d.promoBrand;
+  document.getElementById('promo-tagline').textContent=d.promoTag;
+  document.getElementById('promo-offer-text').innerHTML=d.promoOffer;
+  document.getElementById('promo-cta').textContent=d.promoCta;
+  document.getElementById('promo-badges').innerHTML=d.promoPills.map(b=>`<span class="i-promo-badge-pill">${b}</span>`).join('');
+  // promo-badge removed
+  const pi=document.getElementById('promo-img'),pd=document.getElementById('promo-deco');
+  if(d.promoImg){pi.src=d.promoImg;pi.style.display='block';pd.style.display='none';}
+  else{pi.style.display='none';pd.style.display='block';}
+  d.counters.forEach((c,i)=>{
+    const el=document.getElementById(`c${i+1}`),lel=document.getElementById(`cl${i+1}`);
+    if(el){el.dataset.target=c.v;el.textContent='0';}
+    if(lel) lel.innerHTML=c.l;
+  });
+  document.getElementById('info-tag').textContent=d.infoTag;
+  document.getElementById('info-title').innerHTML=d.infoTitle;
+  document.getElementById('info-sub').textContent=d.infoSub;
+  document.getElementById('info-badges').innerHTML=d.infoBadges.map(b=>`<span class="i-info-badge">${b}</span>`).join('');
+  document.getElementById('footer-logo').innerHTML=d.footerLogo;
+  document.getElementById('footer-tagline').textContent=d.footerTag;
+  document.getElementById('footer-copy').textContent=d.copy;
+  document.getElementById('footer-contact1').textContent=d.contact;
+  document.getElementById('footer-col2').innerHTML=`<div class="i-footer-col-title">${d.col2Title}</div>`+d.col2Links.map(l=>`<a class="i-footer-link">${l}</a>`).join('');
+  document.getElementById('products-grid').innerHTML=d.products.map(p=>`
+    <div class="i-product-card">
+      <div class="i-product-img" style="${t==='dark'?'aspect-ratio:3/4':''}" >
+        <img src="${p.img}" alt="" loading="lazy" style="object-position:${p.pos||'center center'};object-fit:cover;width:100%;height:100%;">
+        ${p.disc?`<span class="i-product-discount">${p.disc}</span>`:''}
+      </div>
+      ${t==='dark'?`<div class="i-product-info" style="padding:10px 12px 12px;">
+        <div class="i-product-name" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:rgba(245,245,245,.7);text-align:center;">${p.name}</div>
+      </div>`:`<div class="i-product-info">
+        <div class="i-product-brand">${p.brand||''}</div>
+        <div class="i-product-name">${p.name}</div>
+        <div class="i-product-prices">
+          ${p.old?`<div class="i-product-price-old">${p.old}</div>`:''}
+          ${p.price?`<div class="i-product-price">${p.price}</div>`:''}
+        </div>
+      </div>
+      <div class="i-product-footer">
+        <button class="i-add-cart">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+          ${t==='gold'?'Reservar':'Añadir'}
+        </button>
+      </div>`}
+    </div>`).join('');
+  const show=(t!=='dark')?'flex':'none';
+  document.getElementById('navCart').style.display=show;
+  document.getElementById('navAccount').style.display=show;
+}
+
+// ── MORPH UTILITIES ──────────────────────────────────────
+
+// ── LETTER SCATTER / GATHER ──────────────────────────────
+
+function scatterText(el, onDone) {
+  // Simplemente fade out el bloque completo rápido
+  el.style.transition = 'opacity 0.15s ease, transform 0.18s ease';
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(-10px)';
+  setTimeout(() => { onDone && onDone(); }, 200);
+}
+
+function gatherText(el, html, targetTheme, baseColor) {
+  el.style.transition = 'none';
+  el.style.opacity = '1';
+  el.style.transform = '';
+
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+
+  const accentColors = { dark:'#ff6b35', light:'#ffd166', gold:'#b8923a' };
+  const accentColor  = accentColors[targetTheme] || '#fff';
+  const normalColor  = baseColor || '#ffffff';
+
+  let i = 0;
+  function buildHTML(node, isAccent) {
+    if (node.nodeType === 3) {
+      return node.textContent.split('').map(ch => {
+        if (ch === ' ') return ' ';
+        const up = Math.random() > 0.5;
+        const dist = 30 + Math.random() * 40;
+        const delay = i++ * 0.02;
+        const col = isAccent ? accentColor : normalColor;
+        return `<span style="display:inline-block;color:${col};transform:translateY(${up?-dist:dist}px);opacity:0;transition:transform 0.3s cubic-bezier(0.34,1.4,0.64,1) ${delay}s,opacity 0.22s ease ${delay}s;font-size:inherit;font-family:inherit;font-weight:inherit;font-style:inherit;line-height:1;letter-spacing:inherit;vertical-align:baseline;">${ch}</span>`;
+      }).join('');
+    } else if (node.nodeType === 1 && node.tagName === 'BR') {
+      return '<br>';
+    } else if (node.nodeType === 1 && node.tagName === 'SPAN') {
+      return Array.from(node.childNodes).map(c => buildHTML(c, true)).join('');
+    } else if (node.nodeType === 1) {
+      const attrs = Array.from(node.attributes).map(a => `${a.name}="${a.value}"`).join(' ');
+      return `<${node.tagName.toLowerCase()} ${attrs}>${Array.from(node.childNodes).map(c=>buildHTML(c,false)).join('')}</${node.tagName.toLowerCase()}>`;
+    }
+    return '';
+  }
+
+  el.innerHTML = Array.from(tmp.childNodes).map(n => buildHTML(n, false)).join('');
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.querySelectorAll('span[style*="translateY"]').forEach(s => {
+      s.style.transform = 'translateY(0)';
+      s.style.opacity = '1';
+    });
+  }));
+
+  const total = i;
+  // Cleanup: restore clean HTML. Also set color inline on the element so CSS transition doesn't flicker
+  setTimeout(() => {
+    el.innerHTML = html;
+    if (baseColor) el.style.color = baseColor;
+  }, total * 20 + 500);
+}
+
+// Morphing de color CSS (background, color, border-color)
+function morphColor(el, prop, fromColor, toColor, duration=600) {
+  // Parsea rgba
+  function parse(c) {
+    const m = c.match(/[\d.]+/g) || ['0','0','0','1'];
+    return [+m[0],+m[1],+m[2],+(m[3]||1)];
+  }
+  function toRgba(arr) {
+    return `rgba(${Math.round(arr[0])},${Math.round(arr[1])},${Math.round(arr[2])},${arr[3].toFixed(2)})`;
+  }
+  const from = parse(fromColor), to = parse(toColor);
+  const start = performance.now();
+  function step(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const ease = p < 0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+    const cur = from.map((v,i) => v + (to[i]-v)*ease);
+    el.style[prop] = toRgba(cur);
+    if (p < 1) requestAnimationFrame(step);
+    else el.style[prop] = '';
+  }
+  requestAnimationFrame(step);
+}
+
+// Theme accent colors
+const ACCENT = { dark:'rgba(220,64,42,1)', light:'rgba(24,71,232,1)', gold:'rgba(184,146,58,1)' };
+const BG     = { dark:'rgba(9,9,11,1)', light:'rgba(244,244,242,1)', gold:'rgba(250,246,240,1)' };
+
+// COUNTER
+function animateCounters(){
+  document.querySelectorAll('.i-count').forEach(el=>{
+    const target=+el.dataset.target,dur=1600,s=performance.now();
+    function u(now){const p=Math.min((now-s)/dur,1),e=p===1?1:1-Math.pow(2,-10*p);el.textContent=Math.floor(e*target);if(p<1)requestAnimationFrame(u);else el.textContent=target;}
+    requestAnimationFrame(u);
+  });
+}
+let counterObserver=null;
+function setupCounterObserver(){
+  const c=document.querySelector('.i-counters');if(!c)return;
+  if(counterObserver) counterObserver.disconnect();
+  let fired=false;
+  counterObserver=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting&&!fired){fired=true;animateCounters();}});},{threshold:0.3});
+  counterObserver.observe(c);
+}
+
+// ── MORPH TRANSITION ─────────────────────────────────────
+// Gradientes del fluido por tema
+const FLUID_GRADIENTS = {
+  dark:  'radial-gradient(ellipse 80% 60% at 20% 50%,#dc402a 0%,transparent 55%),radial-gradient(ellipse 60% 80% at 80% 30%,#ff6b35 0%,transparent 50%),radial-gradient(ellipse 50% 50% at 60% 80%,#c41c00 0%,transparent 50%),#09090b',
+  light: 'radial-gradient(ellipse 80% 60% at 20% 50%,#1847e8 0%,transparent 55%),radial-gradient(ellipse 60% 80% at 80% 30%,#00d4ff 0%,transparent 50%),radial-gradient(ellipse 50% 50% at 60% 80%,#2563eb 0%,transparent 50%),#1035c0',
+  gold:  'radial-gradient(ellipse 80% 60% at 20% 50%,#b8923a 0%,transparent 55%),radial-gradient(ellipse 60% 80% at 80% 30%,#d4af6a 0%,transparent 50%),radial-gradient(ellipse 50% 50% at 60% 80%,#8a6820 0%,transparent 50%),#09090b',
+};
+const FLUID_OPACITY = { dark: 0.85, light: 0.85, gold: 0 };
+const BG_COLOR = { dark:'#09090b', light:'#f4f4f2', gold:'#faf6f0' };
+
+let cur='dark', busy=false;
+
+// Inicializar gradiente
+function initFluid() {
+  const fb = document.getElementById('fluid-bg');
+  if (fb) { fb.style.background = FLUID_GRADIENTS['dark']; fb.style.opacity = FLUID_OPACITY['dark']; }
+}
+
+window.setIrisTheme = function(theme) {
+  if (busy || theme === cur) return;
+  busy = true;
+  const from = cur;
+  cur = theme;
+  const iris = document.getElementById('iris');
+  const d = T[theme];
+  const fb = document.getElementById('fluid-bg');
+
+  // ── 1. CARDS salen hacia la izquierda ────────────────
+  iris.querySelectorAll('.i-product-card').forEach((el, i) => {
+    el.style.transition = `transform 0.32s cubic-bezier(0.4,0,0.2,1) ${i*0.04}s, opacity 0.25s ease ${i*0.04}s`;
+    el.style.transform = 'translateX(-120%)';
+    el.style.opacity = '0';
+  });
+
+  // ── 2. FONDO del iris ────────────────────────────────
+  iris.style.transition = 'background 0.8s ease';
+  iris.style.background = BG_COLOR[theme];
+
+  // ── 3. GRADIENTE FLUIDO transiciona de color/opacidad ─
+  if (fb) {
+    fb.style.transition = 'none';
+    fb.style.background = FLUID_GRADIENTS[theme];
+    fb.getBoundingClientRect();
+    fb.style.transition = 'opacity 1.0s ease';
+    fb.style.opacity = FLUID_OPACITY[theme];
+  }
+
+  // ── 3b. IMAGEN DE FONDO ──────────────────────────────
+  const heroBgImg = document.getElementById('hero-bg-img');
+  if (heroBgImg) {
+    heroBgImg.style.transition = 'none';
+    heroBgImg.style.opacity = '0';
+    heroBgImg.style.display = 'none';
+    heroBgImg.style.zIndex = '';
+    const T_heroImg = { light: 'novo-hero.jpg', dark: 'arbu-hero.jpg', gold: 'celestia-hero.jpg' };
+    const T_heroPos = { light: 'center 40%', dark: 'center 50%', gold: 'right center' };
+    const imgSrc = T_heroImg[theme];
+    const imgPos = T_heroPos[theme] || 'center';
+    if (imgSrc) {
+      setTimeout(() => {
+        heroBgImg.src = imgSrc;
+        heroBgImg.style.objectPosition = imgPos;
+        heroBgImg.style.display = 'block';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          heroBgImg.style.transition = 'opacity 0.8s ease';
+          heroBgImg.style.opacity = theme === 'gold' ? '1' : theme === 'dark' ? '0.55' : '0.35';
+        }));
+      }, 300);
+    }
+  }
+
+  // ── 3c. Ocultar texto del hero INMEDIATAMENTE para evitar flash ──
+  ['hero-title','hero-tag','hero-sub','hero-cta'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.transition = 'none'; el.style.opacity = '0'; }
+  });
+  // Promo también se oculta al mismo tiempo
+  const promoEl = document.querySelector('.i-promo');
+  if (promoEl) { promoEl.style.transition = 'none'; promoEl.style.opacity = '0'; }
+
+  // ── 3b. Aplicar clase del tema al iris YA — para que CSS logo funcione ─
+  // (solo cambia colores CSS, el contenido se actualiza en el paso 7)
+  iris.className = 'theme-' + theme;
+  // Pero preservar el fondo inline que ya pusimos
+  iris.style.background = BG_COLOR[from];
+  iris.style.transition = 'background 0.8s ease';
+  setTimeout(() => { iris.style.background=''; iris.style.transition=''; }, 900);
+
+  // ── 4. LOGO scatter → gather ─────────────────────────
+  const logoEl = document.getElementById('logo-text');
+  if (logoEl) {
+    const navColors = { dark:'#f5f5f5', light:'#1847e8', gold:'#1a1410' };
+    const logoColor = navColors[theme];
+    // Forzar color destino en el elemento ANTES de que empiece la animación
+    logoEl.style.color = logoColor;
+    scatterText(logoEl, () => gatherText(logoEl, d.logo, theme, logoColor));
+  }
+
+  // ── 5. NAV CTA color ─────────────────────────────────
+  const cta = document.getElementById('nav-cta');
+  if (cta) {
+    cta.style.transition = 'background 0.5s ease, color 0.5s ease, border-color 0.5s ease';
+    if (theme === 'gold') { cta.style.background = 'transparent'; cta.style.color = '#b8923a'; cta.style.borderColor = '#b8923a'; }
+    else { cta.style.background = ACCENT[theme]; cta.style.color = '#fff'; cta.style.borderColor = ACCENT[theme]; }
+    setTimeout(() => { cta.style.transition=''; cta.style.background=''; cta.style.color=''; cta.style.borderColor=''; }, 700);
+  }
+
+  // ── 6. Hero title scatter → gather (200ms) ───────────
+  setTimeout(() => {
+    const titleEl = document.getElementById('hero-title');
+    if (titleEl) scatterText(titleEl, () => gatherText(titleEl, d.heroTitle, theme));
+
+    const tagEl = document.getElementById('hero-tag');
+    if (tagEl) { tagEl.style.transition='none'; tagEl.style.opacity='0'; setTimeout(()=>{ tagEl.textContent=d.heroTag; tagEl.style.transition='opacity 0.25s ease'; tagEl.style.opacity='1'; }, 250); }
+
+    const subEl = document.getElementById('hero-sub');
+    if (subEl) { subEl.style.transition='none'; subEl.style.opacity='0'; setTimeout(()=>{ subEl.textContent=d.heroSub; subEl.style.transition='opacity 0.25s ease'; subEl.style.opacity='1'; }, 350); }
+
+    const ctaEl = document.getElementById('hero-cta');
+    if (ctaEl) { ctaEl.style.transition='none'; ctaEl.style.opacity='0'; setTimeout(()=>{ ctaEl.textContent=d.heroCta; ctaEl.style.transition='opacity 0.25s ease'; ctaEl.style.opacity='1'; }, 420); }
+  }, 180);
+
+  // ── 7. Resto del contenido al punto medio ────────────
+  setTimeout(() => {
+    // (iris.className ya aplicado en paso 3b)
+    iris.style.background = '';
+    iris.style.transition = '';
+
+    // Actualizar datos
+    document.getElementById('nav-mid').textContent = d.navMid;
+    document.getElementById('section-title').textContent = d.secTitle;
+    document.getElementById('section-link').textContent = d.secLink;
+    // ── Promo banner: mismo timing que hero ─────────────
+    const promoEl = document.querySelector('.i-promo');
+    if (promoEl) { promoEl.style.transition='none'; promoEl.style.opacity='0'; }
+
+    setTimeout(() => {
+      document.getElementById('promo-brand').innerHTML = d.promoBrand;
+      document.getElementById('promo-tagline').textContent = d.promoTag;
+      document.getElementById('promo-offer-text').innerHTML = d.promoOffer;
+      document.getElementById('promo-cta').textContent = d.promoCta;
+      document.getElementById('promo-badges').innerHTML = d.promoPills.map(b=>`<span class="i-promo-badge-pill">${b}</span>`).join('');
+      // promo-badge removed
+      const pi=document.getElementById('promo-img'), pd=document.getElementById('promo-deco');
+      if(d.promoImg){pi.src=d.promoImg;pi.style.display='block';if(pd)pd.style.display='none';}
+      else{pi.style.display='none';if(pd)pd.style.display='block';}
+      if (promoEl) { promoEl.style.transition='opacity 0.25s ease'; promoEl.style.opacity='1'; }
+    }, 180);
+    d.counters.forEach((c,i)=>{ const el=document.getElementById(`c${i+1}`),lel=document.getElementById(`cl${i+1}`); if(el){el.dataset.target=c.v;el.textContent='0';}if(lel)lel.innerHTML=c.l; });
+    document.getElementById('info-tag').textContent = d.infoTag;
+    document.getElementById('info-title').innerHTML = d.infoTitle;
+    document.getElementById('info-sub').textContent = d.infoSub;
+    document.getElementById('info-badges').innerHTML = d.infoBadges.map(b=>`<span class="i-info-badge">${b}</span>`).join('');
+    document.getElementById('footer-logo').innerHTML = d.footerLogo;
+    document.getElementById('footer-tagline').textContent = d.footerTag;
+    document.getElementById('footer-copy').textContent = d.copy;
+    document.getElementById('footer-contact1').textContent = d.contact;
+    document.getElementById('footer-col2').innerHTML = `<div class="i-footer-col-title">${d.col2Title}</div>`+d.col2Links.map(l=>`<a class="i-footer-link">${l}</a>`).join('');
+    const show=(theme!=='dark')?'flex':'none';
+    document.getElementById('navCart').style.display=show;
+    document.getElementById('navAccount').style.display=show;
+
+    // ── 8. Cards nuevas entran desde la derecha ───────
+    const grid = document.getElementById('products-grid');
+    grid.innerHTML = d.products.map(p=>`
+      <div class="i-product-card" style="transform:translateX(120%);opacity:0">
+        <div class="i-product-img" style="${theme==='dark'?'aspect-ratio:3/4':''}">
+          <img src="${p.img}" alt="" loading="lazy" style="object-position:${p.pos||'center center'};object-fit:cover;width:100%;height:100%;">
+          ${p.disc?`<span class="i-product-discount">${p.disc}</span>`:''}
+        </div>
+        ${theme==='dark'?`<div class="i-product-info" style="padding:10px 12px 12px;">
+          <div class="i-product-name" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:rgba(245,245,245,.7);text-align:center;">${p.name}</div>
+        </div>`:`<div class="i-product-info">
+          <div class="i-product-brand">${p.brand||''}</div>
+          <div class="i-product-name">${p.name}</div>
+          <div class="i-product-prices">
+            ${p.old?`<div class="i-product-price-old">${p.old}</div>`:''}
+            ${p.price?`<div class="i-product-price">${p.price}</div>`:''}
+          </div>
+        </div>
+        <div class="i-product-footer">
+          <button class="i-add-cart">
+            <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+            ${theme==='gold'?'Reservar':'Añadir'}
+          </button>
+        </div>`}
+      </div>`).join('');
+
+    requestAnimationFrame(() => {
+      iris.querySelectorAll('.i-product-card').forEach((el,i) => {
+        setTimeout(() => {
+          el.style.transition = `transform 0.38s cubic-bezier(0.34,1.1,0.64,1), opacity 0.28s ease`;
+          el.style.transform = 'translateX(0)'; el.style.opacity = '1';
+        }, i*55);
+      });
+    });
+
+    window.scrollTo(0,0);
+    setupCounterObserver();
+    setTimeout(() => { busy=false; }, 700);
+  }, 340);
+};
+
+apply('dark');
+initFluid();
+setupCounterObserver();
+window.addEventListener('message', e => { if(e.data && e.data.type==='SET_THEME') window.setIrisTheme(e.data.theme); });
+</script>
+</body>
+</html>
+
