@@ -881,21 +881,13 @@
 
   .iris-menu .im-link {
     display: block; position: relative;
-    padding: 10px 4px 2px 24px; text-decoration: none; color: var(--ink); cursor: pointer;
+    padding: 10px 4px 2px 4px; text-decoration: none; color: var(--ink); cursor: pointer;
     transition: color .6s cubic-bezier(0.16,1,0.3,1);
   }
   .iris-menu .im-links .im-link {
-    font-family: "Clash Display", 'Inter', sans-serif;
-    font-size: 20px; font-weight: 600; letter-spacing: -.03em; line-height: 1.2;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 20px; font-weight: 600; letter-spacing: -.02em; line-height: 1.2;
   }
-  .iris-menu .im-links .im-link::before {
-    content: ""; position: absolute; left: 4px; top: 50%;
-    width: 6px; height: 6px; margin-top: -3px; background: currentColor;
-    transform: rotate(45deg) scale(0); opacity: 0;
-    transition: transform .5s cubic-bezier(0.16,1,0.3,1), opacity .4s cubic-bezier(0.16,1,0.3,1);
-  }
-  .iris-menu .im-links li:hover .im-link::before,
-  .iris-menu .im-links .im-link.current::before { transform: rotate(45deg) scale(1); opacity: 1; }
 
   .iris-menu .im-roll { position: relative; display: inline-block; overflow: hidden; vertical-align: top; line-height: 1.14; padding-bottom: .14em; }
   .iris-menu .im-roll span { display: block; transition: transform .55s cubic-bezier(0.16,1,0.3,1); }
@@ -909,13 +901,13 @@
   }
 
   .iris-menu .im-sub-head {
-    margin: 22px 4px 8px 24px;
+    margin: 22px 4px 8px 4px;
     font-family: 'Inter', monospace; font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
     color: var(--ink); opacity: .5;
   }
   .iris-menu .im-subs .im-link {
     font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: -.01em;
-    padding: 8px 4px 2px 24px;
+    padding: 8px 4px 2px 4px;
   }
 
   .iris-menu .im-reveal { display: block; }
