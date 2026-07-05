@@ -144,11 +144,11 @@
   }
   .hero-tags .tag {
     font-family: "Inter", sans-serif;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 500;
     letter-spacing: .14em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
+    color: rgba(255,255,255,0.7);
     padding: 0;
     background: none;
     border: none;
@@ -592,14 +592,14 @@
 
   .hero-title {
     font-family: 'Inter', sans-serif;
-    font-size: clamp(14px, 1.35vw, 18px);
-    font-weight: 400;
-    line-height: 1.55;
-    letter-spacing: 0;
-    color: rgba(255,255,255,0.88);
+    font-size: clamp(26px, 2.8vw, 38px);
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -.025em;
+    color: #fff;
     margin-bottom: 22px;
     user-select: none;
-    max-width: 380px;
+    max-width: 480px;
   }
 
   .hero-sub {
@@ -619,11 +619,11 @@
   }
   .hero-tags .tag {
     font-family: "Inter", sans-serif;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 500;
     letter-spacing: .14em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
+    color: rgba(255,255,255,0.7);
     padding: 0;
     background: none;
     border: none;
@@ -809,10 +809,10 @@
   }
   .hero-nav-wordmark {
     font-family: "Clash Display", 'Inter', sans-serif;
-    font-size: clamp(28px, 2.8vw, 44px);
+    font-size: clamp(52px, 7vw, 96px);
     font-weight: 700;
-    line-height: .9;
-    letter-spacing: -.02em;
+    line-height: .88;
+    letter-spacing: -.03em;
     color: #fff;
   }
   .hero-nav-wordmark .s { color: #fff; }
@@ -1045,7 +1045,7 @@
       </div>
       <div class="browser">
         <div class="browser-bar"><span class="wm">IRIS STUDIO</span></div>
-        <div class="browser-body"><iframe id="irisFrame" src="iris-studio/iris-frame.html?v=20260705a" scrolling="yes" frameborder="0"></iframe></div>
+        <div class="browser-body"><iframe id="irisFrame" src="iris-studio/iris-frame.html?v=20260705b" scrolling="yes" frameborder="0"></iframe></div>
       </div>
     </div>
   </div>
@@ -1191,7 +1191,7 @@ function isUnlocked(key) {
 }
 function setUnlocked(key) { localStorage.setItem(key, JSON.stringify({ ts: Date.now() })); sessionStorage.setItem(key, '1'); }
 const PASSWORDS = { corlima: 'Corlima2026', diseno: 'Socrates99@', spacio: '455211' };
-const DESTINATIONS = { corlima: 'corlima/herramientas_corlima.html', diseno: 'diseno/herramientas_diseno.html', spacio: 'spacio/spacio2.html?v=20260705a' };
+const DESTINATIONS = { corlima: 'corlima/herramientas_corlima.html', diseno: 'diseno/herramientas_diseno.html', spacio: 'spacio/spacio2.html?v=20260705b' };
 const STORAGE_KEYS = { corlima: 'corlimaAccess', diseno: 'disenoAccess', spacio: 'spacioAccess' };
 function openModal(which) {
   if (isUnlocked(STORAGE_KEYS[which])) { setUnlocked(STORAGE_KEYS[which]); window.location.href = DESTINATIONS[which]; return; }
