@@ -861,6 +861,159 @@
     .hero-banner-img { object-position: 70% 50%; }
   }
 
+  /* ── Botón Menu ── */
+  .menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px 9px 18px;
+    border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.28);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: pointer;
+    transition: background .25s, border-color .25s;
+    margin-top: 4px;
+  }
+  .menu-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.5); }
+  .menu-btn-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .menu-btn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+    width: 14px;
+    height: 14px;
+  }
+  .menu-btn-grid span {
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 1px;
+    background: rgba(255,255,255,0.85);
+  }
+
+  /* ── Panel desplegable ── */
+  .nav-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    pointer-events: none;
+  }
+  .nav-drawer-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    transition: background .4s ease;
+  }
+  .nav-drawer.open .nav-drawer-backdrop {
+    background: rgba(0,0,0,0.32);
+    pointer-events: all;
+  }
+  .nav-drawer-panel {
+    position: absolute;
+    top: 0; right: 0;
+    width: min(420px, 92vw);
+    height: 100%;
+    background: #f5f4f0;
+    display: flex;
+    flex-direction: column;
+    padding: 36px 44px 48px;
+    transform: translateX(100%);
+    transition: transform .55s cubic-bezier(0.77,0,0.18,1);
+    pointer-events: all;
+    overflow-y: auto;
+  }
+  .nav-drawer.open .nav-drawer-panel { transform: translateX(0); }
+
+  /* Logo invertido en el panel */
+  .nav-drawer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 52px;
+  }
+  .nav-drawer-wordmark {
+    font-family: "Clash Display", 'Inter', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -.03em;
+    color: #111;
+    line-height: 1;
+  }
+
+  /* Close btn */
+  .nav-drawer-close {
+    margin-left: auto;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s;
+    flex-shrink: 0;
+  }
+  .nav-drawer-close:hover { background: rgba(0,0,0,0.07); }
+  .nav-drawer-close svg { width: 14px; height: 14px; }
+
+  /* Nav links en el panel */
+  .nav-drawer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 1;
+  }
+  .nav-drawer-links a {
+    font-family: "Clash Display", 'Inter', sans-serif;
+    font-size: clamp(32px, 5.5vw, 46px);
+    font-weight: 700;
+    color: #111;
+    letter-spacing: -.02em;
+    line-height: 1;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    transition: color .2s, padding-left .3s cubic-bezier(0.77,0,0.18,1);
+    display: flex;
+    align-items: center;
+  }
+  .nav-drawer-links a:first-child { border-top: 1px solid rgba(0,0,0,0.1); }
+  .nav-drawer-links a:hover { color: #c0392b; padding-left: 10px; }
+
+  /* Redes sociales */
+  .nav-drawer-social {
+    margin-top: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .nav-drawer-social-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,0.38);
+    margin-bottom: 10px;
+  }
+  .nav-drawer-social a {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #111;
+    letter-spacing: .01em;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    transition: color .2s;
+  }
+  .nav-drawer-social a:hover { color: #c0392b; }
+
 </style>
 </head>
 <body>
@@ -873,14 +1026,40 @@
       <span class="hero-nav-wordmark">IRI<span class="s">S</span></span>
       <span class="hero-nav-tagline">Estudio · Diseño &amp; Automatización</span>
     </div>
-    <div class="hero-nav-links">
-      <a href="#servicios">ESTUDIO</a>
-      <a href="#projects">PROYECTOS</a>
-      <a href="#showcase">DISEÑO</a>
-      <a href="#" onclick="openCvPin(event)">CV</a>
-      <a href="#contacto">CONTACTO</a>
-    </div>
+    <button class="menu-btn" onclick="openDrawer()" aria-label="Abrir menú">
+      <span class="menu-btn-label">Menu</span>
+      <span class="menu-btn-grid"><span></span><span></span><span></span><span></span></span>
+    </button>
   </nav>
+
+  <!-- ── DRAWER NAV ── -->
+  <div class="nav-drawer" id="navDrawer">
+    <div class="nav-drawer-backdrop" onclick="closeDrawer()"></div>
+    <div class="nav-drawer-panel">
+      <div class="nav-drawer-logo">
+        <span class="nav-drawer-wordmark">IRI<span style="color:#c0392b">S</span></span>
+        <button class="nav-drawer-close" onclick="closeDrawer()" aria-label="Cerrar menú">
+          <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 1l12 12M13 1L1 13" stroke="#111" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <nav class="nav-drawer-links">
+        <a href="#heroSection" onclick="closeDrawer()">Home</a>
+        <a href="#projects" onclick="closeDrawer()">Proyectos</a>
+        <a href="#capacidades" onclick="closeDrawer()">Capacidades</a>
+        <a href="#servicios" onclick="closeDrawer()">Servicios</a>
+        <a href="#contacto" onclick="closeDrawer()">Contacto</a>
+      </nav>
+      <div class="nav-drawer-social">
+        <span class="nav-drawer-social-label">Síguenos</span>
+        <a href="#">Instagram</a>
+        <a href="#">Behance</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">X / Twitter</a>
+      </div>
+    </div>
+  </div>
   <!-- BANNER: imagen fullscreen con parallax -->
   <div class="hero-banner" id="heroBanner">
     <img class="hero-banner-img" id="heroBannerImg" src="assets/hero_bg.jpg" alt="" aria-hidden="true">
@@ -1220,6 +1399,19 @@ async function checkPwd(which) {
 }
 document.querySelectorAll('.modal-overlay').forEach(el => { el.addEventListener('click', e => { if (e.target === el) closeModal(el.id.replace('modal','').toLowerCase()); }); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.show').forEach(el => closeModal(el.id.replace('modal','').toLowerCase())); });
+
+  // ── Drawer nav ──
+  function openDrawer() {
+    const d = document.getElementById('navDrawer');
+    d.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    const d = document.getElementById('navDrawer');
+    d.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 </script>
 
 <script>
