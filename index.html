@@ -59,11 +59,7 @@
   .shell { max-width: 1920px; margin: 0 auto; padding: var(--frame); }
   .rounded { border-radius: 22px; overflow: hidden; background: var(--bg); }
 
-  /* Grano */
-  .grain {
-    position: fixed; inset: 0; z-index: 6; pointer-events: none;
-    background-image: url("assets/grain.jpg"); background-size: 320px; opacity: 0.045; mix-blend-mode: overlay;
-  }
+
 
   .wrap { max-width: 1520px; margin: 0 auto; padding: 0 var(--inset); }
 
@@ -132,14 +128,7 @@
     transition: transform 0.1s linear;
     animation: heroZoomIn 1.2s cubic-bezier(0.44, 0, 0.56, 1) forwards;
   }
-  .hero-banner-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(to top,    rgba(8,8,10,0.92) 0%,  rgba(8,8,10,0)   38%),
-      linear-gradient(to bottom, rgba(8,8,10,0.55) 0%,  rgba(8,8,10,0)   28%),
-      linear-gradient(to right,  rgba(8,8,10,0.65) 0%,  rgba(8,8,10,0)   48%);
-  }
+  
   /* Contenido del hero: posición absoluta abajo-izquierda */
   .hero-content {
     position: absolute;
@@ -566,61 +555,17 @@
   }
 
   /* Ruido de grano sutil encima del placeholder */
-  .hero-banner-img::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    opacity: .35;
-    pointer-events: none;
-  }
+  
 
   /* Overlay gradiente igual que Norvin: oscuro en bordes, transparente al centro */
-  .hero-grain {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    mix-blend-mode: overlay;
-    opacity: 0.18;
-    pointer-events: none;
-    z-index: 1;
-  }
+  
 
-  .hero-banner-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(to top,    rgba(8,8,10,1)   0%,  rgba(8,8,10,0)  45%),
-      linear-gradient(to bottom, rgba(8,8,10,0.6) 0%,  rgba(8,8,10,0)  30%),
-      linear-gradient(to right,  rgba(8,8,10,0.7) 0%,  rgba(8,8,10,0)  50%);
-  }
+  
 
   /* Luz ambiental animada (círculo que se desplaza) */
-  .hero-banner::before {
-    content: '';
-    position: absolute;
-    width: 600px; height: 600px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(220,64,42,0.12) 0%, transparent 70%);
-    top: 10%; right: 15%;
-    animation: ambient 8s ease-in-out infinite alternate;
-    pointer-events: none;
-    z-index: 1;
-  }
+  
 
-  .hero-banner::after {
-    content: '';
-    position: absolute;
-    width: 400px; height: 400px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(59,157,214,0.08) 0%, transparent 70%);
-    bottom: 20%; left: 10%;
-    animation: ambient 10s ease-in-out infinite alternate-reverse;
-    pointer-events: none;
-    z-index: 1;
-  }
+  
 
   @keyframes ambient {
     0%   { transform: translate(0, 0) scale(1); }
@@ -847,8 +792,6 @@
 </head>
 <body>
 
-<div class="grain"></div>
-
 <!-- ════════════════════ HERO ════════════════════ -->
 <section class="hero" id="heroSection">
 
@@ -857,7 +800,6 @@
   <div class="hero-banner" id="heroBanner">
     <!-- Placeholder: reemplazar src por tu imagen cuando esté lista -->
     <img class="hero-banner-img" id="heroBannerImg" src="assets/hero_bg.jpg" alt="" aria-hidden="true">
-    <div class="hero-banner-overlay"></div>
   </div>
 
   <!-- CONTENIDO -->
