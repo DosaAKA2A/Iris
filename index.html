@@ -547,10 +547,22 @@
     filter: blur(12px) brightness(0.72) saturate(1.1);
     transform: scale(1.08);
   }
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: url("assets/grain.jpg") repeat;
+    background-size: 180px 180px;
+    opacity: 0.09;
+    mix-blend-mode: overlay;
+    /* solo visible en los bordes blur — el banner (z-index:1 overflow:hidden) lo tapa internamente */
+  }
 
   .hero-banner {
     position: absolute;
-    top: 48px; left: 48px; right: 48px; bottom: 48px;
+    top: 58px; left: 58px; right: 58px; bottom: 58px;
     z-index: 1;
     overflow: hidden;
     border-radius: 0;
@@ -576,8 +588,8 @@
   .hero-content {
     position: relative;
     z-index: 10;
-    padding: 0 40px 72px;
-    max-width: 780px;
+    padding: 0 52px 64px;
+    max-width: 720px;
   }
 
   .hero-eyebrow {
@@ -591,15 +603,15 @@
 
   .hero-title {
     font-family: "Clash Display", sans-serif;
-    font-size: clamp(96px, 16vw, 220px);
+    font-size: clamp(38px, 5.5vw, 78px);
     font-weight: 700;
-    line-height: .85;
+    line-height: 1.0;
     letter-spacing: -.03em;
-    color: var(--white);
-    margin-bottom: 28px;
+    color: #fff;
+    margin-bottom: 22px;
     user-select: none;
+    max-width: 600px;
   }
-  .hero-title .s { color: var(--red); }
 
   .hero-sub {
     font-size: clamp(14px, 1.5vw, 17px);
@@ -794,7 +806,7 @@
   /* ── Nav del hero ── */
   .hero-nav {
     position: absolute;
-    top: 48px; left: 48px; right: 48px;
+    top: 58px; left: 58px; right: 58px;
     z-index: 10;
     display: flex;
     align-items: flex-start;
@@ -808,7 +820,7 @@
   }
   .hero-nav-wordmark {
     font-family: "Clash Display", 'Inter', sans-serif;
-    font-size: clamp(22px, 2.6vw, 38px);
+    font-size: clamp(18px, 1.6vw, 26px);
     font-weight: 700;
     line-height: .9;
     letter-spacing: -.01em;
@@ -888,10 +900,7 @@
 
   <!-- CONTENIDO -->
   <div class="hero-content">
-    <h1 class="hero-title">IRI<span class="s">S</span></h1>
-    <p class="hero-sub">
-      Diseño, tecnología e identidad<br>para proyectos que exigen precisión.
-    </p>
+    <h1 class="hero-title">Diseño, tecnología e identidad para proyectos que exigen precisión.</h1>
     <div class="hero-tags">
       <span class="tag">Diseño Gráfico</span>
       <span class="tag">Desarrollo Web</span>
