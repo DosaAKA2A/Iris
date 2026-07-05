@@ -547,18 +547,7 @@
     filter: blur(12px) brightness(0.72) saturate(1.1);
     transform: scale(1.08);
   }
-  .hero::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    background: url("assets/grain.jpg") repeat;
-    background-size: 180px 180px;
-    opacity: 0.09;
-    mix-blend-mode: overlay;
-    /* solo visible en los bordes blur — el banner (z-index:1 overflow:hidden) lo tapa internamente */
-  }
+
 
   .hero-banner {
     position: absolute;
@@ -602,15 +591,15 @@
   }
 
   .hero-title {
-    font-family: "Clash Display", sans-serif;
-    font-size: clamp(38px, 5.5vw, 78px);
-    font-weight: 700;
-    line-height: 1.0;
-    letter-spacing: -.03em;
-    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(14px, 1.35vw, 18px);
+    font-weight: 400;
+    line-height: 1.55;
+    letter-spacing: 0;
+    color: rgba(255,255,255,0.88);
     margin-bottom: 22px;
     user-select: none;
-    max-width: 600px;
+    max-width: 380px;
   }
 
   .hero-sub {
@@ -820,10 +809,10 @@
   }
   .hero-nav-wordmark {
     font-family: "Clash Display", 'Inter', sans-serif;
-    font-size: clamp(18px, 1.6vw, 26px);
+    font-size: clamp(28px, 2.8vw, 44px);
     font-weight: 700;
     line-height: .9;
-    letter-spacing: -.01em;
+    letter-spacing: -.02em;
     color: #fff;
   }
   .hero-nav-wordmark .s { color: #fff; }
