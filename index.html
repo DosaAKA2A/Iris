@@ -199,10 +199,6 @@
     0%, 100% { opacity: .4; transform: scaleY(1); }
     50%       { opacity: 1;  transform: scaleY(1.15); }
   }
-  @keyframes heroZoomIn {
-    from { transform: scale(1.06); }
-    to   { transform: scale(1);    }
-  }
   @keyframes fadeUp {
     0%   { transform: translateY(10px); opacity: 0; }
     100% { transform: translateY(0);    opacity: 1; }
@@ -523,10 +519,7 @@
   /* ── Animaciones de entrada — basadas en Norvin ── */
 
   /* Imagen hero: scale 1.2→1 + fade, ease [0.44,0,0.56,1] */
-  @keyframes heroZoomIn {
-    0%   { transform: scale(1.2); opacity: 0; }
-    100% { transform: scale(1);   opacity: 1; }
-  }
+
 
   /* Header: cae desde arriba con spring */
   @keyframes slideDown {
@@ -786,17 +779,113 @@
     clip-path: inset(0 round 28px);
   }
 
+
+  /* ── Efecto Pokota: fondo estirado en bordes ── */
+  .hero-backdrop {
+    position: absolute;
+    inset: -8%;
+    z-index: 0;
+    background-image: url("assets/hero_bg.jpg");
+    background-size: cover;
+    background-position: center;
+    filter: blur(28px) saturate(1.4);
+    transform: scale(1.08);
+  }
+
+  /* ── Imagen principal: zoom-out desde 1.18 → 1.0 ── */
+  .hero-banner-img {
+    animation: heroZoomOut 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes heroZoomOut {
+    from { transform: scale(1.18); }
+    to   { transform: scale(1.0); }
+  }
+
+  /* ── Nav del hero ── */
+  .hero-nav {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: clamp(22px,3vw,38px) clamp(28px,5vw,64px);
+  }
+  .hero-nav-logo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .hero-nav-wordmark {
+    font-family: "Clash Display", 'Inter', sans-serif;
+    font-size: clamp(22px, 2.6vw, 38px);
+    font-weight: 700;
+    line-height: .9;
+    letter-spacing: -.01em;
+    color: #fff;
+  }
+  .hero-nav-wordmark .s { color: var(--red); }
+  .hero-nav-tagline {
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: .03em;
+    font-family: 'Inter', sans-serif;
+  }
+  .hero-nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    padding-top: 8px;
+  }
+  .hero-nav-links a {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    color: #fff;
+    transition: color .25s;
+  }
+  .hero-nav-links a::after {
+    content: ',';
+    color: rgba(255,255,255,0.4);
+    margin-right: 5px;
+  }
+  .hero-nav-links a:last-child::after { content: ''; margin: 0; }
+  .hero-nav-links a:hover { color: var(--pop); }
+  @media (max-width: 620px) {
+    .hero-nav-tagline { display: none; }
+    .hero-nav-links a { font-size: 11px; }
+  }
+
 </style>
 </head>
 <body>
 
 <!-- ════════════════════ HERO ════════════════════ -->
 <section class="hero" id="heroSection">
+  <!-- NAV -->
+  <nav class="hero-nav">
+    <div class="hero-nav-logo">
+      <span class="hero-nav-wordmark">IRI<span class="s">S</span>.</span>
+      <span class="hero-nav-tagline">Estudio · Diseño &amp; Automatización</span>
+    </div>
+    <div class="hero-nav-links">
+      <a href="#servicios">ESTUDIO</a>
+      <a href="#projects">PROYECTOS</a>
+      <a href="#showcase">DISEÑO</a>
+      <a href="#" onclick="openCvPin(event)">CV</a>
+      <a href="#contacto">CONTACTO</a>
+    </div>
+  </nav>
 
+
+
+  <!-- Fondo estirado efecto Pokota (bordes blurred) -->
+  <div class="hero-backdrop"></div>
 
   <!-- BANNER: imagen fullscreen con parallax -->
   <div class="hero-banner" id="heroBanner">
-    <!-- Placeholder: reemplazar src por tu imagen cuando esté lista -->
     <img class="hero-banner-img" id="heroBannerImg" src="assets/hero_bg.jpg" alt="" aria-hidden="true">
   </div>
 
