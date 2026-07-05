@@ -848,14 +848,7 @@
   .hero-nav-links a:hover {
     background-position: -100% 0%;
   }
-  .hero-nav-links a::after {
-    content: ',';
-    color: rgba(255,255,255,0.4);
-    margin-right: 6px;
-    display: inline-block;
-    transition: none;
-  }
-  .hero-nav-links a:last-child::after { content: ''; margin: 0; }
+  .hero-nav-links a::after { display: none; }
   @media (max-width: 620px) {
     .hero-nav { top: 48px; left: 12px; right: 12px; }
     .hero-nav-tagline { display: none; }
@@ -1045,7 +1038,7 @@
       </div>
       <div class="browser">
         <div class="browser-bar"><span class="wm">IRIS STUDIO</span></div>
-        <div class="browser-body"><iframe id="irisFrame" src="iris-studio/iris-frame.html?v=20260705b" scrolling="yes" frameborder="0"></iframe></div>
+        <div class="browser-body"><iframe id="irisFrame" src="iris-studio/iris-frame.html?v=20260705c" scrolling="yes" frameborder="0"></iframe></div>
       </div>
     </div>
   </div>
@@ -1191,7 +1184,7 @@ function isUnlocked(key) {
 }
 function setUnlocked(key) { localStorage.setItem(key, JSON.stringify({ ts: Date.now() })); sessionStorage.setItem(key, '1'); }
 const PASSWORDS = { corlima: 'Corlima2026', diseno: 'Socrates99@', spacio: '455211' };
-const DESTINATIONS = { corlima: 'corlima/herramientas_corlima.html', diseno: 'diseno/herramientas_diseno.html', spacio: 'spacio/spacio2.html?v=20260705b' };
+const DESTINATIONS = { corlima: 'corlima/herramientas_corlima.html', diseno: 'diseno/herramientas_diseno.html', spacio: 'spacio/spacio2.html?v=20260705c' };
 const STORAGE_KEYS = { corlima: 'corlimaAccess', diseno: 'disenoAccess', spacio: 'spacioAccess' };
 function openModal(which) {
   if (isUnlocked(STORAGE_KEYS[which])) { setUnlocked(STORAGE_KEYS[which]); window.location.href = DESTINATIONS[which]; return; }
