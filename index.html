@@ -59,8 +59,6 @@
   .shell { max-width: 1920px; margin: 0 auto; padding: var(--frame); }
   .rounded { border-radius: 22px; overflow: hidden; background: var(--bg); }
 
-
-
   .wrap { max-width: 1520px; margin: 0 auto; padding: 0 var(--inset); }
 
   /* Marcador de sección ( 0X ) • NOMBRE */
@@ -110,18 +108,7 @@
   /* Empuja el contenido siguiente para que el hero no tape las secciones */
 
   /* Banner imagen con parallax */
-  .hero-banner {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    /* Siempre 100% ancho — el borde vertical (blur) aparece solo si
-       la pantalla es más alta que el ratio 1.5:1 de la imagen.
-       En ultrawide (21:9) la imagen cubre todo sin bordes laterales. */
-    width: 100%;
-    height: clamp(60svh, calc(100vw / 1.5), 100svh);
-    z-index: 1;
-    overflow: hidden;
-  }
+  
   
   
   /* Contenido del hero: posición absoluta abajo-izquierda */
@@ -433,7 +420,6 @@
   .sec-dark .send-btn { background:var(--surface); border-color:var(--line2); color:var(--text); }
   .sec-dark .send-btn:hover { background:var(--accent); color:#001018; border-color:var(--accent); }
 
-
   /* HERO ORIGINAL */
 /* HERO */
 
@@ -495,18 +481,13 @@
   }
 
   /* Banner imagen con parallax */
-  .hero-banner {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-  }
+  
 
   
 
   /* ── Animaciones de entrada — basadas en Norvin ── */
 
   /* Imagen hero: scale 1.2→1 + fade, ease [0.44,0,0.56,1] */
-
 
   /* Header: cae desde arriba con spring */
   @keyframes slideDown {
@@ -550,12 +531,26 @@
     100% { transform: translate(40px, -30px) scale(1.15); }
   }
 
-  /* ── Hero imagen: sin escalado CSS, calidad nativa ── */
+  
+  /* ── Backdrop: misma imagen, blur+saturate, sobresale por los bordes ── */
+  .hero-backdrop {
+    position: absolute;
+    inset: -6%;          /* sobresale 6% por cada lado */
+    z-index: 0;
+    
+    filter: blur(32px) saturate(1.6) brightness(0.85);
+    /* sin overflow:hidden para que se vea el sangrado */
+  }
+
+
+  /* ══ HERO IMAGE — full-bleed con blur en bordes (Pokota style) ══ */
+
+  /* La imagen ocupa TODO el hero con object-fit:cover — siempre llena */
   .hero-banner {
     position: absolute;
     inset: 0;
     z-index: 1;
-    overflow: hidden;   /* contiene la img escalada para zoom */
+    overflow: hidden;
   }
   .hero-banner-img {
     position: absolute;
@@ -564,26 +559,23 @@
     height: 100%;
     object-fit: cover;
     object-position: center center;
-    image-rendering: auto;
     will-change: transform;
     transform-origin: center center;
     animation: heroZoomOut 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
   @keyframes heroZoomOut {
-    from { transform: scale(1.14); }
+    from { transform: scale(1.10); }
     to   { transform: scale(1.0);  }
   }
 
-  /* ── Backdrop: misma imagen, blur+saturate, sobresale por los bordes ── */
-  .hero-backdrop {
+  /* Blur en los 4 bordes — pseudo-elemento encima con sombra interior */
+  .hero-banner::after {
+    content: '';
     position: absolute;
-    inset: -6%;          /* sobresale 6% por cada lado */
-    z-index: 0;
-    background-image: url("assets/hero_bg.jpg");
-    background-size: cover;
-    background-position: center;
-    filter: blur(32px) saturate(1.6) brightness(0.85);
-    /* sin overflow:hidden para que se vea el sangrado */
+    inset: 0;
+    z-index: 2;
+    box-shadow: inset 0 0 80px 40px rgba(0,0,0,0.55);
+    pointer-events: none;
   }
 
   /* Contenido del hero */
@@ -802,7 +794,6 @@
     clip-path: inset(0 round 28px);
   }
 
-
   /* ── Efecto Pokota: fondo estirado en bordes ── */
   
 
@@ -883,12 +874,6 @@
       <a href="#contacto">CONTACTO</a>
     </div>
   </nav>
-
-
-
-  <!-- Fondo estirado efecto Pokota (bordes blurred) -->
-  <div class="hero-backdrop"></div>
-
   <!-- BANNER: imagen fullscreen con parallax -->
   <div class="hero-banner" id="heroBanner">
     <img class="hero-banner-img" id="heroBannerImg" src="assets/hero_bg.jpg" alt="" aria-hidden="true">
