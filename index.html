@@ -359,7 +359,7 @@
   [data-reveal].in { opacity: 1; transform: none; }
   [data-reveal-stagger] > * { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
   [data-reveal-stagger].in > * { opacity: 1; transform: none; }
-  @keyframes heroUp { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+  @keyframes heroUp { from { opacity: 0; transform: translateY(26px); } 
   .h-anim { animation: heroUp .8s var(--ease) both; }
   @media (prefers-reduced-motion: reduce) {
     * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
@@ -542,25 +542,48 @@
     /* sin overflow:hidden para que se vea el sangrado */
   }
 
-
   /* ══ HERO IMAGE — full-bleed con blur en bordes (Pokota style) ══ */
 
   /* La imagen ocupa TODO el hero con object-fit:cover — siempre llena */
+  
+  
+  
+    
+
+  /* Blur en los 4 bordes — pseudo-elemento encima con sombra interior */
+  
+
+
+  /* ══ HERO — técnica blur en bordes ══
+     Capa 1 (z=0): hero-bg → misma imagen como background, escalada y blurred
+     Capa 2 (z=1): hero-banner → imagen con object-fit:contain, centrada
+     El bg blurred sobresale por donde la imagen no llega → bordes borrosos
+  */
+  .hero-bg {
+    position: absolute;
+    inset: -4%;                  /* sobresale para que el blur no deje halo */
+    z-index: 0;
+    background: url("assets/hero_bg.jpg") center/cover no-repeat;
+    filter: blur(28px) brightness(0.7) saturate(1.2);
+  }
   .hero-banner {
     position: absolute;
     inset: 0;
     z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
   }
   .hero-banner-img {
-    position: absolute;
-    inset: 0;
+    /* contain: imagen completa visible, sin recortar */
+    /* El fondo blurred rellena donde la imagen no llega */
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: center center;
+    object-fit: cover;           /* cubre siempre — en ultrawide no sobran bordes */
+    object-position: center;
     will-change: transform;
-    transform-origin: center center;
+    transform-origin: center;
     animation: heroZoomOut 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
   @keyframes heroZoomOut {
@@ -568,14 +591,19 @@
     to   { transform: scale(1.0);  }
   }
 
-  /* Blur en los 4 bordes — pseudo-elemento encima con sombra interior */
-  .hero-banner::after {
+  /* Borde blur visible: 4 franjas con blur real usando pseudo-elementos */
+  .hero-banner::before {
     content: '';
     position: absolute;
     inset: 0;
     z-index: 2;
-    box-shadow: inset 0 0 80px 40px rgba(0,0,0,0.55);
     pointer-events: none;
+    /* Sombra inset que difumina los bordes de la imagen real */
+    box-shadow:
+      inset  60px  0    60px -20px rgba(0,0,0,0.6),   /* izquierda */
+      inset -60px  0    60px -20px rgba(0,0,0,0.6),   /* derecha   */
+      inset  0    80px  60px -20px rgba(0,0,0,0.5),   /* arriba    */
+      inset  0   -80px  60px -20px rgba(0,0,0,0.5);   /* abajo     */
   }
 
   /* Contenido del hero */
@@ -854,6 +882,8 @@
     .hero-nav-links a { font-size: 11px; }
   }
 
+}
+
 </style>
 </head>
 <body>
@@ -874,6 +904,9 @@
       <a href="#contacto">CONTACTO</a>
     </div>
   </nav>
+  <!-- Fondo blurred (bordes) -->
+  <div class="hero-bg"></div>
+
   <!-- BANNER: imagen fullscreen con parallax -->
   <div class="hero-banner" id="heroBanner">
     <img class="hero-banner-img" id="heroBannerImg" src="assets/hero_bg.jpg" alt="" aria-hidden="true">
