@@ -59,6 +59,8 @@
   .shell { max-width: 1920px; margin: 0 auto; padding: var(--frame); }
   .rounded { border-radius: 22px; overflow: hidden; background: var(--bg); }
 
+
+
   .wrap { max-width: 1520px; margin: 0 auto; padding: 0 var(--inset); }
 
   /* Marcador de sección ( 0X ) • NOMBRE */
@@ -108,7 +110,18 @@
   /* Empuja el contenido siguiente para que el hero no tape las secciones */
 
   /* Banner imagen con parallax */
-  
+  .hero-banner {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    /* Siempre 100% ancho — el borde vertical (blur) aparece solo si
+       la pantalla es más alta que el ratio 1.5:1 de la imagen.
+       En ultrawide (21:9) la imagen cubre todo sin bordes laterales. */
+    width: 100%;
+    height: clamp(60svh, calc(100vw / 1.5), 100svh);
+    z-index: 1;
+    overflow: hidden;
+  }
   
   
   /* Contenido del hero: posición absoluta abajo-izquierda */
@@ -420,6 +433,7 @@
   .sec-dark .send-btn { background:var(--surface); border-color:var(--line2); color:var(--text); }
   .sec-dark .send-btn:hover { background:var(--accent); color:#001018; border-color:var(--accent); }
 
+
   /* HERO ORIGINAL */
 /* HERO */
 
@@ -481,13 +495,18 @@
   }
 
   /* Banner imagen con parallax */
-  
+  .hero-banner {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
 
   
 
   /* ── Animaciones de entrada — basadas en Norvin ── */
 
   /* Imagen hero: scale 1.2→1 + fade, ease [0.44,0,0.56,1] */
+
 
   /* Header: cae desde arriba con spring */
   @keyframes slideDown {
@@ -531,42 +550,12 @@
     100% { transform: translate(40px, -30px) scale(1.15); }
   }
 
-  /* ── Backdrop: misma imagen, blur+saturate, sobresale por los bordes ── */
-  
-
-
-  /* ── Pokota-style hero: fondo blurred + imagen limpia encima ── */
-
-  /* El hero mismo ES el fondo estirado/blurred (efecto borde Pokota) */
-  .hero {
-    background-image: url("assets/hero_bg.jpg");
-    background-size: cover;
-    background-position: center;
-    /* El blur se aplica con un pseudo-elemento para no afectar al contenido */
-  }
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    background-image: url("assets/hero_bg.jpg");
-    background-size: cover;
-    background-position: center;
-    filter: blur(40px) saturate(1.5) brightness(0.7);
-    transform: scale(1.05); /* evita halo blanco en bordes del blur */
-  }
-
-  /* Contenedor de la imagen: tamaño natural de la foto sin estirar */
+  /* ── Hero imagen: sin escalado CSS, calidad nativa ── */
   .hero-banner {
     position: absolute;
-    /* Imagen 2400×1706 — ratio 1.407:1 */
-    /* Ajustamos para que se vea completa y los bordes queden al fondo */
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: min(100%, calc(100svh * 1.407));  /* ancho = alto × ratio imagen */
-    height: min(100svh, calc(100% / 1.407)); /* alto = ancho / ratio */
+    inset: 0;
     z-index: 1;
-    overflow: hidden;
+    overflow: hidden;   /* contiene la img escalada para zoom */
   }
   .hero-banner-img {
     position: absolute;
@@ -575,17 +564,26 @@
     height: 100%;
     object-fit: cover;
     object-position: center center;
+    image-rendering: auto;
     will-change: transform;
     transform-origin: center center;
     animation: heroZoomOut 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
   @keyframes heroZoomOut {
-    from { transform: scale(1.12); }
+    from { transform: scale(1.14); }
     to   { transform: scale(1.0);  }
   }
-  /* srcset para calidad nativa en diferentes densidades */
-  .hero-banner-img {
-    image-rendering: auto;
+
+  /* ── Backdrop: misma imagen, blur+saturate, sobresale por los bordes ── */
+  .hero-backdrop {
+    position: absolute;
+    inset: -6%;          /* sobresale 6% por cada lado */
+    z-index: 0;
+    background-image: url("assets/hero_bg.jpg");
+    background-size: cover;
+    background-position: center;
+    filter: blur(32px) saturate(1.6) brightness(0.85);
+    /* sin overflow:hidden para que se vea el sangrado */
   }
 
   /* Contenido del hero */
@@ -804,6 +802,7 @@
     clip-path: inset(0 round 28px);
   }
 
+
   /* ── Efecto Pokota: fondo estirado en bordes ── */
   
 
@@ -886,6 +885,9 @@
   </nav>
 
 
+
+  <!-- Fondo estirado efecto Pokota (bordes blurred) -->
+  <div class="hero-backdrop"></div>
 
   <!-- BANNER: imagen fullscreen con parallax -->
   <div class="hero-banner" id="heroBanner">
