@@ -947,112 +947,76 @@
   #iris-intro {
     position: fixed; inset: 0; z-index: 9999;
     background: transparent;
-    display: flex; align-items: center; justify-content: center;
-    overflow: hidden;
+    display: block; overflow: hidden;
     pointer-events: all;
   }
   #iris-intro.done { pointer-events: none; }
-
-  /* two halves — slide apart */
   .intro-half {
     position: absolute; left: 0; right: 0; height: 50%;
     background: #080808; z-index: 2;
-    transition: transform 1.1s cubic-bezier(0.77,0,0.18,1);
+    display: flex; justify-content: center;
+    transition: transform 1.0s cubic-bezier(0.77,0,0.18,1);
   }
-  .intro-half.top { top: 0; }
-  .intro-half.bot { bottom: 0; }
+  .intro-half.top { top: 0; align-items: flex-end; padding-bottom: 28px; }
+  .intro-half.bot { bottom: 0; align-items: flex-start; padding-top: 28px; }
   #iris-intro.reveal .intro-half.top { transform: translateY(-100%); }
   #iris-intro.reveal .intro-half.bot { transform: translateY(100%); }
-
-  /* logo wrap: centrado inicialmente, luego vuela a esquina sup-izq */
-  .intro-logo-wrap {
-    position: fixed;
-    z-index: 10;
-    /* posición inicial: centrado en pantalla */
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex; flex-direction: column; align-items: center; gap: 24px;
-    transition:
-      top    0.9s cubic-bezier(0.77,0,0.18,1),
-      left   0.9s cubic-bezier(0.77,0,0.18,1),
-      transform 0.9s cubic-bezier(0.77,0,0.18,1);
-  }
-  /* al hacer reveal: vuela a la posición del hero-nav-wordmark */
-  #iris-intro.reveal .intro-logo-wrap {
-    top: 58px; left: 58px;
-    transform: translate(0, 0);
-  }
-
-  /* logo SVG */
   .intro-logo-svg {
-    width: clamp(56px, 9vw, 100px);
-    opacity: 0; transform: scale(1.18);
-    transition: opacity 0.65s ease 0.08s,
-                transform 0.85s cubic-bezier(0.16,1,0.3,1) 0.08s,
-                width 0.9s cubic-bezier(0.77,0,0.18,1);
+    width: clamp(52px, 8vw, 88px);
+    opacity: 0; transform: scale(1.15);
+    transition: opacity 0.6s ease 0.08s, transform 0.85s cubic-bezier(0.16,1,0.3,1) 0.08s;
   }
   #iris-intro.active .intro-logo-svg { opacity: 1; transform: scale(1); }
-  /* al volar al nav: el logo encoge al tamaño del nav logo (~48px) */
-  #iris-intro.reveal .intro-logo-svg { width: 48px; opacity: 0; }
-
-  /* wordmark */
+  .intro-text-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
   .intro-wordmark {
     font-family: "Clash Display",'Inter',sans-serif;
-    font-size: clamp(34px,5.5vw,68px); font-weight: 700;
+    font-size: clamp(32px,5vw,62px); font-weight: 700;
     letter-spacing: -.03em; color: #fff; line-height: 1;
-    overflow: hidden; height: 1.12em;
-    transition: opacity 0.4s ease, transform 0.5s ease;
+    overflow: hidden; height: 1.1em;
   }
   .intro-wordmark span {
     display: block; transform: translateY(110%);
-    transition: transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.25s;
+    transition: transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.22s;
   }
   #iris-intro.active .intro-wordmark span { transform: translateY(0); }
-  /* wordmark desaparece al volar */
-  #iris-intro.reveal .intro-wordmark { opacity: 0; transform: translateY(-8px); }
-
-  /* tagline */
   .intro-tagline {
-    font-family: 'Inter',sans-serif; font-size: clamp(10px,1vw,13px);
+    font-family: 'Inter',sans-serif; font-size: clamp(10px,1vw,12px);
     letter-spacing: .18em; text-transform: uppercase;
-    color: rgba(255,255,255,0.4); overflow: hidden; height: 1.4em;
-    transition: opacity 0.3s ease;
+    color: rgba(255,255,255,0.45); overflow: hidden; height: 1.4em;
   }
   .intro-tagline span {
     display: block; transform: translateY(110%);
-    transition: transform 0.75s cubic-bezier(0.16,1,0.3,1) 0.38s;
+    transition: transform 0.75s cubic-bezier(0.16,1,0.3,1) 0.35s;
   }
   #iris-intro.active .intro-tagline span { transform: translateY(0); }
-  #iris-intro.reveal .intro-tagline { opacity: 0; }
-
-  /* progress bar */
   .intro-bar {
     position: absolute; bottom: 0; left: 0;
     height: 2px; width: 100%; z-index: 3; overflow: hidden;
     background: rgba(255,255,255,0.1);
   }
   .intro-bar-fill {
-    height: 100%; width: 0%; background: rgba(255,255,255,0.7);
-    transition: width 1.5s cubic-bezier(0.16,1,0.3,1) 0.12s;
+    height: 100%; width: 0%; background: rgba(255,255,255,0.6);
+    transition: width 1.5s cubic-bezier(0.16,1,0.3,1) 0.1s;
   }
   #iris-intro.active .intro-bar-fill { width: 100%; }
 
 
 </style>
-<!-- cache: 20260706L -->
+<!-- cache: 20260706M -->
 </head>
 <body>
 <div id="iris-intro">
-  <div class="intro-grain"></div>
-  <div class="intro-half top"></div>
-  <div class="intro-half bot"></div>
-  <div class="intro-logo-wrap">
+  <div class="intro-half top">
     <svg class="intro-logo-svg" viewBox="0 0 127.71 133.66" xmlns="http://www.w3.org/2000/svg">
       <path fill="#ffffff" fill-rule="evenodd" d="M.06,44.42C-.92,26.17,9.65,14.36,21.66,8.43c6.33-3.13,13.55-5.37,21.95-6.96,8.19-1.55,18.05-2.14,26.27-.48,15.39,3.11,27.54,10.81,37.67,20.15,9.65,8.91,17.98,21.42,19.79,37.91,2.04,18.53-4.51,33.08-12.84,44.26-8.47,11.38-18.81,20-32.15,25.67-13.2,5.62-34.56,6.16-49.66,1.68-13.44-3.99-25.35-14.59-29.99-27.71-2.62-7.41-2.44-16.7,1.08-23.51,3.17-6.13,9.11-10.04,17.75-11.16,19.62-2.54,26.88,12,36.23,20.87,5.01,4.76,10.11,9.16,17.15,11.76,7.03,2.59,16.5,3.46,24.47.84,14.15-4.65,24.22-14.64,26.63-31.07,2.8-19.11-7.48-31.51-19.31-37.55-6.79-3.46-14.6-5.55-23.63-4.56-8.55.94-14.04,4.68-19.67,9.24-4.63,3.74-9.73,9.77-13.92,15-4.02,5.01-9.11,11.41-15.71,13.19-8.59,2.32-17.82.88-23.75-2.52C3.86,59.96.54,53.32.06,44.42Z"/>
       <path fill="#ffffff" fill-rule="evenodd" d="M69.52,68.17c-.58-9,2.6-15.43,6.72-20.27,4.08-4.8,11.55-9.58,21.23-9,7.61.46,13.28,3.92,17.39,8.04,4.18,4.18,7.73,9.83,8.16,17.27.44,7.58-2.55,14.23-6.72,18.71-4.18,4.5-9.22,7.9-16.31,9-6.96,1.08-13.46-1.12-17.39-3.36-4.17-2.37-8.05-6.03-10.44-10.68-1.44-2.81-2.36-5.44-2.64-9.72Z"/>
     </svg>
-    <div class="intro-wordmark"><span>IRIS</span></div>
-    <div class="intro-tagline"><span>Estudio · Diseño &amp; Automatización</span></div>
+  </div>
+  <div class="intro-half bot">
+    <div class="intro-text-group">
+      <div class="intro-wordmark"><span>IRIS</span></div>
+      <div class="intro-tagline"><span>Estudio · Diseño &amp; Automatización</span></div>
+    </div>
   </div>
   <div class="intro-bar"><div class="intro-bar-fill"></div></div>
 </div>
@@ -1509,28 +1473,14 @@ function switchTheme(btn) {
       intro.style.display = 'none';
       return;
     }
-    // hide the real hero wordmark until the logo lands
-    var heroLogo = document.querySelector('.hero-nav-logo');
-    if (heroLogo) heroLogo.style.opacity = '0';
-
     setTimeout(function(){ intro.classList.add('active'); }, 80);
-
-    // t=1900: curtain opens + logo flies to nav corner simultaneously
+    setTimeout(function(){ intro.classList.add('reveal'); }, 1900);
     setTimeout(function(){
-      intro.classList.add('reveal');
-    }, 1900);
-
-    // t=2700: logo has arrived → show real hero wordmark, remove intro
-    setTimeout(function(){
-      if (heroLogo) {
-        heroLogo.style.transition = 'opacity 0.35s ease';
-        heroLogo.style.opacity = '1';
-      }
       sessionStorage.setItem('iris-intro-done', '1');
       intro.remove();
-    }, 2850);
+    }, 3000);
   })();
-</script>
+  </script>
 
 </body>
 </html>
