@@ -953,12 +953,17 @@
   .intro-half {
     position: absolute; left: 0; right: 0; height: 50%;
     background: #080808; z-index: 2;
-    transition: transform 1s cubic-bezier(0.76,0,0.24,1) 0.5s;
+    transition: transform 1.2s cubic-bezier(0.76,0,0.24,1) 0.5s;
   }
   .intro-half.top { top: 0; }
   .intro-half.bot { bottom: 0; }
   #iris-intro.reveal .intro-half.top { transform: translateY(-100%); }
   #iris-intro.reveal .intro-half.bot { transform: translateY(100%); }
+  #iris-intro.done {
+    opacity: 0;
+    transition: opacity 0.45s cubic-bezier(0.16,1,0.3,1);
+    pointer-events: none;
+  }
   .intro-logo-wrap {
     position: relative; z-index: 3;
     display: flex; flex-direction: column; align-items: center; gap: 24px;
@@ -1006,7 +1011,7 @@
 
 
 </style>
-<!-- cache: 20260706E -->
+<!-- cache: 20260706F -->
 </head>
 <body>
 <div id="iris-intro">
@@ -1479,12 +1484,18 @@ function switchTheme(btn) {
     document.body.style.overflow = 'hidden';
     setTimeout(function(){ intro.classList.add('active'); }, 80);
     setTimeout(function(){ intro.classList.add('reveal'); }, 1800);
+    // curtain: delay 500ms + duration 1200ms = ends at ~3500ms
+    // restore scroll at 3000ms so page is ready under the curtain
+    setTimeout(function(){ document.body.style.overflow = ''; }, 3000);
+    // fade-out overlaps the last stretch of curtain (~3300ms)
     setTimeout(function(){
       intro.classList.add('done');
-      document.body.style.overflow = '';
+    }, 3300);
+    // remove from DOM after fade completes (450ms fade)
+    setTimeout(function(){
       sessionStorage.setItem('iris-intro-done', '1');
-      setTimeout(function(){ intro.remove(); }, 200);
-    }, 2960);
+      intro.remove();
+    }, 3800);
   })();
 </script>
 
