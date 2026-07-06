@@ -1159,6 +1159,11 @@
     animation: none !important;
     opacity: 0;
   }
+  .hero-banner-img {
+    animation: none !important;
+    transform: scale(1.12);
+  }
+  body.hero-go .hero-banner-img { animation: heroZoomOut 1.8s cubic-bezier(0.22,1,0.36,1) forwards !important; }
   body.hero-go .hero-eyebrow { animation: fadeUp 0.5s cubic-bezier(0.44,0,0.34,0.98) 0s    both !important; }
   body.hero-go .hero-title   { animation: fadeUp 0.5s cubic-bezier(0.44,0,0.34,0.98) 0.12s both !important; }
   body.hero-go .hero-sub     { animation: fadeUp 0.5s cubic-bezier(0.44,0,0.34,0.98) 0.20s both !important; }
@@ -1168,11 +1173,12 @@
     .hero-eyebrow, .hero-title, .hero-sub, .hero-tags, .scroll-hint {
       animation: none !important; opacity: 1 !important;
     }
+    .hero-banner-img { animation: none !important; transform: none !important; }
   }
 
 
 </style>
-<!-- cache: 20260706T -->
+<!-- cache: 20260706U -->
 </head>
 <body>
 <div id="iris-intro">
