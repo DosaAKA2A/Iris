@@ -492,11 +492,13 @@
   /* Marco del móvil (PNG con pantalla transparente) que llena la card */
   .bc-phone-frame {
     position: absolute;
-    top: 18px;
+    top: 26px;
     left: 50%;
     transform: translateX(-50%);
-    height: calc(100% + 40px);   /* sobresale ligeramente por abajo, clipeado */
-    width: auto;
+    /* estrecho: deja ver la foto a los lados, como Lyniq */
+    width: 74%;
+    max-width: 210px;
+    height: auto;
     z-index: 2;
     pointer-events: none;
   }
@@ -1129,7 +1131,7 @@
 
 
 </style>
-<!-- cache: 20260706O -->
+<!-- cache: 20260706P -->
 </head>
 <body>
 <div id="iris-intro">
