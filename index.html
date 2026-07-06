@@ -425,7 +425,8 @@
   .bento-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
   .bc-hands { background: #f2efe8; justify-content: flex-end; }
   .bc-hands .bc-img-wrap { flex: 1; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-  .bc-hands .bc-placeholder-svg { width: 60%; max-width: 240px; opacity: .18; }
+  .bc-hands .bc-hands-img { width: 100%; height: 100%; object-fit: cover; object-position: center 34%; display: block; transition: transform .6s cubic-bezier(.22,1,.36,1); }
+  .bc-hands:hover .bc-hands-img { transform: scale(1.05); }
   .bc-text { padding: 28px 30px 30px; flex-shrink: 0; }
   .bc-text h4 { font-size: 18px; font-weight: 700; letter-spacing: -.02em; color: var(--ink); margin-bottom: 8px; }
   .bc-text p  { font-size: 14px; line-height: 1.55; color: rgba(12,12,12,.55); }
@@ -1311,7 +1312,7 @@
 
 
 </style>
-<!-- cache: 20260706Z -->
+<!-- cache: 20260706AA -->
 </head>
 <body>
 <div id="iris-intro">
@@ -1424,16 +1425,10 @@
     <!-- BENTO GRID servicios al estilo Lyniq -->
     <div class="bento-grid" id="bento-svc">
 
-      <!-- Card 1: Atención prioritaria (manos — placeholder SVG) -->
+      <!-- Card 1: Atención prioritaria -->
       <div class="bento-card bc-hands">
         <div class="bc-img-wrap">
-          <svg class="bc-placeholder-svg" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 90 Q60 40 100 60 Q140 80 180 30" stroke="#0c0c0c" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-            <ellipse cx="55" cy="85" rx="30" ry="18" stroke="#0c0c0c" stroke-width="1.5" fill="none"/>
-            <ellipse cx="145" cy="75" rx="28" ry="16" stroke="#0c0c0c" stroke-width="1.5" fill="none"/>
-            <path d="M55 67 C55 55 65 50 75 55" stroke="#0c0c0c" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-            <path d="M145 59 C145 47 155 42 165 47" stroke="#0c0c0c" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-          </svg>
+          <img class="bc-hands-img" src="assets/bento-atencion.jpg?v=20260706" alt="Persona trabajando en portátil" loading="lazy">
         </div>
         <div class="bc-text">
           <h4>Atención 24/7</h4>
