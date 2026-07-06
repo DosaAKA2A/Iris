@@ -946,14 +946,12 @@
   /* ══ IRIS INTRO ══ */
   #iris-intro {
     position: fixed; inset: 0; z-index: 9999;
-    background: #080808;
+    background: transparent;
     display: flex; align-items: center; justify-content: center;
     overflow: hidden;
-    /* exit: fade whole overlay out */
-    opacity: 1;
-    transition: opacity 0.6s ease;
+    pointer-events: all;
   }
-  #iris-intro.done { opacity: 0; pointer-events: none; }
+  #iris-intro.done { pointer-events: none; }
 
   /* two halves — slide apart */
   .intro-half {
@@ -1019,7 +1017,7 @@
 
 
 </style>
-<!-- cache: 20260706I -->
+<!-- cache: 20260706J -->
 </head>
 <body>
 <div id="iris-intro">
@@ -1491,11 +1489,10 @@ function switchTheme(btn) {
     }
     setTimeout(function(){ intro.classList.add('active'); }, 80);
     setTimeout(function(){ intro.classList.add('reveal'); }, 1900);
-    setTimeout(function(){ intro.classList.add('done'); }, 3050);
     setTimeout(function(){
       sessionStorage.setItem('iris-intro-done', '1');
       intro.remove();
-    }, 3700);
+    }, 3100);
   })();
   })();
 </script>
