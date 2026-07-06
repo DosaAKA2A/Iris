@@ -454,6 +454,91 @@
   .bc-grid-lines::after  { height: 100%; width: 1px; right: 40px; }
   .bc-brand .bc-text h4 { color: #fff; }
   .bc-brand .bc-text p  { color: rgba(255,255,255,.45); }
+
+  /* ── Card 3: Kit de diseño ── */
+  .bc-kit {
+    background: #0c0c0c;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px 24px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .bc-kit-head {
+    display: flex; align-items: center; justify-content: space-between;
+    position: relative; z-index: 2;
+  }
+  .bc-kit-eyebrow {
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: rgba(255,255,255,.5); font-family: "Inter",sans-serif; font-weight: 500;
+  }
+  .bc-kit-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: .06em; color: #fff;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.13);
+    padding: 3px 9px; border-radius: 20px; font-family: "Inter",sans-serif;
+  }
+  .bc-kit-stack {
+    position: relative; flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 168px;
+  }
+  .bc-tile {
+    position: absolute;
+    width: 116px; height: 150px;
+    border-radius: 16px;
+    background: #171717;
+    border: 1px solid rgba(255,255,255,.09);
+    box-shadow: 0 14px 30px rgba(0,0,0,.45);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px; padding: 14px;
+    transition: transform .55s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
+    will-change: transform;
+  }
+  .bc-tile-cap {
+    position: absolute; bottom: 10px; left: 0; right: 0; text-align: center;
+    font-size: 9px; letter-spacing: .08em; text-transform: uppercase;
+    color: rgba(255,255,255,.4); font-family: "Inter",sans-serif; font-weight: 600;
+  }
+  .bc-tile-type .bc-tile-aa {
+    font-family: "Clash Display","Inter",sans-serif; font-weight: 600;
+    font-size: 46px; color: #fff; line-height: 1;
+  }
+  .bc-tile-grid { display: grid; grid-template-columns: repeat(3,1fr); grid-auto-rows: 1fr; gap: 7px; padding: 20px 18px 26px; }
+  .bc-tile-grid > span:not(.bc-tile-cap) { background: rgba(255,255,255,.14); border-radius: 4px; }
+  .bc-tile-color { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 18px 18px 26px; }
+  .bc-tile-color .bc-sw { border-radius: 7px; width: 100%; height: 100%; min-height: 30px; }
+  /* Fan inicial */
+  .bc-tile-type  { transform: translateX(-70px) rotate(-10deg); z-index: 1; }
+  .bc-tile-grid  { transform: translateX(70px)  rotate(10deg);  z-index: 1; }
+  .bc-tile-color { transform: translateY(-8px)  rotate(0deg);   z-index: 3; }
+  /* Hover: abren y se elevan */
+  .bc-kit:hover .bc-tile-type  { transform: translateX(-84px) translateY(-4px) rotate(-14deg); }
+  .bc-kit:hover .bc-tile-grid  { transform: translateX(84px)  translateY(-4px) rotate(14deg); }
+  .bc-kit:hover .bc-tile-color { transform: translateY(-16px) rotate(0deg) scale(1.04); }
+  .bc-kit-foot {
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 14px;
+    position: relative; z-index: 2;
+  }
+  .bc-kit-copy h4 {
+    font-size: 16px; font-weight: 700; letter-spacing: -.02em; color: #fff;
+    margin-bottom: 6px; line-height: 1.25; font-family: "Inter",sans-serif;
+  }
+  .bc-kit-copy p {
+    font-size: 12.5px; color: rgba(255,255,255,.5); line-height: 1.5;
+    font-family: "Inter",sans-serif; margin: 0;
+  }
+  .bc-kit-btn {
+    flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 7px;
+    background: #fff; color: #0c0c0c;
+    font-size: 13px; font-weight: 600; font-family: "Inter",sans-serif;
+    padding: 10px 15px; border-radius: 11px; border: none; cursor: pointer;
+    transition: background .25s ease, color .25s ease, transform .2s ease;
+  }
+  .bc-kit-btn:hover { background: var(--red); color: #fff; transform: translateY(-2px); }
+  .bc-kit-btn:active { transform: translateY(0) scale(.97); }
   /* Botón descarga bento card */
   .bc-dl-btn {
     width: 72px; height: 72px;
@@ -521,8 +606,8 @@
     left: 50%;
     transform: translateX(-50%);
     /* estrecho: deja ver la foto a los lados, como Lyniq */
-    width: 74%;
-    max-width: 210px;
+    width: 84%;
+    max-width: 280px;
     height: auto;
     z-index: 2;
     pointer-events: none;
@@ -572,12 +657,12 @@
   /* ── Blur central: glass sobre la pantalla del móvil ── */
   .bc-phone-glass {
     position: absolute;
-    top: 64px;
+    top: 72px;
     left: 50%;
-    width: min(66%, 190px);
-    height: 280px;
+    width: min(75%, 244px);
+    height: 372px;
     z-index: 2;
-    border-radius: 28px;
+    border-radius: 34px;
     background: rgba(255,255,255,0.05);
     -webkit-backdrop-filter: blur(7px) saturate(1.06);
     backdrop-filter: blur(7px) saturate(1.06);
@@ -1228,7 +1313,7 @@
 
 
 </style>
-<!-- cache: 20260706X -->
+<!-- cache: 20260706Y -->
 </head>
 <body>
 <div id="iris-intro">
@@ -1384,22 +1469,46 @@
         </div>
       </div>
 
-      <!-- Card 3: Descarga de herramientas -->
-      <div class="bento-card bc-brand" style="background:#1a1a1a; justify-content:space-between; padding:36px 30px 30px;">
+      <!-- Card 3: Kit de diseño descargable -->
+      <div class="bento-card bc-kit">
         <div class="bc-grid-lines"></div>
-        <!-- Botón de descarga centrado -->
-        <div style="flex:1; display:flex; align-items:center; justify-content:center;">
-          <button class="bc-dl-btn" onclick="return false;" aria-label="Descargar herramientas de diseño">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
-              <path d="M12 3v13M5 13l7 7 7-7"/>
-              <path d="M3 21h18"/>
-            </svg>
-          </button>
+        <div class="bc-kit-head">
+          <span class="bc-kit-eyebrow">Kit de diseño</span>
+          <span class="bc-kit-badge">.ZIP · 24MB</span>
         </div>
-        <!-- Texto abajo -->
-        <div style="position:relative;z-index:2;">
-          <h4 style="font-size:17px;font-weight:700;letter-spacing:-.02em;color:#fff;margin-bottom:8px;line-height:1.25;">Descargar Herramientas<br>de Diseño</h4>
-          <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.55;">Descarga con un solo click todos los recursos para despegar tu proyecto.</p>
+        <div class="bc-kit-stack" aria-hidden="true">
+          <!-- Tipografías -->
+          <div class="bc-tile bc-tile-type">
+            <span class="bc-tile-aa">Aa</span>
+            <span class="bc-tile-cap">Clash · Inter</span>
+          </div>
+          <!-- Componentes / iconos -->
+          <div class="bc-tile bc-tile-grid">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span class="bc-tile-cap">Componentes</span>
+          </div>
+          <!-- Paleta -->
+          <div class="bc-tile bc-tile-color">
+            <span class="bc-sw" style="background:#F9452D"></span>
+            <span class="bc-sw" style="background:#F5F1E8"></span>
+            <span class="bc-sw" style="background:#5B74D6"></span>
+            <span class="bc-sw" style="background:#111"></span>
+            <span class="bc-tile-cap">Paleta</span>
+          </div>
+        </div>
+        <div class="bc-kit-foot">
+          <div class="bc-kit-copy">
+            <h4>Herramientas de Diseño</h4>
+            <p>Tipografías, paletas y componentes listos para arrancar.</p>
+          </div>
+          <button class="bc-kit-btn" onclick="return false;" aria-label="Descargar herramientas de diseño">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+              <path d="M12 3v11M6.5 10.5 12 16l5.5-5.5"/><path d="M4 20h16"/>
+            </svg>
+            Descargar
+          </button>
         </div>
       </div>
 
