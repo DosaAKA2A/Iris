@@ -415,6 +415,55 @@
   .pin-ok:hover { background:#e5fe41; border-color:#e5fe41; color:#0a0a0a; }
 
   
+  /* ════════════════════ BENTO CARDS (servicios) ════════════════════ */
+  .bento-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: clamp(46px,6vw,72px); }
+  @media (max-width: 1024px){ .bento-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px)  { .bento-grid { grid-template-columns: 1fr; } }
+  .bento-card { border-radius: 20px; overflow: hidden; position: relative; background: #fff; border: 1px solid rgba(0,0,0,0.09); display: flex; flex-direction: column; min-height: 380px; padding: 0; opacity: 0; transform: translateY(32px); transition: opacity .7s var(--ease), transform .7s var(--ease), box-shadow .3s var(--ease); }
+  .bento-card.bc-in { opacity: 1; transform: none; }
+  .bento-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+  .bc-hands { background: #f2efe8; justify-content: flex-end; }
+  .bc-hands .bc-img-wrap { flex: 1; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .bc-hands .bc-placeholder-svg { width: 60%; max-width: 240px; opacity: .18; }
+  .bc-text { padding: 28px 30px 30px; flex-shrink: 0; }
+  .bc-text h4 { font-size: 18px; font-weight: 700; letter-spacing: -.02em; color: var(--ink); margin-bottom: 8px; }
+  .bc-text p  { font-size: 14px; line-height: 1.55; color: rgba(12,12,12,.55); }
+  .bc-revisions { background: #f7f7f5; }
+  .bc-list { padding: 16px 20px; margin: 16px 20px 0; background: #fff; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+  .bc-list-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid #ebebeb; font-size: 13px; color: var(--ink2); }
+  .bc-list-item:last-child { border-bottom: none; }
+  .bc-list-item.done { color: rgba(12,12,12,.35); text-decoration: line-through; }
+  .bc-check { width: 18px; height: 18px; border-radius: 50%; background: var(--red); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .bc-check svg { width: 10px; height: 10px; stroke: #fff; fill: none; }
+  .bc-check-empty { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #d0d0d0; flex-shrink: 0; }
+  .bc-list-footer { margin: 8px 20px 20px; font-size: 11px; color: rgba(12,12,12,.35); display: flex; align-items: center; gap: 6px; }
+  .bc-avatars { display: flex; margin: 14px 20px 0; }
+  .bc-avatar { width: 34px; height: 34px; border-radius: 50%; border: 2.5px solid #f7f7f5; margin-right: -8px; overflow: hidden; }
+  .bc-avatar-placeholder { width: 100%; height: 100%; }
+  .bc-brand { background: #0c0c0c; align-items: center; justify-content: flex-end; }
+  .bc-brand .bc-inner-pad { padding: 0 30px 30px; width: 100%; }
+  .bc-brand-visual { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; padding-top: 30px; }
+  .bc-brand-orb { width: 100px; height: 100px; border-radius: 50%; background: var(--red); box-shadow: 0 0 60px 20px rgba(249,69,45,0.45); display: flex; align-items: center; justify-content: center; position: relative; }
+  .bc-brand-orb svg { width: 32px; height: 32px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .bc-brand-badge { position: absolute; top: -8px; right: -8px; background: #fff; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #0c0c0c; }
+  .bc-brand-label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.45); margin-bottom: 6px; }
+  .bc-grid-lines { position: absolute; inset: 0; pointer-events: none; }
+  .bc-grid-lines::before, .bc-grid-lines::after { content: ''; position: absolute; background: rgba(255,255,255,0.06); }
+  .bc-grid-lines::before { width: 100%; height: 1px; top: 40px; }
+  .bc-grid-lines::after  { height: 100%; width: 1px; right: 40px; }
+  .bc-brand .bc-text h4 { color: #fff; }
+  .bc-brand .bc-text p  { color: rgba(255,255,255,.45); }
+  .bc-phone-card { background: var(--red); justify-content: flex-end; }
+  .bc-phone-bg { position: absolute; inset: 0; overflow: hidden; border-radius: 20px; }
+  .bc-phone-bg-gradient { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(249,69,45,0) 30%, rgba(249,69,45,0.95) 100%); }
+  .bc-phone-wrap { position: absolute; bottom: 110px; left: 50%; transform: translateX(-50%); width: 58%; max-width: 200px; z-index: 3; filter: drop-shadow(0 20px 50px rgba(0,0,0,0.5)); transition: transform .6s var(--ease); }
+  .bc-phone-card:hover .bc-phone-wrap { transform: translateX(-50%) translateY(-8px); }
+  .bc-phone-img { width: 100%; display: block; }
+  .bc-blur-layer { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 80%; height: 55%; border-radius: 50%; background: rgba(249,69,45,0.35); filter: blur(40px); z-index: 2; }
+  .bc-phone-card .bc-text { position: relative; z-index: 4; }
+  .bc-phone-card .bc-text h4 { color: #fff; }
+  .bc-phone-card .bc-text p  { color: rgba(255,255,255,.7); }
+
   /* ════ PCARD sin imagen ni contenido visual: fondo puro ════ */
   .pcard { background: #111; }
   .pcard-mark, .pcard-media, .pcard-veil, .pcard-accent { display:none !important; }
@@ -1002,7 +1051,7 @@
 
 
 </style>
-<!-- cache: 20260706K -->
+<!-- cache: 20260706L -->
 </head>
 <body>
 <div id="iris-intro">
@@ -1112,34 +1161,94 @@
       </div>
     </div>
 
-    <div class="svc-cards" data-reveal-stagger>
-      <!-- Rendimiento -->
-      <div class="svc-card on-dark-card">
-        <div class="svc-tag">Rendimiento</div>
-        <p class="svc-lead">Rápido de cargar. Rápido de construir. Tu web debe rendir tan bien como tu producto.</p>
-        <div class="bars">
-          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-          <div class="bar lime"><div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div></div>
+    <!-- BENTO GRID servicios al estilo Lyniq -->
+    <div class="bento-grid" id="bento-svc">
+
+      <!-- Card 1: Atención prioritaria (manos — placeholder SVG) -->
+      <div class="bento-card bc-hands">
+        <div class="bc-img-wrap">
+          <svg class="bc-placeholder-svg" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 90 Q60 40 100 60 Q140 80 180 30" stroke="#0c0c0c" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <ellipse cx="55" cy="85" rx="30" ry="18" stroke="#0c0c0c" stroke-width="1.5" fill="none"/>
+            <ellipse cx="145" cy="75" rx="28" ry="16" stroke="#0c0c0c" stroke-width="1.5" fill="none"/>
+            <path d="M55 67 C55 55 65 50 75 55" stroke="#0c0c0c" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            <path d="M145 59 C145 47 155 42 165 47" stroke="#0c0c0c" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <div class="bc-text">
+          <h4>Atención 24/7</h4>
+          <p>Respuesta prioritaria en menos de 24h. Tu proyecto siempre tiene a alguien pendiente.</p>
         </div>
       </div>
-      <!-- Clientes -->
-      <div class="svc-card svc-photo">
-        <div class="ph-img"><img src="iris-studio/arbu-hero.jpg" alt="" aria-hidden="true"></div>
-        <div class="ph-inner">
-          <div class="svc-tag">Clientes satisfechos</div>
-          <div class="badge-lime"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l6-6 4 4 6-8"/></svg></div>
-          <p class="svc-lead">Facilitamos que las personas encuentren lo que buscan. Mejor UX significa menos abandonos y más conversiones.</p>
+
+      <!-- Card 2: Revisiones post-lanzamiento -->
+      <div class="bento-card bc-revisions" style="position:relative;">
+        <div style="padding:28px 30px 0;position:relative;">
+          <div style="position:absolute;top:22px;right:22px;width:9px;height:9px;border-right:2px solid var(--red);border-top:2px solid var(--red);"></div>
+          <h4 style="font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--ink);margin-bottom:4px;">Ajustes a medida</h4>
+          <p style="font-size:13px;color:rgba(12,12,12,.5);line-height:1.5;margin-bottom:0;">Hasta 5 revisiones post-lanzamiento cuando quieras.</p>
+          <div class="bc-avatars">
+            <div class="bc-avatar"><div class="bc-avatar-placeholder" style="background:linear-gradient(135deg,#e8c4a0,#c49060);"></div></div>
+            <div class="bc-avatar"><div class="bc-avatar-placeholder" style="background:linear-gradient(135deg,#a0b8e8,#607ab0);"></div></div>
+            <div class="bc-avatar"><div class="bc-avatar-placeholder" style="background:linear-gradient(135deg,#c4a0e8,#8060b0);"></div></div>
+            <div class="bc-avatar"><div class="bc-avatar-placeholder" style="background:linear-gradient(135deg,#d4d4d4,#999);"></div></div>
+          </div>
+        </div>
+        <div class="bc-list">
+          <div class="bc-list-item done"><div class="bc-check"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>Ajustar márgenes de texto</div>
+          <div class="bc-list-item done"><div class="bc-check"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>Aumentar fuente en menú móvil</div>
+          <div class="bc-list-item done"><div class="bc-check"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>Reemplazar imágenes</div>
+          <div class="bc-list-item"><div class="bc-check-empty"></div>Corregir color botón #F9452D</div>
+          <div class="bc-list-item"><div class="bc-check-empty"></div>Optimizar velocidad de carga</div>
+        </div>
+        <div class="bc-list-footer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 4v5M15 4v5"/></svg>
+          Válido 3 meses tras el lanzamiento
         </div>
       </div>
-      <!-- Responsive -->
-      <div class="svc-card svc-dev on-dark-card">
-        <div class="svc-tag">Totalmente responsive</div>
-        <div class="dev-stage">
-          <div class="phone"><div class="screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg></div></div>
+
+      <!-- Card 3: Brand kit (oscura con orbe rojo) -->
+      <div class="bento-card bc-brand">
+        <div class="bc-grid-lines"></div>
+        <div class="bc-brand-visual">
+          <div style="position:absolute;top:20px;left:0;right:0;text-align:center;">
+            <p class="bc-brand-label">Descargar brand kit</p>
+            <div style="display:flex;justify-content:center;gap:16px;margin-top:8px;opacity:.3;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><path d="M4 6h16M4 10h16M4 14h10M4 18h6"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 4v5"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><path d="M4 7h3m0 0V4m0 3L4 7m3 0h10M7 17h3m0 0v3m0-3L7 17m3 0h7"/></svg>
+            </div>
+          </div>
+          <div class="bc-brand-orb">
+            <svg viewBox="0 0 24 24"><path d="M4 16v-4a4 4 0 018 0v4M4 16h8M2 20h12"/></svg>
+            <div class="bc-brand-badge">6</div>
+          </div>
         </div>
-        <p class="svc-lead">Una sola experiencia en todas las pantallas. De móvil a tablet y escritorio.</p>
+        <div class="bc-inner-pad">
+          <div class="bc-text" style="padding:0 0 2px;">
+            <h4>Brand kit completo</h4>
+            <p>Logo, paleta, tipografía y activos listos para descargar o compartir con tu equipo.</p>
+          </div>
+        </div>
       </div>
-    </div>
+
+      <!-- Card 4: Móvil con efecto blur (phone.png) -->
+      <div class="bento-card bc-phone-card">
+        <div class="bc-phone-bg">
+          <div class="bc-phone-bg-gradient"></div>
+        </div>
+        <div class="bc-blur-layer"></div>
+        <div class="bc-phone-wrap">
+          <img class="bc-phone-img" src="assets/phone.png?v=20260706" alt="Vista móvil IRIS" loading="lazy">
+        </div>
+        <div class="bc-text">
+          <h4>Soporte en tiempo real</h4>
+          <p>Notificaciones instantáneas. Siempre al tanto del estado de tu proyecto.</p>
+        </div>
+      </div>
+
+    </div><!-- /bento-grid -->    </div>
   </div>
 </section>
 
@@ -1413,6 +1522,22 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') document.que
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
   document.querySelectorAll('[data-reveal],[data-reveal-stagger]').forEach(el => io.observe(el));
+})();
+/* ════ Bento cards staggered entrance ════ */
+(function() {
+  var cards = document.querySelectorAll('.bento-card');
+  if (!cards.length) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        var idx = Array.from(cards).indexOf(e.target);
+        var el = e.target;
+        setTimeout(function(){ el.classList.add('bc-in'); }, idx * 130);
+        obs.unobserve(el);
+      }
+    });
+  }, { threshold: 0.10 });
+  cards.forEach(function(c){ obs.observe(c); });
 })();
 /* ════════ Contacto → mailto ════════ */
 function sendContact() {
