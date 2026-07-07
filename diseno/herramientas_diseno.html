@@ -3525,24 +3525,26 @@ let videoFile = null;
 let videoQuality = 'high';
 
 // FFmpeg.wasm CDN
-const FFMPEG_CORE_URL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
+const FFMPEG_CORE_URL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
 
 async function loadFFmpeg() {
   if (ffmpegLoaded) return;
-  const { FFmpeg } = await import('https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js');
-  const { toBlobURL } = await import('https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js');
+  const { FFmpeg } = await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js');
+  const { toBlobURL } = await import('https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js');
   ffmpegInstance = new FFmpeg();
+  ffmpegInstance.on('log', ({ message }) => { console.log('[ffmpeg]', message); });
   ffmpegInstance.on('progress', ({ progress }) => {
-    const pct = Math.round(Math.min(progress, 1) * 100);
+    const pct = Math.round(Math.min(Math.max(progress, 0), 1) * 100);
     const bar = document.getElementById('vidProgressBar');
     const label = document.getElementById('vidProgressPct');
     if (bar) bar.style.width = pct + '%';
     if (label) label.textContent = pct + '%';
   });
-  const coreURL = await toBlobURL(FFMPEG_CORE_URL + '/ffmpeg-core.js', 'text/javascript');
-  const wasmURL = await toBlobURL(FFMPEG_CORE_URL + '/ffmpeg-core.wasm', 'application/wasm');
-  const workerURL = await toBlobURL(FFMPEG_CORE_URL + '/ffmpeg-core.worker.js', 'text/javascript');
-  await ffmpegInstance.load({ coreURL, wasmURL, workerURL });
+  // Single-thread UMD core via jsDelivr (no SharedArrayBuffer / COOP-COEP required on GitHub Pages)
+  const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
+  const coreURL = await toBlobURL(baseURL + '/ffmpeg-core.js', 'text/javascript');
+  const wasmURL = await toBlobURL(baseURL + '/ffmpeg-core.wasm', 'application/wasm');
+  await ffmpegInstance.load({ coreURL, wasmURL });
   ffmpegLoaded = true;
 }
 
@@ -3674,7 +3676,12 @@ async function startVideoCompress() {
 
   } catch (err) {
     console.error('Video compress error:', err);
-    alert('Error al comprimir: ' + err.message);
+    let msg = err.message || String(err);
+    if (msg.includes('fetch') || msg.includes('import') || msg.includes('Worker')) {
+      msg = 'No se pudo cargar el motor de compresión. Verifica tu conexión e inténtalo de nuevo.';
+    }
+    alert('Error al comprimir: ' + msg);
+    document.getElementById('videoProgress').style.display = 'none';
   }
   btn.disabled = false;
   btn.textContent = 'Comprimir Video';
