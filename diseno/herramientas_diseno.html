@@ -3541,12 +3541,13 @@ async function loadFFmpeg() {
     if (label) label.textContent = pct + '%';
   });
   // Self-hosted, same-origin assets — avoids all cross-origin Worker restrictions.
-  // The worker.js and its deps (const.js, errors.js) live together so relative imports resolve.
+  // Module-type worker loads the ESM core via dynamic import(); worker deps
+  // (const.js, errors.js) sit beside worker.js so relative imports resolve.
   const origin = location.origin;
   await ffmpegInstance.load({
     classWorkerURL: origin + '/assets/ffmpeg/worker.js',
-    coreURL: origin + '/assets/ffmpeg/ffmpeg-core.js',
-    wasmURL: origin + '/assets/ffmpeg/ffmpeg-core.wasm',
+    coreURL: origin + '/assets/ffmpeg/esm/ffmpeg-core.js',
+    wasmURL: origin + '/assets/ffmpeg/esm/ffmpeg-core.wasm',
   });
   ffmpegLoaded = true;
 }
