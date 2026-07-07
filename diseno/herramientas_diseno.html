@@ -391,6 +391,7 @@ button:disabled { opacity: .3; cursor: default; }
   <button type="button" class="tab" id="tabAscii" onclick="switchTab('ascii')">ASCII</button>
   <button type="button" class="tab" id="tabDosa" onclick="switchTab('dosa')">Pruebas Dosa</button>
   <button type="button" class="tab" id="tabFiltros" onclick="switchTab('filtros')">Filtros</button>
+  <button type="button" class="tab" id="tabVideo" onclick="switchTab('video')">Compresor de Videos</button>
 </div>
 
 <div id="panelDither">
@@ -806,6 +807,74 @@ button:disabled { opacity: .3; cursor: default; }
   </div><!-- /filtrosCrt -->
 
 </div><!-- /panelFiltros -->
+
+<div id="panelVideo" style="display:none">
+  <div class="sec">Compresor de Videos</div>
+  <p style="font-size:12px;color:var(--muted);margin:0 0 16px">Sube un video, elige las resoluciones y descarga versiones comprimidas con la mejor relación calidad/peso.</p>
+
+  <!-- Upload zone -->
+  <div class="drop-zone" id="videoDropZone" style="cursor:pointer;margin-bottom:16px">
+    <p>Arrastra un video aquí o haz clic para seleccionar</p>
+    <p style="font-size:11px;color:var(--muted);margin-top:4px">MP4, MOV, WEBM, AVI, MKV</p>
+    <input type="file" id="videoFileInput" accept="video/*" style="display:none">
+  </div>
+
+  <!-- Video info -->
+  <div id="videoInfo" style="display:none;margin-bottom:16px;padding:12px;background:var(--bg3);border-radius:6px;font-size:12px;color:var(--text)">
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <span><strong>Archivo:</strong> <span id="vidName">-</span></span>
+      <span><strong>Tamaño:</strong> <span id="vidSize">-</span></span>
+      <span><strong>Resolución:</strong> <span id="vidRes">-</span></span>
+      <span><strong>Duración:</strong> <span id="vidDuration">-</span></span>
+    </div>
+  </div>
+
+  <!-- Resolution checkboxes -->
+  <div id="videoResOptions" style="display:none;margin-bottom:16px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--muted);margin-bottom:8px">RESOLUCIONES DE SALIDA</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="res1080" value="1080" checked> 1080p
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="res720" value="720" checked> 720p
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="res480" value="480"> 480p
+      </label>
+    </div>
+
+    <!-- Quality preset -->
+    <div style="margin-top:12px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--muted);margin-bottom:6px">CALIDAD</div>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="vidQBtn active" data-q="high" onclick="setVideoQuality('high')" style="padding:5px 12px;font-size:11px;font-family:inherit;cursor:pointer;border:1px solid var(--border);background:var(--bg4);color:#fff;border-radius:4px;letter-spacing:.03em">Alta (menor compresión)</button>
+        <button type="button" class="vidQBtn" data-q="balanced" onclick="setVideoQuality('balanced')" style="padding:5px 12px;font-size:11px;font-family:inherit;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);border-radius:4px;letter-spacing:.03em">Balanceada</button>
+        <button type="button" class="vidQBtn" data-q="max" onclick="setVideoQuality('max')" style="padding:5px 12px;font-size:11px;font-family:inherit;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);border-radius:4px;letter-spacing:.03em">Máxima compresión</button>
+      </div>
+    </div>
+
+    <!-- Compress button -->
+    <button type="button" id="btnCompress" onclick="startVideoCompress()" style="margin-top:16px;padding:10px 28px;font-size:13px;font-family:inherit;cursor:pointer;border:none;background:#fff;color:#0a0a0a;font-weight:600;border-radius:6px;letter-spacing:.02em">Comprimir Video</button>
+  </div>
+
+  <!-- Progress -->
+  <div id="videoProgress" style="display:none;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span id="vidProgressLabel" style="font-size:12px;color:var(--text)">Comprimiendo...</span>
+      <span id="vidProgressPct" style="font-size:12px;color:var(--muted)">0%</span>
+    </div>
+    <div style="width:100%;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
+      <div id="vidProgressBar" style="width:0%;height:100%;background:#fff;border-radius:2px;transition:width .3s ease"></div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="videoResults" style="display:none">
+    <div style="font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--muted);margin-bottom:10px">RESULTADOS</div>
+    <div id="videoResultsList"></div>
+  </div>
+</div><!-- /panelVideo -->
 
 <div id="panelCorlima">
   <div class="sec">Subir Imágenes (Máx 10)</div>
@@ -1710,22 +1779,25 @@ function switchTab(tab) {
   const isAscii   = tab === 'ascii';
   const isDosa    = tab === 'dosa';
   const isFiltros = tab === 'filtros';
+  const isVideo   = tab === 'video';
 
   document.getElementById('panelDither').style.display   = isDither  ? 'block' : 'none';
   document.getElementById('panelAscii').style.display    = isAscii   ? 'block' : 'none';
   document.getElementById('panelDosa').style.display     = isDosa    ? 'block' : 'none';
   document.getElementById('panelFiltros').style.display  = isFiltros ? 'block' : 'none';
+  document.getElementById('panelVideo').style.display    = isVideo   ? 'block' : 'none';
 
   document.getElementById('tabDither').classList.toggle('active', isDither);
   document.getElementById('tabAscii').classList.toggle('active', isAscii);
   document.getElementById('tabDosa').classList.toggle('active', isDosa);
   document.getElementById('tabFiltros').classList.toggle('active', isFiltros);
+  document.getElementById('tabVideo').classList.toggle('active', isVideo);
 
   // Ocultar uploader global en Filtros (tiene su propio uploader por imagen)
   const dz = document.getElementById('dropZone');
-  if (dz) dz.style.display = isFiltros ? 'none' : 'block';
+  if (dz) dz.style.display = (isFiltros || isVideo) ? 'none' : 'block';
   const sc = document.getElementById('sharedControls');
-  if (sc) sc.style.display = isFiltros ? 'none' : 'block';
+  if (sc) sc.style.display = (isFiltros || isVideo) ? 'none' : 'block';
 
   const gea = document.getElementById('globalExportArea');
   const br  = document.getElementById('btnRow');
@@ -3443,6 +3515,183 @@ document.addEventListener('DOMContentLoaded', function() {
 }); // DOMContentLoaded CRT
 // ══════════════ FIN CRT MACHINE ══════════════
 
+
+
+
+/* ════════ Compresor de Videos (FFmpeg.wasm) ════════ */
+let ffmpegLoaded = false;
+let ffmpegInstance = null;
+let videoFile = null;
+let videoQuality = 'high';
+
+// FFmpeg.wasm CDN
+const FFMPEG_CORE_URL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
+
+async function loadFFmpeg() {
+  if (ffmpegLoaded) return;
+  const { FFmpeg } = await import('https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js');
+  const { toBlobURL } = await import('https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js');
+  ffmpegInstance = new FFmpeg();
+  ffmpegInstance.on('progress', ({ progress }) => {
+    const pct = Math.round(progress * 100);
+    const bar = document.getElementById('vidProgressBar');
+    const label = document.getElementById('vidProgressPct');
+    if (bar) bar.style.width = pct + '%';
+    if (label) label.textContent = pct + '%';
+  });
+  await ffmpegInstance.load({
+    coreURL: await toBlobURL(FFMPEG_CORE_URL + '/ffmpeg-core.js', 'text/javascript'),
+    wasmURL: await toBlobURL(FFMPEG_CORE_URL + '/ffmpeg-core.wasm', 'application/wasm'),
+  });
+  ffmpegLoaded = true;
+}
+
+// Drop zone events
+(function() {
+  const dz = document.getElementById('videoDropZone');
+  const fi = document.getElementById('videoFileInput');
+  if (!dz || !fi) return;
+  dz.addEventListener('click', () => fi.click());
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); handleVideoFile(e.dataTransfer.files[0]); });
+  fi.addEventListener('change', e => { handleVideoFile(e.target.files[0]); e.target.value = ''; });
+})();
+
+function handleVideoFile(file) {
+  if (!file || !file.type.startsWith('video/')) { alert('Selecciona un archivo de video válido.'); return; }
+  videoFile = file;
+  document.getElementById('vidName').textContent = file.name;
+  document.getElementById('vidSize').textContent = formatBytes(file.size);
+  document.getElementById('videoInfo').style.display = 'block';
+  document.getElementById('videoResOptions').style.display = 'block';
+  document.getElementById('videoResults').style.display = 'none';
+  document.getElementById('videoResultsList').innerHTML = '';
+
+  // Get video metadata
+  const video = document.createElement('video');
+  video.preload = 'metadata';
+  video.onloadedmetadata = () => {
+    document.getElementById('vidRes').textContent = video.videoWidth + '×' + video.videoHeight;
+    document.getElementById('vidDuration').textContent = formatDuration(video.duration);
+    URL.revokeObjectURL(video.src);
+
+    // Auto-check only resolutions <= source
+    const h = video.videoHeight;
+    document.getElementById('res1080').disabled = h < 1080;
+    document.getElementById('res720').disabled = h < 720;
+    document.getElementById('res1080').checked = h >= 1080;
+    document.getElementById('res720').checked = h >= 720;
+    document.getElementById('res480').checked = h < 720;
+    if (h < 1080) document.getElementById('res1080').parentElement.style.opacity = '0.4';
+    else document.getElementById('res1080').parentElement.style.opacity = '1';
+    if (h < 720) document.getElementById('res720').parentElement.style.opacity = '0.4';
+    else document.getElementById('res720').parentElement.style.opacity = '1';
+    document.getElementById('res480').parentElement.style.opacity = '1';
+  };
+  video.src = URL.createObjectURL(file);
+}
+
+function setVideoQuality(q) {
+  videoQuality = q;
+  document.querySelectorAll('.vidQBtn').forEach(b => {
+    const isActive = b.dataset.q === q;
+    b.style.background = isActive ? 'var(--bg4)' : 'transparent';
+    b.style.color = isActive ? '#fff' : 'var(--muted)';
+  });
+}
+
+function getCRF() {
+  if (videoQuality === 'high') return 23;
+  if (videoQuality === 'balanced') return 28;
+  return 33;
+}
+
+async function startVideoCompress() {
+  if (!videoFile) return;
+  const resolutions = [];
+  if (document.getElementById('res1080').checked && !document.getElementById('res1080').disabled) resolutions.push(1080);
+  if (document.getElementById('res720').checked && !document.getElementById('res720').disabled) resolutions.push(720);
+  if (document.getElementById('res480').checked) resolutions.push(480);
+  if (resolutions.length === 0) { alert('Selecciona al menos una resolución.'); return; }
+
+  const btn = document.getElementById('btnCompress');
+  btn.disabled = true;
+  btn.textContent = 'Cargando FFmpeg...';
+  document.getElementById('videoProgress').style.display = 'block';
+  document.getElementById('videoResults').style.display = 'none';
+  document.getElementById('videoResultsList').innerHTML = '';
+
+  try {
+    await loadFFmpeg();
+    const ffmpeg = ffmpegInstance;
+    const inputName = 'input' + (videoFile.name.includes('.') ? videoFile.name.substring(videoFile.name.lastIndexOf('.')) : '.mp4');
+    const fileData = new Uint8Array(await videoFile.arrayBuffer());
+    await ffmpeg.writeFile(inputName, fileData);
+
+    const crf = getCRF();
+    const results = [];
+
+    for (let i = 0; i < resolutions.length; i++) {
+      const res = resolutions[i];
+      document.getElementById('vidProgressLabel').textContent = 'Comprimiendo a ' + res + 'p... (' + (i + 1) + '/' + resolutions.length + ')';
+      document.getElementById('vidProgressBar').style.width = '0%';
+      document.getElementById('vidProgressPct').textContent = '0%';
+
+      const outName = videoFile.name.replace(/\.[^.]+$/, '') + '_' + res + 'p.mp4';
+      await ffmpeg.exec([
+        '-i', inputName,
+        '-vf', 'scale=-2:' + res,
+        '-c:v', 'libx264',
+        '-preset', 'slow',
+        '-crf', String(crf),
+        '-c:a', 'aac',
+        '-b:a', '128k',
+        '-movflags', '+faststart',
+        '-y', outName
+      ]);
+
+      const data = await ffmpeg.readFile(outName);
+      const blob = new Blob([data.buffer], { type: 'video/mp4' });
+      results.push({ res, name: outName, blob, size: blob.size });
+      await ffmpeg.deleteFile(outName);
+    }
+
+    await ffmpeg.deleteFile(inputName);
+
+    // Show results
+    const list = document.getElementById('videoResultsList');
+    results.forEach(r => {
+      const ratio = ((1 - r.size / videoFile.size) * 100).toFixed(1);
+      const url = URL.createObjectURL(r.blob);
+      const div = document.createElement('div');
+      div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--bg3);border-radius:6px;margin-bottom:8px;';
+      div.innerHTML = '<div style="font-size:12px;color:var(--text)"><strong>' + r.res + 'p</strong><span style="color:var(--muted);margin-left:12px">' + formatBytes(r.size) + '</span><span style="color:' + (parseFloat(ratio) > 0 ? '#4ade80' : '#f87171') + ';margin-left:12px;font-size:11px">' + (parseFloat(ratio) > 0 ? '-' : '+') + Math.abs(parseFloat(ratio)) + '% vs original</span></div>' +
+        '<a href="' + url + '" download="' + r.name + '" style="padding:6px 16px;font-size:11px;font-family:inherit;text-decoration:none;background:#fff;color:#0a0a0a;font-weight:600;border-radius:4px;letter-spacing:.02em">Descargar</a>';
+      list.appendChild(div);
+    });
+    document.getElementById('videoResults').style.display = 'block';
+    document.getElementById('videoProgress').style.display = 'none';
+
+  } catch (err) {
+    console.error('Video compress error:', err);
+    alert('Error al comprimir: ' + err.message);
+  }
+  btn.disabled = false;
+  btn.textContent = 'Comprimir Video';
+}
+
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+  if (b < 1073741824) return (b / 1048576).toFixed(1) + ' MB';
+  return (b / 1073741824).toFixed(2) + ' GB';
+}
+function formatDuration(s) {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + String(sec).padStart(2, '0');
+}
 
 </script>
 
