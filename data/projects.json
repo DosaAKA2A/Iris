@@ -1,0 +1,12 @@
+[
+  {
+    "id": "p1783443365908",
+    "nombre": "Spacio",
+    "cliente": "SPACIO2",
+    "inicio": "2026-07-01",
+    "deadline": "2026-07-25",
+    "review": 3,
+    "estado": "curso",
+    "notas": "Crear sitio de Spacio2 futurista"
+  }
+]
