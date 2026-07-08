@@ -295,6 +295,106 @@
   @media (max-width: 1000px){ .proj-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 640px){ .proj-grid { grid-template-columns: 1fr; } }
 
+  /* ════════════════════ BUILT FOR SUCCESS (chat) ════════════════════ */
+  .success-sec { padding: clamp(80px,10vw,140px) 0; }
+  .success-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.05fr 0.75fr;
+    gap: clamp(20px,2.4vw,36px);
+    align-items: stretch;
+  }
+  .success-left { display: flex; flex-direction: column; justify-content: center; }
+  .success-title {
+    font-family: 'Clash Display','Inter',sans-serif;
+    font-size: clamp(44px,6vw,88px);
+    font-weight: 700;
+    line-height: .96;
+    letter-spacing: -.02em;
+    color: #fff;
+    text-transform: uppercase;
+    margin: 0 0 24px;
+  }
+  .success-sub {
+    font-family: 'Inter',sans-serif;
+    font-size: clamp(14px,1.4vw,16px);
+    font-weight: 500;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.55);
+    max-width: 360px;
+  }
+
+  /* Chat card */
+  .chat-card {
+    background: #171717;
+    border-radius: 30px;
+    padding: clamp(24px,2.4vw,34px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 460px;
+  }
+  .chat-time {
+    text-align: center;
+    font-family: 'Inter',sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.28);
+    margin: 8px 0 4px;
+  }
+  .chat-bubble {
+    max-width: 74%;
+    padding: 11px 17px;
+    border-radius: 20px;
+    font-family: 'Inter',sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: #fff;
+    width: fit-content;
+    opacity: 0;
+    transform: translateY(12px) scale(0.92);
+  }
+  .chat-bubble.gray { background: #666; align-self: flex-start; border-bottom-left-radius: 6px; }
+  .chat-bubble.red  { background: var(--red); align-self: flex-end; border-bottom-right-radius: 6px; }
+  .success-sec.in .chat-bubble {
+    animation: bubblePop .5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+  .success-sec.in .chat-bubble:nth-of-type(1) { animation-delay: .3s; }
+  .success-sec.in .chat-bubble:nth-of-type(2) { animation-delay: .5s; }
+  .success-sec.in .chat-bubble:nth-of-type(3) { animation-delay: .7s; }
+  .success-sec.in .chat-bubble:nth-of-type(4) { animation-delay: 1.0s; }
+  .success-sec.in .chat-bubble:nth-of-type(5) { animation-delay: 1.2s; }
+  .success-sec.in .chat-bubble:nth-of-type(6) { animation-delay: 1.45s; }
+  @keyframes bubblePop {
+    0%   { opacity: 0; transform: translateY(12px) scale(0.92); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Image placeholder */
+  .success-img {
+    border-radius: 30px;
+    overflow: hidden;
+    background: #1a1a1a;
+    position: relative;
+    min-height: 460px;
+  }
+  .success-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .success-img-ph {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px;
+    color: rgba(255,255,255,0.25);
+    font-family: 'Inter',sans-serif; font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 12px, transparent 12px 24px),
+      #141414;
+  }
+
+  @media (max-width: 900px) {
+    .success-grid { grid-template-columns: 1fr; }
+    .success-img { min-height: 320px; order: 3; }
+    .chat-card { min-height: 400px; }
+  }
+
   .pcard { position: relative; aspect-ratio: 3 / 4; border-radius: 16px; overflow: hidden; cursor: pointer; border: 1px solid var(--line); background: var(--surface); isolation: isolate; }
   .pcard-media { position: absolute; inset: 0; z-index: 0; }
   .pcard-media img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.02); transition: transform .8s var(--ease); }
@@ -1356,7 +1456,7 @@
 
 
 </style>
-<!-- cache: 20260708a -->
+<!-- cache: 20260708b -->
 </head>
 <body>
 <div id="iris-intro">
@@ -1639,6 +1739,42 @@
   </div>
 </section>
 
+<!-- ════════════════════ BUILT FOR SUCCESS ════════════════════ -->
+<section class="section sec-dark success-sec" id="success">
+  <div class="wrap">
+    <div class="success-grid">
+
+      <!-- Left: heading -->
+      <div class="success-left" data-reveal>
+        <h2 class="success-title">Hecho a tu<br>medida.</h2>
+        <p class="success-sub">De la idea al lanzamiento, avanzamos rápido y de forma cercana — cada detalle, cada paso.</p>
+      </div>
+
+      <!-- Center: chat -->
+      <div class="chat-card">
+        <div class="chat-time">Hoy 17:01</div>
+        <div class="chat-bubble gray">¡Hey hey!</div>
+        <div class="chat-bubble gray">Me encantan los diseños ❤</div>
+        <div class="chat-bubble gray">¿Podemos ajustar el hero?</div>
+        <div class="chat-time">Hoy 17:02</div>
+        <div class="chat-bubble red">Claro</div>
+        <div class="chat-bubble red">Lo actualizamos enseguida</div>
+        <div class="chat-bubble gray">¡Perfecto!</div>
+      </div>
+
+      <!-- Right: image placeholder -->
+      <div class="success-img">
+        <div class="success-img-ph">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          Imagen
+        </div>
+        <!-- Reemplaza el placeholder por: <img src="assets/success.jpg" alt="IRIS"> -->
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- ════════════════════ SHOWCASE (oscuro) ════════════════════ -->
 <!-- ════════════════════ CONTACTO (claro) ════════════════════ -->
 <section class="section sec-dark"  id="contacto">
@@ -1852,6 +1988,17 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') document.que
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
   document.querySelectorAll('[data-reveal],[data-reveal-stagger]').forEach(el => io.observe(el));
+})();
+/* ════ Success chat section ════ */
+(function(){
+  const sec = document.getElementById('success');
+  if (!sec) return;
+  const so = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) { sec.classList.add('in'); so.unobserve(sec); }
+    });
+  }, { threshold: 0.2 });
+  so.observe(sec);
 })();
 /* ════ Bento cards staggered entrance ════ */
 (function() {
