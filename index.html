@@ -235,12 +235,16 @@
   .hero-sticky-wrap ~ .section:nth-of-type(2) { z-index: 3; }
   .hero-sticky-wrap ~ .section:nth-of-type(3) { z-index: 4; }
   .hero-sticky-wrap ~ .section:nth-of-type(4) { z-index: 5; }
+  .hero-sticky-wrap ~ .section:nth-of-type(5) { z-index: 6; }
+  .hero-sticky-wrap ~ .section:nth-of-type(6) { z-index: 7; }
   .hero-sticky-wrap ~ .section {
     position: sticky;
     top: 0;
     z-index: 2;
     border-radius: 24px 24px 0 0;
   }
+  /* El footer se antepone a la última cartilla */
+  footer#footer { position: relative; z-index: 8; }
   .sec-dark  { background: var(--bg); color: var(--text); }
   #servicios { background: #000; }
   .sec-light { background: var(--light); color: var(--ink); }
@@ -399,6 +403,88 @@
     .success-img { min-height: 320px; order: 3; }
     .chat-card { min-height: 400px; }
   }
+
+  /* ════════════════════ TARIFAS ════════════════════ */
+  .tarifas-sec { background: #000; padding: clamp(80px,10vw,140px) 0; }
+  .tarifas-head { max-width: 640px; }
+  .tarifas-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: clamp(46px,6vw,72px);
+    align-items: stretch;
+  }
+  @media (max-width: 1080px){ .tarifas-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .tarifas-grid { grid-template-columns: 1fr; } }
+
+  .tier {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: #0e0e0e;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 30px 26px 28px;
+    transition: border-color .4s var(--ease), transform .4s var(--ease), box-shadow .4s var(--ease);
+  }
+  .tier:hover { transform: translateY(-4px); border-color: var(--line2); }
+
+  /* Cartilla destacada */
+  .tier.featured {
+    background: linear-gradient(180deg, #17100e 0%, #0e0e0e 60%);
+    border-color: rgba(220,64,42,0.55);
+    box-shadow: 0 0 0 1px rgba(220,64,42,0.25), 0 24px 60px rgba(220,64,42,0.10);
+  }
+  .tier.featured:hover { border-color: var(--red); box-shadow: 0 0 0 1px rgba(220,64,42,0.4), 0 28px 70px rgba(220,64,42,0.16); }
+  .tier-badge {
+    position: absolute; top: -11px; left: 26px;
+    font-family: 'Inter',sans-serif; font-size: 10.5px; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase; color: #fff;
+    background: var(--red); padding: 5px 12px; border-radius: 100px;
+  }
+
+  .tier-name {
+    font-family: 'Inter',sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--red);
+    margin-bottom: 14px;
+  }
+  .tier.plain .tier-name { color: var(--muted); }
+  .tier-desc { font-size: 13.5px; line-height: 1.5; color: var(--muted); min-height: 40px; margin-bottom: 22px; }
+
+  .tier-price { display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px; }
+  .tier-price .amount {
+    font-family: 'Inter',sans-serif; font-weight: 800;
+    font-size: clamp(38px,3.4vw,46px); line-height: 1; letter-spacing: -.03em; color: #fff;
+  }
+  .tier-price .cur { font-family: 'Inter',sans-serif; font-weight: 700; font-size: 22px; color: #fff; letter-spacing: -.02em; }
+  .tier.plain .tier-price .amount { font-size: clamp(26px,2.4vw,32px); font-weight: 700; }
+  .tier-price-note { font-size: 12px; color: var(--dim); margin-bottom: 24px; }
+
+  .tier-cta {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 14px 20px; border-radius: 12px;
+    font-family: 'Inter',sans-serif; font-size: 14px; font-weight: 600; letter-spacing: -.01em;
+    cursor: pointer; text-decoration: none; margin-bottom: 26px;
+    transition: background .3s var(--ease), color .3s var(--ease), transform .25s var(--ease);
+  }
+  .tier-cta .arr { transition: transform .3s var(--ease); }
+  .tier-cta:hover .arr { transform: translate(3px,-3px); }
+  .tier-cta.solid { background: var(--red); color: #fff; border: 1px solid var(--red); }
+  .tier-cta.solid:hover { background: #e8543e; }
+  .tier-cta.ghost { background: transparent; color: #fff; border: 1px solid var(--line2); }
+  .tier-cta.ghost:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.28); }
+
+  .tier-feats { list-style: none; display: flex; flex-direction: column; gap: 11px; margin: 0; padding: 22px 0 0; border-top: 1px solid var(--line); }
+  .tier-feats li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.45; color: rgba(245,245,245,0.82); }
+  .tier-feats li svg { flex: 0 0 auto; width: 15px; height: 15px; margin-top: 1px; color: var(--red); }
+  .tier.plain .tier-feats li svg { color: var(--muted); }
+  .tier-feats li b { color: #fff; font-weight: 600; }
+
+  .tarifas-fine {
+    margin-top: 26px; font-size: 12px; line-height: 1.6; color: var(--dim);
+    max-width: 680px;
+  }
+  .tarifas-fine strong { color: var(--muted); font-weight: 600; }
 
   .pcard { position: relative; aspect-ratio: 3 / 4; border-radius: 16px; overflow: hidden; cursor: pointer; border: 1px solid var(--line); background: var(--surface); isolation: isolate; }
   .pcard-media { position: absolute; inset: 0; z-index: 0; }
@@ -1781,6 +1867,103 @@
 </section>
 
 <!-- ════════════════════ SHOWCASE (oscuro) ════════════════════ -->
+
+<!-- ════════════════════ TARIFAS (oscuro) ════════════════════ -->
+<section class="section sec-dark tarifas-sec" id="tarifas">
+  <div class="wrap">
+    <div class="tarifas-head" data-reveal>
+      <div class="marker on-dark"><span class="paren">(&nbsp;03&nbsp;)</span> &bull; <span>Tarifas</span></div>
+      <h2 class="sec-title">Planes de desarrollo web, <span class="g">pensados para cada etapa.</span></h2>
+    </div>
+
+    <div class="tarifas-grid" data-reveal-stagger>
+
+      <!-- Esencial -->
+      <div class="tier plain">
+        <div class="tier-name">Esencial</div>
+        <div class="tier-desc">Presencia digital para marca personal, freelance o campañas.</div>
+        <div class="tier-price"><span class="cur">&euro;</span><span class="amount">890</span></div>
+        <div class="tier-price-note">Pago &uacute;nico &middot; sin IVA</div>
+        <a class="tier-cta ghost" data-plan="esencial">Empezar <span class="arr">&#8599;</span></a>
+        <ul class="tier-feats">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Landing / one-page a medida (secciones ilimitadas)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Dise&ntilde;o <b>100% personalizado</b>, sin plantillas</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Responsive total (m&oacute;vil &middot; tablet &middot; desktop)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Formulario de contacto + p&aacute;ginas legales</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>SEO b&aacute;sico (metaetiquetas + estructura)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>2 rondas</b> de revisi&oacute;n</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Entrega en <b>1&ndash;2 semanas</b></span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>30 d&iacute;as de soporte post-lanzamiento</span></li>
+        </ul>
+      </div>
+
+      <!-- Estudio (destacado) -->
+      <div class="tier featured">
+        <div class="tier-badge">M&aacute;s elegido</div>
+        <div class="tier-name">Estudio</div>
+        <div class="tier-desc">Web corporativa completa para negocios que quieren destacar.</div>
+        <div class="tier-price"><span class="cur">&euro;</span><span class="amount">2.450</span></div>
+        <div class="tier-price-note">Pago &uacute;nico &middot; sin IVA</div>
+        <a class="tier-cta solid" data-plan="estudio">Empezar <span class="arr">&#8599;</span></a>
+        <ul class="tier-feats">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Hasta <b>6 p&aacute;ginas</b> a medida (inicio, servicios, portfolio&hellip;)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Dise&ntilde;o editorial con <b>animaciones</b> y micro-interacciones</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Gestor de contenidos ligero (autoedici&oacute;n)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>SEO on-page + Google Analytics (GA4)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Copywriting orientado a conversi&oacute;n (asistido)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Integraciones: formularios, email, calendario</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>3 rondas</b> de revisi&oacute;n</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Entrega en <b>3&ndash;5 semanas</b></span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>60 d&iacute;as de soporte + <b>1 mes de mantenimiento</b></span></li>
+        </ul>
+      </div>
+
+      <!-- Sistema -->
+      <div class="tier plain">
+        <div class="tier-name">Sistema</div>
+        <div class="tier-desc">E-commerce, plataformas y funcionalidad avanzada a medida.</div>
+        <div class="tier-price"><span class="cur">&euro;</span><span class="amount">4.900</span></div>
+        <div class="tier-price-note">Desde &middot; sin IVA</div>
+        <a class="tier-cta ghost" data-plan="sistema">Empezar <span class="arr">&#8599;</span></a>
+        <ul class="tier-feats">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>P&aacute;ginas ilimitadas / arquitectura a medida</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>E-commerce</b> o funci&oacute;n compleja (pagos, reservas, portal)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Automatizaciones a medida</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Dise&ntilde;o premium con <b>motion / 3D</b></span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>SEO t&eacute;cnico + datos estructurados</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Multi-idioma opcional</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>Revisiones ilimitadas</b> (dentro del alcance)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Entrega en <b>6&ndash;10 semanas</b></span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>90 d&iacute;as de soporte + <b>3 meses de mantenimiento</b></span></li>
+        </ul>
+      </div>
+
+      <!-- A medida -->
+      <div class="tier plain">
+        <div class="tier-name">A medida</div>
+        <div class="tier-desc">Para proyectos que no encajan en lo anterior.</div>
+        <div class="tier-price"><span class="amount">A medida</span></div>
+        <div class="tier-price-note">Presupuesto personalizado</div>
+        <a class="tier-cta ghost" href="#contacto">Hablemos <span class="arr">&#8599;</span></a>
+        <ul class="tier-feats">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>SaaS, plataformas complejas, integraciones ERP/CRM</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Alcance y precio definidos en <b>llamada de descubrimiento</b></span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Equipo y calendario dedicados</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Fases, hitos y entregables acordados por contrato</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Mantenimiento y evoluci&oacute;n a la carta</span></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <p class="tarifas-fine" data-reveal>
+      <strong>Nota:</strong> precios sin IVA. Hosting y dominio se facturan aparte (aprox. 100&ndash;300&nbsp;&euro;/a&ntilde;o).
+      El plazo de entrega depende de la rapidez con la que recibamos contenidos y feedback. El pago inicia el proyecto;
+      el resto se abona a la entrega.
+    </p>
+  </div>
+</section>
+
 <!-- ════════════════════ CONTACTO (claro) ════════════════════ -->
 <section class="section sec-dark"  id="contacto">
   <div class="wrap">
@@ -2020,6 +2203,28 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') document.que
     });
   }, { threshold: 0.10 });
   cards.forEach(function(c){ obs.observe(c); });
+})();
+/* ════════ Tarifas → Stripe Payment Links ════════ */
+(function(){
+  // ↓↓↓ Pega aquí los Payment Links de Stripe (buy.stripe.com/...). Vacío = lleva a #contacto.
+  const STRIPE_LINKS = {
+    esencial: '',
+    estudio:  '',
+    sistema:  ''
+  };
+  document.querySelectorAll('.tier-cta[data-plan]').forEach(function(a){
+    var plan = a.getAttribute('data-plan');
+    var url  = STRIPE_LINKS[plan];
+    if (url) { a.setAttribute('href', url); }
+    else {
+      a.setAttribute('href', '#contacto');
+      a.addEventListener('click', function(e){
+        e.preventDefault();
+        var c = document.getElementById('contacto');
+        if (c) c.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+  });
 })();
 /* ════════ Contacto → Worker ════════ */
 async function sendContact() {
