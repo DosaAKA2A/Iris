@@ -2208,9 +2208,9 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') document.que
 (function(){
   // ↓↓↓ Pega aquí los Payment Links de Stripe (buy.stripe.com/...). Vacío = lleva a #contacto.
   const STRIPE_LINKS = {
-    esencial: '',
-    estudio:  '',
-    sistema:  ''
+    esencial: 'https://buy.stripe.com/28EbIT7exgSeeeN5JL6Ri00',
+    estudio:  'https://buy.stripe.com/7sYcMX0Q96dA5Ih6NP6Ri01',
+    sistema:  'https://buy.stripe.com/4gM7sD2YhdG2b2B4FH6Ri02'
   };
   document.querySelectorAll('.tier-cta[data-plan]').forEach(function(a){
     var plan = a.getAttribute('data-plan');
