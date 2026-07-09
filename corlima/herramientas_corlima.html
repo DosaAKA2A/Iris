@@ -2340,7 +2340,7 @@ function ebInit(){
 function ebUID(){ return EB.nextId++; }
 
 function ebDefaults(type){
-  var o={id:ebUID(),type:type,x:48,y:48};
+  var o={id:ebUID(),type:type,x:48,y:48,shadow:false};
   if(type==='panel')    Object.assign(o,{x:0,y:0,w:624,h:600,c1:'#0b2577',c2:'#0f319e',angle:135,radius:0,z:1});
   if(type==='text')     Object.assign(o,{x:48,y:96,text:'Escribe aquí',size:64,weight:700,color:'#ffffff',align:'left',w:480,z:20});
   if(type==='discount') Object.assign(o,{x:48,y:288,top:'Hasta',big:'20%',sub:'dcto.',bg:'#ffd400',fg:'#0b2577',style:'tag',scale:1,z:22});
@@ -2366,21 +2366,36 @@ function ebPickLogo(cb){var inp=document.createElement('input');inp.type='file';
 
 function ebLoadDefault(){
   EB.objects=[]; EB.nextId=1;
-  var panel=ebDefaults('panel'); panel.w=EB.W/3; EB.objects.push(panel);
-  var image=ebDefaults('image'); image.x=EB.W/3; image.w=EB.W-EB.W/3; EB.objects.push(image);
-  var logo=ebDefaults('logo'); logo.text='MARCA'; logo.x=50; logo.y=50; EB.objects.push(logo);
-  var head=ebDefaults('text'); head.text='Hasta 20% de descuento'; head.x=50; head.y=190; head.size=58; head.w=530; EB.objects.push(head);
-  var sub=ebDefaults('text'); sub.text='En selección de productos.\nSolo hasta agotar stock'; sub.x=50; sub.y=330; sub.size=26; sub.weight=400; sub.w=530; EB.objects.push(sub);
-  var disc=ebDefaults('discount'); disc.x=50; disc.y=390; EB.objects.push(disc);
-  var dates=ebDefaults('dates'); dates.x=290; dates.y=430; EB.objects.push(dates);
-  var s1=ebDefaults('stamp'); s1.text='Despachos a todo el Perú'; s1.icon='truck'; s1.x=50; s1.y=490; EB.objects.push(s1);
-  var cta=ebDefaults('cta'); cta.x=1530; cta.y=430; EB.objects.push(cta);
+  // panel a sangre (1/3)
+  var panel=ebDefaults('panel'); panel.w=Math.round(EB.W/3); panel.shadow=false; EB.objects.push(panel);
+  // zona de imagen (a sangre, 2/3)
+  var image=ebDefaults('image'); image.x=Math.round(EB.W/3); image.w=EB.W-Math.round(EB.W/3); image.shadow=false; EB.objects.push(image);
+  // logo: alto 144, ancho proporcional (ratio Luminarc 5.17:1)
+  var logo=ebDefaults('logo'); logo.text='MARCA'; logo.x=50; logo.y=50; logo.h=144; logo.w=Math.round(144*3.5); logo.shadow=false; EB.objects.push(logo);
+  // eslogan: tamaño 21, peso 700, centrado, ancho 320
+  var slogan=ebDefaults('text'); slogan.text='Solo durante fiestas | CORLIMA'; slogan.x=50; slogan.y=200; slogan.size=21; slogan.weight=700; slogan.align='center'; slogan.w=320; slogan.shadow=false; EB.objects.push(slogan);
+  // badge flat tamaño 1
+  var disc=ebDefaults('discount'); disc.x=50; disc.y=260; disc.style='flat'; disc.scale=1; disc.shadow=false; EB.objects.push(disc);
+  // Precios imperdibles: tamaño 26, ancho 300, peso 800, left
+  var head=ebDefaults('text'); head.text='Precios imperdibles'; head.x=280; head.y=260; head.size=26; head.weight=800; head.align='left'; head.w=300; head.shadow=false; EB.objects.push(head);
+  // subtexto: tamaño 14, peso 400
+  var sub=ebDefaults('text'); sub.text='En selección de productos.\nSolo hasta agotar stock'; sub.x=280; sub.y=310; sub.size=14; sub.weight=400; sub.align='left'; sub.w=300; sub.shadow=false; EB.objects.push(sub);
+  // estampillas: escala 0.65
+  var s1=ebDefaults('stamp'); s1.text='Despachos a todo el Perú'; s1.icon='truck'; s1.x=50; s1.y=400; s1.scale=0.65; s1.shadow=false; EB.objects.push(s1);
+  var s2=ebDefaults('stamp'); s2.text='Todos los metodos de pago'; s2.icon='card'; s2.x=280; s2.y=400; s2.scale=0.65; s2.shadow=false; EB.objects.push(s2);
+  // disclaimer: tamaño 14, peso 400
+  var disc2=ebDefaults('text'); disc2.text='Promociones sujetas a cambios y stock.'; disc2.x=50; disc2.y=490; disc2.size=14; disc2.weight=400; disc2.align='left'; disc2.w=450; disc2.shadow=false; EB.objects.push(disc2);
+  // CTA
+  var cta=ebDefaults('cta'); cta.x=1530; cta.y=450; cta.shadow=true; EB.objects.push(cta);
   EB.sel=head.id;
 }
 
 /* ── helpers dibujo ── */
 function ebRR(c,x,y,w,h,r){r=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
-function ebShadow(c,on){ if(on){c.save();c.shadowColor='rgba(0,0,0,.22)';c.shadowBlur=18;c.shadowOffsetY=6;} else {c.restore();} }
+function ebShadow(c,o,on){
+  if(on&&o&&o.shadow){c.save();c.shadowColor='rgba(0,0,0,.26)';c.shadowBlur=20;c.shadowOffsetX=0;c.shadowOffsetY=7;}
+  else if(!on){c.restore();}
+}
 function ebWrap(c,text,w){var out=[];(text||'').split('\n').forEach(function(para){
   var words=para.split(' '),line='';
   words.forEach(function(word){var t=line?line+' '+word:word;
@@ -2472,12 +2487,12 @@ function ebDraw(c,o){
   }
   else if(o.type==='discount'){
     var s=o.scale;
-    ebShadow(c,true);
+    ebShadow(c,o,true);
     if(o.style==='seal'){
       var R=64*s,cx2=o.x+R,cy2=o.y+R,pts=16;
       c.fillStyle=o.bg;c.beginPath();
       for(var i=0;i<pts*2;i++){var ang=i*Math.PI/pts,rr=(i%2?R*0.86:R);c.lineTo(cx2+Math.cos(ang)*rr,cy2+Math.sin(ang)*rr);}
-      c.closePath();c.fill();ebShadow(c,false);
+      c.closePath();c.fill();ebShadow(c,o,false);
       c.fillStyle=o.fg;c.textAlign='center';c.textBaseline='middle';
       c.font="600 "+(16*s)+"px "+EBF;c.fillText(o.top,cx2,cy2-R*0.42);
       c.font="800 "+(48*s)+"px "+EBF;c.fillText(o.big,cx2,cy2+R*0.02);
@@ -2487,7 +2502,7 @@ function ebDraw(c,o){
       var w=210*s,h=132*s,notch=26*s;
       c.fillStyle=o.bg;c.beginPath();
       c.moveTo(o.x+notch,o.y);c.lineTo(o.x+w,o.y);c.lineTo(o.x+w,o.y+h);c.lineTo(o.x+notch,o.y+h);
-      c.lineTo(o.x,o.y+h/2);c.closePath();c.fill();ebShadow(c,false);
+      c.lineTo(o.x,o.y+h/2);c.closePath();c.fill();ebShadow(c,o,false);
       c.beginPath();c.fillStyle='rgba(255,255,255,.9)';c.arc(o.x+notch+6*s,o.y+h/2,9*s,0,7);c.fill();
       c.fillStyle=o.fg;c.textAlign='center';c.textBaseline='middle';var mx=o.x+notch+(w-notch)/2;
       c.font="600 "+(18*s)+"px "+EBF;c.fillText(o.top,mx,o.y+h*0.24);
@@ -2496,7 +2511,7 @@ function ebDraw(c,o){
       c.textAlign='left';c.textBaseline='alphabetic';ebSetBBox(o,o.x,o.y,w,h);
     } else {
       var w2=190*s,h2=120*s;
-      c.fillStyle=o.bg;ebRR(c,o.x,o.y,w2,h2,14*s);c.fill();ebShadow(c,false);
+      c.fillStyle=o.bg;ebRR(c,o.x,o.y,w2,h2,14*s);c.fill();ebShadow(c,o,false);
       c.fillStyle=o.fg;c.textAlign='center';c.textBaseline='middle';
       c.font="600 "+(20*s)+"px "+EBF;c.fillText(o.top,o.x+w2/2,o.y+h2*0.2);
       c.font="800 "+(56*s)+"px "+EBF;c.fillText(o.big,o.x+w2/2,o.y+h2*0.53);
@@ -2507,7 +2522,7 @@ function ebDraw(c,o){
   else if(o.type==='dates'){
     var sd=o.scale;c.font="700 "+(24*sd)+"px "+EBF;var tw=c.measureText(o.dates).width;
     var pad=22*sd,w3=tw+pad*2,h3=72*sd;
-    ebShadow(c,true);c.fillStyle=o.bg;ebRR(c,o.x,o.y,w3,h3,12*sd);c.fill();ebShadow(c,false);
+    ebShadow(c,o,true);c.fillStyle=o.bg;ebRR(c,o.x,o.y,w3,h3,12*sd);c.fill();ebShadow(c,o,false);
     c.fillStyle=o.fg;c.textBaseline='middle';c.globalAlpha=.65;c.font="600 "+(12*sd)+"px "+EBF;
     c.fillText((o.label||'').toUpperCase(),o.x+pad,o.y+h3*0.3);c.globalAlpha=1;
     c.font="700 "+(24*sd)+"px "+EBF;c.fillText(o.dates,o.x+pad,o.y+h3*0.66);
@@ -2517,7 +2532,7 @@ function ebDraw(c,o){
     var ss=o.scale,hasIcon=o.icon&&o.icon!=='none';
     c.font="600 "+(20*ss)+"px "+EBF;var tws=c.measureText(o.text).width;
     var iconW=hasIcon?44*ss:0,padL=hasIcon?18*ss:26*ss,padR=26*ss,h4=52*ss,w4=iconW+tws+padL+padR;
-    ebShadow(c,true);c.fillStyle=o.bg;ebRR(c,o.x,o.y,w4,h4,h4/2);c.fill();ebShadow(c,false);
+    ebShadow(c,o,true);c.fillStyle=o.bg;ebRR(c,o.x,o.y,w4,h4,h4/2);c.fill();ebShadow(c,o,false);
     c.strokeStyle=o.border;c.lineWidth=1.5*ss;ebRR(c,o.x,o.y,w4,h4,h4/2);c.stroke();
     if(hasIcon)ebIcon(c,o.icon,o.x+padL+iconW*0.42,o.y+h4/2,30*ss,o.fg);
     c.fillStyle=o.fg;c.textBaseline='middle';c.font="600 "+(20*ss)+"px "+EBF;
@@ -2526,7 +2541,7 @@ function ebDraw(c,o){
   else if(o.type==='cta'){
     var sc=o.scale;c.font="700 "+(24*sc)+"px "+EBF;var twc=c.measureText(o.text).width;
     var w5=twc+84*sc,h5=64*sc;
-    ebShadow(c,true);c.fillStyle=o.bg;ebRR(c,o.x,o.y,w5,h5,h5/2);c.fill();ebShadow(c,false);
+    ebShadow(c,o,true);c.fillStyle=o.bg;ebRR(c,o.x,o.y,w5,h5,h5/2);c.fill();ebShadow(c,o,false);
     c.fillStyle='rgba(255,255,255,.18)';c.beginPath();c.arc(o.x+32*sc,o.y+h5/2,13*sc,0,7);c.fill();
     c.fillStyle=o.fg;c.textBaseline='middle';c.textAlign='center';c.font="800 "+(15*sc)+"px "+EBF;c.fillText('➜',o.x+32*sc,o.y+h5/2);
     c.textAlign='left';c.font="700 "+(24*sc)+"px "+EBF;c.fillText(o.text,o.x+54*sc,o.y+h5/2);
@@ -2644,6 +2659,8 @@ function ebBuildProps(){
       if(!o.brand)h+=ebF('Texto logo','text',o);
       h+=ebR('Ancho','w',o,48,900,24)+ebR('Alto','h',o,24,300,12);
     }
+    // toggle sombra paralela (para todos los tipos)
+    h+='<div class="eb-fld" style="margin-top:12px;"><div style="display:flex;align-items:center;justify-content:space-between;"><label style="text-transform:uppercase;letter-spacing:.05em;font-size:10px;color:var(--muted);">Sombra paralela</label><button id="ebShadowBtn" class="switch '+(o.shadow?'on':'')+'" onclick="ebToggleShadow('+o.id+')" style="flex-shrink:0;"></button></div></div>';
     h+='<div class="eb-lay" style="margin-top:12px;"><button onclick="ebLayer(\'front\')">▲ Frente</button><button onclick="ebLayer(\'back\')">▼ Fondo</button><button onclick="ebLayer(\'dup\')">Duplicar</button><button onclick="ebLayer(\'del\')" style="color:#ff6b6b;">Borrar</button></div>';
     h+='</div>';
   }else{
@@ -2670,6 +2687,7 @@ function ebApplyBrand(o){
   var img=new Image();img.onload=function(){o.img=img;var r=img.naturalWidth/img.naturalHeight||b.ratio||3.5;
     o.h=Math.max(48,o.h||96);o.w=o.h*r;ebRender();};img.src=uri;
 }
+function ebToggleShadow(id){var o=EB.objects.find(function(x){return x.id===id;});if(!o)return;o.shadow=!o.shadow;var btn=document.getElementById('ebShadowBtn');if(btn)btn.classList.toggle('on',o.shadow);ebRender();}
 function ebReplaceImg(id){var inp=document.createElement('input');inp.type='file';inp.accept='image/*';
   inp.onchange=function(e){var f=e.target.files[0];if(!f)return;var img=new Image();img.onload=function(){var o=EB.objects.find(function(x){return x.id===id;});o.img=img;ebRender();};img.src=URL.createObjectURL(f);};inp.click();}
 function ebReplaceLogo(id){var inp=document.createElement('input');inp.type='file';inp.accept='image/svg+xml,image/png,image/*';
