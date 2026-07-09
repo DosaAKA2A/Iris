@@ -2377,16 +2377,15 @@ function ebLoadDefault(){
   var image=ebDefaults('image'); image.x=PW; image.w=EB.W-PW; image.h=EB.H; image.shadow=false;
   EB.objects.push(image);
 
-  // Logo CENTRADO en el panel: anchor x = PW/2 (texto con align center)
-  // Renderizamos como texto con align center, x = centro del panel
+  // Logo: alineado al margen izquierdo (x=50), NO centrado — evita que se corte
   var logo=ebDefaults('logo'); logo.text='MARCA'; logo.h=144; logo.w=Math.round(144*3.5);
-  logo.x=Math.round(PW/2 - logo.w/2); logo.y=50; logo.shadow=false;
+  logo.x=50; logo.y=50; logo.shadow=false;
   EB.objects.push(logo);
 
-  // Eslogan: align=center, x = PW/2 (el anchor de canvas textAlign=center ES el punto x)
+  // Eslogan: alineado a la izquierda al margen (x=50), ancho de caja = panel útil
   var slogan=ebDefaults('text'); slogan.text='Solo durante fiestas | CORLIMA';
-  slogan.size=21; slogan.weight=700; slogan.align='center'; slogan.w=530; slogan.color='#ffffff';
-  slogan.x=Math.round(PW/2); slogan.y=206; slogan.shadow=false;
+  slogan.size=21; slogan.weight=700; slogan.align='left'; slogan.w=PW-100; slogan.color='#ffffff';
+  slogan.x=50; slogan.y=210; slogan.shadow=false;
   EB.objects.push(slogan);
 
   // Badge flat — x=50, y=260
