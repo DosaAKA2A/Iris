@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- cache: 20260709a -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Herramientas Corlima — IRIS</title>
@@ -904,6 +905,26 @@ input[name="scaleAutoBg"]:checked + .sabg-swatch {
   #panelBanner .eb-layers .eb-layer{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;font-size:11px;cursor:pointer;border:1px solid transparent;}
   #panelBanner .eb-layers .eb-layer:hover{background:var(--bg3);}
   #panelBanner .eb-layers .eb-layer.sel{border-color:#ff5c38;background:var(--bg3);}
+  /* ── Pulido pro · lenguaje visual Creative Tools ── */
+  #panelBanner{--eb-mono:ui-monospace,'SF Mono','Menlo','Consolas',monospace;}
+  #panelBanner .sec{font-family:var(--eb-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:9px;}
+  #panelBanner .sec::before{content:"";width:6px;height:6px;border-radius:50%;background:#ff5c38;box-shadow:0 0 10px rgba(255,92,56,.7);flex-shrink:0;}
+  #panelBanner #ebBar{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;}
+  #panelBanner .eb-lbl{font-family:var(--eb-mono);}
+  #panelBanner .eb-add{font-family:var(--eb-mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;background:var(--bg3);border-color:var(--border2);}
+  #panelBanner .eb-add:hover{background:#242424;border-color:#ff5c38;color:#fff;}
+  #panelBanner .btn-primary{font-family:var(--eb-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
+  #panelBanner #ebStage::after{content:"";position:absolute;inset:0;border-radius:12px;pointer-events:none;background:radial-gradient(120% 90% at 50% 0%,transparent 62%,rgba(0,0,0,.32) 100%);}
+  #panelBanner .eb-hud{position:absolute;font-family:var(--eb-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);pointer-events:none;user-select:none;z-index:2;}
+  #panelBanner .eb-hud.tl{left:16px;top:14px;}
+  #panelBanner .eb-hud.br{right:16px;bottom:13px;color:#ff5c38;opacity:.75;}
+  #panelBanner .eb-grp{background:var(--bg2);border-color:var(--border);border-radius:10px;}
+  #panelBanner .eb-grp-t{font-family:var(--eb-mono);letter-spacing:.16em;color:var(--muted);display:flex;align-items:center;gap:7px;}
+  #panelBanner .eb-grp-t::before{content:"";width:5px;height:5px;background:#ff5c38;border-radius:1px;flex-shrink:0;}
+  #panelBanner .eb-fld label{font-family:var(--eb-mono);letter-spacing:.06em;}
+  #panelBanner .eb-lay button{font-family:var(--eb-mono);letter-spacing:.03em;text-transform:uppercase;}
+  #panelBanner input[type=range]{accent-color:#ff5c38;}
+  #panelBanner .eb-layers .eb-layer{font-family:var(--eb-mono);font-size:10px;letter-spacing:.02em;}
 </style>
 <div id="panelBanner" style="display:none;">
   <div class="sec" style="margin-bottom:12px;">Editor de Banners · 1920×600 · margen 50px · grilla 20px</div>
@@ -925,8 +946,10 @@ input[name="scaleAutoBg"]:checked + .sabg-swatch {
     <button class="btn btn-primary" onclick="ebExport()" style="padding:7px 18px;">Exportar PNG</button>
   </div>
   <div style="display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;">
-    <div id="ebStage" style="background:#0d0d0f;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.05) 1px,transparent 0);background-size:24px 24px;border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:flex;align-items:center;justify-content:center;overflow:auto;min-height:420px;">
-      <canvas id="ebCanvas" style="width:100%;max-width:1760px;display:block;box-shadow:0 20px 60px rgba(0,0,0,.6);cursor:grab;touch-action:none;border-radius:2px;"></canvas>
+    <div id="ebStage" style="background:var(--bg);background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.04) 1px,transparent 0);background-size:22px 22px;border:1px solid var(--border);border-radius:12px;padding:34px 34px 30px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:440px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03);">
+      <span class="eb-hud tl">1920 &#215; 600 px &middot; CORLIMA</span>
+      <canvas id="ebCanvas" style="width:100%;max-width:1760px;display:block;position:relative;z-index:1;box-shadow:0 30px 70px rgba(0,0,0,.55);cursor:grab;touch-action:none;border-radius:3px;border:1px solid rgba(255,255,255,.08);"></canvas>
+      <span class="eb-hud br">margen 50 &middot; grilla 20</span>
     </div>
     <div id="ebProps" style="display:flex;flex-direction:column;gap:12px;"></div>
   </div>
@@ -2347,8 +2370,8 @@ function ebDefaults(type){
   if(type==='dates')    Object.assign(o,{x:240,y:288,label:'Válido',dates:'01/07 — 31/07',bg:'#0b2577',fg:'#ffffff',scale:1,z:22});
   if(type==='stamp')    Object.assign(o,{x:48,y:480,text:'Despachos a todo el Perú',icon:'truck',bg:'rgba(255,255,255,.10)',fg:'#ffffff',border:'rgba(255,255,255,.45)',scale:1,z:24});
   if(type==='cta')      Object.assign(o,{x:1584,y:432,text:'¡Lo quiero!',bg:'#0b2577',fg:'#ffffff',scale:1,z:26});
-  if(type==='image')    Object.assign(o,{x:624,y:0,w:1296,h:600,img:null,radius:0,z:2});
-  if(type==='logo')     Object.assign(o,{x:48,y:48,img:null,text:'MARCA',w:336,h:96,z:28});
+  if(type==='image')    Object.assign(o,{x:624,y:0,w:1296,h:600,img:null,radius:0,angle:0,z:2});
+  if(type==='logo')     Object.assign(o,{x:48,y:48,img:null,text:'MARCA',w:336,h:96,angle:0,z:28});
   return o;
 }
 function ebAdd(type){ var o=ebDefaults(type); EB.objects.push(o); EB.sel=o.id; ebRender(); ebBuildProps(); }
@@ -2422,7 +2445,8 @@ function ebLoadDefault(){
   EB.objects.push(disc2);
 
   // CTA — esquina inferior derecha de la zona de imagen
-  var cta=ebDefaults('cta'); cta.x=1560; cta.y=450; cta.bg='#0b2577'; cta.shadow=true;
+  var cta=ebDefaults('cta'); cta.scale=0.7; cta.bg='#0b2577'; cta.shadow=true;
+  ebPinBottomRight(cta);
   EB.objects.push(cta);
 
   EB.sel=head.id;
@@ -2494,6 +2518,14 @@ function ebIcon(c,name,cx,cy,s,col){
 }
 
 function ebSetBBox(o,x,y,w,h){o._x=x;o._y=y;o._w=w;o._h=h;}
+function ebRot(c,o){if(!o.angle)return;var cx=o.x+o.w/2,cy=o.y+o.h/2;c.translate(cx,cy);c.rotate(o.angle*Math.PI/180);c.translate(-cx,-cy);}
+function ebPinBottomRight(o){var c=EB.ctx,sc=o.scale||1,w5;
+  if(c){c.save();c.font="700 "+(24*sc)+"px "+EBF;w5=c.measureText(o.text).width+84*sc;c.restore();}else{w5=260*sc;}
+  var h5=64*sc,g=EB.GRID,M=EB.MARGIN;
+  o.x=M+Math.max(0,Math.floor((EB.W-M-w5-M)/g))*g;
+  o.y=M+Math.max(0,Math.floor((EB.H-M-h5-M)/g))*g;}
+function ebRotRow(o){return ebR('Rotaci\u00f3n','angle',o,0,360,1)+'<div class="eb-lay" style="margin-top:2px;"><button onclick="ebRotate(-90)">&#8630;\u00a090&deg;</button><button onclick="ebRotate(90)">&#8631;\u00a090&deg;</button><button onclick="ebRotate(0,true)">Reset</button></div>';}
+function ebRotate(delta,reset){var o=ebSelObj();if(!o)return;if(reset){o.angle=0;}else{o.angle=(((o.angle||0)+delta)%360+360)%360;}ebRender();ebBuildProps();}
 function ebDraw(c,o){
   if(o.type==='panel'){
     var rad=o.angle*Math.PI/180,cx=o.x+o.w/2,cy=o.y+o.h/2,len=(Math.abs(o.w*Math.cos(rad))+Math.abs(o.h*Math.sin(rad)))/2;
@@ -2504,7 +2536,7 @@ function ebDraw(c,o){
   }
   else if(o.type==='image'){
     ebSetBBox(o,o.x,o.y,o.w,o.h);
-    if(o.img){c.save();ebRR(c,o.x,o.y,o.w,o.h,o.radius);c.clip();
+    if(o.img){c.save();ebRot(c,o);ebRR(c,o.x,o.y,o.w,o.h,o.radius);c.clip();
       var ar=o.img.naturalWidth/o.img.naturalHeight,tar=o.w/o.h,dw,dh,dx,dy;
       if(ar>tar){dh=o.h;dw=o.h*ar;dx=o.x-(dw-o.w)/2;dy=o.y;}else{dw=o.w;dh=o.w/ar;dx=o.x;dy=o.y-(dh-o.h)/2;}
       c.drawImage(o.img,dx,dy,dw,dh);c.restore();}
@@ -2587,10 +2619,12 @@ function ebDraw(c,o){
   }
   else if(o.type==='logo'){
     ebSetBBox(o,o.x,o.y,o.w,o.h);
+    c.save();ebRot(c,o);
     if(o.img){var ar=o.img.naturalWidth/o.img.naturalHeight,dw=o.w,dh=o.w/ar;if(dh>o.h){dh=o.h;dw=o.h*ar;}
       c.drawImage(o.img,o.x,o.y,dw,dh);ebSetBBox(o,o.x,o.y,dw,dh);}
     else{c.fillStyle='#ffffff';c.font="800 "+(o.h*0.82)+"px "+EBF;c.textBaseline='top';
       c.fillText(o.text,o.x,o.y);var lw=c.measureText(o.text).width;ebSetBBox(o,o.x,o.y,lw,o.h*0.9);c.textBaseline='alphabetic';}
+    c.restore();
   }
 }
 function ebGrid(c){
@@ -2686,7 +2720,7 @@ function ebBuildProps(){
     if(o.type==='dates'){h+=ebF('Etiqueta','label',o)+ebF('Fechas','dates',o)+'<div class="eb-lay">'+ebC('Fondo','bg',o)+ebC('Texto','fg',o)+'</div>'+ebR('Tamaño','scale',o,0.5,3,0.05);}
     if(o.type==='stamp'){h+=ebF('Texto','text',o)+ebSelectF('Icono','icon',o,EB_ICONS)+'<div class="eb-lay">'+ebC('Fondo','bg',o)+ebC('Texto','fg',o)+'</div>'+ebR('Tamaño','scale',o,0.5,3,0.05);}
     if(o.type==='cta'){h+=ebF('Texto','text',o)+'<div class="eb-lay">'+ebC('Fondo','bg',o)+ebC('Texto','fg',o)+'</div>'+ebR('Tamaño','scale',o,0.5,3,0.05);}
-    if(o.type==='image'){h+='<button class="eb-add" style="width:100%;margin-bottom:8px;" onclick="ebReplaceImg('+o.id+')">Reemplazar imagen</button>'+ebR('Ancho','w',o,96,1920,48)+ebR('Alto','h',o,96,600,24)+ebR('Radio','radius',o,0,60,4);}
+    if(o.type==='image'){h+='<button class="eb-add" style="width:100%;margin-bottom:8px;" onclick="ebReplaceImg('+o.id+')">Reemplazar imagen</button>'+ebR('Ancho','w',o,96,1920,48)+ebR('Alto','h',o,96,600,24)+ebR('Radio','radius',o,0,60,4)+ebRotRow(o);}
     if(o.type==='logo'){
       var brandOpts='<option value="__text">Texto (sin logo)</option>'+Object.keys(BRANDS).map(function(b){return '<option value="'+b+'" '+(o.brand===b?'selected':'')+'>'+b+'</option>';}).join('')+'<option value="__upload">Subir imagen…</option>';
       h+='<div class="eb-fld"><label>Marca</label><select class="eb-in" id="ebBrandSel">'+brandOpts+'</select></div>';
@@ -2695,7 +2729,7 @@ function ebBuildProps(){
         h+='<div class="eb-fld"><label>Variante de color</label><select class="eb-in" id="ebVarSel">'+Object.keys(vars).map(function(v){return '<option '+(o.variant===v?'selected':'')+'>'+v+'</option>';}).join('')+'</select></div>';
       }
       if(!o.brand)h+=ebF('Texto logo','text',o);
-      h+=ebR('Ancho','w',o,48,900,24)+ebR('Alto','h',o,24,300,12);
+      h+=ebR('Ancho','w',o,48,900,24)+ebR('Alto','h',o,24,300,12)+ebRotRow(o);
     }
     // toggle sombra paralela (para todos los tipos)
     h+='<div class="eb-fld" style="margin-top:12px;"><div style="display:flex;align-items:center;justify-content:space-between;"><label style="text-transform:uppercase;letter-spacing:.05em;font-size:10px;color:var(--muted);">Sombra paralela</label><button id="ebShadowBtn" class="switch '+(o.shadow?'on':'')+'" onclick="ebToggleShadow('+o.id+')" style="flex-shrink:0;"></button></div></div>';
