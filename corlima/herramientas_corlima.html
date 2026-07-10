@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- cache: 20260710e -->
+<!-- cache: 20260710f -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Herramientas Corlima — IRIS</title>
@@ -15,10 +15,10 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #0a0a0a; --bg2: #141414; --bg3: #1e1e1e; --bg4: #252525;
-  --border: #2a2a2a; --border2: #333;
-  --text: #d4d4d4; --muted: #555; --muted2: #444; --dim: #333;
-  --accent: #6c6cff; --accent-dim: #3a3aaa; --accent-glow: rgba(108,108,255,0.12);
+  --bg: #ffffff; --bg2: #f6f7f9; --bg3: #eef0f3; --bg4: #e4e7ec;
+  --border: #e4e6ea; --border2: #d7dae0;
+  --text: #1c2128; --muted: #8b9099; --muted2: #a6abb3; --dim: #c4c8cf;
+  --accent: #3a49c9; --accent-dim: #b9beeb; --accent-glow: rgba(58,73,201,0.10);
   --ok: #3fb950; --warn: #e3a341;
   --radius: 8px; --radius-sm: 5px;
 }
@@ -39,7 +39,7 @@ body {
   width: 28px; height: 28px; flex-shrink: 0;
   border-radius: 4px; overflow: hidden;
 }
-.header h1 { font-size: 15px; font-weight: 500; color: #fff; letter-spacing: .04em; text-transform: uppercase; }
+.header h1 { font-size: 15px; font-weight: 500; color:#1c2128; letter-spacing: .04em; text-transform: uppercase; }
 .header-ver {
   margin-left: auto; font-size: 11px; color: var(--muted);
   border: .5px solid var(--border2); border-radius: 20px; padding: 2px 9px;
@@ -83,7 +83,7 @@ body {
   background: transparent; border: none; color: var(--muted);
   font-family: inherit; transition: background .12s, color .12s; letter-spacing: .02em;
 }
-.tab.active { background: var(--bg4); color: #fff; font-weight: 500; }
+.tab.active { background: var(--accent); color:#fff; font-weight: 600; }
 .tab:hover:not(.active) { background: var(--bg3); color: var(--text); }
 
 /* SECTION LABEL */
@@ -264,7 +264,7 @@ button:disabled { opacity: .3; cursor: default; }
 }
 .pwd-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
 .pwd-logo img { width: 22px; height: 22px; border-radius: 3px; }
-.pwd-logo span { font-size: 12px; font-weight: 600; color: #fff; letter-spacing: .06em; text-transform: uppercase; }
+.pwd-logo span { font-size: 12px; font-weight: 600; color:#1c2128; letter-spacing: .06em; text-transform: uppercase; }
 .pwd-title { font-size: 13px; color: var(--text); font-weight: 500; }
 .pwd-sub { font-size: 11px; color: var(--muted); margin-top: -8px; }
 .pwd-input-wrap { position: relative; }
@@ -310,16 +310,16 @@ button:disabled { opacity: .3; cursor: default; }
   border: 1px solid rgba(108, 108, 255, 0.25);
   padding: 1.75rem 3.5rem; border-radius: 12px;
   text-align: center; transform: scale(0.92) translateY(10px);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0,0,0, 0.05) inset;
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .success-overlay.show .success-box { 
   transform: scale(1) translateY(0); 
   border-color: rgba(108, 108, 255, 0.8);
-  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), 0 0 40px rgba(108, 108, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), 0 0 40px rgba(108, 108, 255, 0.15), 0 0 0 1px rgba(0,0,0, 0.05) inset;
 }
 .success-text { 
-  font-size: 14px; font-weight: 500; color: #ffffff; 
+  font-size: 14px; font-weight: 500; color:#1c2128; 
   letter-spacing: 0.18em; text-transform: uppercase;
   opacity: 0; transform: translateY(4px);
   transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
@@ -333,7 +333,7 @@ button:disabled { opacity: .3; cursor: default; }
 }
 
 body { font-family: 'Inter', system-ui, sans-serif; }
-.header h1, .header-title { font-family: "Clash Display", sans-serif; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: 15px; color: #fff; }
+.header h1, .header-title { font-family: "Clash Display", sans-serif; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: 15px; color:#1c2128; }
 .header-logo { display: flex; align-items: center; flex-shrink: 0; text-decoration: none; outline: none; }
 .header-logo:focus { outline: none; }
 .header-logo img { border-radius: 7px; }
@@ -345,7 +345,7 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 
 /* Drop zone */
 #scaleDropZone {
-  border: 1.5px dashed rgba(255,255,255,0.14);
+  border: 1.5px dashed rgba(0,0,0,0.14);
   border-radius: 12px;
   padding: 40px 24px;
   text-align: center;
@@ -354,44 +354,44 @@ body { font-family: 'Inter', system-ui, sans-serif; }
   user-select: none;
 }
 #scaleDropZone:hover, #scaleDropZone.drag-over {
-  border-color: rgba(255,255,255,0.38);
-  background: rgba(255,255,255,0.025);
+  border-color: rgba(0,0,0,0.38);
+  background: rgba(0,0,0,0.025);
 }
-.sdz-icon { font-size: 22px; color: rgba(255,255,255,0.2); margin-bottom: 8px; }
-.sdz-main { font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 4px; }
-.sdz-sub  { font-size: 11px; color: rgba(255,255,255,0.28); letter-spacing:.03em; }
+.sdz-icon { font-size: 22px; color: rgba(0,0,0,0.2); margin-bottom: 8px; }
+.sdz-main { font-size: 13px; color: rgba(0,0,0,0.65); margin-bottom: 4px; }
+.sdz-sub  { font-size: 11px; color: rgba(0,0,0,0.28); letter-spacing:.03em; }
 
 /* Títulos de sección */
 .s-section-title {
   font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
-  color: rgba(255,255,255,0.3); margin-bottom: 12px;
+  color: rgba(0,0,0,0.3); margin-bottom: 12px;
   display: flex; align-items: center; gap: 10px;
 }
 #scaleCanvasSize {
   font-size: 10px; letter-spacing: .04em; text-transform: none;
-  color: rgba(255,255,255,0.2);
+  color: rgba(0,0,0,0.2);
 }
 
 /* Resoluciones */
 .sres-label-title {
   font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
-  color: rgba(255,255,255,0.3); margin-bottom: 12px;
+  color: rgba(0,0,0,0.3); margin-bottom: 12px;
 }
 .sres-options { display: flex; gap: 10px; flex-wrap: wrap; }
 .sres-opt { cursor: pointer; }
 .sres-opt input { display: none; }
 .sres-card {
   display: flex; flex-direction: column; gap: 5px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(0,0,0,0.08);
   border-radius: 10px; padding: 12px 16px;
   transition: border-color .2s, background .2s;
   min-width: 180px;
 }
 .sres-opt:has(input:checked) .sres-card {
-  border-color: rgba(255,255,255,0.32);
-  background: rgba(255,255,255,0.04);
+  border-color: rgba(0,0,0,0.32);
+  background: rgba(0,0,0,0.04);
 }
-.sres-px { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.82); }
+.sres-px { font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.82); }
 .sres-ratio { font-style: normal; font-size: 10px; opacity: .45; margin-left: 4px; }
 .sres-hint { font-size: 11px; line-height: 1.4; }
 .sres-hint.blue   { color: #4a9fd4; }
@@ -428,7 +428,7 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 .sdual-col { display: flex; flex-direction: column; gap: 8px; }
 .sdual-col-label {
   font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
-  color: rgba(255,255,255,0.3);
+  color: rgba(0,0,0,0.3);
   display: flex; align-items: center; justify-content: space-between;
 }
 
@@ -451,30 +451,30 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 #scaleGrid {
   position: absolute; inset: 0; pointer-events: none;
   background-image:
-    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
   background-size: 33.33% 33.33%;
 }
 
 /* Botón descarga individual (inline, pequeño) */
 .sbtn-inline {
   padding: 3px 9px; border-radius: 5px;
-  border: 1px solid rgba(255,255,255,0.16);
+  border: 1px solid rgba(0,0,0,0.16);
   background: transparent;
-  color: rgba(255,255,255,0.5);
+  color: rgba(0,0,0,0.5);
   font-family: inherit; font-size: 10px; font-weight: 600;
   letter-spacing: .04em; cursor: pointer;
   transition: background .15s, color .15s; white-space: nowrap;
 }
-.sbtn-inline:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,.85); }
+.sbtn-inline:hover { background: rgba(0,0,0,0.08); color: rgba(0,0,0,.85); }
 
 /* Zoom */
 .sws-zoom-row {
   display: flex; align-items: center; gap: 10px; margin-top: 4px;
 }
-.sws-zoom-lbl { font-size: 11px; color: rgba(255,255,255,.3); min-width: 30px; }
-#scaleZoom { flex:1; max-width: 220px; accent-color: rgba(255,255,255,.6); }
-#scaleZoomVal { font-size: 11px; color: rgba(255,255,255,.35); min-width: 36px; }
+.sws-zoom-lbl { font-size: 11px; color: rgba(0,0,0,.3); min-width: 30px; }
+#scaleZoom { flex:1; max-width: 220px; accent-color: rgba(0,0,0,.6); }
+#scaleZoomVal { font-size: 11px; color: rgba(0,0,0,.35); min-width: 36px; }
 
 /* Botón descarga todas */
 .sbtn-dl-all {
@@ -486,9 +486,9 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 }
 .sbtn-dl-all:hover { opacity: .85; }
 #scaleDlStatus {
-  font-size: 11px; color: rgba(255,255,255,.4); margin-left: 12px;
+  font-size: 11px; color: rgba(0,0,0,.4); margin-left: 12px;
 }
-#scaleDlAllBlock { display: flex; align-items: center; }.sbtn-accent  { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+#scaleDlAllBlock { display: flex; align-items: center; }.sbtn-accent  { background: rgba(0,0,0,0.1); color:#1c2128; border: 1px solid rgba(0,0,0,0.2); }
 .sbtn-primary { background: #fff; color: #000; }
 
 #scaleDlAllBlock { margin-top: 16px; display: flex; align-items: center; }
@@ -496,14 +496,14 @@ body { font-family: 'Inter', system-ui, sans-serif; }
 /* Swatches fondo modo automático */
 .sabg-swatch {
   width: 20px; height: 20px; border-radius: 4px;
-  border: 1.5px solid rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(0,0,0,0.15);
   transition: border-color .15s, transform .15s;
   cursor: pointer;
 }
-.sabg-swatch:hover { border-color: rgba(255,255,255,0.5); transform: scale(1.12); }
+.sabg-swatch:hover { border-color: rgba(0,0,0,0.5); transform: scale(1.12); }
 input[name="scaleAutoBg"]:checked + .sabg-swatch {
-  border-color: rgba(255,255,255,0.9);
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
+  border-color: rgba(0,0,0,0.9);
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.2);
 }
 .sabg-transparent {
   background:
@@ -602,17 +602,17 @@ input[name="scaleAutoBg"]:checked + .sabg-swatch {
     </div>
 
     <!-- Modo Automático -->
-    <div id="scaleAutoRow" style="display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.03);">
+    <div id="scaleAutoRow" style="display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);background:rgba(0,0,0,0.02);">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
         <input type="checkbox" id="scaleAutoMode" style="display:none;">
-        <div id="scaleAutoToggle" style="width:32px;height:18px;border-radius:9px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);position:relative;transition:background .2s;flex-shrink:0;">
+        <div id="scaleAutoToggle" style="width:32px;height:18px;border-radius:9px;background:rgba(0,0,0,0.14);border:1px solid rgba(0,0,0,0.15);position:relative;transition:background .2s;flex-shrink:0;">
           <div id="scaleAutoThumb" style="width:12px;height:12px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .2s,background .2s;opacity:0.5;"></div>
         </div>
-        <span style="font-size:12px;color:rgba(255,255,255,0.55);letter-spacing:.04em;">Modo Automático</span>
-        <span style="font-size:10px;color:rgba(255,255,255,0.25);">— contain + fondo</span>
+        <span style="font-size:12px;color:rgba(28,33,40,0.78);letter-spacing:.04em;">Modo Automático</span>
+        <span style="font-size:10px;color:rgba(28,33,40,0.5);">— contain + fondo</span>
       </label>
       <div id="scaleAutoBgPicker" style="display:none;align-items:center;gap:8px;margin-left:auto;">
-        <span style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:.06em;text-transform:uppercase;">Fondo</span>
+        <span style="font-size:10px;color:rgba(28,33,40,0.55);letter-spacing:.06em;text-transform:uppercase;">Fondo</span>
         <label title="Blanco" style="cursor:pointer;">
           <input type="radio" name="scaleAutoBg" value="white" checked style="display:none;">
           <div class="sabg-swatch" style="background:#ffffff;"></div>
@@ -750,7 +750,7 @@ input[name="scaleAutoBg"]:checked + .sabg-swatch {
     <div class="ctrl-lbl" style="margin-bottom:6px;">1. Selecciona el tipo de actualización</div>
     <div style="display:flex;gap:0;background:var(--bg2);border:0.5px solid var(--border);border-radius:6px;overflow:hidden;width:fit-content;margin-bottom:1.25rem;">
       <button type="button" id="modePrecios" onclick="autoSetMode('precios')"
-        style="padding:7px 18px;font-size:12px;font-family:inherit;cursor:pointer;border:none;background:var(--bg4);color:#4ade80;font-weight:500;letter-spacing:.03em;">
+        style="padding:7px 18px;font-size:12px;font-family:inherit;cursor:pointer;border:none;background:var(--bg4);color:#1a7f37;font-weight:600;letter-spacing:.03em;">
         Actualizar Precios
       </button>
       <button type="button" id="modeStock" onclick="autoSetMode('stock')"
@@ -785,7 +785,7 @@ input[name="scaleAutoBg"]:checked + .sabg-swatch {
         <select id="mapRef" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:6px 8px;font-size:12px;color:var(--text);font-family:inherit;"></select>
       </div>
       <div>
-        <div style="font-size:10px;color:#4ade80;margin-bottom:4px;font-weight:600;">Precio Original</div>
+        <div style="font-size:10px;color:#1a7f37;margin-bottom:4px;font-weight:600;">Precio Original</div>
         <select id="mapPrecio" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:6px 8px;font-size:12px;color:var(--text);font-family:inherit;"></select>
       </div>
       <div>
@@ -903,7 +903,7 @@ input[name="scaleAutoBg"]:checked + .sabg-swatch {
   #panelBanner .eb-in:focus{outline:none;border-color:#ff5c38;}
   #panelBanner .eb-fld label{display:block;font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;}
   #panelBanner .eb-fld label b{color:var(--text);}
-  #panelBanner .eb-grp{border:1px solid var(--border);border-radius:8px;padding:12px;background:rgba(255,255,255,.02);}
+  #panelBanner .eb-grp{border:1px solid var(--border);border-radius:8px;padding:12px;background:rgba(0,0,0,.02);}
   #panelBanner .eb-grp-t{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;}
   #panelBanner .eb-lay{display:flex;gap:6px;flex-wrap:wrap;}
   #panelBanner .eb-lay button{flex:1;min-width:0;font-size:10px;padding:6px 4px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;}
@@ -2015,7 +2015,7 @@ function autoSetMode(mode) {
   const isP = mode === 'precios';
   // Tabs — verde activo/inactivo para Precios, rosa activo/inactivo para Stock
   document.getElementById('modePrecios').style.background = isP ? 'var(--bg4)' : 'transparent';
-  document.getElementById('modePrecios').style.color      = isP ? '#4ade80' : 'var(--muted)';
+  document.getElementById('modePrecios').style.color      = isP ? '#1a7f37' : 'var(--muted)';
   document.getElementById('modePrecios').style.fontWeight = isP ? '500' : 'normal';
   document.getElementById('modeStock').style.background   = isP ? 'transparent' : 'var(--bg4)';
   document.getElementById('modeStock').style.color        = isP ? 'var(--muted)' : '#f9a8d4';
