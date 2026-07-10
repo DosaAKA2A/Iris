@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- cache: 20260710c -->
+<!-- cache: 20260710d -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WAVA — Batidos, Raspados & Helados</title>
@@ -201,7 +201,16 @@ nav.main-nav a.nav-link:hover::after{ transform:scaleX(1); transform-origin:left
   user-select:none;
 }
 .hero-stack .row{ display:flex; }
-.hero-stack .row span{ display:inline-block; animation:wave 3.6s ease-in-out infinite; }
+.hero-stack .row span{ display:inline-block; animation:wave 3.6s ease-in-out infinite; will-change:transform; }
+/* Glyph interior: recibe la deformación "crema" al pasar el puntero,
+   y vuelve a su forma con un muelle suave. La ola (translateY) queda en el span externo. */
+.hero-stack .row span .g{
+  display:inline-block;
+  transform-origin:center bottom;
+  transition:transform .6s cubic-bezier(.34,1.56,.64,1);
+}
+.hero-stack .row{ transition:filter .3s ease; }
+.hero-stack:hover .row{ filter:url(#cream); }
 /* colores alternos: relleno pastel / contorno */
 .hero-stack .row.fill-fresa span{ color:var(--fresa); }
 .hero-stack .row.fill-lila  span{ color:var(--lila); }
@@ -318,6 +327,27 @@ nav.main-nav a.nav-link:hover::after{ transform:scaleX(1); transform-origin:left
    Secciones de carta
    ============================================================ */
 .menu-section{ padding-bottom:clamp(60px, 8vw, 120px); }
+.menu-lead{
+  padding:clamp(40px, 6vw, 88px) clamp(20px, 4vw, 56px) 0;
+}
+.menu-lead-eyebrow{
+  display:inline-flex; align-items:center; gap:10px;
+  font-size:13px; font-weight:600;
+  letter-spacing:.18em; text-transform:uppercase;
+  color:var(--ink-soft);
+  margin-bottom:10px;
+}
+.menu-lead-eyebrow::before{
+  content:""; width:34px; height:2px; background:var(--ink); border-radius:2px;
+}
+.menu-lead-title{
+  font-family:var(--disp);
+  font-weight:800;
+  font-size:clamp(44px, 7vw, 92px);
+  line-height:.95;
+  letter-spacing:-.02em;
+  text-transform:uppercase;
+}
 .menu-body{
   display:grid;
   grid-template-columns:.9fr 1.1fr;
@@ -582,6 +612,18 @@ footer{
   <div class="intro-word"><span>W</span><span>A</span><span>V</span><span>A</span></div>
 </div>
 
+<!-- Filtro de deformación "crema" para el logo -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="cream" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.009 0.014" numOctaves="2" seed="7" result="noise">
+        <animate attributeName="baseFrequency" dur="9s" values="0.009 0.014;0.013 0.018;0.009 0.014" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
 <!-- ============ NAV ============ -->
 <header id="topbar">
   <a class="logo" href="#top">WAVA<span class="dot">.</span></a>
@@ -623,7 +665,7 @@ footer{
       <defs><path id="circ" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs>
       <circle cx="60" cy="60" r="58" fill="#F7BFD6"/>
       <text font-family="Bricolage Grotesque, sans-serif" font-size="13.5" font-weight="800" letter-spacing="3.5" fill="#33254A">
-        <textPath href="#circ">FRÍO · FRUTA · HELADO · WAVA ·</textPath>
+        <textPath href="#circ">WAVA · FRUTA · WAVA · FRÍO ·</textPath>
       </text>
       <text x="60" y="67" text-anchor="middle" font-size="22">✺</text>
     </svg>
@@ -650,11 +692,9 @@ footer{
 
   <!-- ---------- BATIDOS ---------- -->
   <section class="menu-section tint-fresa">
-    <div class="menu-marquee marquee" aria-label="Batidos">
-      <div class="track">
-        <span>Batidos</span><span>Batidos</span><span>Batidos</span><span>Batidos</span>
-        <span>Batidos</span><span>Batidos</span><span>Batidos</span><span>Batidos</span>
-      </div>
+    <div class="menu-lead reveal">
+      <span class="menu-lead-eyebrow">La carta</span>
+      <h2 class="menu-lead-title">Batidos</h2>
     </div>
     <div class="menu-body">
       <div class="menu-media reveal">
@@ -971,12 +1011,64 @@ llevar</h3>
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  /* Ola del hero: retardo escalonado por letra */
-  document.querySelectorAll('.hero-stack .row').forEach((row, r) => {
-    row.querySelectorAll('span').forEach((ch, i) => {
-      ch.style.animationDelay = (r * 0.12 + i * 0.15) + 's';
+  /* Hero: envolver cada letra en un glyph interior (.g) para separar
+     la ola (span externo) de la deformación crema (glyph interno) */
+  const stack = document.querySelector('.hero-stack');
+  if (stack) {
+    stack.querySelectorAll('.row > span').forEach((sp, i) => {
+      const g = document.createElement('span');
+      g.className = 'g';
+      g.textContent = sp.textContent;
+      sp.textContent = '';
+      sp.appendChild(g);
     });
-  });
+
+    /* Ola: retardo escalonado por letra (span externo) */
+    document.querySelectorAll('.hero-stack .row').forEach((row, r) => {
+      row.querySelectorAll(':scope > span').forEach((ch, i) => {
+        ch.style.animationDelay = (r * 0.12 + i * 0.15) + 's';
+      });
+    });
+
+    /* Efecto crema: al pasar el puntero las letras se estiran y se
+       inclinan hacia el cursor como crema; al salir vuelven solas */
+    if (!reduced) {
+      const glyphs = [...stack.querySelectorAll('.g')];
+      const R = 160;           // radio de influencia
+      let raf = null, mx = 0, my = 0, active = false;
+
+      function apply() {
+        raf = null;
+        glyphs.forEach(g => {
+          const r = g.getBoundingClientRect();
+          const cx = r.left + r.width / 2;
+          const cy = r.top + r.height / 2;
+          const dx = mx - cx, dy = my - cy;
+          const dist = Math.hypot(dx, dy) || 1;
+          if (active && dist < R) {
+            const f  = 1 - dist / R;               // 0..1 cercanía
+            const tx = (dx / dist) * 12 * f;       // se pega al cursor
+            const ty = (dy / dist) * 12 * f;
+            const sy = 1 + 0.30 * f;               // estira (crema tirada)
+            const sx = 1 - 0.16 * f;               // se afina
+            const rot = (dx / R) * 10 * f;         // se inclina
+            g.style.transform =
+              `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) scale(${sx.toFixed(3)}, ${sy.toFixed(3)}) rotate(${rot.toFixed(2)}deg)`;
+          } else {
+            g.style.transform = '';
+          }
+        });
+      }
+      stack.addEventListener('pointermove', e => {
+        mx = e.clientX; my = e.clientY; active = true;
+        if (!raf) raf = requestAnimationFrame(apply);
+      });
+      stack.addEventListener('pointerleave', () => {
+        active = false;
+        if (!raf) raf = requestAnimationFrame(apply);   // vuelve a su forma
+      });
+    }
+  }
 })();
 </script>
 </body>
