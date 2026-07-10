@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- cache: 20260710a -->
+<!-- cache: 20260710c -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WAVA — Batidos & Raspados</title>
-<meta name="description" content="WAVA — batidos y raspados artesanales. Fruta fresca, hielo y buen rollo.">
+<title>WAVA — Batidos, Raspados & Helados</title>
+<meta name="description" content="WAVA — batidos, raspados y helados artesanales. Fruta fresca, hielo y buen rollo.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -371,6 +371,7 @@ nav.main-nav a.nav-link:hover::after{ transform:scaleX(1); transform-origin:left
 .menu-section.tint-menta     { --band:var(--menta); }
 .menu-section.tint-cielo     { --band:var(--cielo); }
 .menu-section.tint-melocoton { --band:var(--melocoton); }
+.menu-section.tint-lila      { --band:var(--lila); }
 .menu-section .menu-marquee{ background:var(--band); }
 
 /* ============================================================
@@ -595,14 +596,14 @@ footer{
 <!-- ============ HERO ============ -->
 <section class="hero" id="top">
   <div>
-    <p class="hero-eyebrow reveal">Batidos &amp; raspados artesanales</p>
+    <p class="hero-eyebrow reveal">Batidos, raspados &amp; helados artesanales</p>
     <h1 class="hero-stack" aria-label="WAVA">
       <span class="row fill-fresa reveal"><span>W</span><span>A</span><span>V</span><span>A</span></span>
       <span class="row outline reveal d1"><span>W</span><span>A</span><span>V</span><span>A</span></span>
       <span class="row fill-lila reveal d2"><span>W</span><span>A</span><span>V</span><span>A</span></span>
       <span class="row outline reveal d3"><span>W</span><span>A</span><span>V</span><span>A</span></span>
     </h1>
-    <p class="hero-sub reveal d2">Fruta de verdad, hielo recién raspado y cero prisas. Frío que sienta bien.</p>
+    <p class="hero-sub reveal d2">Fruta de verdad, hielo recién raspado, helado artesanal y cero prisas. Frío que sienta bien.</p>
     <div class="hero-cta reveal d3">
       <a class="btn" href="#carta">Ver la carta</a>
       <a class="btn ghost" href="#encuentranos">Dónde estamos</a>
@@ -622,7 +623,7 @@ footer{
       <defs><path id="circ" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs>
       <circle cx="60" cy="60" r="58" fill="#F7BFD6"/>
       <text font-family="Bricolage Grotesque, sans-serif" font-size="13.5" font-weight="800" letter-spacing="3.5" fill="#33254A">
-        <textPath href="#circ">FRÍO · FRUTA · WAVA · FRÍO · FRUTA ·</textPath>
+        <textPath href="#circ">FRÍO · FRUTA · HELADO · WAVA ·</textPath>
       </text>
       <text x="60" y="67" text-anchor="middle" font-size="22">✺</text>
     </svg>
@@ -639,8 +640,8 @@ footer{
 <!-- ============ MARQUEE GRANDE ============ -->
 <div class="marquee marquee-big" aria-hidden="true">
   <div class="track">
-    <span>Wava</span><i>✺</i><span>Batidos</span><i>✺</i><span>Raspados</span><i>✺</i>
-    <span>Wava</span><i>✺</i><span>Batidos</span><i>✺</i><span>Raspados</span><i>✺</i>
+    <span>Wava</span><i>✺</i><span>Batidos</span><i>✺</i><span>Raspados</span><i>✺</i><span>Helados</span><i>✺</i>
+    <span>Wava</span><i>✺</i><span>Batidos</span><i>✺</i><span>Raspados</span><i>✺</i><span>Helados</span><i>✺</i>
   </div>
 </div>
 
@@ -757,8 +758,46 @@ footer{
     </div>
   </section>
 
-  <!-- ---------- TOPPINGS ---------- -->
+  <!-- ---------- HELADOS ---------- -->
   <section class="menu-section tint-melocoton">
+    <div class="menu-marquee marquee rev" aria-label="Helados">
+      <div class="track">
+        <span>Helados</span><span>Helados</span><span>Helados</span><span>Helados</span>
+        <span>Helados</span><span>Helados</span><span>Helados</span><span>Helados</span>
+      </div>
+    </div>
+    <div class="menu-body">
+      <div class="menu-media reveal">
+        <!-- PLACEHOLDER: foto de helados -->
+        <div class="ph" id="ph-helados">
+          <span class="ph-ico">🍦</span>
+          <span class="ph-tag">Imagen · helados</span>
+          <span class="ph-file">sustituir: assets/wava/helados.jpg</span>
+        </div>
+      </div>
+      <ul class="menu-list" style="--hover:var(--melocoton)">
+        <li class="reveal">
+          <h3>Vainilla Real</h3><span class="price">3,50&nbsp;€</span>
+          <p>Vaina de vainilla de Madagascar, leche fresca y nada más. El de siempre, bien hecho.</p>
+        </li>
+        <li class="reveal d1">
+          <h3>Fresa &amp; Nata</h3><span class="price">3,50&nbsp;€</span>
+          <p>Helado de fresa con trozos reales y nata montada por encima.</p>
+        </li>
+        <li class="reveal d2">
+          <h3>Chocolate Negro</h3><span class="price">4,00&nbsp;€</span>
+          <p>Cacao al 70%, intenso y cremoso. Para los que van en serio.</p>
+        </li>
+        <li class="reveal d3">
+          <h3>Mango &amp; Maracuyá</h3><span class="price">4,50&nbsp;€</span>
+          <p>Sorbete tropical sin lácteos. Ácido, dulce y ligero.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ---------- TOPPINGS ---------- -->
+  <section class="menu-section tint-lila">
     <div class="menu-marquee marquee rev" aria-label="Toppings">
       <div class="track">
         <span>Toppings</span><span>Toppings</span><span>Toppings</span><span>Toppings</span>
@@ -774,7 +813,7 @@ footer{
           <span class="ph-file">sustituir: assets/wava/toppings.jpg</span>
         </div>
       </div>
-      <ul class="menu-list" style="--hover:var(--melocoton)">
+      <ul class="menu-list" style="--hover:var(--lila)">
         <li class="reveal">
           <h3>Perlas de tapioca</h3><span class="price">1,00&nbsp;€</span>
           <p>Masticables y dulces, para batidos con juego.</p>
@@ -894,7 +933,7 @@ llevar</h3>
   <div class="foot-logo" aria-hidden="true">WAVA</div>
 
   <div class="foot-bottom">
-    <span>© 2026 WAVA — Batidos &amp; Raspados</span>
+    <span>© 2026 WAVA — Batidos, Raspados &amp; Helados</span>
     <span><a href="#">Aviso legal</a> · <a href="#">Privacidad</a> · <a href="#">Cookies</a></span>
   </div>
 </footer>
