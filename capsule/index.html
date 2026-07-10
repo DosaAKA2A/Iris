@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Capsule 1v1 Preloader + Hero</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+</head>
+<body>
+  <div class="preloader">
+    <div class="preloader-progress">
+      <div class="preloader-progress-bar"></div>
+      <div class="preloader-logo">
+        <h1 id="js-preloader-logo">Capsule</h1>
+      </div>
+    </div>
+
+    <div class="preloader-mask"></div>
+
+    <div class="preloader-content">
+      <div class="preloader-footer">
+        <p id="js-preloader-footer">
+          Meet Capsules®—modern and cozy<br />
+          houses, in the California desert.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <section class="hero-section">
+    <div class="hero-shell">
+      <div class="responsive-mobile">
+        <div class="hero-img desktop-bg"></div>
+
+        <div class="mobile-fallback">
+          <img src="./assets/hero-mobile.png" alt="mobile bg" />
+        </div>
+
+        <video
+          src="./assets/smoke_final.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          class="smoke-video"
+        ></video>
+      </div>
+
+      <div class="hero-copy-wrap">
+        <div class="hero-copy-inner">
+          <h1 id="js-hero-title">Capsules®</h1>
+
+          <div class="hero-bottom">
+            <h2 id="js-hero-subtitle">
+              <span>Closer to</span>
+              <span>Nature—Closer</span>
+              <span>to Yourself</span>
+            </h2>
+
+            <p id="js-hero-description">
+              Spend unforgettable and remarkable time in the Californian desert with—Capsules.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
