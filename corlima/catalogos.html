@@ -93,6 +93,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .cellempty button:hover{border-color:var(--accent);color:var(--accent)}
 .cellctrl{position:absolute;top:.3em;right:.3em;display:flex;gap:.25em;z-index:7;opacity:0;transition:opacity .1s}
 .gcell:hover .cellctrl{opacity:1}
+.cellctrl.cc-prod{left:.3em;right:auto}
 .cellctrl button{min-width:1.6em;height:1.6em;padding:0 .4em;border-radius:.4em;background:rgba(255,255,255,.94);border:1px solid var(--line);font-size:.7em;font-weight:600;display:flex;align-items:center;justify-content:center;color:#4b5058}
 .cellctrl button:hover{color:var(--accent);border-color:var(--accent)}
 .gcell .imgbox{flex:1}
@@ -182,7 +183,7 @@ function foot(){return '<div class="pg-foot"><div class="fl" contenteditable dat
 
 function cellAt(face,r,c){return face.querySelector('.gcell[data-r="'+r+'"][data-c="'+c+'"]');}
 function renderCell(cell){const t=cell.dataset.type;
-  if(t==='product'){cell.innerHTML=productHTML()+'<div class="cellctrl"><button data-clear title="Vaciar">✕</button></div>';}
+  if(t==='product'){cell.innerHTML=productHTML()+'<div class="cellctrl cc-prod"><button data-clear title="Vaciar">✕</button></div>';}
   else if(t==='image'){cell.innerHTML=shot('','Imagen')+'<div class="cellctrl"><button data-span title="Filas (1/2/3)">⇕ '+(cell.dataset.span||1)+'</button><button data-clear title="Vaciar">✕</button></div>';}
   else{cell.dataset.span=1;cell.style.gridRow=cell.dataset.r;cell.innerHTML='<div class="cellempty"><button data-add="product">+ Producto</button><button data-add="image">+ Imagen</button></div>';}}
 function setSpan(face,cell,span){const r=+cell.dataset.r,c=+cell.dataset.c;
