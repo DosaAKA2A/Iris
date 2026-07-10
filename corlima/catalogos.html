@@ -152,7 +152,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   <div class="body">
     <aside class="rail">
       <h4>Añadir cara</h4>
-      <div class="railhint">Cada cara es una grilla 3×3 (máx. 9 elementos). Las caras se colocan en el libro, dos por pliego.</div>
+      <div class="railhint">Cada cara es una grilla 3×3 (máx. 9 elementos). En una imagen, <b>⇔</b> y <b>⇕</b> la extienden por columnas y filas para <b>fusionar celdas</b> (p. ej. 2×2 = una sola imagen).</div>
       <div class="addface" id="addface"></div>
       <h4>Estampillas</h4>
       <div class="railhint">Toca los recuadros redondeados junto a cada producto para elegir su estampilla.</div>
@@ -184,22 +184,32 @@ function foot(){return '<div class="pg-foot"><div class="fl" contenteditable dat
 function cellAt(face,r,c){return face.querySelector('.gcell[data-r="'+r+'"][data-c="'+c+'"]');}
 function renderCell(cell){const t=cell.dataset.type;
   if(t==='product'){cell.innerHTML=productHTML()+'<div class="cellctrl cc-prod"><button data-clear title="Vaciar">✕</button></div>';}
-  else if(t==='image'){cell.innerHTML=shot('','Imagen')+'<div class="cellctrl"><button data-span title="Filas (1/2/3)">⇕ '+(cell.dataset.span||1)+'</button><button data-clear title="Vaciar">✕</button></div>';}
-  else{cell.dataset.span=1;cell.style.gridRow=cell.dataset.r;cell.innerHTML='<div class="cellempty"><button data-add="product">+ Producto</button><button data-add="image">+ Imagen</button></div>';}}
-function setSpan(face,cell,span){const r=+cell.dataset.r,c=+cell.dataset.c;
-  for(let rr=r+1;rr<=3;rr++){const b=cellAt(face,rr,c);if(b&&b.dataset.coveredby===cell.dataset.id){b.dataset.covered='';b.dataset.coveredby='';b.style.display='';renderCell(b);}}
-  let maxs=1;for(let rr=r+1;rr<=3;rr++){const b=cellAt(face,rr,c);if(b&&((b.dataset.type!=='product'&&b.dataset.type!=='image')||b.dataset.covered==='1'))maxs++;else break;}
-  span=Math.min(span,maxs);if(span<1)span=1;cell.dataset.span=span;cell.style.gridRow=span>1?(r+' / span '+span):(''+r);
-  for(let i=1;i<span;i++){const b=cellAt(face,r+i,c);if(b){b.dataset.covered='1';b.dataset.coveredby=cell.dataset.id;b.style.display='none';}}
-  const sb=cell.querySelector('[data-span]');if(sb)sb.textContent='⇕ '+span;}
+  else if(t==='image'){cell.innerHTML=shot('','Imagen')+'<div class="cellctrl"><button data-cspan title="Columnas (1/2/3)">⇔ '+(cell.dataset.cols||1)+'</button><button data-rspan title="Filas (1/2/3)">⇕ '+(cell.dataset.rows||1)+'</button><button data-clear title="Vaciar">✕</button></div>';}
+  else{cell.dataset.rows=1;cell.dataset.cols=1;cell.style.gridRow=cell.dataset.r;cell.style.gridColumn=cell.dataset.c;cell.innerHTML='<div class="cellempty"><button data-add="product">+ Producto</button><button data-add="image">+ Imagen</button></div>';}}
+function releaseCovered(face,id){face.querySelectorAll('.gcell').forEach(b=>{if(b.dataset.coveredby===id){b.dataset.covered='';b.dataset.coveredby='';b.style.display='';renderCell(b);}});}
+function rectFree(face,r,c,R,C,id){if(r+R-1>3||c+C-1>3)return false;
+  for(let rr=r;rr<r+R;rr++)for(let cc=c;cc<c+C;cc++){if(rr===r&&cc===c)continue;const b=cellAt(face,rr,cc);const t=b.dataset.type;
+    const free=((t!=='product'&&t!=='image')||b.dataset.coveredby===id);if(!free)return false;}return true;}
+function setBlock(face,cell,rows,cols){const r=+cell.dataset.r,c=+cell.dataset.c,id=cell.dataset.id;
+  releaseCovered(face,id);
+  rows=Math.max(1,Math.min(rows,4-r));cols=Math.max(1,Math.min(cols,4-c));
+  while(cols>1&&!rectFree(face,r,c,rows,cols,id))cols--;
+  while(rows>1&&!rectFree(face,r,c,rows,cols,id))rows--;
+  cell.dataset.rows=rows;cell.dataset.cols=cols;
+  cell.style.gridRow=rows>1?(r+' / span '+rows):(''+r);
+  cell.style.gridColumn=cols>1?(c+' / span '+cols):(''+c);
+  for(let rr=r;rr<r+rows;rr++)for(let cc=c;cc<c+cols;cc++){if(rr===r&&cc===c)continue;const b=cellAt(face,rr,cc);b.dataset.covered='1';b.dataset.coveredby=id;b.style.display='none';}
+  const rb=cell.querySelector('[data-rspan]');if(rb)rb.textContent='⇕ '+rows;
+  const cb=cell.querySelector('[data-cspan]');if(cb)cb.textContent='⇔ '+cols;}
 const PRESETS={
   p9:[1,2,3].flatMap(r=>[1,2,3].map(c=>({r,c,type:'product'}))),
-  p6img:[{r:1,c:1,type:'product'},{r:2,c:1,type:'product'},{r:3,c:1,type:'product'},{r:1,c:2,type:'product'},{r:2,c:2,type:'product'},{r:3,c:2,type:'product'},{r:1,c:3,type:'image',span:3}],
-  p3img:[{r:1,c:1,type:'product'},{r:2,c:1,type:'product'},{r:3,c:1,type:'product'},{r:1,c:2,type:'image',span:3},{r:1,c:3,type:'image',span:3}],
+  p6img:[{r:1,c:1,type:'product'},{r:2,c:1,type:'product'},{r:3,c:1,type:'product'},{r:1,c:2,type:'product'},{r:2,c:2,type:'product'},{r:3,c:2,type:'product'},{r:1,c:3,type:'image',rows:3}],
+  p3img:[{r:1,c:1,type:'product'},{r:2,c:1,type:'product'},{r:3,c:1,type:'product'},{r:1,c:2,type:'image',rows:3},{r:1,c:3,type:'image',rows:3}],
+  pbig:[{r:1,c:1,type:'image',rows:2,cols:2},{r:1,c:3,type:'product'},{r:2,c:3,type:'product'},{r:3,c:1,type:'product'},{r:3,c:2,type:'product'},{r:3,c:3,type:'product'}],
   free:[]};
 function initGrid(face,preset){const g=face.querySelector('.g33');g.innerHTML='';
   for(let r=1;r<=3;r++)for(let c=1;c<=3;c++){const cell=document.createElement('div');cell.className='gcell';cell.dataset.r=r;cell.dataset.c=c;cell.dataset.id='g'+(++UID);cell.dataset.type='empty';cell.dataset.span=1;cell.style.gridColumn=c;cell.style.gridRow=r;g.appendChild(cell);renderCell(cell);}
-  (PRESETS[preset]||[]).forEach(p=>{const cell=cellAt(face,p.r,p.c);cell.dataset.type=p.type;renderCell(cell);if(p.type==='image'&&p.span>1)setSpan(face,cell,p.span);});}
+  (PRESETS[preset]||[]).forEach(p=>{const cell=cellAt(face,p.r,p.c);cell.dataset.type=p.type;renderCell(cell);if(p.type==='image'&&((p.rows||1)>1||(p.cols||1)>1))setBlock(face,cell,p.rows||1,p.cols||1);});}
 
 function buildFace(type,preset){const f=document.createElement('div');f.className='face';f.dataset.type=type;
   if(type==='cover'){f.classList.add('cover');f.innerHTML='<div class="cv-top"><div class="cv-brand" contenteditable data-ph="Marca"></div><div class="cv-edtag" contenteditable data-ph="Etiqueta"></div></div><div class="cv-title" contenteditable data-ph="Título del catálogo"></div><div class="cv-sub" contenteditable data-ph="Edición · Año"></div>'+shot('cv-hero','Añadir portada')+'<div class="cv-foot"><div class="cv-disc" contenteditable data-ph="Aviso">Las imágenes son referenciales y pueden presentar ligeras variaciones respecto al producto final.</div><div class="cv-lock">Marca<small>PROFESIONAL</small></div></div>';}
@@ -246,6 +256,7 @@ const FT=[
  {t:'grid',p:'p9',n:'Grilla · 9 productos',d:'3×3 de productos',ic:[[8,8,22,26],[39,8,22,26],[70,8,22,26],[8,38,22,26],[39,38,22,26],[70,38,22,26],[8,68,22,26],[39,68,22,26],[70,68,22,26]]},
  {t:'grid',p:'p6img',n:'Grilla · 6 productos + imagen',d:'2 columnas de productos, 1 imagen 3×1',ic:[[8,8,22,26],[39,8,22,26],[8,38,22,26],[39,38,22,26],[8,68,22,26],[39,68,22,26]],ii:[[70,8,22,86]]},
  {t:'grid',p:'p3img',n:'Grilla · 3 productos + imágenes',d:'1 columna de productos, 2 imágenes al lado',ic:[[8,8,22,26],[8,38,22,26],[8,68,22,26]],ii:[[39,8,22,86],[70,8,22,86]]},
+ {t:'grid',p:'pbig',n:'Grilla · imagen destacada 2×2',d:'1 imagen que fusiona 4 celdas + 5 productos',ic:[[70,8,20,26],[70,38,20,26],[8,68,20,26],[39,68,20,26],[70,68,20,26]],ii:[[8,8,53,56]]},
  {t:'grid',p:'free',n:'Grilla libre',d:'Compón tú los 9 huecos',ic:[[8,8,84,86]]},
  {t:'line',n:'Portada de línea',d:'Imagen grande para dar entrada a una línea',ic:[],ii:[[10,8,80,84]]},
 ];
@@ -257,8 +268,9 @@ FT.forEach(o=>{const b=document.createElement('button');b.className='aft';
 
 document.addEventListener('click',e=>{
   const add=e.target.closest('[data-add]');if(add){const cell=add.closest('.gcell');cell.dataset.type=add.dataset.add;renderCell(cell);return;}
-  const clr=e.target.closest('[data-clear]');if(clr){const cell=clr.closest('.gcell');const face=cell.closest('.face');if(cell.dataset.type==='image')setSpan(face,cell,1);cell.dataset.type='empty';renderCell(cell);return;}
-  const sp=e.target.closest('[data-span]');if(sp){const cell=sp.closest('.gcell');const face=cell.closest('.face');let s=(+cell.dataset.span||1)+1;if(s>3)s=1;setSpan(face,cell,s);return;}});
+  const clr=e.target.closest('[data-clear]');if(clr){const cell=clr.closest('.gcell');const face=cell.closest('.face');if(cell.dataset.type==='image')releaseCovered(face,cell.dataset.id);cell.dataset.type='empty';cell.style.gridRow=cell.dataset.r;cell.style.gridColumn=cell.dataset.c;renderCell(cell);return;}
+  const cb=e.target.closest('[data-cspan]');if(cb){const cell=cb.closest('.gcell');const face=cell.closest('.face');let v=(+cell.dataset.cols||1)+1;if(v>3)v=1;setBlock(face,cell,+cell.dataset.rows||1,v);return;}
+  const rb=e.target.closest('[data-rspan]');if(rb){const cell=rb.closest('.gcell');const face=cell.closest('.face');let v=(+cell.dataset.rows||1)+1;if(v>3)v=1;setBlock(face,cell,v,+cell.dataset.cols||1);return;}});
 
 let imgTarget=null;const picker=document.getElementById('picker');
 document.addEventListener('click',e=>{const box=e.target.closest('.imgbox[data-img]');if(box&&!e.target.closest('.pslot')&&!e.target.closest('.cellctrl')){imgTarget=box;picker.click();}});
