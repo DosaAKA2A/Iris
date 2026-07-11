@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- cache: 20260711f -->
+<!-- cache: 20260711g -->
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -280,72 +280,327 @@
       #sec-services .marquee__img { width: 22vw; }
     }
 
-    /* ============ TOOLS / TEAM ============ */
-    #sec-tools {
-      position: relative;
-      width: 100%;
-      height: 100svh;
-      background-color: #0a0a0a;
+
+    /* ============ TAYLOR SECTIONS · SHARED ============ */
+    .t-section {
+      background: #0a0a0a;
       color: #e3e3db;
+      font-family: "Inter", sans-serif;
+      padding: 7rem 3rem;
+    }
+    .t-inner { max-width: 1280px; margin: 0 auto; }
+    .t-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #777;
+      padding-bottom: 1.2rem;
+      border-bottom: 1px solid rgba(227,227,219,0.14);
+      margin-bottom: 4rem;
+    }
+    .t-header .t-label { color: #e3e3db; }
+    .t-reveal { opacity: 0; transform: translateY(40px); }
+    .t-line-mask { overflow: hidden; display: block; }
+
+    /* ============ ABOUT ============ */
+    #sec-about .t-statement {
+      font-size: clamp(1.8rem, 4.2vw, 3.6rem);
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      max-width: 20ch;
+      margin-bottom: 4rem;
+    }
+    #sec-about .t-about-cols {
+      display: flex;
+      gap: 4rem;
+      justify-content: flex-end;
+    }
+    #sec-about .t-about-cols p {
+      max-width: 34ch;
+      font-size: 1rem;
+      line-height: 1.65;
+      color: #a5a5a0;
+    }
+    #sec-about .t-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 2.5rem;
+      padding: 0.9rem 1.6rem;
+      border: 1px solid rgba(227,227,219,0.25);
+      border-radius: 3rem;
+      color: #e3e3db;
+      text-decoration: none;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      transition: background 0.35s, color 0.35s;
+    }
+    #sec-about .t-btn:hover { background: #e3e3db; color: #0a0a0a; }
+    @media (max-width: 800px) {
+      #sec-about .t-about-cols { flex-direction: column; gap: 2rem; }
+    }
+
+    /* ============ WORKS ============ */
+    #sec-works .t-works-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3.5rem 2.5rem;
+    }
+    #sec-works .t-work {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+    #sec-works .t-work-img {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      border-radius: 0.4rem;
+      background: #161616;
+    }
+    #sec-works .t-work-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.01);
+      transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #sec-works .t-work:hover .t-work-img img { transform: scale(1.07); }
+    #sec-works .t-work-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1rem;
+    }
+    #sec-works .t-work-meta h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    #sec-works .t-tags { display: flex; gap: 0.4rem; }
+    #sec-works .t-tag {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.3rem 0.7rem;
+      border: 1px solid rgba(227,227,219,0.25);
+      border-radius: 2rem;
+      color: #a5a5a0;
+    }
+    #sec-works .t-all {
+      display: flex;
+      justify-content: center;
+      margin-top: 4rem;
+    }
+    #sec-works .t-all a {
+      color: #e3e3db;
+      text-decoration: none;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.9rem 1.8rem;
+      border: 1px solid rgba(227,227,219,0.25);
+      border-radius: 3rem;
+      transition: background 0.35s, color 0.35s;
+    }
+    #sec-works .t-all a:hover { background: #e3e3db; color: #0a0a0a; }
+    @media (max-width: 800px) {
+      #sec-works .t-works-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ============ SERVICES LIST ============ */
+    #sec-servlist .t-serv-intro {
+      font-size: clamp(1.4rem, 2.6vw, 2.2rem);
+      font-weight: 600;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      max-width: 28ch;
+      margin-bottom: 4.5rem;
+    }
+    #sec-servlist .t-serv {
+      display: grid;
+      grid-template-columns: 80px 1fr 1.2fr;
+      gap: 2rem;
+      padding: 2.4rem 0;
+      border-top: 1px solid rgba(227,227,219,0.14);
+    }
+    #sec-servlist .t-serv:last-child { border-bottom: 1px solid rgba(227,227,219,0.14); }
+    #sec-servlist .t-serv-num { font-size: 0.8rem; color: #777; padding-top: 0.4rem; }
+    #sec-servlist .t-serv h3 {
+      font-size: clamp(1.4rem, 2.4vw, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    #sec-servlist .t-serv p {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: #a5a5a0;
+      max-width: 46ch;
+    }
+    @media (max-width: 800px) {
+      #sec-servlist .t-serv { grid-template-columns: 1fr; gap: 0.8rem; }
+    }
+
+    /* ============ PROCESS ============ */
+    #sec-process .t-proc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+    }
+    #sec-process .t-proc {
+      border-top: 1px solid rgba(227,227,219,0.14);
+      padding-top: 1.4rem;
+    }
+    #sec-process .t-proc-num { font-size: 0.75rem; color: #777; margin-bottom: 2.2rem; display: block; }
+    #sec-process .t-proc h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.9rem; }
+    #sec-process .t-proc p { font-size: 0.88rem; line-height: 1.6; color: #a5a5a0; }
+    @media (max-width: 900px) {
+      #sec-process .t-proc-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      #sec-process .t-proc-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ============ TESTIMONIALS ============ */
+    #sec-testi .t-quote-wrap {
+      min-height: 16rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: 2.5em;
-      overflow: hidden;
+      text-align: center;
     }
-    #sec-tools img { width: 100%; height: 100%; object-fit: cover; }
-    #sec-tools .profile-images {
-      width: max-content;
+    #sec-testi blockquote {
+      font-size: clamp(1.3rem, 2.6vw, 2.1rem);
+      font-weight: 500;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+      max-width: 32ch;
+      margin: 0 auto 2rem;
+    }
+    #sec-testi .t-author { font-size: 0.9rem; color: #e3e3db; font-weight: 600; }
+    #sec-testi .t-role { font-size: 0.8rem; color: #777; margin-top: 0.2rem; }
+    #sec-testi .t-testi-nav {
       display: flex;
       justify-content: center;
-      align-items: center;
+      gap: 1rem;
+      margin-top: 3rem;
     }
-    #sec-tools .img {
-      position: relative;
-      width: 70px;
-      height: 70px;
-      padding: 5px;
-      cursor: pointer;
-      will-change: width, height;
-    }
-    #sec-tools .img img { border-radius: 0.5rem; }
-    #sec-tools .profile-names {
-      width: 100%;
-      height: 15rem;
-      clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
-      overflow: hidden;
-    }
-    #sec-tools .name h1 {
-      position: absolute;
-      width: 100%;
-      text-align: center;
-      text-transform: uppercase;
-      font-family: "Inter", sans-serif;
-      font-size: 12rem;
-      font-weight: 900;
-      letter-spacing: -0.2rem;
-      line-height: 1;
+    #sec-testi .t-testi-nav button {
+      background: none;
+      border: 1px solid rgba(227,227,219,0.25);
       color: #e3e3db;
-      user-select: none;
-      transform: translateY(100%);
+      border-radius: 50%;
+      width: 3rem;
+      height: 3rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+      font-family: "Inter", sans-serif;
     }
-    #sec-tools .name.default h1 {
-      color: #555;
-      transform: translateY(-100%);
+    #sec-testi .t-testi-nav button:hover { background: #e3e3db; color: #0a0a0a; }
+
+    /* ============ STATS ============ */
+    #sec-stats .t-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2.5rem;
     }
-    #sec-tools .name h1 .letter {
-      position: relative;
-      transform: translateY(0%);
-      will-change: transform;
+    #sec-stats .t-stat {
+      border-top: 1px solid rgba(227,227,219,0.14);
+      padding-top: 1.4rem;
     }
-    @media screen and (max-width: 900px) {
-      #sec-tools { flex-direction: column-reverse; }
-      #sec-tools .profile-images { flex-wrap: wrap; max-width: 90%; justify-content: center; }
-      #sec-tools .img { width: 60px; height: 60px; padding: 2.5px; }
-      #sec-tools .profile-names { height: 4rem; }
-      #sec-tools .name h1 { font-size: 4rem; letter-spacing: 0; }
+    #sec-stats .t-stat-num {
+      font-size: clamp(2.6rem, 5vw, 4.2rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 0.8rem;
+      display: block;
     }
+    #sec-stats .t-stat h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.7rem;
+      color: #e3e3db;
+    }
+    #sec-stats .t-stat p { font-size: 0.85rem; line-height: 1.55; color: #a5a5a0; }
+    @media (max-width: 900px) {
+      #sec-stats .t-stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      #sec-stats .t-stats-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ============ ARTICLES ============ */
+    #sec-articles .t-article {
+      display: grid;
+      grid-template-columns: 120px 140px 1fr auto;
+      gap: 2rem;
+      align-items: center;
+      padding: 1.8rem 0;
+      border-top: 1px solid rgba(227,227,219,0.14);
+      text-decoration: none;
+      color: inherit;
+      transition: padding-left 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #sec-articles .t-article:hover { padding-left: 1rem; }
+    #sec-articles .t-article:last-of-type { border-bottom: 1px solid rgba(227,227,219,0.14); }
+    #sec-articles .t-art-cat, #sec-articles .t-art-date {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #777;
+    }
+    #sec-articles .t-article h3 {
+      font-size: clamp(1rem, 1.8vw, 1.4rem);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    #sec-articles .t-art-arrow { font-size: 1.2rem; color: #777; transition: transform 0.35s, color 0.35s; }
+    #sec-articles .t-article:hover .t-art-arrow { transform: translateX(6px); color: #e3e3db; }
+    @media (max-width: 800px) {
+      #sec-articles .t-article { grid-template-columns: 1fr auto; gap: 0.6rem 1rem; }
+      #sec-articles .t-art-date { display: none; }
+    }
+
+    /* ============ CTA ============ */
+    #sec-cta {
+      background: #0a0a0a;
+      color: #e3e3db;
+      font-family: "Inter", sans-serif;
+      padding: 10rem 3rem;
+      text-align: center;
+    }
+    #sec-cta h2 {
+      font-size: clamp(2.4rem, 7vw, 6rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 3rem;
+    }
+    #sec-cta .t-cta-btn {
+      display: inline-block;
+      padding: 1.1rem 2.6rem;
+      background: #e3e3db;
+      color: #0a0a0a;
+      border-radius: 3rem;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #sec-cta .t-cta-btn:hover { transform: scale(1.05); }
 
     /* ============ FOOTER ============ */
     #sec-footer {
@@ -456,7 +711,7 @@
     <nav>
       <div class="links">
         <a href="#sec-services">Servicios</a>
-        <a href="#sec-tools">Proyectos</a>
+        <a href="#sec-works">Trabajos</a>
       </div>
       <div class="nav-logo">
         <img src="DOSA_logo.svg" alt="DOSA" />
@@ -480,7 +735,208 @@
     </div>
   </section>
 
-  <!-- ============ SERVICES · MARQUEE MENU ============ -->
+  <!-- ============ 02 · ABOUT ============ -->
+  <section id="sec-about" class="t-section">
+    <div class="t-inner">
+      <div class="t-header t-reveal">
+        <span>02</span><span class="t-label">( Sobre mí )</span><span>&copy; 2026</span>
+      </div>
+      <h2 class="t-statement t-reveal">Creo visuales de alto impacto y experiencias digitales estructuradas para dejar huella.</h2>
+      <div class="t-about-cols">
+        <div class="t-reveal">
+          <p>Soy DOSA, creativo enfocado en dar forma a visuales audaces y experiencias digitales con propósito. Mi trabajo vive en la intersección entre claridad y expresión — donde las ideas fuertes se encuentran con la ejecución limpia.</p>
+        </div>
+        <div class="t-reveal">
+          <p>Abordo cada proyecto con intención, creando soluciones que no solo se ven refinadas, sino que comunican con eficacia y dejan una impresión duradera.</p>
+          <a href="#sec-footer" class="t-btn">Leer más <span>&rarr;</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 03 · SELECTED WORKS ============ -->
+  <section id="sec-works" class="t-section">
+    <div class="t-inner">
+      <div class="t-header t-reveal">
+        <span>03</span><span class="t-label">( Trabajos seleccionados )</span><span>&copy; 2026</span>
+      </div>
+      <div class="t-works-grid">
+        <a class="t-work t-reveal" href="#">
+          <div class="t-work-img"><img src="placeholder/img10.jpeg" alt="BRAVEN" /></div>
+          <div class="t-work-meta"><h3>Braven</h3><div class="t-tags"><span class="t-tag">Brand</span><span class="t-tag">Web</span></div></div>
+        </a>
+        <a class="t-work t-reveal" href="#">
+          <div class="t-work-img"><img src="placeholder/img11.jpeg" alt="LUMINA" /></div>
+          <div class="t-work-meta"><h3>Lumina</h3><div class="t-tags"><span class="t-tag">Brand</span><span class="t-tag">Web</span></div></div>
+        </a>
+        <a class="t-work t-reveal" href="#">
+          <div class="t-work-img"><img src="placeholder/img12.jpeg" alt="GOLDIE" /></div>
+          <div class="t-work-meta"><h3>Goldie</h3><div class="t-tags"><span class="t-tag">Brand</span><span class="t-tag">Web</span></div></div>
+        </a>
+        <a class="t-work t-reveal" href="#">
+          <div class="t-work-img"><img src="placeholder/img13.jpeg" alt="SOPHIA" /></div>
+          <div class="t-work-meta"><h3>Sophia</h3><div class="t-tags"><span class="t-tag">Brand</span><span class="t-tag">Web</span></div></div>
+        </a>
+        <a class="t-work t-reveal" href="#">
+          <div class="t-work-img"><img src="placeholder/img14.jpeg" alt="ZOLLY" /></div>
+          <div class="t-work-meta"><h3>Zolly</h3><div class="t-tags"><span class="t-tag">Brand</span><span class="t-tag">Web</span></div></div>
+        </a>
+        <a class="t-work t-reveal" href="#">
+          <div class="t-work-img"><img src="placeholder/img15.jpeg" alt="FLORA" /></div>
+          <div class="t-work-meta"><h3>Flora</h3><div class="t-tags"><span class="t-tag">Brand</span><span class="t-tag">Web</span></div></div>
+        </a>
+      </div>
+      <div class="t-all t-reveal"><a href="#">Todos los trabajos</a></div>
+    </div>
+  </section>
+
+  <!-- ============ 04 · SERVICES LIST ============ -->
+  <section id="sec-servlist" class="t-section">
+    <div class="t-inner">
+      <div class="t-header t-reveal">
+        <span>04</span><span class="t-label">( Servicios )</span><span>&copy; 2026</span>
+      </div>
+      <p class="t-serv-intro t-reveal">Visuales de alto impacto y experiencias digitales estructuradas, construidas para tu marca.</p>
+      <div class="t-serv t-reveal">
+        <span class="t-serv-num">01</span>
+        <h3>Dirección de Arte</h3>
+        <p>Creamos historias visuales convincentes que se alinean con tu visión y hablan directamente a tu audiencia. Del concepto a la ejecución, cada detalle se dirige con intención para garantizar consistencia, emoción e impacto en todos los puntos de contacto.</p>
+      </div>
+      <div class="t-serv t-reveal">
+        <span class="t-serv-num">02</span>
+        <h3>Identidad de Marca</h3>
+        <p>Desarrollamos sistemas de marca cohesivos que van más allá del logotipo — definiendo cómo tu marca se ve, se siente y comunica. El resultado es una identidad distintiva y memorable que genera confianza y destaca en un mercado saturado.</p>
+      </div>
+      <div class="t-serv t-reveal">
+        <span class="t-serv-num">03</span>
+        <h3>Diseño &amp; Desarrollo Web</h3>
+        <p>Diseñamos webs intuitivas y visualmente atractivas que equilibran estética y funcionalidad. Cada experiencia se adapta para guiar al usuario sin fricción, reforzando tu marca y generando interacción con sentido.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 05 · PROCESS ============ -->
+  <section id="sec-process" class="t-section">
+    <div class="t-inner">
+      <div class="t-header t-reveal">
+        <span>05</span><span class="t-label">( Proceso )</span><span>&copy; 2026</span>
+      </div>
+      <div class="t-proc-grid">
+        <div class="t-proc t-reveal">
+          <span class="t-proc-num">(01)</span>
+          <h3>Descubrimiento</h3>
+          <p>Nos tomamos el tiempo de entender tu marca, objetivos y audiencia, reuniendo los insights necesarios para trazar una dirección clara y meditada.</p>
+        </div>
+        <div class="t-proc t-reveal">
+          <span class="t-proc-num">(02)</span>
+          <h3>Estrategia</h3>
+          <p>Damos forma a un plan enfocado que alinea ideas, mensaje y estructura, asegurando que cada decisión creativa sea intencional y efectiva.</p>
+        </div>
+        <div class="t-proc t-reveal">
+          <span class="t-proc-num">(03)</span>
+          <h3>Diseño</h3>
+          <p>Traducimos la estrategia en resultados visuales sólidos, creando trabajo que es a la vez atractivo y con propósito en cada punto de contacto.</p>
+        </div>
+        <div class="t-proc t-reveal">
+          <span class="t-proc-num">(04)</span>
+          <h3>Entrega</h3>
+          <p>Preparamos y lanzamos con cuidado, entregando piezas pulidas, consistentes, funcionales y listas para rendir en el mundo real.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 06 · TESTIMONIALS ============ -->
+  <section id="sec-testi" class="t-section">
+    <div class="t-inner">
+      <div class="t-header t-reveal">
+        <span>06</span><span class="t-label">( Testimonios )</span><span>&copy; 2026</span>
+      </div>
+      <div class="t-quote-wrap t-reveal">
+        <blockquote id="t-quote">&ldquo;Trabajar con ellos fue impecable de principio a fin. Entendieron nuestra visión, la elevaron con un diseño muy cuidado y entregaron resultados que realmente diferencian a nuestra marca.&rdquo;</blockquote>
+        <div class="t-author" id="t-author">Aisha Okafor</div>
+        <div class="t-role" id="t-role">Fundadora</div>
+      </div>
+      <div class="t-testi-nav t-reveal">
+        <button id="t-prev" aria-label="Anterior">&larr;</button>
+        <button id="t-next" aria-label="Siguiente">&rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 07 · STATS ============ -->
+  <section id="sec-stats" class="t-section">
+    <div class="t-inner">
+      <div class="t-header t-reveal">
+        <span>07</span><span class="t-label">( Datos &amp; Cifras )</span><span>&copy; 2026</span>
+      </div>
+      <div class="t-stats-grid">
+        <div class="t-stat t-reveal">
+          <span class="t-stat-num" data-count="48" data-suffix="+">0</span>
+          <h4>Proyectos entregados</h4>
+          <p>Trabajo cuidado y de alta calidad en una amplia gama de industrias y clientes.</p>
+        </div>
+        <div class="t-stat t-reveal">
+          <span class="t-stat-num" data-count="30" data-suffix="+">0</span>
+          <h4>Marcas acompañadas</h4>
+          <p>Apoyando marcas y productos que han conseguido crecer y consolidarse.</p>
+        </div>
+        <div class="t-stat t-reveal">
+          <span class="t-stat-num" data-count="98" data-suffix="%">0</span>
+          <h4>Satisfacción de clientes</h4>
+          <p>Relaciones a largo plazo construidas sobre confianza, claridad y resultados.</p>
+        </div>
+        <div class="t-stat t-reveal">
+          <span class="t-stat-num" data-count="6" data-suffix="+">0</span>
+          <h4>Años de experiencia</h4>
+          <p>Una trayectoria probada creando soluciones de diseño con impacto.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 08 · ARTICLES ============ -->
+  <section id="sec-articles" class="t-section">
+    <div class="t-inner">
+      <div class="t-header t-reveal">
+        <span>08</span><span class="t-label">( Artículos )</span><span>&copy; 2026</span>
+      </div>
+      <a class="t-article t-reveal" href="#">
+        <span class="t-art-cat">Diseño</span>
+        <span class="t-art-date">12 Ene, 2026</span>
+        <h3>Creando experiencias digitales fluidas que convierten</h3>
+        <span class="t-art-arrow">&rarr;</span>
+      </a>
+      <a class="t-article t-reveal" href="#">
+        <span class="t-art-cat">Diseño</span>
+        <span class="t-art-date">18 Feb, 2026</span>
+        <h3>Construyendo marcas que destacan en un mercado saturado</h3>
+        <span class="t-art-arrow">&rarr;</span>
+      </a>
+      <a class="t-article t-reveal" href="#">
+        <span class="t-art-cat">Diseño</span>
+        <span class="t-art-date">24 Mar, 2026</span>
+        <h3>Por qué una identidad sólida es la base del crecimiento</h3>
+        <span class="t-art-arrow">&rarr;</span>
+      </a>
+      <a class="t-article t-reveal" href="#">
+        <span class="t-art-cat">Diseño</span>
+        <span class="t-art-date">2 Abr, 2026</span>
+        <h3>Sistemas de diseño que escalan con tu negocio</h3>
+        <span class="t-art-arrow">&rarr;</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section id="sec-cta">
+    <h2 class="t-reveal">Hagamos algo<br />increíble juntos.</h2>
+    <a href="mailto:hello@dosa.studio" class="t-cta-btn t-reveal">Contacto</a>
+  </section>
+
+
+
+<!-- ============ SERVICES · MARQUEE MENU ============ -->
   <section id="sec-services">
     <div class="menu-wrap">
       <nav class="menu">
@@ -588,33 +1044,6 @@
     </div>
   </section>
 
-  <!-- ============ TOOLS / STACK ============ -->
-  <section id="sec-tools">
-    <div class="profile-images">
-      <div class="img"><img src="team/img1.jpeg" alt="" /></div>
-      <div class="img"><img src="team/img2.jpeg" alt="" /></div>
-      <div class="img"><img src="team/img3.jpeg" alt="" /></div>
-      <div class="img"><img src="team/img4.jpeg" alt="" /></div>
-      <div class="img"><img src="team/img5.jpeg" alt="" /></div>
-      <div class="img"><img src="team/img6.jpeg" alt="" /></div>
-      <div class="img"><img src="team/img7.jpeg" alt="" /></div>
-      <div class="img"><img src="team/img8.jpeg" alt="" /></div>
-      <div class="img"><img src="team/img9.jpeg" alt="" /></div>
-    </div>
-    <div class="profile-names">
-      <div class="name default"><h1>Proyectos</h1></div>
-      <div class="name"><h1>Figma</h1></div>
-      <div class="name"><h1>React</h1></div>
-      <div class="name"><h1>Webflow</h1></div>
-      <div class="name"><h1>Node.js</h1></div>
-      <div class="name"><h1>Shopify</h1></div>
-      <div class="name"><h1>After FX</h1></div>
-      <div class="name"><h1>Illustrator</h1></div>
-      <div class="name"><h1>Python</h1></div>
-      <div class="name"><h1>Stripe</h1></div>
-    </div>
-  </section>
-
   <!-- ============ FOOTER ============ -->
   <footer id="sec-footer">
     <div class="footer-grid">
@@ -657,6 +1086,7 @@
 
   <script src="lib/gsap.min.js"></script>
   <script src="lib/SplitText.min.js"></script>
+  <script src="lib/ScrollTrigger.min.js"></script>
   <script src="lib/CustomEase.min.js"></script>
   <script src="lib/split-type.min.js"></script>
 
@@ -914,43 +1344,98 @@
     document.querySelectorAll('#sec-services .menu__item').forEach(el => new MenuItem(el));
   })();
 
-  /* ============ TOOLS / STACK ============ */
+  /* ============ TAYLOR SECTIONS · REVEALS + STATS + TESTIMONIALS ============ */
   (() => {
-    const section = document.getElementById("sec-tools");
-    const profileImagesContainer = section.querySelector(".profile-images");
-    const profileImages = section.querySelectorAll(".profile-images .img");
-    const nameElements = section.querySelectorAll(".profile-names .name");
-    const nameHeadings = section.querySelectorAll(".profile-names .name h1");
+    gsap.registerPlugin(ScrollTrigger);
 
-    nameHeadings.forEach((heading) => {
-      const split = new SplitText(heading, { type: "chars" });
-      split.chars.forEach((c) => c.classList.add("letter"));
+    /* Reveals genéricos on-scroll */
+    document.querySelectorAll(".t-reveal").forEach((el) => {
+      gsap.to(el, {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: el,
+          start: "top 88%",
+          once: true,
+        },
+      });
     });
 
-    const defaultLetters = nameElements[0].querySelectorAll(".letter");
-    gsap.set(defaultLetters, { y: "100%" });
+    /* Contadores de stats */
+    document.querySelectorAll("#sec-stats .t-stat-num").forEach((el) => {
+      const target = parseInt(el.dataset.count, 10);
+      const suffix = el.dataset.suffix || "";
+      const obj = { v: 0 };
+      gsap.to(obj, {
+        v: target,
+        duration: 1.8,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: el,
+          start: "top 88%",
+          once: true,
+        },
+        onUpdate: () => {
+          el.textContent = Math.round(obj.v) + suffix;
+        },
+      });
+    });
 
-    if (window.innerWidth >= 900) {
-      profileImages.forEach((img, index) => {
-        const name = nameElements[index + 1];
-        const letters = name.querySelectorAll(".letter");
-        img.addEventListener("mouseenter", () => {
-          gsap.to(img, { width: 140, height: 140, duration: 0.5, ease: "power4.out" });
-          gsap.to(letters, { y: "-100%", ease: "power4.out", duration: 0.75, stagger: { each: 0.025, from: "center" } });
-        });
-        img.addEventListener("mouseleave", () => {
-          gsap.to(img, { width: 70, height: 70, duration: 0.5, ease: "power4.out" });
-          gsap.to(letters, { y: "0%", ease: "power4.out", duration: 0.75, stagger: { each: 0.025, from: "center" } });
-        });
-      });
-      profileImagesContainer.addEventListener("mouseenter", () => {
-        gsap.to(defaultLetters, { y: "0%", ease: "power4.out", duration: 0.75, stagger: { each: 0.025, from: "center" } });
-      });
-      profileImagesContainer.addEventListener("mouseleave", () => {
-        gsap.to(defaultLetters, { y: "100%", ease: "power4.out", duration: 0.75, stagger: { each: 0.025, from: "center" } });
+    /* Slider de testimonios */
+    const quotes = [
+      {
+        q: "\u201CTrabajar con ellos fue impecable de principio a fin. Entendieron nuestra visi\u00F3n, la elevaron con un dise\u00F1o muy cuidado y entregaron resultados que realmente diferencian a nuestra marca.\u201D",
+        a: "Aisha Okafor",
+        r: "Fundadora",
+      },
+      {
+        q: "\u201CEl proceso fue claro y ordenado en todo momento. Cada entrega super\u00F3 lo que esper\u00E1bamos, y la web final captura exactamente la personalidad de nuestro producto.\u201D",
+        a: "Marco Ferretti",
+        r: "CEO",
+      },
+      {
+        q: "\u201CUn socio creativo de verdad: aporta criterio, cuestiona con sentido y ejecuta con un nivel de detalle que se nota en el resultado final.\u201D",
+        a: "Luc\u00EDa Andrade",
+        r: "Directora de Marketing",
+      },
+    ];
+    let qi = 0;
+    const qEl = document.getElementById("t-quote");
+    const aEl = document.getElementById("t-author");
+    const rEl = document.getElementById("t-role");
+    const wrap = document.querySelector("#sec-testi .t-quote-wrap");
+
+    function showQuote(dir) {
+      gsap.to(wrap, {
+        opacity: 0,
+        x: dir * -30,
+        duration: 0.35,
+        ease: "power2.in",
+        onComplete: () => {
+          qEl.innerHTML = quotes[qi].q;
+          aEl.textContent = quotes[qi].a;
+          rEl.textContent = quotes[qi].r;
+          gsap.fromTo(
+            wrap,
+            { opacity: 0, x: dir * 30 },
+            { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }
+          );
+        },
       });
     }
+
+    document.getElementById("t-next").addEventListener("click", () => {
+      qi = (qi + 1) % quotes.length;
+      showQuote(1);
+    });
+    document.getElementById("t-prev").addEventListener("click", () => {
+      qi = (qi - 1 + quotes.length) % quotes.length;
+      showQuote(-1);
+    });
   })();
+
   </script>
 </body>
 </html>
