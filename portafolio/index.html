@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- cache: 20260711e -->
+<!-- cache: 20260711f -->
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -44,7 +44,7 @@
       display: flex;
       gap: 2em;
       overflow: hidden;
-      z-index: 3;
+      z-index: 1;
     }
     #sec-hero .projects,
     #sec-hero .loader,
@@ -737,79 +737,136 @@
     }
 
     function createAnimationTimelines() {
-      const tl = gsap.timeline();
+      /* Estructura original: 3 timelines EN PARALELO con delays solapados */
+      const overlayTimeline = gsap.timeline();
+      const imagesTimeline = gsap.timeline();
+      const textTimeline = gsap.timeline();
 
-      /* 1 · Logo SVG fade in → light up */
-      tl.to("#sec-hero .logo-svg", { opacity: 1, duration: 1, delay: 0.5 });
-      tl.add(() => { section.querySelector(".logo-svg").classList.add("lit"); }, "+=0.3");
-
-      /* 2 · Textos laterales aparecen (proyecto/ubicación) */
-      tl.to(["#sec-hero .projects-header", "#sec-hero .project-item"], {
-        opacity: 1, duration: 0.15, stagger: 0.075, delay: 0.5,
-      });
-      tl.to(
-        ["#sec-hero .locations-header", "#sec-hero .location-item"],
-        { opacity: 1, duration: 0.15, stagger: 0.075 }, "<"
-      );
-
-      /* 3 · Grid de 9 imágenes aparece CON clip-path sobre el logo (mientras textos siguen visibles) */
-      tl.to("#sec-hero .image-grid .img", {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-        duration: 1, stagger: 0.05, ease: "hop",
-        onStart: () => {
-          /* Empezar rotación de imágenes */
-          startImageRotation();
+      /* -- overlayTimeline -- */
+      /* Logo (adaptado al SVG DOSA): fade in + iluminación, mismos tiempos que logo-line-1/2 */
+      overlayTimeline.to("#sec-hero .logo-svg", {
+        opacity: 1,
+        duration: 1,
+        ease: "none",
+        delay: 0.5,
+        onComplete: () => {
+          section.querySelector(".logo-svg").classList.add("lit");
         },
       });
 
-      /* 4 · Textos laterales se iluminan a blanco */
-      tl.to("#sec-hero .project-item", { color: "#fff", duration: 0.15, stagger: 0.075, delay: 0.5 });
-      tl.to("#sec-hero .location-item", { color: "#fff", duration: 0.15, stagger: 0.075 }, "<");
-
-      /* 5 · Pausa para que se aprecien las imágenes ciclando + textos */
-      tl.to({}, { duration: 2 });
-
-      /* 6 · Textos laterales se barren (fade out) */
-      tl.to(["#sec-hero .projects-header", "#sec-hero .project-item"], {
-        opacity: 0, duration: 0.15, stagger: 0.075,
+      overlayTimeline.to(["#sec-hero .projects-header", "#sec-hero .project-item"], {
+        opacity: 1,
+        duration: 0.15,
+        stagger: 0.075,
+        delay: 1,
       });
-      tl.to(
+
+      overlayTimeline.to(
         ["#sec-hero .locations-header", "#sec-hero .location-item"],
-        { opacity: 0, duration: 0.15, stagger: 0.075 }, "<"
+        { opacity: 1, duration: 0.15, stagger: 0.075 },
+        "<"
       );
 
-      /* 7 · Overlay entero desaparece (logo incluido) */
-      tl.to("#sec-hero .overlay", {
-        opacity: 0, duration: 0.5, delay: 0.5,
-        onComplete: () => { section.querySelector(".overlay").style.pointerEvents = "none"; },
+      overlayTimeline.to("#sec-hero .project-item", {
+        color: "#fff",
+        duration: 0.15,
+        stagger: 0.075,
       });
 
-      /* 8 · Imágenes NO-hero se barren hacia arriba (desaparecen), dejando solo la central */
-      tl.to(images, {
+      overlayTimeline.to(
+        "#sec-hero .location-item",
+        { color: "#fff", duration: 0.15, stagger: 0.075 },
+        "<"
+      );
+
+      overlayTimeline.to(["#sec-hero .projects-header", "#sec-hero .project-item"], {
+        opacity: 0,
+        duration: 0.15,
+        stagger: 0.075,
+      });
+
+      overlayTimeline.to(
+        ["#sec-hero .locations-header", "#sec-hero .location-item"],
+        { opacity: 0, duration: 0.15, stagger: 0.075 },
+        "<"
+      );
+
+      overlayTimeline.to("#sec-hero .overlay", {
+        opacity: 0,
+        duration: 0.5,
+        delay: 1.5,
+        onComplete: () => {
+          section.querySelector(".overlay").style.pointerEvents = "none";
+        },
+      });
+
+      /* -- imagesTimeline (corre en paralelo) -- */
+      imagesTimeline.to("#sec-hero .image-grid .img", {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        duration: 1,
+        delay: 2.5,
+        stagger: 0.05,
+        ease: "hop",
+        onStart: () => {
+          setTimeout(() => {
+            startImageRotation();
+            gsap.to("#sec-hero .loader", { opacity: 0, duration: 0.3 });
+          }, 1000);
+        },
+      });
+
+      imagesTimeline.to(images, {
         clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
-        duration: 1, stagger: 0.05, ease: "hop", delay: 0.5,
+        duration: 1,
+        delay: 2.5,
+        stagger: 0.05,
+        ease: "hop",
       });
 
-      /* 9 · Hero sube un poco */
-      tl.to("#sec-hero .hero-img", { y: -50, duration: 1, ease: "hop" });
+      imagesTimeline.to("#sec-hero .hero-img", {
+        y: -50,
+        duration: 1,
+        ease: "hop",
+      });
 
-      /* 10 · Hero se agranda + banners + nav + textos finales */
-      tl.to("#sec-hero .hero-img", {
+      imagesTimeline.to("#sec-hero .hero-img", {
         scale: 4,
         clipPath: "polygon(20% 10%, 80% 10%, 80% 90%, 20% 90%)",
-        duration: 1.5, ease: "hop",
+        duration: 1.5,
+        ease: "hop",
         onStart: () => {
           gsap.to("#sec-hero .hero-img img", { scale: 1, duration: 1.5, ease: "hop" });
           gsap.to("#sec-hero .banner-img", { scale: 1, delay: 0.5, duration: 0.5 });
           gsap.to("#sec-hero nav", { y: "0%", duration: 1, ease: "hop", delay: 0.25 });
         },
       });
-      tl.to("#sec-hero .banner-img-1", { left: "40%", rotate: -20, duration: 1.5, delay: 0.5, ease: "hop" }, "<");
-      tl.to("#sec-hero .banner-img-2", { left: "60%", rotate: 20, duration: 1.5, ease: "hop" }, "<");
 
-      /* 11 · Título e intro copy aparecen */
-      tl.to(titleHeading.words, { y: "0%", duration: 1, stagger: 0.1, ease: "power3.out" }, "-=0.5");
-      tl.to(introCopy.words, { y: "0%", duration: 1, stagger: 0.1, ease: "power3.out" }, "<");
+      imagesTimeline.to(
+        "#sec-hero .banner-img-1",
+        { left: "40%", rotate: -20, duration: 1.5, delay: 0.5, ease: "hop" },
+        "<"
+      );
+
+      imagesTimeline.to(
+        "#sec-hero .banner-img-2",
+        { left: "60%", rotate: 20, duration: 1.5, ease: "hop" },
+        "<"
+      );
+
+      /* -- textTimeline (corre en paralelo) -- */
+      textTimeline.to(titleHeading.words, {
+        y: "0%",
+        duration: 1,
+        stagger: 0.1,
+        delay: 9.5,
+        ease: "power3.out",
+      });
+
+      textTimeline.to(
+        introCopy.words,
+        { y: "0%", duration: 1, stagger: 0.1, delay: 0.25, ease: "power3.out" },
+        "<"
+      );
     }
 
     initializeDynamicContent();
