@@ -1,81 +1,1445 @@
 <!doctype html>
 <!-- cache: 20260711b -->
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Portafolio</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portafolio</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" />
+  <link rel="stylesheet" href="https://use.typekit.net/dvc1xoh.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: #0f0f0f; }
 
-      html,
-      body {
-        background: #141414;
-      }
+    @font-face {
+      font-family: 'PP Neue Montreal';
+      src: url('https://cdn.prod.website-files.com/6819ed8312518f61b84824df/6819ed8312518f61b84825ba_PPNeueMontreal-Medium.woff2') format('woff2');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
 
-      .demo {
-        position: relative;
-        width: 100%;
-        height: 100svh;
-      }
+    /* ============ 01 · MAGNETIC CARDS ============ */
+    #sec-magnetic {
+      position: relative;
+      width: 100%;
+      height: 100svh;
+      background-color: #141414;
+      overflow: hidden;
+    }
+    #sec-magnetic img { width: 100%; height: 100%; object-fit: cover; }
+    #sec-magnetic .cards {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    #sec-magnetic .card {
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      border-radius: 1rem;
+      overflow: hidden;
+    }
 
-      .demo iframe {
-        display: block;
-        width: 100%;
-        height: 100%;
-        border: 0;
-      }
+    /* ============ 02 · TEAM SECTION ============ */
+    #sec-team {
+      position: relative;
+      width: 100%;
+      height: 100svh;
+      background-color: #0f0f0f;
+      color: #e3e3db;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2.5em;
+      overflow: hidden;
+    }
+    #sec-team img { width: 100%; height: 100%; object-fit: cover; }
+    #sec-team .profile-images {
+      width: max-content;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #sec-team .img {
+      position: relative;
+      width: 70px;
+      height: 70px;
+      padding: 5px;
+      cursor: pointer;
+      will-change: width, height;
+    }
+    #sec-team .img img { border-radius: 0.5rem; }
+    #sec-team .profile-names {
+      width: 100%;
+      height: 15rem;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+      overflow: hidden;
+    }
+    #sec-team .name h1 {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      text-transform: uppercase;
+      font-family: "Barlow Condensed";
+      font-size: 15rem;
+      font-weight: 900;
+      letter-spacing: -0.2rem;
+      line-height: 1;
+      color: #f93535;
+      user-select: none;
+      transform: translateY(100%);
+    }
+    #sec-team .name.default h1 {
+      color: #e3e3db;
+      transform: translateY(-100%);
+    }
+    #sec-team .name h1 .letter {
+      position: relative;
+      transform: translateY(0%);
+      will-change: transform;
+    }
+    @media screen and (max-width: 900px) {
+      #sec-team { flex-direction: column-reverse; }
+      #sec-team .profile-images { flex-wrap: wrap; max-width: 90%; justify-content: center; }
+      #sec-team .img { width: 60px; height: 60px; padding: 2.5px; }
+      #sec-team .profile-names { height: 4rem; }
+      #sec-team .name h1 { font-size: 4rem; letter-spacing: 0; }
+    }
 
-      .demo .tag {
+    /* ============ 03 · ASCII LOGO ============ */
+    #sec-ascii {
+      position: relative;
+      width: 100%;
+      height: 100svh;
+      background-color: #0f0f0f;
+      overflow: hidden;
+    }
+    #sec-ascii canvas { display: block; width: 100%; height: 100%; }
+    #sec-ascii .logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 75%;
+    }
+    #sec-ascii .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      visibility: hidden;
+    }
+
+    /* ============ 04 · MARQUEE MENU ============ */
+    #sec-menu {
+      --color-text: #e7ecef;
+      --color-bg: #0f1720;
+      --color-link: #e7ecef;
+      --color-link-hover: #ffffff;
+      --color-border: rgba(231, 236, 239, 0.14);
+      --marquee-bg: #d8e6ff;
+      --marquee-text: #111827;
+      --menu-focus: #8bb8ff;
+      font-size: 18px;
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      font-family: reason-new, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    #sec-menu a { text-decoration: none; color: var(--color-link); outline: none; }
+    #sec-menu a:hover { color: var(--color-link-hover); }
+    #sec-menu a:focus { outline: none; background: rgba(255,255,255,0.08); }
+    #sec-menu a:focus:not(:focus-visible) { background: transparent; }
+    #sec-menu a:focus-visible { outline: 2px solid #8bb8ff; background: transparent; }
+    #sec-menu .menu-wrap {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      justify-content: center;
+    }
+    #sec-menu .menu__item {
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      box-shadow: 0 -1px var(--color-border);
+    }
+    #sec-menu .menu__item:last-child {
+      box-shadow: 0 1px var(--color-border), 0 -1px var(--color-border);
+    }
+    #sec-menu .menu__item-link {
+      display: block;
+      position: relative;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    #sec-menu .menu__item-link:focus,
+    #sec-menu .menu__item-link:focus-visible { color: var(--menu-focus); }
+    #sec-menu .menu__item-link:focus:not(:focus-visible) { color: var(--color-link); }
+    #sec-menu .marquee {
+      position: absolute;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: var(--marquee-bg);
+      transform: translate3d(0, 101%, 0);
+    }
+    #sec-menu .marquee__inner-wrap {
+      height: 100%;
+      width: 100%;
+      transform: translate3d(0, -101%, 0);
+    }
+    #sec-menu .marquee__inner {
+      height: 100%;
+      width: fit-content;
+      align-items: center;
+      display: flex;
+      position: relative;
+      animation: menu-marquee 15s linear infinite;
+      will-change: transform;
+    }
+    @keyframes menu-marquee {
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+    #sec-menu .menu__item-link,
+    #sec-menu .marquee span {
+      white-space: nowrap;
+      font-size: 6vw;
+      line-height: 1.2;
+      font-weight: 600;
+      padding: 1vh 1vw 0;
+      text-transform: uppercase;
+    }
+    #sec-menu .menu__item-link { color: var(--color-text); }
+    #sec-menu .marquee span {
+      text-align: center;
+      color: var(--marquee-text);
+      font-weight: 400;
+    }
+    #sec-menu .marquee__img {
+      width: 15vw;
+      height: 70%;
+      margin: 0 2vw;
+      border-radius: 5vw;
+      background-size: cover;
+      background-position: 50% 50%;
+    }
+    @media (max-width: 700px) {
+      #sec-menu .menu__item-link,
+      #sec-menu .marquee span { font-size: 10vw; }
+      #sec-menu .marquee__img { width: 22vw; }
+    }
+
+    /* ============ 05 · PIXELATED IMAGE REVEAL ============ */
+    #sec-pixel {
+      background-color: var(--color-neutral-900, #131313);
+      color: var(--color-light, #efeeec);
+      font-size: 1vw;
+      font-family: 'PP Neue Montreal', Arial, sans-serif;
+      cursor: auto;
+    }
+    #sec-pixel a,
+    #sec-pixel button,
+    #sec-pixel .pixelated-image-card { cursor: pointer; }
+    #sec-pixel .cloneable {
+      padding: var(--container-padding, 2rem);
+      justify-content: center;
+      align-items: center;
+      min-height: 100svh;
+      display: flex;
+      position: relative;
+    }
+    #sec-pixel .pixelated-image-card {
+      background-color: var(--color-neutral-800, #1d1d1d);
+      color: var(--color-primary, #efeeec);
+      border-radius: .5em;
+      width: 30vw;
+      max-width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    #sec-pixel .before__100 { padding-top: 100%; }
+    #sec-pixel .pixelated-image-card__default,
+    #sec-pixel .pixelated-image-card__img,
+    #sec-pixel .pixelated-image-card__active,
+    #sec-pixel .pixelated-image-card__pixels {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    #sec-pixel .pixelated-image-card__img { object-fit: cover; }
+    #sec-pixel .pixelated-image-card__active { display: none; }
+    #sec-pixel .pixelated-image-card__pixel {
+      background-color: currentColor;
+      width: 100%;
+      height: 100%;
+      display: none;
+      position: absolute;
+    }
+    @media (max-width: 991px) {
+      #sec-pixel { font-size: 16px; }
+      #sec-pixel .pixelated-image-card { width: min(84vw, 420px); }
+    }
+
+    /* ============ 06 · NITE RIOT LANDING REVEAL ============ */
+    #sec-reveal {
+      position: relative;
+      width: 100%;
+      height: 100svh;
+      overflow: hidden;
+      font-family: "PP Neue Montreal", sans-serif;
+      background-color: #e3e3db;
+    }
+    #sec-reveal img { width: 100%; height: 100%; object-fit: cover; }
+    #sec-reveal p {
+      text-transform: uppercase;
+      font-family: "Akkurat Mono", monospace;
+      font-size: 0.7rem;
+    }
+    #sec-reveal a {
+      text-decoration: none;
+      text-transform: uppercase;
+      font-family: "Akkurat Mono", monospace;
+      font-size: 0.7rem;
+      color: #000;
+    }
+    #sec-reveal .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 2em;
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      gap: 2em;
+      overflow: hidden;
+      z-index: 3;
+    }
+    #sec-reveal .projects,
+    #sec-reveal .loader,
+    #sec-reveal .locations {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1em;
+    }
+    #sec-reveal .loader { align-items: center; gap: 0; }
+    #sec-reveal .loader h1 {
+      text-align: center;
+      text-transform: uppercase;
+      font-family: "Druk", sans-serif;
+      font-size: 2.5rem;
+      font-style: italic;
+      line-height: 0.9;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-image: linear-gradient(0deg, #3a3a3a, #3a3a3a 50%, #fff 0);
+      background-size: 100% 200%;
+      background-position: 0% 100%;
+      color: #3a3a3a;
+    }
+    #sec-reveal .projects-header,
+    #sec-reveal .project-item,
+    #sec-reveal .locations-header,
+    #sec-reveal .location-item {
+      display: flex;
+      gap: 2em;
+      opacity: 0;
+    }
+    #sec-reveal .projects-header > *,
+    #sec-reveal .project-item > * { flex: 1; }
+    #sec-reveal .locations { align-items: center; }
+    #sec-reveal .locations-header,
+    #sec-reveal .location-item { width: 50%; }
+    #sec-reveal .project-item,
+    #sec-reveal .location-item { color: #4f4f4f; }
+    #sec-reveal .image-grid {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 30%;
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      z-index: 2;
+    }
+    #sec-reveal .grid-row { width: 100%; display: flex; gap: 1em; }
+    #sec-reveal .img {
+      position: relative;
+      flex: 1;
+      aspect-ratio: 1;
+      clip-path: polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%);
+    }
+    #sec-reveal nav {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1em;
+      display: flex;
+      gap: 2em;
+      z-index: 4;
+    }
+    #sec-reveal nav > * { flex: 1; }
+    #sec-reveal .links {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    #sec-reveal .nav-logo {
+      text-align: center;
+      display: flex;
+      justify-content: center;
+    }
+    #sec-reveal .nav-logo a {
+      font-family: "Druk", sans-serif;
+      font-size: 1.75rem;
+      font-weight: bolder;
+      font-style: italic;
+      line-height: 0.9;
+    }
+    #sec-reveal .banner-img {
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 20%;
+      aspect-ratio: 4/5;
+    }
+    #sec-reveal .intro-copy {
+      position: absolute;
+      top: 45%;
+      transform: translateY(-50%);
+      width: 100%;
+      padding: 0 8em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #sec-reveal .title {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    #sec-reveal .intro-copy h3,
+    #sec-reveal .title h1 {
+      position: relative;
+      text-transform: uppercase;
+      color: #000;
+      font-family: "Druk", sans-serif;
+      font-weight: 500;
+      font-style: italic;
+      line-height: 0.9;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+    }
+    #sec-reveal .title h1 { font-size: 3.5rem; }
+    #sec-reveal .intro-copy h3 { font-size: 1.5rem; }
+    #sec-reveal .intro-copy h3 .word,
+    #sec-reveal .title h1 .word {
+      display: inline-block;
+      position: relative;
+      will-change: transform;
+      margin-right: 0.1rem;
+    }
+    @media (max-width: 900px) {
+      #sec-reveal .loader {
         position: absolute;
-        top: 14px;
-        left: 16px;
-        z-index: 5;
-        font-family: ui-monospace, "SF Mono", Menlo, monospace;
-        font-size: 11px;
-        letter-spacing: 0.08em;
-        color: #fff;
-        background: rgba(0, 0, 0, 0.45);
-        padding: 5px 10px;
-        border-radius: 999px;
-        pointer-events: none;
-        mix-blend-mode: difference;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
       }
-    </style>
-  </head>
-  <body>
-    <section class="demo">
-      <span class="tag">01 · MAGNETIC CARDS</span>
-      <iframe src="magnetic-cards/index.html?v=20260711b" title="Magnetic Cards" loading="eager"></iframe>
-    </section>
+      #sec-reveal .projects,
+      #sec-reveal .locations,
+      #sec-reveal .intro-copy,
+      #sec-reveal .banner-img { display: none; }
+      #sec-reveal .title {
+        width: 100%;
+        bottom: 20%;
+        display: flex;
+        justify-content: center;
+      }
+      #sec-reveal .title h1 { font-size: 2.5rem; }
+      #sec-reveal .image-grid { width: 75%; gap: 0.5em; }
+    }
+  </style>
+</head>
+<body>
 
-    <section class="demo">
-      <span class="tag">02 · TEAM SECTION</span>
-      <iframe src="team-section/index.html?v=20260711b" title="Interactive Team Section" loading="lazy"></iframe>
-    </section>
+  <!-- ============ 01 · MAGNETIC CARDS ============ -->
+  <section id="sec-magnetic">
+    <div class="cards">
+      <div class="card"><img src="magnetic/card-img-1.jpg" alt="" /></div>
+      <div class="card"><img src="magnetic/card-img-2.jpg" alt="" /></div>
+      <div class="card"><img src="magnetic/card-img-3.jpg" alt="" /></div>
+      <div class="card"><img src="magnetic/card-img-4.jpg" alt="" /></div>
+    </div>
+  </section>
 
-    <section class="demo">
-      <span class="tag">03 · ASCII LOGO</span>
-      <iframe src="ascii-logo/index.html?v=20260711b" title="Interactive ASCII Logo" loading="lazy"></iframe>
-    </section>
+  <!-- ============ 02 · TEAM SECTION ============ -->
+  <section id="sec-team">
+    <div class="profile-images">
+      <div class="img"><img src="team/img1.jpeg" alt="" /></div>
+      <div class="img"><img src="team/img2.jpeg" alt="" /></div>
+      <div class="img"><img src="team/img3.jpeg" alt="" /></div>
+      <div class="img"><img src="team/img4.jpeg" alt="" /></div>
+      <div class="img"><img src="team/img5.jpeg" alt="" /></div>
+      <div class="img"><img src="team/img6.jpeg" alt="" /></div>
+      <div class="img"><img src="team/img7.jpeg" alt="" /></div>
+      <div class="img"><img src="team/img8.jpeg" alt="" /></div>
+      <div class="img"><img src="team/img9.jpeg" alt="" /></div>
+    </div>
+    <div class="profile-names">
+      <div class="name default"><h1>The Squad</h1></div>
+      <div class="name"><h1>Colin</h1></div>
+      <div class="name"><h1>Liam</h1></div>
+      <div class="name"><h1>Tabitha</h1></div>
+      <div class="name"><h1>Tyson</h1></div>
+      <div class="name"><h1>Max</h1></div>
+      <div class="name"><h1>Everest</h1></div>
+      <div class="name"><h1>Simon</h1></div>
+      <div class="name"><h1>Gideon</h1></div>
+      <div class="name"><h1>Benton</h1></div>
+    </div>
+  </section>
 
-    <section class="demo">
-      <span class="tag">04 · MARQUEE MENU</span>
-      <iframe src="marquee-menu/index.html?v=20260711b" title="Menu with Marquee Hover" loading="lazy"></iframe>
-    </section>
+  <!-- ============ 03 · ASCII LOGO ============ -->
+  <section id="sec-ascii">
+    <canvas id="ascii-grid"></canvas>
+    <div class="logo">
+      <img id="ascii-source" src="ascii/logo.png" />
+    </div>
+  </section>
 
-    <section class="demo">
-      <span class="tag">05 · PIXEL REVEAL</span>
-      <iframe src="pixel-reveal/index.html?v=20260711b" title="Pixelated Image Reveal" loading="lazy"></iframe>
-    </section>
+  <!-- ============ 04 · MARQUEE MENU ============ -->
+  <section id="sec-menu">
+    <div class="menu-wrap">
+      <nav class="menu">
+        <div class="menu__item">
+          <a class="menu__item-link" href="#">Guayaquil</a>
+          <div class="marquee">
+            <div class="marquee__inner-wrap">
+              <div class="marquee__inner" aria-hidden="true">
+                <span>Frank Tower</span>
+                <div class="marquee__img" style="background-image:url('menu/1.jpg')"></div>
+                <span>Dom Dom</span>
+                <div class="marquee__img" style="background-image:url('menu/2.jpg')"></div>
+                <span>Santa Maria</span>
+                <div class="marquee__img" style="background-image:url('menu/3.jpg')"></div>
+                <span>Big Molly</span>
+                <div class="marquee__img" style="background-image:url('menu/4.jpg')"></div>
+                <span>Frank Tower</span>
+                <div class="marquee__img" style="background-image:url('menu/1.jpg')"></div>
+                <span>Dom Dom</span>
+                <div class="marquee__img" style="background-image:url('menu/2.jpg')"></div>
+                <span>Santa Maria</span>
+                <div class="marquee__img" style="background-image:url('menu/3.jpg')"></div>
+                <span>Big Molly</span>
+                <div class="marquee__img" style="background-image:url('menu/4.jpg')"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="menu__item">
+          <a class="menu__item-link" href="#">Cochabamba</a>
+          <div class="marquee">
+            <div class="marquee__inner-wrap">
+              <div class="marquee__inner" aria-hidden="true">
+                <span>Dome House</span>
+                <div class="marquee__img" style="background-image:url('menu/5.jpg')"></div>
+                <span>Revellion High</span>
+                <div class="marquee__img" style="background-image:url('menu/6.jpg')"></div>
+                <span>Wax Palace</span>
+                <div class="marquee__img" style="background-image:url('menu/7.jpg')"></div>
+                <span>Cellar Tree</span>
+                <div class="marquee__img" style="background-image:url('menu/8.jpg')"></div>
+                <span>Dome House</span>
+                <div class="marquee__img" style="background-image:url('menu/5.jpg')"></div>
+                <span>Revellion High</span>
+                <div class="marquee__img" style="background-image:url('menu/6.jpg')"></div>
+                <span>Wax Palace</span>
+                <div class="marquee__img" style="background-image:url('menu/7.jpg')"></div>
+                <span>Cellar Tree</span>
+                <div class="marquee__img" style="background-image:url('menu/8.jpg')"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="menu__item">
+          <a class="menu__item-link" href="#">Montevideo</a>
+          <div class="marquee">
+            <div class="marquee__inner-wrap">
+              <div class="marquee__inner" aria-hidden="true">
+                <span>Mia Terra</span>
+                <div class="marquee__img" style="background-image:url('menu/9.jpg')"></div>
+                <span>Quest Hill</span>
+                <div class="marquee__img" style="background-image:url('menu/10.jpg')"></div>
+                <span>Bean Palace</span>
+                <div class="marquee__img" style="background-image:url('menu/11.jpg')"></div>
+                <span>Treehouse</span>
+                <div class="marquee__img" style="background-image:url('menu/12.jpg')"></div>
+                <span>Mia Terra</span>
+                <div class="marquee__img" style="background-image:url('menu/9.jpg')"></div>
+                <span>Quest Hill</span>
+                <div class="marquee__img" style="background-image:url('menu/10.jpg')"></div>
+                <span>Bean Palace</span>
+                <div class="marquee__img" style="background-image:url('menu/11.jpg')"></div>
+                <span>Treehouse</span>
+                <div class="marquee__img" style="background-image:url('menu/12.jpg')"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="menu__item">
+          <a class="menu__item-link" href="#">Cartagena</a>
+          <div class="marquee">
+            <div class="marquee__inner-wrap">
+              <div class="marquee__inner" aria-hidden="true">
+                <span>Tia Alta</span>
+                <div class="marquee__img" style="background-image:url('menu/13.jpg')"></div>
+                <span>Quadratic Bliss</span>
+                <div class="marquee__img" style="background-image:url('menu/14.jpg')"></div>
+                <span>Host Mall</span>
+                <div class="marquee__img" style="background-image:url('menu/15.jpg')"></div>
+                <span>Freefall Dome</span>
+                <div class="marquee__img" style="background-image:url('menu/1.jpg')"></div>
+                <span>Tia Alta</span>
+                <div class="marquee__img" style="background-image:url('menu/13.jpg')"></div>
+                <span>Quadratic Bliss</span>
+                <div class="marquee__img" style="background-image:url('menu/14.jpg')"></div>
+                <span>Host Mall</span>
+                <div class="marquee__img" style="background-image:url('menu/15.jpg')"></div>
+                <span>Freefall Dome</span>
+                <div class="marquee__img" style="background-image:url('menu/1.jpg')"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
 
-    <section class="demo">
-      <span class="tag">06 · NITE RIOT</span>
-      <iframe src="nite-riot/index.html?v=20260711b" title="Nite Riot Landing Reveal" loading="lazy"></iframe>
-    </section>
-  </body>
+  <!-- ============ 05 · PIXELATED IMAGE REVEAL ============ -->
+  <section id="sec-pixel">
+    <div class="cloneable">
+      <div data-hover data-pixelated-image-reveal class="pixelated-image-card">
+        <div class="before__100"></div>
+        <div class="pixelated-image-card__default">
+          <img src="https://cdn.prod.website-files.com/6712ad33825977f9d2f1ba2c/6714d43a777a77da89a9b5ec_osmo-pixelated-image-1.jpg" width="400" alt="" class="pixelated-image-card__img">
+        </div>
+        <div data-pixelated-image-reveal-active class="pixelated-image-card__active">
+          <img src="https://cdn.prod.website-files.com/6712ad33825977f9d2f1ba2c/6714d43a4d1abab1b3c81caf_osmo-pixelated-image-2.jpg" width="400" alt="" class="pixelated-image-card__img">
+        </div>
+        <div data-pixelated-image-reveal-grid class="pixelated-image-card__pixels">
+          <div class="pixelated-image-card__pixel"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 06 · NITE RIOT LANDING REVEAL ============ -->
+  <section id="sec-reveal">
+    <div class="overlay">
+      <div class="projects">
+        <div class="projects-header">
+          <p>Project</p>
+          <p>Director</p>
+        </div>
+      </div>
+      <div class="loader">
+        <h1 class="logo-line-1">Nova</h1>
+        <h1 class="logo-line-2">Vice</h1>
+      </div>
+      <div class="locations">
+        <div class="locations-header">
+          <p>Location</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="image-grid">
+      <div class="grid-row">
+        <div class="img"><img src="reveal/img1.jpeg" alt="" /></div>
+        <div class="img"><img src="reveal/img2.jpeg" alt="" /></div>
+        <div class="img"><img src="reveal/img3.jpeg" alt="" /></div>
+      </div>
+      <div class="grid-row">
+        <div class="img"><img src="reveal/img4.jpeg" alt="" /></div>
+        <div class="img hero-img"><img src="reveal/img5.jpeg" alt="" /></div>
+        <div class="img"><img src="reveal/img6.jpeg" alt="" /></div>
+      </div>
+      <div class="grid-row">
+        <div class="img"><img src="reveal/img7.jpeg" alt="" /></div>
+        <div class="img"><img src="reveal/img8.jpeg" alt="" /></div>
+        <div class="img"><img src="reveal/img9.jpeg" alt="" /></div>
+      </div>
+    </div>
+
+    <nav>
+      <div class="links">
+        <a href="#">Index</a>
+        <a href="#">Work</a>
+      </div>
+      <div class="nav-logo">
+        <a href="#">Nova<br />Vice</a>
+      </div>
+      <div class="links">
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </div>
+    </nav>
+
+    <div class="banner-img banner-img-1"><img src="reveal/img7.jpeg" alt="" /></div>
+    <div class="banner-img banner-img-2"><img src="reveal/img16.jpeg" alt="" /></div>
+
+    <div class="intro-copy">
+      <h3>Creative Solutions</h3>
+      <h3>Impactful Results</h3>
+    </div>
+
+    <div class="title">
+      <h1>Crafting bold experiences</h1>
+    </div>
+  </section>
+
+  <script src="lib/gsap.min.js"></script>
+  <script src="lib/SplitText.min.js"></script>
+  <script src="lib/CustomEase.min.js"></script>
+  <script src="lib/split-type.min.js"></script>
+
+  <script>
+  /* ============ 01 · MAGNETIC CARDS ============ */
+  (() => {
+    const section = document.getElementById("sec-magnetic");
+    const cards = section.querySelectorAll(".card");
+    const cardsContainer = section.querySelector(".cards");
+
+    const PROXIMITY_RADIUS = 500;
+    const PUSH_FORCE = 10;
+    const TILT_AMOUNT = 0.1;
+    const NEIGHBOR_INFLUENCE = 0.2;
+    const SPRING_STIFFNESS = 0.05;
+    const BOUNCE_FRICTION = 0.85;
+    const CURSOR_SMOOTHING = 0.75;
+
+    const layout = {
+      rotation: [5, -5, 7.5, -10],
+      x: [-275, -100, 100, 275],
+      y: [10, -10, 25, -10],
+    };
+
+    const cursor = { x: 0, y: 0, vx: 0, vy: 0 };
+    let prevCursorX = 0;
+    let prevCursorY = 0;
+
+    const cardPhysics = [...cards].map((el, i) => {
+      gsap.set(el, {
+        x: layout.x[i],
+        y: layout.y[i],
+        rotation: layout.rotation[i],
+        zIndex: i,
+        xPercent: -50,
+        yPercent: -50,
+      });
+      return {
+        el,
+        restX: layout.x[i], restY: layout.y[i], restR: layout.rotation[i],
+        x: layout.x[i], y: layout.y[i], r: layout.rotation[i],
+        vx: 0, vy: 0, vr: 0,
+      };
+    });
+
+    section.addEventListener("mousemove", (e) => {
+      cursor.vx = cursor.vx * CURSOR_SMOOTHING + (e.clientX - prevCursorX) * (1 - CURSOR_SMOOTHING);
+      cursor.vy = cursor.vy * CURSOR_SMOOTHING + (e.clientY - prevCursorY) * (1 - CURSOR_SMOOTHING);
+      prevCursorX = cursor.x = e.clientX;
+      prevCursorY = cursor.y = e.clientY;
+    });
+
+    section.addEventListener("mouseleave", () => {
+      cursor.vx = cursor.vy = 0;
+    });
+
+    function calculatePushForce(card) {
+      const speed = Math.sqrt(cursor.vx ** 2 + cursor.vy ** 2);
+      if (speed < 0.5) return { fx: 0, fy: 0 };
+      const rect = cardsContainer.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2 + card.restX;
+      const cy = rect.top + rect.height / 2 + card.restY;
+      const dist = Math.sqrt((cursor.x - cx) ** 2 + (cursor.y - cy) ** 2);
+      if (dist > PROXIMITY_RADIUS) return { fx: 0, fy: 0 };
+      const weight = (1 - dist / PROXIMITY_RADIUS) ** 3;
+      return { fx: cursor.vx * PUSH_FORCE * weight, fy: cursor.vy * PUSH_FORCE * weight };
+    }
+
+    function applyNeighborInfluence(forces, index) {
+      let fx = forces[index].fx;
+      let fy = forces[index].fy;
+      forces.forEach((f, j) => {
+        if (j === index) return;
+        const falloff = NEIGHBOR_INFLUENCE ** Math.abs(j - index);
+        fx += f.fx * falloff;
+        fy += f.fy * falloff * 0.6;
+      });
+      return { fx, fy };
+    }
+
+    gsap.ticker.add(() => {
+      const forces = cardPhysics.map(calculatePushForce);
+      cardPhysics.forEach((card, i) => {
+        const { fx, fy } = applyNeighborInfluence(forces, i);
+        card.vx = (card.vx + (card.restX + fx - card.x) * SPRING_STIFFNESS) * BOUNCE_FRICTION;
+        card.vy = (card.vy + (card.restY + fy - card.y) * SPRING_STIFFNESS) * BOUNCE_FRICTION;
+        card.vr = (card.vr + (card.restR + fx * TILT_AMOUNT - card.r) * SPRING_STIFFNESS) * BOUNCE_FRICTION;
+        card.x += card.vx;
+        card.y += card.vy;
+        card.r += card.vr;
+        gsap.set(card.el, { x: card.x, y: card.y, rotation: card.r });
+      });
+    });
+  })();
+
+  /* ============ 02 · TEAM SECTION ============ */
+  (() => {
+    gsap.registerPlugin(SplitText);
+    const section = document.getElementById("sec-team");
+    const profileImagesContainer = section.querySelector(".profile-images");
+    const profileImages = section.querySelectorAll(".profile-images .img");
+    const nameElements = section.querySelectorAll(".profile-names .name");
+    const nameHeadings = section.querySelectorAll(".profile-names .name h1");
+
+    nameHeadings.forEach((heading) => {
+      const split = new SplitText(heading, { type: "chars" });
+      split.chars.forEach((char) => {
+        char.classList.add("letter");
+      });
+    });
+
+    const defaultLetters = nameElements[0].querySelectorAll(".letter");
+    gsap.set(defaultLetters, { y: "100%" });
+
+    if (window.innerWidth >= 900) {
+      profileImages.forEach((img, index) => {
+        const correspondingName = nameElements[index + 1];
+        const letters = correspondingName.querySelectorAll(".letter");
+
+        img.addEventListener("mouseenter", () => {
+          gsap.to(img, { width: 140, height: 140, duration: 0.5, ease: "power4.out" });
+          gsap.to(letters, {
+            y: "-100%", ease: "power4.out", duration: 0.75,
+            stagger: { each: 0.025, from: "center" },
+          });
+        });
+
+        img.addEventListener("mouseleave", () => {
+          gsap.to(img, { width: 70, height: 70, duration: 0.5, ease: "power4.out" });
+          gsap.to(letters, {
+            y: "0%", ease: "power4.out", duration: 0.75,
+            stagger: { each: 0.025, from: "center" },
+          });
+        });
+      });
+
+      profileImagesContainer.addEventListener("mouseenter", () => {
+        gsap.to(defaultLetters, {
+          y: "0%", ease: "power4.out", duration: 0.75,
+          stagger: { each: 0.025, from: "center" },
+        });
+      });
+
+      profileImagesContainer.addEventListener("mouseleave", () => {
+        gsap.to(defaultLetters, {
+          y: "100%", ease: "power4.out", duration: 0.75,
+          stagger: { each: 0.025, from: "center" },
+        });
+      });
+    }
+  })();
+
+  /* ============ 03 · ASCII LOGO ============ */
+  (() => {
+    const section = document.getElementById("sec-ascii");
+    let CELL_SIZE = 8;
+    let CELL_GAP = 2;
+    let CELL_STEP = CELL_SIZE + CELL_GAP;
+    const GRID_COLOR = "#171717";
+    const CHAR_COLOR = "#dadada";
+    const ASCII_CHARS = ".:+*#%@0369";
+    const THRESHOLD = 0.5;
+    const PUSH_RADIUS = 5;
+    const PUSH_FORCE = 30;
+    const SPRING = 0.025;
+    const DAMPING = 0.5;
+
+    const canvas = document.getElementById("ascii-grid");
+    const ctx = canvas.getContext("2d", { alpha: true });
+    const dpr = window.devicePixelRatio || 1;
+    const logoImg = document.getElementById("ascii-source");
+
+    let cols, rows, cells = [];
+    let secW = 0, secH = 0;
+
+    function setupCanvas() {
+      secW = section.clientWidth;
+      secH = section.clientHeight;
+      CELL_SIZE = secW < 768 ? 3 : 8;
+      CELL_GAP = secW < 768 ? 1 : 2;
+      CELL_STEP = CELL_SIZE + CELL_GAP;
+      cols = Math.floor(secW / CELL_STEP);
+      rows = Math.floor(secH / CELL_STEP);
+      canvas.width = secW * dpr;
+      canvas.height = secH * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function sampleLogoIntoCells() {
+      const rect = logoImg.getBoundingClientRect();
+      const cRect = canvas.getBoundingClientRect();
+      const relLeft = rect.left - cRect.left;
+      const relTop = rect.top - cRect.top;
+      const logoCols = Math.ceil(rect.width / CELL_STEP);
+      const logoRows = Math.ceil(rect.height / CELL_STEP);
+      const startCol = Math.floor(relLeft / CELL_STEP);
+      const startRow = Math.floor(relTop / CELL_STEP);
+
+      const sampleCanvas = document.createElement("canvas");
+      sampleCanvas.width = logoCols;
+      sampleCanvas.height = logoRows;
+      const sampleCtx = sampleCanvas.getContext("2d");
+      sampleCtx.fillStyle = "#000";
+      sampleCtx.fillRect(0, 0, logoCols, logoRows);
+      sampleCtx.drawImage(logoImg, 0, 0, logoCols, logoRows);
+      const { data } = sampleCtx.getImageData(0, 0, logoCols, logoRows);
+
+      cells = [];
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const inLogo =
+            col >= startCol && col < startCol + logoCols &&
+            row >= startRow && row < startRow + logoRows;
+          let isLit = false, char = " ";
+          if (inLogo) {
+            const idx = ((row - startRow) * logoCols + (col - startCol)) * 4;
+            const brightness =
+              (data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114) / 255;
+            isLit = brightness > THRESHOLD;
+            char = isLit
+              ? ASCII_CHARS[Math.min(ASCII_CHARS.length - 1, Math.floor(brightness * ASCII_CHARS.length))]
+              : " ";
+          }
+          cells.push({ col, row, char, isLit, offsetX: 0, offsetY: 0, velX: 0, velY: 0 });
+        }
+      }
+    }
+
+    function renderFrame() {
+      ctx.font = `${CELL_SIZE + 2}px monospace`;
+      ctx.textBaseline = "top";
+      ctx.textAlign = "center";
+      ctx.clearRect(0, 0, secW, secH);
+
+      ctx.fillStyle = GRID_COLOR;
+      for (const { col, row } of cells)
+        ctx.fillRect(col * CELL_STEP, row * CELL_STEP, CELL_SIZE, CELL_SIZE);
+
+      ctx.fillStyle = CHAR_COLOR;
+      for (const { col, row, char, isLit, offsetX, offsetY } of cells) {
+        if (!isLit) continue;
+        const x = (col + Math.round(offsetX)) * CELL_STEP;
+        const y = (row + Math.round(offsetY)) * CELL_STEP;
+        ctx.fillText(char, x + CELL_SIZE / 2, y);
+      }
+    }
+
+    function init() {
+      setupCanvas();
+      sampleLogoIntoCells();
+      renderFrame();
+    }
+
+    window.addEventListener("resize", init);
+    logoImg.complete ? init() : logoImg.addEventListener("load", init);
+
+    setInterval(() => {
+      for (const cell of cells)
+        if (cell.isLit)
+          cell.char = ASCII_CHARS[Math.floor(Math.random() * ASCII_CHARS.length)];
+      renderFrame();
+    }, 50);
+
+    let mouse = { col: -999, row: -999, isMoving: false };
+    let idleTimer = null;
+
+    function updatePhysics() {
+      for (const cell of cells) {
+        if (!cell.isLit) continue;
+        if (mouse.isMoving) {
+          const dx = cell.col + cell.offsetX - mouse.col;
+          const dy = cell.row + cell.offsetY - mouse.row;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < PUSH_RADIUS && dist > 0) {
+            const force = (1 - dist / PUSH_RADIUS) ** 2 * PUSH_FORCE;
+            cell.velX += (dx / dist) * force;
+            cell.velY += (dy / dist) * force;
+          }
+        }
+        cell.velX += -cell.offsetX * SPRING;
+        cell.velY += -cell.offsetY * SPRING;
+        cell.velX *= DAMPING;
+        cell.velY *= DAMPING;
+        cell.offsetX += cell.velX;
+        cell.offsetY += cell.velY;
+        if (Math.abs(cell.offsetX) < 0.01 && Math.abs(cell.velX) < 0.01) {
+          cell.offsetX = cell.velX = 0;
+        }
+        if (Math.abs(cell.offsetY) < 0.01 && Math.abs(cell.velY) < 0.01) {
+          cell.offsetY = cell.velY = 0;
+        }
+      }
+    }
+
+    function animationLoop() {
+      updatePhysics();
+      renderFrame();
+      requestAnimationFrame(animationLoop);
+    }
+
+    section.addEventListener("mousemove", (e) => {
+      const cRect = canvas.getBoundingClientRect();
+      mouse.col = (e.clientX - cRect.left) / CELL_STEP;
+      mouse.row = (e.clientY - cRect.top) / CELL_STEP;
+      mouse.isMoving = true;
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        mouse.isMoving = false;
+      }, 50);
+    });
+
+    section.addEventListener("mouseleave", () => {
+      mouse.col = mouse.row = -999;
+      mouse.isMoving = false;
+    });
+
+    animationLoop();
+  })();
+
+  /* ============ 04 · MARQUEE MENU ============ */
+  (() => {
+    const closestEdge = (x, y, w, h) => {
+      const topEdgeDist = distMetric(x, y, w / 2, 0);
+      const bottomEdgeDist = distMetric(x, y, w / 2, h);
+      const min = Math.min(topEdgeDist, bottomEdgeDist);
+      return min === topEdgeDist ? 'top' : 'bottom';
+    };
+
+    const distMetric = (x, y, x2, y2) => {
+      const xDiff = x - x2;
+      const yDiff = y - y2;
+      return (xDiff * xDiff) + (yDiff * yDiff);
+    };
+
+    class MenuItem {
+      constructor(el) {
+        this.DOM = { el };
+        this.DOM.link = this.DOM.el.querySelector('.menu__item-link');
+        this.DOM.marquee = this.DOM.el.querySelector('.marquee');
+        this.DOM.marqueeInner = this.DOM.marquee.querySelector('.marquee__inner-wrap');
+        this.animationDefaults = { duration: 0.6, ease: 'expo.out' };
+        this.initEvents();
+      }
+
+      initEvents() {
+        this.onMouseEnterFn = (ev) => this.mouseEnter(ev);
+        this.DOM.link.addEventListener('mouseenter', this.onMouseEnterFn);
+        this.onMouseLeaveFn = (ev) => this.mouseLeave(ev);
+        this.DOM.link.addEventListener('mouseleave', this.onMouseLeaveFn);
+      }
+
+      mouseEnter(ev) {
+        const edge = this.findClosestEdge(ev);
+        gsap.timeline({ defaults: this.animationDefaults })
+          .set(this.DOM.marquee, { y: edge === 'top' ? '-101%' : '101%' }, 0)
+          .set(this.DOM.marqueeInner, { y: edge === 'top' ? '101%' : '-101%' }, 0)
+          .to([this.DOM.marquee, this.DOM.marqueeInner], { y: '0%' }, 0);
+      }
+
+      mouseLeave(ev) {
+        const edge = this.findClosestEdge(ev);
+        gsap.timeline({ defaults: this.animationDefaults })
+          .to(this.DOM.marquee, { y: edge === 'top' ? '-101%' : '101%' }, 0)
+          .to(this.DOM.marqueeInner, { y: edge === 'top' ? '101%' : '-101%' }, 0);
+      }
+
+      findClosestEdge(ev) {
+        const rect = this.DOM.el.getBoundingClientRect();
+        const x = ev.clientX - rect.left;
+        const y = ev.clientY - rect.top;
+        return closestEdge(x, y, this.DOM.el.clientWidth, this.DOM.el.clientHeight);
+      }
+    }
+
+    class Menu {
+      constructor(el) {
+        this.DOM = { el };
+        this.DOM.menuItems = this.DOM.el.querySelectorAll('.menu__item');
+        this.menuItems = [];
+        this.DOM.menuItems.forEach((menuItem) => this.menuItems.push(new MenuItem(menuItem)));
+      }
+    }
+
+    new Menu(document.querySelector('#sec-menu .menu'));
+  })();
+
+  /* ============ 05 · PIXELATED IMAGE REVEAL ============ */
+  (() => {
+    const animationStepDuration = 0.3;
+    const gridSize = 7;
+    const pixelSize = 100 / gridSize;
+    const cards = document.querySelectorAll('#sec-pixel [data-pixelated-image-reveal]');
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
+
+    cards.forEach((card) => {
+      const pixelGrid = card.querySelector('[data-pixelated-image-reveal-grid]');
+      const activeCard = card.querySelector('[data-pixelated-image-reveal-active]');
+      const existingPixels = pixelGrid.querySelectorAll('.pixelated-image-card__pixel');
+
+      existingPixels.forEach(pixel => pixel.remove());
+
+      for (let row = 0; row < gridSize; row++) {
+        for (let col = 0; col < gridSize; col++) {
+          const pixel = document.createElement('div');
+          pixel.classList.add('pixelated-image-card__pixel');
+          pixel.style.width = `${pixelSize}%`;
+          pixel.style.height = `${pixelSize}%`;
+          pixel.style.left = `${col * pixelSize}%`;
+          pixel.style.top = `${row * pixelSize}%`;
+          pixelGrid.appendChild(pixel);
+        }
+      }
+
+      const pixels = pixelGrid.querySelectorAll('.pixelated-image-card__pixel');
+      const totalPixels = pixels.length;
+      const staggerDuration = animationStepDuration / totalPixels;
+      let isActive = false;
+      let delayedCall;
+
+      const animatePixels = (activate) => {
+        isActive = activate;
+        gsap.killTweensOf(pixels);
+        if (delayedCall) delayedCall.kill();
+
+        gsap.set(pixels, { display: 'none' });
+
+        gsap.to(pixels, {
+          display: 'block',
+          duration: 0,
+          stagger: { each: staggerDuration, from: 'random' }
+        });
+
+        delayedCall = gsap.delayedCall(animationStepDuration, () => {
+          if (activate) {
+            activeCard.style.display = 'block';
+            activeCard.style.pointerEvents = 'none';
+          } else {
+            activeCard.style.display = 'none';
+          }
+        });
+
+        gsap.to(pixels, {
+          display: 'none',
+          duration: 0,
+          delay: animationStepDuration,
+          stagger: { each: staggerDuration, from: 'random' }
+        });
+      };
+
+      if (isTouchDevice) {
+        card.addEventListener('click', () => {
+          animatePixels(!isActive);
+        });
+      } else {
+        card.addEventListener('mouseenter', () => {
+          if (!isActive) animatePixels(true);
+        });
+        card.addEventListener('mouseleave', () => {
+          if (isActive) animatePixels(false);
+        });
+      }
+    });
+  })();
+
+  /* ============ 06 · NITE RIOT LANDING REVEAL ============ */
+  (() => {
+    gsap.registerPlugin(CustomEase);
+    CustomEase.create("hop", "0.9, 0, 0.1, 1");
+
+    const projectsData = [
+      { name: "Lunar Eclipse", director: "Amelia Crawford", location: "Toronto, ON" },
+      { name: "Visitor Quarters", director: "Marcus Reynolds", location: "Vancouver Studio, BC" },
+      { name: "Celestial", director: "Nina Liu // Weston", location: "Austin, TX" },
+      { name: "Streamwave Original", director: "Dylan Pierce", location: "Sunset Studios - Miami" },
+      { name: "Viewfinder", director: "Javier // Rodriguez", location: "BLANK Studios - Chicago" },
+      { name: "Rhythm Collective", director: "Sophia // Chen", location: "London, UK" },
+      { name: "Urban Odyssey", director: "Leo Thompson", location: "Pioneer Studios - Seattle" },
+      { name: "Prism No. 1", director: "Taylor // McKnight", location: "Private Estate - Sedona" },
+      { name: "Vision Quest", director: "Spencer // Hudson", location: "Elevation - Denver" },
+      { name: "Wavelength", director: "Kai Nakamura", location: "San Francisco, CA" },
+      { name: "Desert Horizon", director: "Olivia", location: "New Mexico" },
+      { name: "Spectrum", director: "Ellis // Moss", location: "Harmony Studio - Montreal" },
+      { name: "Vision Quest II", director: "Hudson // Wright", location: "Elevation Studios - Denver" },
+      { name: "Auteur", director: "Leo Thompson", location: "Berlin, DE" },
+      { name: "Capsule X Design", director: "Sophia // Chen", location: "Neon House - Brooklyn" },
+      { name: "Pulse", director: "Callum // Winters", location: "Echo Pavilion - Portland" },
+    ];
+
+    const section = document.getElementById("sec-reveal");
+    const projectsContainer = section.querySelector(".projects");
+    const locationsContainer = section.querySelector(".locations");
+    const gridImages = gsap.utils.toArray("#sec-reveal .image-grid .img");
+    const heroImage = section.querySelector(".img.hero-img");
+    const images = gridImages.filter((img) => img !== heroImage);
+
+    const introCopy = new SplitType("#sec-reveal .intro-copy h3", {
+      types: "words",
+      absolute: false,
+    });
+
+    const titleHeading = new SplitType("#sec-reveal .title h1", {
+      types: "words",
+      absolute: false,
+    });
+
+    const allImageSources = Array.from(
+      { length: 35 },
+      (_, i) => `reveal/img${i + 1}.jpeg`
+    );
+
+    const getRandomImageSet = () => {
+      const shuffled = [...allImageSources].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, 9);
+    };
+
+    function initializeDynamicContent() {
+      projectsData.forEach((project) => {
+        const projectItem = document.createElement("div");
+        projectItem.className = "project-item";
+        const projectName = document.createElement("p");
+        projectName.textContent = project.name;
+        const directorName = document.createElement("p");
+        directorName.textContent = project.director;
+        projectItem.appendChild(projectName);
+        projectItem.appendChild(directorName);
+        projectsContainer.appendChild(projectItem);
+      });
+
+      projectsData.forEach((project) => {
+        const locationItem = document.createElement("div");
+        locationItem.className = "location-item";
+        const locationName = document.createElement("p");
+        locationName.textContent = project.location;
+        locationItem.appendChild(locationName);
+        locationsContainer.appendChild(locationItem);
+      });
+    }
+
+    function startImageRotation() {
+      const totalCycles = 20;
+      for (let cycle = 0; cycle < totalCycles; cycle++) {
+        const randomImages = getRandomImageSet();
+        gsap.to({}, {
+          duration: 0,
+          delay: cycle * 0.15,
+          onComplete: () => {
+            gridImages.forEach((img, index) => {
+              const imgElement = img.querySelector("img");
+              if (cycle === totalCycles - 1 && img === heroImage) {
+                imgElement.src = "reveal/img5.jpeg";
+                gsap.set("#sec-reveal .hero-img img", { scale: 2 });
+              } else {
+                imgElement.src = randomImages[index];
+              }
+            });
+          },
+        });
+      }
+    }
+
+    function setupInitialStates() {
+      gsap.set("#sec-reveal nav", { y: "-125%" });
+      gsap.set(introCopy.words, { y: "110%" });
+      gsap.set(titleHeading.words, { y: "110%" });
+    }
+
+    function createAnimationTimelines() {
+      const overlayTimeline = gsap.timeline();
+      const imagesTimeline = gsap.timeline();
+      const textTimeline = gsap.timeline();
+
+      overlayTimeline.to("#sec-reveal .logo-line-1", {
+        backgroundPosition: "0% 0%",
+        color: "#fff",
+        duration: 1,
+        ease: "none",
+        delay: 0.5,
+        onComplete: () => {
+          gsap.to("#sec-reveal .logo-line-2", {
+            backgroundPosition: "0% 0%",
+            color: "#fff",
+            duration: 1,
+            ease: "none",
+          });
+        },
+      });
+
+      overlayTimeline.to(["#sec-reveal .projects-header", "#sec-reveal .project-item"], {
+        opacity: 1,
+        duration: 0.15,
+        stagger: 0.075,
+        delay: 1,
+      });
+
+      overlayTimeline.to(
+        ["#sec-reveal .locations-header", "#sec-reveal .location-item"],
+        { opacity: 1, duration: 0.15, stagger: 0.075 },
+        "<"
+      );
+
+      overlayTimeline.to("#sec-reveal .project-item", {
+        color: "#fff",
+        duration: 0.15,
+        stagger: 0.075,
+      });
+
+      overlayTimeline.to(
+        "#sec-reveal .location-item",
+        { color: "#fff", duration: 0.15, stagger: 0.075 },
+        "<"
+      );
+
+      overlayTimeline.to(["#sec-reveal .projects-header", "#sec-reveal .project-item"], {
+        opacity: 0,
+        duration: 0.15,
+        stagger: 0.075,
+      });
+
+      overlayTimeline.to(
+        ["#sec-reveal .locations-header", "#sec-reveal .location-item"],
+        { opacity: 0, duration: 0.15, stagger: 0.075 },
+        "<"
+      );
+
+      overlayTimeline.to("#sec-reveal .overlay", {
+        opacity: 0,
+        duration: 0.5,
+        delay: 1.5,
+        onComplete: () => {
+          section.querySelector(".overlay").style.pointerEvents = "none";
+        },
+      });
+
+      imagesTimeline.to("#sec-reveal .image-grid .img", {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        duration: 1,
+        delay: 2.5,
+        stagger: 0.05,
+        ease: "hop",
+        onStart: () => {
+          setTimeout(() => {
+            startImageRotation();
+            gsap.to("#sec-reveal .loader", { opacity: 0, duration: 0.3 });
+          }, 1000);
+        },
+      });
+
+      imagesTimeline.to(images, {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
+        duration: 1,
+        delay: 2.5,
+        stagger: 0.05,
+        ease: "hop",
+      });
+
+      imagesTimeline.to("#sec-reveal .hero-img", {
+        y: -50,
+        duration: 1,
+        ease: "hop",
+      });
+
+      imagesTimeline.to("#sec-reveal .hero-img", {
+        scale: 4,
+        clipPath: "polygon(20% 10%, 80% 10%, 80% 90%, 20% 90%)",
+        duration: 1.5,
+        ease: "hop",
+        onStart: () => {
+          gsap.to("#sec-reveal .hero-img img", { scale: 1, duration: 1.5, ease: "hop" });
+          gsap.to("#sec-reveal .banner-img", { scale: 1, delay: 0.5, duration: 0.5 });
+          gsap.to("#sec-reveal nav", { y: "0%", duration: 1, ease: "hop", delay: 0.25 });
+        },
+      });
+
+      imagesTimeline.to(
+        "#sec-reveal .banner-img-1",
+        { left: "40%", rotate: -20, duration: 1.5, delay: 0.5, ease: "hop" },
+        "<"
+      );
+
+      imagesTimeline.to(
+        "#sec-reveal .banner-img-2",
+        { left: "60%", rotate: 20, duration: 1.5, ease: "hop" },
+        "<"
+      );
+
+      textTimeline.to(titleHeading.words, {
+        y: "0%",
+        duration: 1,
+        stagger: 0.1,
+        delay: 9.5,
+        ease: "power3.out",
+      });
+
+      textTimeline.to(
+        introCopy.words,
+        { y: "0%", duration: 1, stagger: 0.1, delay: 0.25, ease: "power3.out" },
+        "<"
+      );
+    }
+
+    initializeDynamicContent();
+    setupInitialStates();
+
+    /* La secuencia de entrada arranca la primera vez que la sección entra en viewport */
+    let started = false;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !started) {
+            started = true;
+            createAnimationTimelines();
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.35 }
+    );
+    observer.observe(section);
+  })();
+  </script>
+</body>
 </html>
