@@ -1,48 +1,38 @@
 <!doctype html>
-<!-- cache: 20260711c -->
+<!-- cache: 20260711d -->
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DOSA — Diseño Gráfico & Desarrollo Web</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" />
-  <link rel="stylesheet" href="https://use.typekit.net/dvc1xoh.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body { background: #0a0a0a; overflow-x: hidden; }
-
-    @font-face {
-      font-family: 'PP Neue Montreal';
-      src: url('https://cdn.prod.website-files.com/6819ed8312518f61b84824df/6819ed8312518f61b84825ba_PPNeueMontreal-Medium.woff2') format('woff2');
-      font-weight: 500;
-      font-style: normal;
-      font-display: swap;
-    }
-
-    /* ============ HERO · DOSA REVEAL ============ */
+/* ============ HERO · DOSA REVEAL ============ */
     #sec-hero {
       position: relative;
       width: 100%;
       height: 100svh;
       overflow: hidden;
-      font-family: "PP Neue Montreal", sans-serif;
-      background-color: #e3e3db;
+      font-family: "Inter", sans-serif;
+      background-color: #0a0a0a;
     }
     #sec-hero img { width: 100%; height: 100%; object-fit: cover; }
     #sec-hero p {
       text-transform: uppercase;
-      font-family: "PP Neue Montreal", sans-serif;
+      font-family: "Inter", sans-serif;
       font-size: 0.7rem;
       letter-spacing: 0.08em;
     }
     #sec-hero a {
       text-decoration: none;
       text-transform: uppercase;
-      font-family: "PP Neue Montreal", sans-serif;
+      font-family: "Inter", sans-serif;
       font-size: 0.7rem;
       letter-spacing: 0.08em;
-      color: #000;
+      color: #e3e3db;
     }
     #sec-hero .overlay {
       position: absolute;
@@ -159,7 +149,7 @@
     }
     #sec-hero .title {
       position: absolute;
-      bottom: 10%;
+      bottom: 6%;
       left: 50%;
       transform: translateX(-50%);
       white-space: nowrap;
@@ -168,15 +158,15 @@
     #sec-hero .title h1 {
       position: relative;
       text-transform: uppercase;
-      color: #000;
-      font-family: "Barlow Condensed", sans-serif;
-      font-weight: 700;
-      font-style: italic;
+      color: #e3e3db;
+      font-family: "Inter", sans-serif;
+      font-weight: 800;
+      font-style: normal;
       line-height: 0.9;
       clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
     }
-    #sec-hero .title h1 { font-size: 3.5rem; }
-    #sec-hero .intro-copy h3 { font-size: 1.5rem; }
+    #sec-hero .title h1 { font-size: 3rem; letter-spacing: -0.02em; }
+    #sec-hero .intro-copy h3 { font-size: 1.1rem; letter-spacing: 0.05em; font-weight: 500; }
     #sec-hero .intro-copy h3 .word,
     #sec-hero .title h1 .word {
       display: inline-block;
@@ -204,7 +194,7 @@
       font-size: 18px;
       color: var(--color-text);
       background-color: var(--color-bg);
-      font-family: "Barlow Condensed", sans-serif;
+      font-family: "Inter", sans-serif;
       -webkit-font-smoothing: antialiased;
     }
     #sec-services a { text-decoration: none; color: var(--color-link); outline: none; }
@@ -272,7 +262,7 @@
       text-align: center;
       color: var(--marquee-text);
       font-weight: 400;
-      font-family: "PP Neue Montreal", sans-serif;
+      font-family: "Inter", sans-serif;
       font-size: 3vw;
     }
     #sec-services .marquee__img {
@@ -331,8 +321,8 @@
       width: 100%;
       text-align: center;
       text-transform: uppercase;
-      font-family: "Barlow Condensed";
-      font-size: 15rem;
+      font-family: "Inter", sans-serif;
+      font-size: 12rem;
       font-weight: 900;
       letter-spacing: -0.2rem;
       line-height: 1;
@@ -357,33 +347,11 @@
       #sec-tools .name h1 { font-size: 4rem; letter-spacing: 0; }
     }
 
-    /* ============ ASCII LOGO ============ */
-    #sec-ascii {
-      position: relative;
-      width: 100%;
-      height: 100svh;
-      background-color: #0a0a0a;
-      overflow: hidden;
-    }
-    #sec-ascii canvas { display: block; width: 100%; height: 100%; }
-    #sec-ascii .logo {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 65%;
-    }
-    #sec-ascii .logo img {
-      width: 100%; height: 100%;
-      object-fit: contain;
-      display: block;
-      visibility: hidden;
-    }
-
     /* ============ FOOTER ============ */
     #sec-footer {
       background: #0a0a0a;
       color: #e3e3db;
-      font-family: "PP Neue Montreal", sans-serif;
+      font-family: "Inter", sans-serif;
       padding: 6rem 3rem 3rem;
       border-top: 1px solid rgba(255,255,255,0.08);
     }
@@ -403,7 +371,7 @@
       max-width: 280px;
     }
     #sec-footer h4 {
-      font-family: "Barlow Condensed", sans-serif;
+      font-family: "Inter", sans-serif;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.1em;
@@ -469,19 +437,19 @@
 
     <div class="image-grid">
       <div class="grid-row">
-        <div class="img"><img src="reveal/img1.jpeg" alt="" /></div>
-        <div class="img"><img src="reveal/img2.jpeg" alt="" /></div>
-        <div class="img"><img src="reveal/img3.jpeg" alt="" /></div>
+        <div class="img"><img src="placeholder/img1.jpeg" alt="" /></div>
+        <div class="img"><img src="placeholder/img2.jpeg" alt="" /></div>
+        <div class="img"><img src="placeholder/img3.jpeg" alt="" /></div>
       </div>
       <div class="grid-row">
-        <div class="img"><img src="reveal/img4.jpeg" alt="" /></div>
-        <div class="img hero-img"><img src="reveal/img5.jpeg" alt="" /></div>
-        <div class="img"><img src="reveal/img6.jpeg" alt="" /></div>
+        <div class="img"><img src="placeholder/img4.jpeg" alt="" /></div>
+        <div class="img hero-img"><img src="placeholder/img5.jpeg" alt="" /></div>
+        <div class="img"><img src="placeholder/img6.jpeg" alt="" /></div>
       </div>
       <div class="grid-row">
-        <div class="img"><img src="reveal/img7.jpeg" alt="" /></div>
-        <div class="img"><img src="reveal/img8.jpeg" alt="" /></div>
-        <div class="img"><img src="reveal/img9.jpeg" alt="" /></div>
+        <div class="img"><img src="placeholder/img7.jpeg" alt="" /></div>
+        <div class="img"><img src="placeholder/img8.jpeg" alt="" /></div>
+        <div class="img"><img src="placeholder/img9.jpeg" alt="" /></div>
       </div>
     </div>
 
@@ -494,13 +462,13 @@
         <img src="DOSA_logo.svg" alt="DOSA" />
       </div>
       <div class="links">
-        <a href="#sec-ascii">Estudio</a>
+        <a href="#sec-footer">Estudio</a>
         <a href="#sec-footer">Contacto</a>
       </div>
     </nav>
 
-    <div class="banner-img banner-img-1"><img src="reveal/img21.jpeg" alt="" /></div>
-    <div class="banner-img banner-img-2"><img src="reveal/img33.jpeg" alt="" /></div>
+    <div class="banner-img banner-img-1"><img src="placeholder/img21.jpeg" alt="" /></div>
+    <div class="banner-img banner-img-2"><img src="placeholder/img33.jpeg" alt="" /></div>
 
     <div class="intro-copy">
       <h3>Diseño Gráfico</h3>
@@ -647,14 +615,6 @@
     </div>
   </section>
 
-  <!-- ============ ASCII LOGO ============ -->
-  <section id="sec-ascii">
-    <canvas id="ascii-grid"></canvas>
-    <div class="logo">
-      <img id="ascii-source" src="ascii/logo.png" />
-    </div>
-  </section>
-
   <!-- ============ FOOTER ============ -->
   <footer id="sec-footer">
     <div class="footer-grid">
@@ -731,7 +691,7 @@
     const introCopy = new SplitType("#sec-hero .intro-copy h3", { types: "words", absolute: false });
     const titleHeading = new SplitType("#sec-hero .title h1", { types: "words", absolute: false });
 
-    const allImageSources = Array.from({ length: 35 }, (_, i) => `reveal/img${i + 1}.jpeg`);
+    const allImageSources = Array.from({ length: 35 }, (_, i) => `placeholder/img${i + 1}.jpeg`);
     const getRandomImageSet = () => [...allImageSources].sort(() => 0.5 - Math.random()).slice(0, 9);
 
     function initializeDynamicContent() {
@@ -759,7 +719,7 @@
             gridImages.forEach((img, index) => {
               const imgEl = img.querySelector("img");
               if (cycle === totalCycles - 1 && img === heroImage) {
-                imgEl.src = "reveal/img5.jpeg";
+                imgEl.src = "placeholder/img5.jpeg";
                 gsap.set("#sec-hero .hero-img img", { scale: 2 });
               } else {
                 imgEl.src = randomImages[index];
@@ -914,113 +874,6 @@
         gsap.to(defaultLetters, { y: "100%", ease: "power4.out", duration: 0.75, stagger: { each: 0.025, from: "center" } });
       });
     }
-  })();
-
-  /* ============ ASCII LOGO ============ */
-  (() => {
-    const section = document.getElementById("sec-ascii");
-    let CELL_SIZE = 8, CELL_GAP = 2, CELL_STEP = 10;
-    const GRID_COLOR = "#111";
-    const CHAR_COLOR = "#dadada";
-    const ASCII_CHARS = ".:+*#%@0369";
-    const THRESHOLD = 0.5;
-    const PUSH_RADIUS = 5, PUSH_FORCE = 30, SPRING = 0.025, DAMPING = 0.5;
-
-    const canvas = document.getElementById("ascii-grid");
-    const ctx = canvas.getContext("2d", { alpha: true });
-    const dpr = window.devicePixelRatio || 1;
-    const logoImg = document.getElementById("ascii-source");
-    let cols, rows, cells = [], secW = 0, secH = 0;
-
-    function setupCanvas() {
-      secW = section.clientWidth; secH = section.clientHeight;
-      CELL_SIZE = secW < 768 ? 3 : 8;
-      CELL_GAP = secW < 768 ? 1 : 2;
-      CELL_STEP = CELL_SIZE + CELL_GAP;
-      cols = Math.floor(secW / CELL_STEP);
-      rows = Math.floor(secH / CELL_STEP);
-      canvas.width = secW * dpr; canvas.height = secH * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    function sampleLogoIntoCells() {
-      const rect = logoImg.getBoundingClientRect();
-      const cRect = canvas.getBoundingClientRect();
-      const relLeft = rect.left - cRect.left, relTop = rect.top - cRect.top;
-      const logoCols = Math.ceil(rect.width / CELL_STEP);
-      const logoRows = Math.ceil(rect.height / CELL_STEP);
-      const startCol = Math.floor(relLeft / CELL_STEP);
-      const startRow = Math.floor(relTop / CELL_STEP);
-      const sc = document.createElement("canvas");
-      sc.width = logoCols; sc.height = logoRows;
-      const sctx = sc.getContext("2d");
-      sctx.fillStyle = "#000"; sctx.fillRect(0, 0, logoCols, logoRows);
-      sctx.drawImage(logoImg, 0, 0, logoCols, logoRows);
-      const { data } = sctx.getImageData(0, 0, logoCols, logoRows);
-      cells = [];
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          const inLogo = col >= startCol && col < startCol + logoCols && row >= startRow && row < startRow + logoRows;
-          let isLit = false, char = " ";
-          if (inLogo) {
-            const idx = ((row - startRow) * logoCols + (col - startCol)) * 4;
-            const brightness = (data[idx] * 0.299 + data[idx+1] * 0.587 + data[idx+2] * 0.114) / 255;
-            isLit = brightness > THRESHOLD;
-            char = isLit ? ASCII_CHARS[Math.min(ASCII_CHARS.length - 1, Math.floor(brightness * ASCII_CHARS.length))] : " ";
-          }
-          cells.push({ col, row, char, isLit, offsetX: 0, offsetY: 0, velX: 0, velY: 0 });
-        }
-      }
-    }
-
-    function renderFrame() {
-      ctx.font = `${CELL_SIZE + 2}px monospace`;
-      ctx.textBaseline = "top"; ctx.textAlign = "center";
-      ctx.clearRect(0, 0, secW, secH);
-      ctx.fillStyle = GRID_COLOR;
-      for (const { col, row } of cells) ctx.fillRect(col * CELL_STEP, row * CELL_STEP, CELL_SIZE, CELL_SIZE);
-      ctx.fillStyle = CHAR_COLOR;
-      for (const { col, row, char, isLit, offsetX, offsetY } of cells) {
-        if (!isLit) continue;
-        ctx.fillText(char, (col + Math.round(offsetX)) * CELL_STEP + CELL_SIZE / 2, (row + Math.round(offsetY)) * CELL_STEP);
-      }
-    }
-
-    function init() { setupCanvas(); sampleLogoIntoCells(); renderFrame(); }
-    window.addEventListener("resize", init);
-    logoImg.complete ? init() : logoImg.addEventListener("load", init);
-    setInterval(() => { for (const c of cells) if (c.isLit) c.char = ASCII_CHARS[Math.floor(Math.random() * ASCII_CHARS.length)]; renderFrame(); }, 50);
-
-    let mouse = { col: -999, row: -999, isMoving: false }, idleTimer = null;
-    function updatePhysics() {
-      for (const c of cells) {
-        if (!c.isLit) continue;
-        if (mouse.isMoving) {
-          const dx = c.col + c.offsetX - mouse.col, dy = c.row + c.offsetY - mouse.row;
-          const dist = Math.sqrt(dx*dx + dy*dy);
-          if (dist < PUSH_RADIUS && dist > 0) {
-            const force = (1 - dist / PUSH_RADIUS) ** 2 * PUSH_FORCE;
-            c.velX += (dx/dist) * force; c.velY += (dy/dist) * force;
-          }
-        }
-        c.velX += -c.offsetX * SPRING; c.velY += -c.offsetY * SPRING;
-        c.velX *= DAMPING; c.velY *= DAMPING;
-        c.offsetX += c.velX; c.offsetY += c.velY;
-        if (Math.abs(c.offsetX) < 0.01 && Math.abs(c.velX) < 0.01) c.offsetX = c.velX = 0;
-        if (Math.abs(c.offsetY) < 0.01 && Math.abs(c.velY) < 0.01) c.offsetY = c.velY = 0;
-      }
-    }
-    (function loop() { updatePhysics(); renderFrame(); requestAnimationFrame(loop); })();
-
-    section.addEventListener("mousemove", (e) => {
-      const r = canvas.getBoundingClientRect();
-      mouse.col = (e.clientX - r.left) / CELL_STEP;
-      mouse.row = (e.clientY - r.top) / CELL_STEP;
-      mouse.isMoving = true;
-      clearTimeout(idleTimer);
-      idleTimer = setTimeout(() => { mouse.isMoving = false; }, 50);
-    });
-    section.addEventListener("mouseleave", () => { mouse.col = mouse.row = -999; mouse.isMoving = false; });
   })();
   </script>
 </body>
