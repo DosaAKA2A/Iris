@@ -498,7 +498,32 @@
     z-index: 1;
   }
   .chat-app-bar { display: flex; align-items: center; gap: 9px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,.07); }
-  .chat-app-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--red); color: #fff; font: 700 12px/26px 'Inter',sans-serif; text-align: center; }
+  .chat-app-back { width: 14px; height: 14px; color: rgba(255,255,255,.55); flex: none; }
+  .chat-app-avatar { width: 26px; height: 26px; border-radius: 50%; background: #3a3a3a; color: #fff; font: 700 12px/26px 'Inter',sans-serif; text-align: center; }
+  .chat-app-brand { margin-left: auto; font: 700 8px 'Inter',sans-serif; letter-spacing: .28em; color: rgba(255,255,255,.38); }
+  .chat-input {
+    margin-top: auto;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    background: #1c1c1c; border: 1px solid rgba(255,255,255,.06);
+    border-radius: 18px; padding: 6px 6px 6px 14px;
+    font: 500 11.5px 'Inter',sans-serif; color: rgba(255,255,255,.35);
+  }
+  .chat-send { width: 24px; height: 24px; border-radius: 50%; background: var(--red); color: #fff; display: grid; place-items: center; flex: none; }
+  .chat-send svg { width: 12px; height: 12px; }
+  .chat-card { position: relative; }
+  .chat-card::before {
+    content: ""; position: absolute; inset: -35%;
+    background:
+      radial-gradient(38% 38% at 28% 30%, rgba(220,64,42,.5), transparent 68%),
+      radial-gradient(30% 30% at 72% 70%, rgba(255,255,255,.10), transparent 70%),
+      radial-gradient(34% 34% at 62% 22%, rgba(220,64,42,.28), transparent 70%);
+    filter: blur(46px);
+    animation: chatGrad 16s linear infinite;
+    pointer-events: none;
+  }
+  .chat-phone { z-index: 1; }
+  @keyframes chatGrad { to { transform: rotate(1turn); } }
+  @media (prefers-reduced-motion: reduce) { .chat-card::before { animation: none; } }
   .chat-app-name { font: 700 11px 'Inter',sans-serif; letter-spacing: .1em; color: #fff; display: flex; flex-direction: column; gap: 2px; }
   .chat-app-name em { font: 500 10px 'Inter',sans-serif; font-style: normal; letter-spacing: .02em; color: rgba(255,255,255,.4); }
   .chat-screen .chat-time { font-size: 10.5px; margin: 4px 0 2px; }
@@ -1229,7 +1254,7 @@
 
 
 </style>
-<!-- cache: 20260713k -->
+<!-- cache: 20260713l -->
 </head>
 <body>
 <div id="iris-intro">
@@ -1567,8 +1592,10 @@
         <div class="chat-phone">
           <div class="chat-screen">
             <div class="chat-app-bar">
-              <span class="chat-app-avatar">P</span>
-              <span class="chat-app-name">PULSO<em>En línea</em></span>
+              <svg class="chat-app-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+              <span class="chat-app-avatar">L</span>
+              <span class="chat-app-name">Laura<em>En línea</em></span>
+              <span class="chat-app-brand">PULSO&reg;</span>
             </div>
             <div class="chat-time">Hoy 17:01</div>
             <div class="chat-bubble gray">¡Hey hey!</div>
@@ -1578,6 +1605,10 @@
             <div class="chat-bubble red">Claro</div>
             <div class="chat-bubble red">Lo actualizamos enseguida</div>
             <div class="chat-bubble gray">¡Perfecto!</div>
+            <div class="chat-input">
+              <span>Escribe un mensaje&hellip;</span>
+              <span class="chat-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12h15m0 0-6-6m6 6-6 6"/></svg></span>
+            </div>
           </div>
           <img class="chat-phone-frame" src="assets/phone.png?v=20260706b" alt="" aria-hidden="true">
         </div>
