@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 
@@ -81,35 +82,170 @@
   
   
   
-  /* ════════════════════ HERO 2026 — nav bar + overlay + grid + marquee ════════════════════ */
+  /* ════════════════════ HERO — composición referencia (top bar / statement / giant) ════════════════════ */
 
-  /* ── Nav bar ── */
-  .hn-nav {
-    position: absolute; top: 0; left: 0; right: 0; z-index: 60;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: clamp(20px, 2.6vw, 34px) clamp(24px, 3.4vw, 52px);
+  /* ── Fondo ── */
+  .hz-bg {
+    position: absolute; left: 0; right: 0; top: -10%;
+    width: 100%; height: 120%;
+    object-fit: cover; object-position: center 30%;
+    will-change: transform; z-index: 0;
   }
-  .hn-logo {
+  .hz-shade {
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(to bottom,
+      rgba(8,8,8,0.42) 0%, rgba(8,8,8,0.12) 24%,
+      rgba(8,8,8,0.10) 52%, rgba(8,8,8,0.46) 100%);
+  }
+
+  /* ── Top bar ── */
+  .hz-top {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    padding: clamp(16px, 2.2vw, 26px) clamp(20px, 3vw, 44px);
+    animation: hzDown .7s var(--ease) .1s both;
+  }
+  .hz-top-left { display: flex; align-items: center; gap: clamp(12px, 1.6vw, 22px); }
+  .hz-menu-btn {
+    display: flex; align-items: center; gap: 10px;
+    background: none; border: 0; padding: 0; cursor: pointer;
+    color: #fff; font-family: 'Geist Mono', monospace;
+    font-size: 12px; font-weight: 500; letter-spacing: .18em;
+  }
+  .hz-menu-btn:hover .hn-menu-label { color: rgba(255,255,255,0.7); }
+  .hn-menu-label { transition: color .25s; }
+  .hz-dots { display: grid; grid-template-columns: repeat(2, 4px); gap: 3px; }
+  .hz-dots i { width: 4px; height: 4px; background: #fff; display: block; transition: transform .35s var(--ease); }
+  .hz-menu-btn:hover .hz-dots i { transform: rotate(45deg); }
+  .hz-top-sep { width: clamp(22px, 3vw, 40px); height: 1px; background: rgba(255,255,255,0.55); }
+  .hz-wordmark {
     font-family: "Clash Display", 'Inter', sans-serif;
-    font-size: clamp(26px, 2.4vw, 34px); font-weight: 700;
-    line-height: .9; letter-spacing: -.02em; color: #fff; text-decoration: none;
+    font-size: clamp(17px, 1.5vw, 21px); font-weight: 700;
+    letter-spacing: .04em; color: #fff; text-decoration: none; line-height: 1;
   }
-  .hn-logo .s { color: var(--red); }
-  .hn-menu-btn {
-    display: flex; align-items: center; gap: 12px;
-    background: rgba(14,14,16,0.38); border: 1px solid rgba(255,255,255,0.14);
-    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    border-radius: 999px; padding: 10px 18px;
-    color: #fff; cursor: pointer;
-    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: .02em;
-    transition: background .35s var(--ease), border-color .35s var(--ease);
+  .hz-wordmark sup { font-size: .48em; font-weight: 600; vertical-align: super; }
+  .hz-time {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500;
+    letter-spacing: .16em; color: rgba(255,255,255,0.55); white-space: nowrap;
   }
-  .hn-menu-btn:hover { background: rgba(255,255,255,0.12); }
-  .hn-burger { display: flex; flex-direction: column; gap: 5px; width: 18px; }
-  .hn-burger i { display: block; height: 1.5px; background: #fff; border-radius: 2px; transition: transform .4s var(--ease), width .4s var(--ease); }
-  .hn-burger i:last-child { width: 70%; align-self: flex-end; }
-  body.hn-open .hn-burger i:first-child { transform: translateY(3.25px) rotate(45deg); }
-  body.hn-open .hn-burger i:last-child  { width: 100%; transform: translateY(-3.25px) rotate(-45deg); }
+  .hz-time b { color: #fff; font-weight: 600; }
+  .hz-cta {
+    display: flex; align-items: stretch;
+    background: #0a0a0a; color: #fff; text-decoration: none;
+    font-family: 'Geist Mono', monospace; font-size: 11.5px; font-weight: 500; letter-spacing: .14em;
+  }
+  .hz-cta-logo { width: 42px; display: grid; place-items: center; background: #151515; }
+  .hz-cta-logo img { width: 20px; height: 20px; }
+  .hz-cta-txt { display: flex; align-items: center; padding: 0 18px; height: 42px; white-space: nowrap; }
+  .hz-cta-txt em { font-style: normal; color: rgba(255,255,255,0.45); }
+  .hz-cta-arrow {
+    width: 42px; display: grid; place-items: center;
+    background: var(--red); font-size: 15px; line-height: 1;
+    transition: filter .25s;
+  }
+  .hz-cta:hover .hz-cta-arrow { filter: brightness(1.18); }
+
+  /* ── Statement + servicios ── */
+  .hz-mid {
+    position: absolute; left: 50%; top: 51%; transform: translateY(-50%);
+    z-index: 10;
+    display: flex; align-items: flex-start; gap: clamp(40px, 6vw, 110px);
+    padding-right: clamp(20px, 3vw, 44px);
+    animation: hzUp .7s var(--ease) .35s both;
+  }
+  .hz-statement {
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    line-height: 1.75; color: #fff; max-width: 34ch; margin: 0;
+  }
+  .hz-statement .dim { color: rgba(255,255,255,0.55); font-weight: 600; }
+  .hz-services { list-style: none; display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; }
+  .hz-services li {
+    display: flex; align-items: baseline; gap: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #fff;
+    white-space: nowrap;
+  }
+  .hz-services li span { font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.5); }
+
+  /* Cruces decorativas */
+  .hz-cross { position: absolute; width: 9px; height: 9px; z-index: 9; pointer-events: none; opacity: .55; }
+  .hz-cross::before, .hz-cross::after { content: ""; position: absolute; background: rgba(255,255,255,0.8); }
+  .hz-cross::before { left: 50%; top: 0; bottom: 0; width: 1px; transform: translateX(-50%); }
+  .hz-cross::after  { top: 50%; left: 0; right: 0; height: 1px; transform: translateY(-50%); }
+
+  /* ── Trust abajo-izquierda ── */
+  .hz-trust {
+    position: absolute; left: clamp(20px, 3vw, 44px); bottom: clamp(20px, 3.4vh, 38px);
+    z-index: 12;
+    display: flex; flex-direction: column; gap: 9px;
+    font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: .16em;
+    animation: hzUp .7s var(--ease) .6s both;
+  }
+  .hz-trust-row { display: flex; align-items: center; gap: 10px; color: #fff; }
+  .hz-dot { width: 8px; height: 8px; border-radius: 50%; background: #3fb950; flex-shrink: 0; animation: hzPulse 2s ease-in-out infinite; }
+  .hz-trust-sub { color: rgba(255,255,255,0.55); }
+  .hz-trust-sub b { color: #fff; font-weight: 600; }
+
+  /* ── Wordmark gigante ── */
+  .hz-giant {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 8;
+    font-family: "Clash Display", 'Inter', sans-serif;
+    font-weight: 700; color: #fff; text-align: right;
+    padding-right: 1.5vw;
+    font-size: 27vw; line-height: .72; letter-spacing: -.015em;
+    white-space: nowrap; pointer-events: none; user-select: none;
+    transform: translateY(16%);
+    animation: hzGiant 1s cubic-bezier(0.22, 1, 0.36, 1) .5s both;
+  }
+  .hz-giant sup { font-size: .1em; font-weight: 600; vertical-align: 4.2em; letter-spacing: 0; }
+
+  @keyframes hzDown  { from { opacity: 0; transform: translateY(-26px); } to { opacity: 1; transform: none; } }
+  @keyframes hzUp    { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+  @keyframes hzGiant { from { opacity: 0; transform: translateY(58%); } to { opacity: 1; transform: translateY(16%); } }
+  @keyframes hzPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(63,185,80,0.5); } 50% { box-shadow: 0 0 0 6px rgba(63,185,80,0); } }
+
+  /* .hz-mid usa translateY(-50%): variante de hzUp que la respeta */
+  .hz-mid { animation-name: hzMid; }
+  @keyframes hzMid { from { opacity: 0; transform: translateY(calc(-50% + 22px)); } to { opacity: 1; transform: translateY(-50%); } }
+
+  /* ── Responsive ── */
+  @media (max-width: 1100px) {
+    .hz-time { display: none; }
+  }
+  @media (max-width: 900px) {
+    .hz-cta-logo { display: none; }
+    .hz-mid {
+      left: clamp(20px, 5vw, 32px); right: clamp(20px, 5vw, 32px);
+      top: auto; bottom: 34%; transform: none;
+      flex-direction: column; gap: 26px;
+    }
+    .hz-mid { animation-name: hzUp; }
+    .hz-cross { display: none; }
+    .hz-giant { font-size: 31vw; text-align: center; padding-right: 0; }
+    .hz-trust { bottom: calc(31vw * .62 + 20px); }
+  }
+  @media (max-width: 560px) {
+    .hz-top { padding: 16px 20px; }
+    .hz-top-sep { display: none; }
+    .hz-cta-txt em { display: none; }
+    .hz-cta-txt { padding: 0 13px; height: 38px; font-size: 10.5px; }
+    .hz-cta-arrow { width: 38px; }
+    .hz-statement { font-size: 12.5px; max-width: 100%; }
+    .hz-services li { font-size: 12.5px; }
+    .hz-trust-sub { display: none; }
+    .hz-trust { font-size: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hz-top, .hz-mid, .hz-trust, .hz-giant { animation: none !important; opacity: 1 !important; }
+    .hz-giant { transform: translateY(16%) !important; }
+    .hz-mid { transform: translateY(-50%) !important; }
+    .hz-dot { animation: none !important; }
+  }
+  @media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+    .hz-mid { transform: none !important; }
+  }
 
   /* ── Overlay ── */
   .hn-overlay {
@@ -138,8 +274,9 @@
   }
   body.hn-open .hn-ov-links a { opacity: 1; transform: none; transition-delay: var(--d, 0s); }
   .hn-ov-num {
-    font-size: 12px; font-weight: 600; letter-spacing: .12em; color: var(--red);
-    min-width: 26px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px; font-weight: 500; letter-spacing: .1em; color: rgba(255,255,255,0.45);
+    min-width: 34px;
   }
   .hn-ov-word {
     font-family: "Clash Display", 'Inter', sans-serif;
@@ -159,122 +296,6 @@
   .hn-ov-col a:hover { color: var(--red); }
   .hn-ov-mut { font-size: 13px; color: var(--muted); }
   .hn-ov-socials { display: flex; gap: 18px; flex-wrap: wrap; }
-
-  /* ── Grid del hero ── */
-  .hn-grid {
-    position: relative; z-index: 5;
-    height: 100%;
-    display: grid;
-    grid-template-columns: 1.02fr 0.98fr;
-    align-items: center;
-    gap: clamp(32px, 4vw, 72px);
-    padding: clamp(96px, 13vh, 150px) clamp(24px, 3.4vw, 52px) clamp(74px, 10vh, 110px);
-    max-width: 1520px; margin: 0 auto;
-  }
-  .hn-left { display: flex; flex-direction: column; gap: clamp(24px, 3.4vh, 40px); }
-  .hn-statement {
-    font-family: 'Inter', sans-serif;
-    font-size: clamp(30px, 2.4vw + 14px, 54px);
-    font-weight: 800; line-height: 1.12; letter-spacing: -.028em; color: #fff;
-    max-width: 15ch;
-    animation: hnUp .7s var(--ease) .15s both;
-  }
-  .hn-statement .g { color: rgba(245,245,245,0.45); }
-  .hn-divider { height: 1px; background: var(--line2); width: 100%; max-width: 480px; transform-origin: left center; animation: hnLine .8s var(--ease) .45s both; }
-  .hn-services { list-style: none; display: flex; flex-direction: column; }
-  .hn-services li {
-    display: flex; align-items: baseline; gap: 18px;
-    padding: clamp(9px, 1.3vh, 14px) 0;
-    animation: hnUp .6s var(--ease) both;
-  }
-  .hn-services li:nth-child(1) { animation-delay: .55s; }
-  .hn-services li:nth-child(2) { animation-delay: .65s; }
-  .hn-services li:nth-child(3) { animation-delay: .75s; }
-  .hn-num { font-size: 12px; font-weight: 600; letter-spacing: .1em; color: var(--red); }
-  .hn-svc { font-size: clamp(17px, 1.5vw, 23px); font-weight: 600; letter-spacing: -.01em; color: rgba(245,245,245,0.9); }
-
-  /* ── Media derecha ── */
-  .hn-right { height: 100%; display: flex; align-items: center; }
-  .hn-media {
-    position: relative; width: 100%;
-    height: min(100%, 640px); min-height: 340px;
-    border-radius: 24px; overflow: hidden;
-    background: #111;
-    animation: hnMedia .9s cubic-bezier(0.22, 1, 0.36, 1) .35s both;
-  }
-  .hn-media-img { position: absolute; left: 0; right: 0; top: -12%; width: 100%; height: 124%; object-fit: cover; object-position: center 28%; will-change: transform; }
-  .hn-media-shade {
-    position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.08) 42%, transparent 68%);
-  }
-  .hn-badge {
-    position: absolute; left: 16px; bottom: 16px; z-index: 2;
-    display: flex; align-items: center; gap: 12px;
-    background: rgba(12,12,14,0.55); border: 1px solid rgba(255,255,255,0.14);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border-radius: 14px; padding: 12px 16px;
-    animation: hnUp .6s var(--ease) 1s both;
-  }
-  .hn-dot { width: 9px; height: 9px; border-radius: 50%; background: #3fb950; flex-shrink: 0; animation: hnPulse 2s ease-in-out infinite; }
-  .hn-badge-txt { display: flex; flex-direction: column; gap: 2px; }
-  .hn-badge-txt b { font-size: 12.5px; font-weight: 700; color: #fff; letter-spacing: -.01em; }
-  .hn-badge-txt span { font-size: 11px; color: rgba(245,245,245,0.6); }
-
-  /* ── Marquee ── */
-  .hn-marquee {
-    position: absolute; left: 0; right: 0; bottom: 0; z-index: 6;
-    border-top: 1px solid var(--line);
-    background: rgba(8,8,8,0.55);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    overflow: hidden;
-    padding: 14px 0;
-    animation: hnFade .8s var(--ease) 1.1s both;
-  }
-  .hn-mq-track {
-    display: flex; align-items: center; gap: 34px;
-    width: max-content;
-    animation: hnScroll 28s linear infinite;
-  }
-  .hn-mq-track span {
-    font-size: 12px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
-    color: rgba(245,245,245,0.55); white-space: nowrap;
-  }
-  .hn-mq-track i { font-style: normal; font-size: 11px; color: var(--red); }
-
-  @keyframes hnUp    { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
-  @keyframes hnLine  { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-  @keyframes hnMedia { from { opacity: 0; clip-path: inset(8% 8% 8% 8% round 24px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 24px); } }
-  @keyframes hnFade  { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes hnPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(63,185,80,0.5); } 50% { box-shadow: 0 0 0 6px rgba(63,185,80,0); } }
-  @keyframes hnScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-
-  /* ── Responsive hero ── */
-  @media (max-width: 900px) {
-    .hn-grid {
-      grid-template-columns: 1fr;
-      align-items: start; align-content: start;
-      gap: clamp(24px, 4vh, 36px);
-      padding-top: clamp(88px, 12vh, 120px);
-      padding-bottom: 92px;
-      overflow: hidden;
-    }
-    .hn-statement { max-width: 100%; font-size: clamp(28px, 7.4vw, 40px); }
-    .hn-right { height: auto; }
-    .hn-media { height: clamp(240px, 34vh, 360px); min-height: 0; }
-    .hn-services li { padding: 7px 0; }
-    .hn-svc { font-size: 16px; }
-  }
-  @media (max-width: 560px) {
-    .hn-nav { padding: 18px 20px; }
-    .hn-grid { padding-left: 20px; padding-right: 20px; }
-    .hn-badge { left: 12px; bottom: 12px; padding: 10px 13px; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .hn-statement, .hn-divider, .hn-services li, .hn-media, .hn-badge, .hn-marquee { animation: none !important; }
-    .hn-mq-track { animation: none !important; }
-    .hn-overlay { transition: none; }
-    .hn-ov-links a, .hn-ov-foot { transition: none; }
-  }
 
   /* ════════════════════ SECCIONES base ════════════════════ */
   .section { padding: clamp(72px, 10vw, 140px) 0; }
@@ -1118,26 +1139,19 @@
   #iris-intro.active .intro-bar-fill { width: 100%; }
 
   /* ── Hero: las animaciones esperan a que la intro termine ── */
-  .hn-statement, .hn-divider, .hn-services li, .hn-media, .hn-badge, .hn-marquee {
+  .hz-top, .hz-mid, .hz-trust, .hz-giant {
     animation-play-state: paused;
   }
-  body.hero-go .hn-statement,
-  body.hero-go .hn-divider,
-  body.hero-go .hn-services li,
-  body.hero-go .hn-media,
-  body.hero-go .hn-badge,
-  body.hero-go .hn-marquee {
+  body.hero-go .hz-top,
+  body.hero-go .hz-mid,
+  body.hero-go .hz-trust,
+  body.hero-go .hz-giant {
     animation-play-state: running;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .hn-statement, .hn-divider, .hn-services li, .hn-media, .hn-badge, .hn-marquee {
-      animation: none !important; opacity: 1 !important; transform: none !important; clip-path: none !important;
-    }
   }
 
 
 </style>
-<!-- cache: 20260713b -->
+<!-- cache: 20260713c -->
 </head>
 <body>
 <div id="iris-intro">
@@ -1160,25 +1174,38 @@
 <!-- ════════════════════ HERO ════════════════════ -->
 <div class="hero-sticky-wrap"><section class="hero" id="heroSection">
 
-  <!-- ══ NAV BAR ══ -->
-  <header class="hn-nav" id="hnNav">
-    <a class="hn-logo" href="#heroSection">IRI<span class="s">S</span></a>
-    <button class="hn-menu-btn" id="hnMenuBtn" onclick="toggleHnMenu()" aria-expanded="false" aria-controls="hnOverlay" aria-label="Abrir men&uacute;">
-      <span class="hn-menu-label" data-open="Men&uacute;" data-close="Cerrar">Men&uacute;</span>
-      <span class="hn-burger"><i></i><i></i></span>
-    </button>
+  <!-- Fondo full-bleed -->
+  <img class="hz-bg" id="heroBannerImg" src="assets/hero_bg.jpg" alt="" aria-hidden="true">
+  <div class="hz-shade" aria-hidden="true"></div>
+
+  <!-- ══ TOP BAR ══ -->
+  <header class="hz-top">
+    <div class="hz-top-left">
+      <button class="hz-menu-btn" id="hnMenuBtn" onclick="toggleHnMenu()" aria-expanded="false" aria-controls="hnOverlay" aria-label="Abrir men&uacute;">
+        <span class="hz-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="hn-menu-label" data-open="MENU" data-close="CERRAR">MENU</span>
+      </button>
+      <span class="hz-top-sep" aria-hidden="true"></span>
+      <a class="hz-wordmark" href="#heroSection">IRIS<sup>&reg;</sup></a>
+    </div>
+    <div class="hz-time" aria-hidden="true"><b id="hzTimeVal">--:--</b>&ensp;HORA&nbsp;LOCAL</div>
+    <a class="hz-cta" href="#contacto">
+      <span class="hz-cta-logo" aria-hidden="true"><img src="assets/IRIS_BLANCO.svg" alt=""></span>
+      <span class="hz-cta-txt">EMPEZAR&nbsp;PROYECTO&ensp;<em>/IRIS</em></span>
+      <span class="hz-cta-arrow" aria-hidden="true">&#8594;</span>
+    </a>
   </header>
 
   <!-- ══ MENU OVERLAY ══ -->
   <div class="hn-overlay" id="hnOverlay" aria-hidden="true">
     <div class="hn-ov-inner">
       <nav class="hn-ov-links" aria-label="Navegaci&oacute;n principal">
-        <a href="#heroSection"><span class="hn-ov-num">01</span><span class="hn-ov-word">Home</span></a>
-        <a href="#projects"><span class="hn-ov-num">02</span><span class="hn-ov-word">Proyectos</span></a>
-        <a href="#capacidades"><span class="hn-ov-num">03</span><span class="hn-ov-word">Proceso</span></a>
-        <a href="#servicios"><span class="hn-ov-num">04</span><span class="hn-ov-word">Servicios</span></a>
-        <a href="#tarifas"><span class="hn-ov-num">05</span><span class="hn-ov-word">Tarifas</span></a>
-        <a href="#contacto"><span class="hn-ov-num">06</span><span class="hn-ov-word">Contacto</span></a>
+        <a href="#heroSection"><span class="hn-ov-num">/01</span><span class="hn-ov-word">Home</span></a>
+        <a href="#projects"><span class="hn-ov-num">/02</span><span class="hn-ov-word">Proyectos</span></a>
+        <a href="#capacidades"><span class="hn-ov-num">/03</span><span class="hn-ov-word">Proceso</span></a>
+        <a href="#servicios"><span class="hn-ov-num">/04</span><span class="hn-ov-word">Servicios</span></a>
+        <a href="#tarifas"><span class="hn-ov-num">/05</span><span class="hn-ov-word">Tarifas</span></a>
+        <a href="#contacto"><span class="hn-ov-num">/06</span><span class="hn-ov-word">Contacto</span></a>
       </nav>
       <div class="hn-ov-foot">
         <div class="hn-ov-col">
@@ -1196,38 +1223,26 @@
     </div>
   </div>
 
-  <!-- ══ HERO GRID ══ -->
-  <div class="hn-grid">
-    <div class="hn-left">
-      <h1 class="hn-statement">Dise&ntilde;o, tecnolog&iacute;a e identidad para <span class="g">proyectos que exigen precisi&oacute;n.</span></h1>
-      <div class="hn-divider"></div>
-      <ul class="hn-services">
-        <li><span class="hn-num">/01</span><span class="hn-svc">Dise&ntilde;o Web</span></li>
-        <li><span class="hn-num">/02</span><span class="hn-svc">Desarrollo</span></li>
-        <li><span class="hn-num">/03</span><span class="hn-svc">Automatizaci&oacute;n</span></li>
-      </ul>
-    </div>
-    <div class="hn-right">
-      <div class="hn-media">
-        <img class="hn-media-img" id="heroBannerImg" src="assets/hero_bg.jpg" alt="" aria-hidden="true">
-        <div class="hn-media-shade" aria-hidden="true"></div>
-        <div class="hn-badge">
-          <span class="hn-dot" aria-hidden="true"></span>
-          <div class="hn-badge-txt">
-            <b>Disponible para nuevos proyectos</b>
-            <span>Pago seguro con Stripe &middot; Factura incluida</span>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- ══ STATEMENT + SERVICIOS (zona media-derecha) ══ -->
+  <div class="hz-mid">
+    <p class="hz-statement">Dise&ntilde;o, tecnolog&iacute;a e identidad <span class="dim">para proyectos que exigen precisi&oacute;n.</span></p>
+    <ul class="hz-services">
+      <li><span>/01</span>Dise&ntilde;o Web</li>
+      <li><span>/02</span>Desarrollo</li>
+      <li><span>/03</span>Automatizaci&oacute;n</li>
+    </ul>
+  </div>
+  <span class="hz-cross" style="left:47.5%; top:66%;" aria-hidden="true"></span>
+  <span class="hz-cross" style="left:72%; top:66%;" aria-hidden="true"></span>
+
+  <!-- ══ TRUST (abajo-izquierda) ══ -->
+  <div class="hz-trust">
+    <div class="hz-trust-row"><span class="hz-dot" aria-hidden="true"></span>DISPONIBLE PARA NUEVOS PROYECTOS</div>
+    <div class="hz-trust-sub">PAGO SEGURO CON <b>STRIPE</b> &middot; FACTURA INCLUIDA</div>
   </div>
 
-  <!-- ══ MARQUEE ══ -->
-  <div class="hn-marquee" aria-hidden="true">
-    <div class="hn-mq-track">
-      <span>Dise&ntilde;o Gr&aacute;fico</span><i>&#10022;</i><span>Desarrollo Web</span><i>&#10022;</i><span>UI / UX</span><i>&#10022;</i><span>Automatizaci&oacute;n</span><i>&#10022;</i><span>Branding</span><i>&#10022;</i><span>Motion</span><i>&#10022;</i><span>Dise&ntilde;o Gr&aacute;fico</span><i>&#10022;</i><span>Desarrollo Web</span><i>&#10022;</i><span>UI / UX</span><i>&#10022;</i><span>Automatizaci&oacute;n</span><i>&#10022;</i><span>Branding</span><i>&#10022;</i><span>Motion</span><i>&#10022;</i>
-    </div>
-  </div>
+  <!-- ══ WORDMARK GIGANTE ══ -->
+  <div class="hz-giant" aria-hidden="true">IRIS<sup>&reg;</sup></div>
 
 </section></div>
 
@@ -1877,6 +1892,18 @@ async function checkPwd(which) {
 }
 document.querySelectorAll('.modal-overlay').forEach(el => { el.addEventListener('click', e => { if (e.target === el) closeModal(el.id.replace('modal','').toLowerCase()); }); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.show').forEach(el => closeModal(el.id.replace('modal','').toLowerCase())); });
+
+  // ── Hora local del hero ──
+  (function(){
+    var el = document.getElementById('hzTimeVal');
+    if (!el) return;
+    function tick(){
+      var d = new Date();
+      el.textContent = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+    }
+    tick();
+    setInterval(tick, 15000);
+  })();
 
   // ── Menú overlay (hero 2026) ──
   (function(){
