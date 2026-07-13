@@ -1192,7 +1192,7 @@
 
 
 </style>
-<!-- cache: 20260713g -->
+<!-- cache: 20260713h -->
 </head>
 <body>
 <div id="iris-intro">
@@ -1947,16 +1947,24 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') document.que
     var a = document.getElementById('hzVidA'), b = document.getElementById('hzVidB');
     if (!a || !b) return;
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var FADE = 1.4, cur = a, nxt = b, switching = false;
+    var FADE = 1.4, PRE = 2.4, cur = a, nxt = b, phase = 0;
     function play(v){ var p = v.play(); if (p && p.catch) p.catch(function(){}); }
     function tick(){
-      if (!switching && cur.duration && cur.currentTime >= cur.duration - FADE) {
-        switching = true;
-        nxt.currentTime = 0; play(nxt);
-        nxt.classList.add('on');
-        cur.classList.remove('on');
-        var old = cur; cur = nxt; nxt = old;
-        setTimeout(function(){ old.pause(); switching = false; }, FADE * 1000 + 200);
+      var d = cur.duration;
+      if (d) {
+        var left = d - cur.currentTime;
+        if (phase === 0 && left <= PRE) {
+          // precalentar el siguiente en oculto: arranca antes del fundido
+          nxt.currentTime = 0; play(nxt);
+          phase = 1;
+        }
+        if (phase === 1 && left <= FADE) {
+          nxt.classList.add('on');
+          cur.classList.remove('on');
+          var old = cur; cur = nxt; nxt = old;
+          phase = 2;
+          setTimeout(function(){ old.pause(); phase = 0; }, FADE * 1000 + 150);
+        }
       }
       requestAnimationFrame(tick);
     }
