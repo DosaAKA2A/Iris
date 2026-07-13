@@ -85,12 +85,19 @@
   /* ════════════════════ HERO — composición referencia (top bar / statement / giant) ════════════════════ */
 
   /* ── Fondo ── */
-  .hz-bg {
+  .hz-bgwrap {
     position: absolute; left: 0; right: 0; top: -10%;
     width: 100%; height: 120%;
-    object-fit: cover; object-position: center 30%;
-    will-change: transform; z-index: 0;
+    will-change: transform; z-index: 0; overflow: hidden;
+    background: #080808;
   }
+  .hz-bg-poster, .hz-video {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; object-position: center 30%;
+  }
+  .hz-video { opacity: 0; transition: opacity 1.4s ease; }
+  .hz-video.on { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .hz-video { display: none; } }
   .hz-shade {
     position: absolute; inset: 0; z-index: 1; pointer-events: none;
     background: linear-gradient(to bottom,
@@ -1185,7 +1192,7 @@
 
 
 </style>
-<!-- cache: 20260713f -->
+<!-- cache: 20260713g -->
 </head>
 <body>
 <div id="iris-intro">
@@ -1208,8 +1215,12 @@
 <!-- ════════════════════ HERO ════════════════════ -->
 <div class="hero-sticky-wrap"><section class="hero" id="heroSection">
 
-  <!-- Fondo full-bleed -->
-  <img class="hz-bg" id="heroBannerImg" src="assets/hero_bg.jpg" alt="" aria-hidden="true">
+  <!-- Fondo full-bleed: poster + v&iacute;deos en alternancia -->
+  <div class="hz-bgwrap" id="heroBannerImg" aria-hidden="true">
+    <img class="hz-bg-poster" src="assets/hero_bg.jpg" alt="">
+    <video class="hz-video" id="hzVidA" muted playsinline loop preload="auto"><source src="assets/hero_video_a.mp4?v=20260713" type="video/mp4"></video>
+    <video class="hz-video" id="hzVidB" muted playsinline loop preload="auto"><source src="assets/hero_video_b.mp4?v=20260713" type="video/mp4"></video>
+  </div>
   <div class="hz-shade" aria-hidden="true"></div>
 
   <!-- ══ TOP BAR ══ -->
@@ -1930,6 +1941,28 @@ async function checkPwd(which) {
 }
 document.querySelectorAll('.modal-overlay').forEach(el => { el.addEventListener('click', e => { if (e.target === el) closeModal(el.id.replace('modal','').toLowerCase()); }); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.show').forEach(el => closeModal(el.id.replace('modal','').toLowerCase())); });
+
+  // ── Vídeos del hero: alternancia con crossfade (loop continuo, en silencio) ──
+  (function(){
+    var a = document.getElementById('hzVidA'), b = document.getElementById('hzVidB');
+    if (!a || !b) return;
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var FADE = 1.4, cur = a, nxt = b, switching = false;
+    function play(v){ var p = v.play(); if (p && p.catch) p.catch(function(){}); }
+    function tick(){
+      if (!switching && cur.duration && cur.currentTime >= cur.duration - FADE) {
+        switching = true;
+        nxt.currentTime = 0; play(nxt);
+        nxt.classList.add('on');
+        cur.classList.remove('on');
+        var old = cur; cur = nxt; nxt = old;
+        setTimeout(function(){ old.pause(); switching = false; }, FADE * 1000 + 200);
+      }
+      requestAnimationFrame(tick);
+    }
+    a.classList.add('on'); play(a);
+    requestAnimationFrame(tick);
+  })();
 
   // ── Hora local del hero ──
   (function(){
