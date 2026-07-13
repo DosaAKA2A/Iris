@@ -370,6 +370,17 @@
     z-index: 2;
     border-radius: 24px 24px 0 0;
   }
+  /* ── Mobile/tablet: sin card-stack (secciones más altas que el viewport
+        quedaban congeladas por sticky y solo se veía la primera pantalla).
+        El hero sigue sticky: las secciones suben sobre él y luego scroll normal. ── */
+  @media (max-width: 860px) {
+    .hero-sticky-wrap + .section,
+    .hero-sticky-wrap ~ .section {
+      position: relative;
+      top: auto;
+    }
+  }
+
   /* El footer se antepone a la última cartilla */
   footer#footer { position: relative; z-index: 12; }
   .sec-dark  { background: var(--bg); color: var(--text); }
@@ -1192,7 +1203,7 @@
 
 
 </style>
-<!-- cache: 20260713h -->
+<!-- cache: 20260713i -->
 </head>
 <body>
 <div id="iris-intro">
