@@ -97,7 +97,12 @@
   }
   .hz-video { opacity: 0; transition: opacity 1.4s ease; }
   .hz-video.on { opacity: 1; }
+  /* Zoom de entrada: arranca con body.hero-go (al irse la intro).
+     Va aqui y no en .hz-bgwrap porque el parallax pisa ese transform via style inline. */
+  .hz-bg-poster, .hz-video { animation: hzZoom 2.4s var(--ease) both; }
+  @keyframes hzZoom { from { transform: scale(1.18); } to { transform: scale(1); } }
   @media (prefers-reduced-motion: reduce) { .hz-video { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .hz-bg-poster { animation: none !important; transform: none !important; } }
   .hz-shade {
     position: absolute; inset: 0; z-index: 1; pointer-events: none;
     background: linear-gradient(to bottom,
@@ -203,8 +208,14 @@
     font-size: min(25vw, 38vh); line-height: .8; letter-spacing: -.015em;
     white-space: nowrap; pointer-events: none; user-select: none;
     transform: translateY(0);
-    animation: hzGiant 1s cubic-bezier(0.22, 1, 0.36, 1) .5s both;
   }
+  /* Cada letra sube por separado, escalonada */
+  .hz-giant > * { display: inline-block; animation: hzGiant 1s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .hz-giant > *:nth-child(1) { animation-delay: .50s; }
+  .hz-giant > *:nth-child(2) { animation-delay: .60s; }
+  .hz-giant > *:nth-child(3) { animation-delay: .70s; }
+  .hz-giant > *:nth-child(4) { animation-delay: .80s; }
+  .hz-giant > *:nth-child(5) { animation-delay: .90s; }
   .hz-giant sup { font-size: .1em; font-weight: 600; vertical-align: 4.2em; letter-spacing: 0; }
 
   @keyframes hzDown  { from { opacity: 0; transform: translateY(-26px); } to { opacity: 1; transform: none; } }
@@ -245,8 +256,8 @@
     .hz-trust { font-size: 10px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .hz-top, .hz-mid, .hz-trust, .hz-giant { animation: none !important; opacity: 1 !important; }
-    .hz-giant { transform: translateY(0) !important; }
+    .hz-top, .hz-mid, .hz-trust, .hz-giant, .hz-giant > * { animation: none !important; opacity: 1 !important; }
+    .hz-giant, .hz-giant > * { transform: translateY(0) !important; }
     .hz-mid { transform: translate(-50%, -50%) !important; }
     .hz-dot { animation: none !important; }
   }
@@ -1243,19 +1254,22 @@
   #iris-intro.active .intro-bar-fill { width: 100%; }
 
   /* ── Hero: las animaciones esperan a que la intro termine ── */
-  .hz-top, .hz-mid, .hz-trust, .hz-giant {
+  .hz-top, .hz-mid, .hz-trust, .hz-giant > *,
+  .hz-bg-poster, .hz-video {
     animation-play-state: paused;
   }
   body.hero-go .hz-top,
   body.hero-go .hz-mid,
   body.hero-go .hz-trust,
-  body.hero-go .hz-giant {
+  body.hero-go .hz-giant > *,
+  body.hero-go .hz-bg-poster,
+  body.hero-go .hz-video {
     animation-play-state: running;
   }
 
 
 </style>
-<!-- cache: 20260716c -->
+<!-- cache: 20260716d -->
 </head>
 <body>
 <div id="iris-intro">
@@ -1353,7 +1367,7 @@
   </div>
 
   <!-- ══ WORDMARK GIGANTE ══ -->
-  <div class="hz-giant" aria-hidden="true">IRIS<sup>&reg;</sup></div>
+  <div class="hz-giant" aria-hidden="true"><span>I</span><span>R</span><span>I</span><span>S</span><sup>&reg;</sup></div>
 
 </section></div>
 
