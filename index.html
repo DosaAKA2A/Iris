@@ -155,10 +155,9 @@
 
   /* ── Statement + servicios ── */
   .hz-mid {
-    position: absolute; left: 50%; top: 51%; transform: translateY(-50%);
+    position: absolute; left: 50%; top: 51%; transform: translate(-50%, -50%);
     z-index: 10;
     display: flex; align-items: flex-start; gap: clamp(40px, 6vw, 110px);
-    padding-right: clamp(20px, 3vw, 44px);
     animation: hzUp .7s var(--ease) .35s both;
   }
   .hz-statement {
@@ -213,9 +212,9 @@
   @keyframes hzGiant { from { opacity: 0; transform: translateY(42%); } to { opacity: 1; transform: translateY(0); } }
   @keyframes hzPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(63,185,80,0.5); } 50% { box-shadow: 0 0 0 6px rgba(63,185,80,0); } }
 
-  /* .hz-mid usa translateY(-50%): variante de hzUp que la respeta */
+  /* .hz-mid usa translate(-50%,-50%): variante de hzUp que la respeta */
   .hz-mid { animation-name: hzMid; }
-  @keyframes hzMid { from { opacity: 0; transform: translateY(calc(-50% + 22px)); } to { opacity: 1; transform: translateY(-50%); } }
+  @keyframes hzMid { from { opacity: 0; transform: translate(-50%, calc(-50% + 22px)); } to { opacity: 1; transform: translate(-50%, -50%); } }
 
   /* ── Responsive ── */
   @media (max-width: 1100px) {
@@ -227,6 +226,7 @@
       left: clamp(20px, 5vw, 32px); right: clamp(20px, 5vw, 32px);
       top: auto; bottom: 34%; transform: none;
       flex-direction: column; gap: 26px;
+      padding-right: clamp(20px, 3vw, 44px);
     }
     .hz-mid { animation-name: hzUp; }
     .hz-cross { display: none; }
@@ -247,7 +247,7 @@
   @media (prefers-reduced-motion: reduce) {
     .hz-top, .hz-mid, .hz-trust, .hz-giant { animation: none !important; opacity: 1 !important; }
     .hz-giant { transform: translateY(0) !important; }
-    .hz-mid { transform: translateY(-50%) !important; }
+    .hz-mid { transform: translate(-50%, -50%) !important; }
     .hz-dot { animation: none !important; }
   }
   @media (max-width: 900px) and (prefers-reduced-motion: reduce) {
@@ -1254,7 +1254,7 @@
 
 
 </style>
-<!-- cache: 20260713l -->
+<!-- cache: 20260716b -->
 </head>
 <body>
 <div id="iris-intro">
@@ -1334,7 +1334,7 @@
     </div>
   </div>
 
-  <!-- ══ STATEMENT + SERVICIOS (zona media-derecha) ══ -->
+  <!-- ══ STATEMENT + SERVICIOS (centrado) ══ -->
   <div class="hz-mid">
     <p class="hz-statement">Dise&ntilde;o, tecnolog&iacute;a e identidad <span class="dim">para proyectos que exigen precisi&oacute;n.</span></p>
     <ul class="hz-services">
