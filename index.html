@@ -869,29 +869,30 @@
   #bento-svc { margin-bottom: clamp(24px, 3vw, 48px); }
   @media (max-width: 1024px){ .bento-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 560px)  { .bento-grid { grid-template-columns: 1fr; } }
-  .bento-card { border-radius: 20px; overflow: hidden; position: relative; background: #fff; border: 1px solid rgba(0,0,0,0.09); display: flex; flex-direction: column; min-height: 380px; padding: 0; opacity: 0; transform: translateY(32px); transition: opacity .7s var(--ease), transform .7s var(--ease), box-shadow .3s var(--ease); }
+  .bento-card { border-radius: 20px; overflow: hidden; position: relative; background: #0c0c0c; border: 1px solid rgba(255,255,255,0.09); display: flex; flex-direction: column; min-height: 380px; padding: 0; opacity: 0; transform: translateY(32px); transition: opacity .7s var(--ease), transform .7s var(--ease), box-shadow .3s var(--ease); }
 
   .bento-card.bc-in { opacity: 1; transform: none; }
-  .bento-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
-  .bc-hands { background: #f2efe8; justify-content: flex-end; }
+  .bento-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.45); }
+  .bc-hands { background: #0c0c0c; justify-content: flex-end; }
   .bc-hands .bc-img-wrap { flex: 1; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
   .bc-hands .bc-hands-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 34%; display: block; transition: transform .6s cubic-bezier(.22,1,.36,1); }
   .bc-hands:hover .bc-hands-img { transform: scale(1.05); }
   .bc-text { padding: 28px 30px 30px; flex-shrink: 0; }
-  .bc-text h4 { font-size: 18px; font-weight: 700; letter-spacing: -.02em; color: var(--ink); margin-bottom: 8px; }
-  .bc-text p  { font-size: 14px; line-height: 1.55; color: rgba(12,12,12,.55); }
-  .bc-revisions { background: #f7f7f5; }
-  .bc-list { padding: 16px 20px; margin: 16px 20px 0; background: #fff; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
-  .bc-list-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid #ebebeb; font-size: 13px; color: var(--ink2); }
+  .bc-text h4 { font-size: 18px; font-weight: 700; letter-spacing: -.02em; color: #fff; margin-bottom: 8px; }
+  .bc-text p  { font-size: 14px; line-height: 1.55; color: rgba(255,255,255,.55); }
+  .bc-revisions { background: #0c0c0c; }
+  .bc-list { padding: 16px 20px; margin: 16px 20px 0; background: #171717; border: 1px solid rgba(255,255,255,.09); border-radius: 14px; box-shadow: 0 14px 30px rgba(0,0,0,.45); }
+  .bc-list-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 13px; color: rgba(255,255,255,.72); }
   .bc-list-item:last-child { border-bottom: none; }
-  .bc-list-item.done { color: rgba(12,12,12,.35); text-decoration: line-through; }
+  .bc-list-item.done { color: rgba(255,255,255,.32); text-decoration: line-through; }
   .bc-check { width: 18px; height: 18px; border-radius: 50%; background: var(--red); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .bc-check svg { width: 10px; height: 10px; stroke: #fff; fill: none; }
-  .bc-check-empty { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #d0d0d0; flex-shrink: 0; }
-  .bc-list-footer { margin: 8px 20px 20px; font-size: 11px; color: rgba(12,12,12,.35); display: flex; align-items: center; gap: 6px; }
+  .bc-check-empty { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.25); flex-shrink: 0; }
+  .bc-list-footer { margin: 8px 20px 20px; font-size: 11px; color: rgba(255,255,255,.32); display: flex; align-items: center; gap: 6px; }
   .bc-avatars { display: flex; margin: 14px 20px 0; }
-  .bc-avatar { width: 34px; height: 34px; border-radius: 50%; border: 2.5px solid #f7f7f5; margin-right: -8px; overflow: hidden; }
+  .bc-avatar { width: 34px; height: 34px; border-radius: 50%; border: 2.5px solid #0c0c0c; margin-right: -8px; overflow: hidden; }
   .bc-avatar-placeholder { width: 100%; height: 100%; }
+  .bc-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .bc-brand { background: #0c0c0c; align-items: center; justify-content: flex-end; }
   .bc-brand .bc-inner-pad { padding: 0 30px 30px; width: 100%; }
   .bc-brand-visual { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; padding-top: 30px; }
@@ -1254,7 +1255,7 @@
 
 
 </style>
-<!-- cache: 20260716b -->
+<!-- cache: 20260716c -->
 </head>
 <body>
 <div id="iris-intro">
@@ -1280,8 +1281,7 @@
   <!-- Fondo full-bleed: poster + v&iacute;deos en alternancia -->
   <div class="hz-bgwrap" id="heroBannerImg" aria-hidden="true">
     <img class="hz-bg-poster" src="assets/hero_bg.jpg?v=20260716a" alt="">
-    <video class="hz-video" id="hzVidA" muted playsinline loop preload="auto"><source src="assets/hero_video.mp4?v=20260716a" type="video/mp4"></video>
-    <video class="hz-video" id="hzVidB" muted playsinline loop preload="auto"><source src="assets/hero_video.mp4?v=20260716a" type="video/mp4"></video>
+    <video class="hz-video" id="hzVidA" muted playsinline loop preload="auto"><source src="assets/hero_video.mp4?v=20260716c" type="video/mp4"></video>
   </div>
   <div class="hz-shade" aria-hidden="true"></div>
 
@@ -1408,13 +1408,13 @@
       <div class="bento-card bc-revisions" style="position:relative;">
         <div style="padding:28px 30px 0;position:relative;">
           <div style="position:absolute;top:22px;right:22px;width:9px;height:9px;border-right:2px solid var(--red);border-top:2px solid var(--red);"></div>
-          <h4 style="font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--ink);margin-bottom:4px;">Ajustes a medida</h4>
-          <p style="font-size:13px;color:rgba(12,12,12,.5);line-height:1.5;margin-bottom:0;">Hasta 3 revisiones post-lanzamiento cuando quieras.</p>
+          <h4 style="font-size:18px;font-weight:700;letter-spacing:-.02em;color:#fff;margin-bottom:4px;">Ajustes a medida</h4>
+          <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.5;margin-bottom:0;">Hasta 3 revisiones post-lanzamiento cuando quieras.</p>
           <div class="bc-avatars">
-            <div class="bc-avatar"><div class="bc-avatar-placeholder" style="background:linear-gradient(135deg,#e8c4a0,#c49060);"></div></div>
-            <div class="bc-avatar"><div class="bc-avatar-placeholder" style="background:linear-gradient(135deg,#a0b8e8,#607ab0);"></div></div>
-            <div class="bc-avatar"><div class="bc-avatar-placeholder" style="background:linear-gradient(135deg,#c4a0e8,#8060b0);"></div></div>
-            <div class="bc-avatar"><div class="bc-avatar-placeholder" style="background:linear-gradient(135deg,#d4d4d4,#999);"></div></div>
+            <div class="bc-avatar"><img src="assets/avatar-1.jpg?v=20260716c" alt="" loading="lazy"></div>
+            <div class="bc-avatar"><img src="assets/avatar-2.jpg?v=20260716c" alt="" loading="lazy"></div>
+            <div class="bc-avatar"><img src="assets/avatar-3.jpg?v=20260716c" alt="" loading="lazy"></div>
+            <div class="bc-avatar"><img src="assets/avatar-4.jpg?v=20260716c" alt="" loading="lazy"></div>
           </div>
         </div>
         <div class="bc-list">
@@ -1452,10 +1452,10 @@
           </div>
           <!-- Paleta -->
           <div class="bc-tile bc-tile-color">
-            <span class="bc-sw" style="background:#F9452D"></span>
-            <span class="bc-sw" style="background:#F5F1E8"></span>
-            <span class="bc-sw" style="background:#5B74D6"></span>
-            <span class="bc-sw" style="background:#111"></span>
+            <span class="bc-sw" style="background:#DC402A"></span>
+            <span class="bc-sw" style="background:#F0E9DC"></span>
+            <span class="bc-sw" style="background:#3F5B5A"></span>
+            <span class="bc-sw" style="background:#2E2A26"></span>
             <span class="bc-tile-cap">Paleta</span>
           </div>
         </div>
@@ -1560,16 +1560,16 @@
 
       <!-- 04 WAVA -->
       <article class="pcard" onclick="window.location.href='/wava/'">
-        <div class="pcard-bg-img" style="background:#C9B4F2;"><img src="assets/cards/card-wava.jpg?v=20260710" alt="WAVA"></div>
+        <div class="pcard-bg-img"><img src="assets/cards/card-wava.jpg?v=20260710" alt="WAVA"></div>
         <div class="pcard-veil-hover"></div>
         <div class="pcard-top">
-          <span class="pcard-lock" style="background:rgba(220,64,42,0.55);border-color:rgba(220,64,42,0.4);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg> Público</span>
+          <span class="pcard-lock"><svg width="9" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg> Acceso privado</span>
           <span class="pcard-num">04</span>
         </div>
         <div class="pcard-bottom">
           <div class="pcard-tags"><span class="pcard-tag">Branding</span><span class="pcard-tag">Batidos</span><span class="pcard-tag">Helados</span></div>
           <h3 class="pcard-title">WAVA</h3>
-          <span class="pcard-go">Ver proyecto <span class="arr">↗</span></span>
+          <span class="pcard-go">Acceder <span class="arr">↗</span></span>
         </div>
       </article>
     </div>
@@ -2006,34 +2006,15 @@ async function checkPwd(which) {
 document.querySelectorAll('.modal-overlay').forEach(el => { el.addEventListener('click', e => { if (e.target === el) closeModal(el.id.replace('modal','').toLowerCase()); }); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.show').forEach(el => closeModal(el.id.replace('modal','').toLowerCase())); });
 
-  // ── Vídeos del hero: alternancia con crossfade (loop continuo, en silencio) ──
+  // ── Vídeo del hero: loop boomerang nativo (ida y vuelta, en silencio) ──
+  // El clip ya contiene la ida + la vuelta, asi que el loop del <video> basta:
+  // sin crossfade no hay superposicion de dos fases del metraje.
   (function(){
-    var a = document.getElementById('hzVidA'), b = document.getElementById('hzVidB');
-    if (!a || !b) return;
+    var v = document.getElementById('hzVidA');
+    if (!v) return;
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var FADE = 1.4, PRE = 2.4, cur = a, nxt = b, phase = 0;
-    function play(v){ var p = v.play(); if (p && p.catch) p.catch(function(){}); }
-    function tick(){
-      var d = cur.duration;
-      if (d) {
-        var left = d - cur.currentTime;
-        if (phase === 0 && left <= PRE) {
-          // precalentar el siguiente en oculto: arranca antes del fundido
-          nxt.currentTime = 0; play(nxt);
-          phase = 1;
-        }
-        if (phase === 1 && left <= FADE) {
-          nxt.classList.add('on');
-          cur.classList.remove('on');
-          var old = cur; cur = nxt; nxt = old;
-          phase = 2;
-          setTimeout(function(){ old.pause(); phase = 0; }, FADE * 1000 + 150);
-        }
-      }
-      requestAnimationFrame(tick);
-    }
-    a.classList.add('on'); play(a);
-    requestAnimationFrame(tick);
+    v.classList.add('on');
+    var p = v.play(); if (p && p.catch) p.catch(function(){});
   })();
 
   // ── Hora local del hero ──
