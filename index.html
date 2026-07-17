@@ -2426,6 +2426,32 @@ function switchTheme(btn) {
 })();
 </script>
 <script>
+/* ── Card-stack: secciones más altas que el viewport ──
+   Con top:0 una sección alta se congela al llegar arriba y la siguiente
+   la tapa antes de poder ver su contenido inferior. Si la sección supera
+   el viewport, su top pasa a (viewport − altura): se recorre completa
+   y solo entonces se ancla, manteniendo el efecto de apilado. ── */
+(function(){
+  var secs = document.querySelectorAll('.hero-sticky-wrap ~ .section');
+  function fixTallSticky(){
+    var vh = window.innerHeight;
+    secs.forEach(function(sec){
+      if(getComputedStyle(sec).position !== 'sticky'){ sec.style.top=''; return; }
+      var h = sec.offsetHeight;
+      sec.style.top = h > vh ? (vh - h) + 'px' : '0px';
+    });
+  }
+  window.addEventListener('resize', fixTallSticky);
+  window.addEventListener('load', fixTallSticky);
+  if('ResizeObserver' in window){
+    var ro = new ResizeObserver(fixTallSticky);
+    secs.forEach(function(s){ ro.observe(s); });
+  }
+  fixTallSticky();
+  setTimeout(fixTallSticky, 900);
+})();
+</script>
+<script>
 /* ── EDERUS: temporizador de lanzamiento (público el 01/08/2026) ── */
 (function(){
   var LAUNCH = new Date('2026-08-01T00:00:00');
