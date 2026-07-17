@@ -122,6 +122,18 @@
   .mini-btn{font-family:var(--mono);font-size:10px;padding:7px 11px;border:1px solid var(--line);border-radius:6px;color:var(--ink-dim);background:var(--panel-2);transition:.13s;text-transform:uppercase;letter-spacing:.05em}
   .mini-btn:hover{border-color:var(--safe);color:var(--ink)}
 
+  .load-media{position:absolute;left:16px;top:38px;z-index:5;display:inline-flex;align-items:center;gap:7px;
+    background:#f4f2ea;color:#0a0a0c;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;
+    text-transform:uppercase;padding:11px 18px;border-radius:100px;box-shadow:0 4px 18px rgba(0,0,0,.45);
+    transition:.15s;cursor:pointer}
+  .load-media svg{width:14px;height:14px}
+  .load-media:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(0,0,0,.55)}
+  #btn-upload{border-color:var(--safe);color:var(--safe)}
+  #btn-upload:hover{background:var(--safe);color:#0a0a0c}
+  .cvmodes{display:flex;gap:4px}
+  .cvmodes button{flex:1;font-family:var(--mono);font-size:11px;font-weight:700;padding:8px 0;border:1px solid var(--line);border-radius:7px;color:var(--ink-faint);transition:.13s}
+  .cvmodes button:hover{color:var(--ink)}
+  .cvmodes button.active{background:#f4f2ea;color:#0a0a0c;border-color:#f4f2ea}
   .brand-home{text-decoration:none;transition:.15s}
   .brand-home:hover .iris{color:var(--safe)}
   /* effects browser */
@@ -213,6 +225,7 @@
         <canvas id="fxview" style="display:none"></canvas>
       </div>
       <div class="drop-hint" id="drop-hint"><span class="cta" id="drop-cta">Drop · click · paste</span> an image to blend the gradient over it</div>
+      <button class="load-media" id="btn-load-media" title="Cargar imagen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Load media</button>
       <div class="stage-hud" id="hud"><span><b id="hud-a">GRADIENT</b></span><span id="hud-b">—</span></div>
     </div>
     <div class="panel" id="panel"></div>
@@ -743,11 +756,19 @@ const FX_DEFS={
     for(let i=0;i<256;i++){let v=clamp((i-p.ib)/Math.max(1,p.iw-p.ib),0,1);v=Math.pow(v,g);lut[i]=clamp(p.ob+v*(p.ow-p.ob),0,255);}
     return fxPix(s,(d)=>{for(let i=0;i<d.length;i+=4){d[i]=lut[d[i]];d[i+1]=lut[d[i+1]];d[i+2]=lut[d[i+2]];}});}},
  curves:{name:'Curves',cat:'COLOR',custom:'curves',params:[],colors:[],
-  init:p=>{p.m=[[0,0],[1,1]];p.r=[[0,0],[1,1]];p.g=[[0,0],[1,1]];p.b=[[0,0],[1,1]];},
+  init:p=>{p.m=[[0,0],[1,1]];p.r=[[0,0],[1,1]];p.g=[[0,0],[1,1]];p.b=[[0,0],[1,1]];p.mode='n';},
   apply:(s,p)=>{const LM=curveLUT(p.m),LR=curveLUT(p.r),LG=curveLUT(p.g),LB=curveLUT(p.b);
     const l8=L=>{const a=new Uint8Array(256);for(let i=0;i<256;i++)a[i]=clamp(L[i]*255,0,255);return a;};
     const m=l8(LM),r=l8(LR),g=l8(LG),b=l8(LB);
-    return fxPix(s,(d)=>{for(let i=0;i<d.length;i+=4){d[i]=r[m[d[i]]];d[i+1]=g[m[d[i+1]]];d[i+2]=b[m[d[i+2]]];}});}},
+    return fxPix(s,(d)=>{for(let i=0;i<d.length;i+=4){
+      const nr=r[m[d[i]]],ng=g[m[d[i+1]]],nb=b[m[d[i+2]]];
+      if(p.mode==='n'){d[i]=nr;d[i+1]=ng;d[i+2]=nb;}
+      else if(p.mode==='l'){const[oh,os]=rgb2hsl(d[i],d[i+1],d[i+2]);
+        const[,,nl]=rgb2hsl(nr,ng,nb);
+        const[rr,gg,bb]=hsl2rgb(oh,os,nl);d[i]=rr;d[i+1]=gg;d[i+2]=bb;}
+      else{const[nh,ns]=rgb2hsl(nr,ng,nb);
+        const[,,ol]=rgb2hsl(d[i],d[i+1],d[i+2]);
+        const[rr,gg,bb]=hsl2rgb(nh,ns,ol);d[i]=rr;d[i+1]=gg;d[i+2]=bb;}}});}},
  huecurves:{name:'Hue curves',cat:'COLOR',custom:'huecurve',params:[],colors:[],
   init:p=>{p.hc=[[0,0.5],[0.5,0.5],[1,0.5]];},
   apply:(s,p)=>{const L=curveLUT(p.hc,360);
@@ -999,12 +1020,15 @@ const FX_DEFS={
     [0,45,90,135].forEach(ang=>{const st=FX_DEFS.motion.apply(bright,{dist:p.len,ang});
       ax.globalCompositeOperation='lighter';ax.drawImage(st,0,0);});
     return fxBlend(s,acc,p.amt/100,'lighter');}},
- motiontrails:{name:'Motion trails',cat:'EFFECTS',params:[['dist','Distance',0,80,1,30,'px'],['ang','Angle',0,360,1,0,'°'],['decay','Decay',10,100,1,55,'%']],colors:[],
-  apply:(s,p)=>{const c=fxC(s.width,s.height);const x=c.getContext('2d');const n=8,a=p.ang*Math.PI/180;
-    for(let i=n;i>=1;i--){const t=i/n*p.dist;
-      x.globalAlpha=Math.pow(1-i/n,p.decay/50)*0.8+0.05;
-      x.drawImage(s,Math.cos(a)*t,Math.sin(a)*t);}
-    x.globalAlpha=1;x.drawImage(s,0,0);return c;}},
+ motiontrails:{name:'Motion trails',cat:'EFFECTS',params:[['thr','Threshold',0,100,1,55,'%'],['dist','Distance',0,120,1,50,'px'],['ang','Angle',0,360,1,0,'°'],['decay','Decay',10,100,1,55,'%']],colors:[],
+  apply:(s,p)=>{const bright=fxPix(s,(d)=>{const t=p.thr*2.55;for(let i=0;i<d.length;i+=4){
+      const l=fxLum(d[i],d[i+1],d[i+2]);if(l<t){d[i]=d[i+1]=d[i+2]=0;}}});
+    const c=fxClone(s);const x=c.getContext('2d');const n=10,a=p.ang*Math.PI/180;
+    x.globalCompositeOperation='lighter';
+    for(let i=1;i<=n;i++){const t=i/n*p.dist;
+      x.globalAlpha=Math.pow(1-i/n,p.decay/40)*0.65;
+      x.drawImage(bright,Math.cos(a)*t,Math.sin(a)*t);}
+    x.globalAlpha=1;x.globalCompositeOperation='source-over';return c;}},
  rgbshift:{name:'RGB Shift',cat:'EFFECTS',params:[['amt','Amount',0,30,0.5,6,'px'],['ang','Angle',0,360,1,0,'°']],colors:[],
   apply:(s,p)=>{const w=s.width,h=s.height,a=p.ang*Math.PI/180;
     const dx=Math.round(Math.cos(a)*p.amt),dy=Math.round(Math.sin(a)*p.amt);
@@ -1115,12 +1139,17 @@ function fxLoadPreset(name){const pr=FX_PRESETS[name];if(!pr)return;
   buildFxPanel();fxRender();toast(name);}
 
 /* ── Fuente + render ── */
+const FXDEMO=new Image();
+FXDEMO.src='assets/fx/demo.jpg?v=20260717a';
+FXDEMO.onload=()=>{if(MODE==='effects'&&!PHOTO)fxRender();};
 function fxSource(){let w,h;
-  if(PHOTO){w=PHOTO.naturalWidth;h=PHOTO.naturalHeight;
+  const SRC=PHOTO||(FXDEMO.complete&&FXDEMO.naturalWidth?FXDEMO:null);
+  if(SRC){w=SRC.naturalWidth;h=SRC.naturalHeight;
     const sc=Math.min(1,FX_MAX/Math.max(w,h));w=Math.round(w*sc);h=Math.round(h*sc);}
   else{w=880;h=560;}
   const c=fxC(w,h);const x=c.getContext('2d');
-  if(PHOTO){x.drawImage(PHOTO,0,0,w,h);}
+  const SRC2=PHOTO||(FXDEMO.complete&&FXDEMO.naturalWidth?FXDEMO:null);
+  if(SRC2){x.drawImage(SRC2,0,0,w,h);}
   else{const g=x.createLinearGradient(0,0,w,h);
     g.addColorStop(0,'#6c5ce7');g.addColorStop(0.5,'#fd79a8');g.addColorStop(1,'#ffe08a');
     x.fillStyle=g;x.fillRect(0,0,w,h);
@@ -1209,6 +1238,12 @@ function buildFxPanel(){
           <input type="range" min="0" max="100" step="1" value="${L.s}" data-fxs="${L.id}">
           <span class="ctl-val" id="fxsv-${L.id}">${L.s}%</span></div>`;
     if(def.custom==='curves'){
+      h+=`<div class="ctl"><div class="ctl-head"><span class="ctl-label">Apply mode</span></div>
+        <div class="cvmodes" data-cvmodes="${L.id}">
+          <button class="${L.p.mode==='n'?'active':''}" data-m="n" title="Normal">N</button>
+          <button class="${L.p.mode==='c'?'active':''}" data-m="c" title="Color">C</button>
+          <button class="${L.p.mode==='l'?'active':''}" data-m="l" title="Luminosity">L</button>
+        </div></div>`;
       h+=curveCanvasHTML(L,'m','RGB curve')+curveCanvasHTML(L,'r','Red channel')+curveCanvasHTML(L,'g','Green channel')+curveCanvasHTML(L,'b','Blue channel');}
     if(def.custom==='huecurve'){
       h+=curveCanvasHTML(L,'hc','Hue shift');}
@@ -1299,7 +1334,11 @@ function wireFx(){
   panel.querySelectorAll('[data-fxc]').forEach(inp=>inp.addEventListener('input',()=>{
     const L=fxById(inp.dataset.fxc);L.p[inp.dataset.fxk]=inp.value;
     inp.parentElement.querySelector('.chip').style.background=inp.value;
-    inp.parentElement.childNodes[2].textContent=inp.value;fxRender();}));
+    [...inp.parentElement.childNodes].forEach(n=>{if(n.nodeType===3&&n.textContent.trim())n.textContent=inp.value;});
+    fxRender();}));
+  panel.querySelectorAll('[data-cvmodes]').forEach(box=>box.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    const L=fxById(box.dataset.cvmodes);L.p.mode=b.dataset.m;
+    box.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));fxRender();})));
   panel.querySelectorAll('[data-cvreset]').forEach(b=>b.addEventListener('click',()=>{
     const[lid,ch]=b.dataset.cvreset.split('|');const L=fxById(lid);if(!L)return;
     L.p[ch]=ch==='hc'?[[0,0.5],[0.5,0.5],[1,0.5]]:[[0,0],[1,1]];
@@ -1337,6 +1376,7 @@ function loadFile(file){if(!file||!file.type.startsWith('image/')){toast('Not an
 const fileInput=document.getElementById('file');
 fileInput.addEventListener('change',e=>loadFile(e.target.files[0]));
 document.getElementById('btn-upload').addEventListener('click',()=>fileInput.click());
+document.getElementById('btn-load-media').addEventListener('click',()=>fileInput.click());
 document.getElementById('drop-cta').addEventListener('click',()=>fileInput.click());
 stage.addEventListener('dragover',e=>{e.preventDefault();stage.classList.add('dragover');});
 stage.addEventListener('dragleave',()=>stage.classList.remove('dragover'));
@@ -1389,7 +1429,7 @@ document.getElementById('btn-reset-all').addEventListener('click',()=>{
     if(animRAF){cancelAnimationFrame(animRAF);animRAF=null;}
     buildComposePanel();glRender();
   }else if(MODE==='effects'){
-    FX.stack=[];buildFxPanel();fxRender();
+    FX.stack=[];FX.preset=null;buildFxPanel();fxRender();
   }else{
     Object.assign(S,S_DEFAULTS);
     buildReducePanel();render();
