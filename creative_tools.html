@@ -122,6 +122,23 @@
   .mini-btn{font-family:var(--mono);font-size:10px;padding:7px 11px;border:1px solid var(--line);border-radius:6px;color:var(--ink-dim);background:var(--panel-2);transition:.13s;text-transform:uppercase;letter-spacing:.05em}
   .mini-btn:hover{border-color:var(--safe);color:var(--ink)}
 
+  /* effects stack */
+  .fxl{border:1px solid var(--line);border-radius:8px;margin-bottom:8px;background:var(--panel-2);overflow:hidden}
+  .fxl.off{opacity:.45}
+  .fxl-head{display:flex;align-items:center;gap:7px;padding:9px 10px;cursor:pointer;user-select:none}
+  .fxl-name{flex:1;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+  .fxl-ico{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;color:var(--ink-dim);border:1px solid transparent;transition:.12s;flex-shrink:0}
+  .fxl-ico:hover{border-color:var(--line);color:var(--ink)}
+  .fxl-ico svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.7}
+  .fxl-ico.eye.on{color:var(--safe)}
+  .fxl-ico.del:hover{color:#ff5c5c;border-color:rgba(255,92,92,.4)}
+  .fxl-body{padding:4px 12px 12px;border-top:1px solid var(--line-soft);display:none}
+  .fxl.open .fxl-body{display:block}
+  .fxl-strength{display:flex;align-items:center;gap:10px;margin:10px 0 12px}
+  .fxl-strength input{flex:1}
+  .fxl-strength .ctl-val{min-width:36px;text-align:right}
+  .fx-add{display:flex;gap:8px}
+  .fx-add .sel{flex:1}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:11px 18px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink);opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:0 12px 30px rgba(0,0,0,.5)}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .toast b{color:var(--safe)}
@@ -144,6 +161,7 @@
       <button data-mode="compose" class="active">Compose</button>
       <button data-mode="reduce">Reduce</button>
       <button data-mode="banner">Banner</button>
+      <button data-mode="effects">Effects</button>
     </div>
     <div class="spacer"></div>
     <button class="top-btn ghost" id="btn-animate">Animate</button>
@@ -160,6 +178,7 @@
         <canvas id="glview"></canvas>
         <canvas id="view" style="display:none"></canvas>
         <canvas id="bannerview" style="display:none"></canvas>
+        <canvas id="fxview" style="display:none"></canvas>
       </div>
       <div class="drop-hint" id="drop-hint"><span class="cta" id="drop-cta">Drop · click · paste</span> an image to blend the gradient over it</div>
       <div class="stage-hud" id="hud"><span><b id="hud-a">GRADIENT</b></span><span id="hud-b">—</span></div>
@@ -609,6 +628,12 @@ function buildRail(){
     }).join('');
     rail.querySelectorAll('[data-bt]').forEach(b=>b.addEventListener('click',()=>{
       Object.assign(B,B_TEMPLATES[b.dataset.bt]);buildBannerPanel();bRender();toast(b.dataset.bt);}));
+  }else if(MODE==='effects'){
+    rail.innerHTML=`<div class="rail-lbl">Preset</div>`+Object.entries(FX_PRESETS).map(([name,pr])=>
+      `<button class="rail-btn" data-fxpr="${name}" title="${name}"><span class="rl">${pr.lbl}</span></button>`).join('');
+    rail.querySelectorAll('[data-fxpr]').forEach(b=>b.addEventListener('click',()=>{
+      rail.querySelectorAll('.rail-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+      fxLoadPreset(b.dataset.fxpr);}));
   }else{
     rail.innerHTML=REDUCE_STYLES.map(([v,t])=>`<button class="rail-btn ${S.style===v?'active':''}" data-style="${v}">
       <span class="rl">${t}</span></button>`).join('');
@@ -618,20 +643,319 @@ function buildRail(){
   }
 }
 
+/* ═══════════════ EFFECTS mode · stack de filtros apilables ═══════════════ */
+const fxview=document.getElementById('fxview');
+const fxctx=fxview.getContext('2d');
+const FX={stack:[],uid:1};
+const FX_MAX=1400;
+let fxRAF=null;
+
+const fxC=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c;};
+const fxClone=s=>{const c=fxC(s.width,s.height);c.getContext('2d').drawImage(s,0,0);return c;};
+function fxFilter(s,f){const c=fxC(s.width,s.height);const x=c.getContext('2d');x.filter=f;x.drawImage(s,0,0);x.filter='none';return c;}
+function fxPix(s,fn){const c=fxClone(s);const x=c.getContext('2d');const id=x.getImageData(0,0,c.width,c.height);fn(id.data,c.width,c.height);x.putImageData(id,0,0);return c;}
+const fxLum=(r,g,b)=>.2126*r+.7152*g+.0722*b;
+const fxMix=(a,b,t)=>a+(b-a)*t;
+function fxRand(seed){let s=seed>>>0||1;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+function fxBlend(base,top,alpha,op){const c=fxClone(base);const x=c.getContext('2d');x.globalCompositeOperation=op||'source-over';x.globalAlpha=alpha==null?1:alpha;x.drawImage(top,0,0,base.width,base.height);x.globalAlpha=1;x.globalCompositeOperation='source-over';return c;}
+function fxConv(s,k,mixAmt){const w=s.width,h=s.height;const sc=s.getContext('2d').getImageData(0,0,w,h).data;
+  const c=fxClone(s);const x=c.getContext('2d');const out=x.getImageData(0,0,w,h);const d=out.data;
+  for(let y=1;y<h-1;y++)for(let xx=1;xx<w-1;xx++){const i=(y*w+xx)*4;
+    for(let ch=0;ch<3;ch++){let v=0,ki=0;
+      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){v+=sc[((y+dy)*w+(xx+dx))*4+ch]*k[ki++];}
+      d[i+ch]=clamp(fxMix(sc[i+ch],v,mixAmt),0,255);}}
+  x.putImageData(out,0,0);return c;}
+
+/* ── Definiciones: params = sliders, colors = pickers ── */
+const FX_DEFS={
+ adjust:{name:'Adjust',params:[['bright','Brightness',0,200,1,100,'%'],['cont','Contrast',0,200,1,100,'%'],['sat','Saturation',0,200,1,100,'%'],['hue','Hue',0,360,1,0,'°']],colors:[],
+  apply:(s,p)=>fxFilter(s,`brightness(${p.bright}%) contrast(${p.cont}%) saturate(${p.sat}%) hue-rotate(${p.hue}deg)`)},
+ temp:{name:'Color temperature',params:[['t','Warmth',-100,100,1,25,'']],colors:[],
+  apply:(s,p)=>fxPix(s,(d)=>{const t=p.t*0.5;for(let i=0;i<d.length;i+=4){d[i]=clamp(d[i]+t,0,255);d[i+2]=clamp(d[i+2]-t,0,255);}})},
+ blur:{name:'Gaussian blur',params:[['r','Radius',0,24,0.5,4,'px']],colors:[],apply:(s,p)=>fxFilter(s,`blur(${p.r}px)`)},
+ sharpen:{name:'Sharpen',params:[['amt','Amount',0,100,1,45,'%']],colors:[],
+  apply:(s,p)=>fxConv(s,[0,-1,0,-1,5,-1,0,-1,0],p.amt/100)},
+ motion:{name:'Motion blur',params:[['dist','Distance',0,60,1,18,'px'],['ang','Angle',0,360,1,0,'°']],colors:[],
+  apply:(s,p)=>{const c=fxC(s.width,s.height);const x=c.getContext('2d');const n=10,a=p.ang*Math.PI/180;
+    for(let i=0;i<n;i++){const t=(i/(n-1)-0.5)*p.dist;x.globalAlpha=1/n;x.drawImage(s,Math.cos(a)*t,Math.sin(a)*t);}x.globalAlpha=1;return c;}},
+ zoomblur:{name:'Zoom blur',params:[['amt','Strength',0,100,1,30,'%']],colors:[],
+  apply:(s,p)=>{const c=fxClone(s);const x=c.getContext('2d');const n=9,cx=s.width/2,cy=s.height/2;
+    for(let i=1;i<=n;i++){const sc=1+p.amt/100*0.25*(i/n);x.globalAlpha=0.5/i;
+      x.drawImage(s,cx-cx*sc,cy-cy*sc,s.width*sc,s.height*sc);}x.globalAlpha=1;return c;}},
+ grain:{name:'Film grain',params:[['amt','Amount',0,100,1,32,'%'],['size','Size',1,4,1,1,'px']],colors:[],
+  apply:(s,p)=>{const gw=Math.ceil(s.width/p.size),gh=Math.ceil(s.height/p.size);
+    const n=fxC(gw,gh);const nx=n.getContext('2d');const id=nx.createImageData(gw,gh);
+    for(let i=0;i<id.data.length;i+=4){const v=128+(Math.random()-0.5)*170;id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255;}
+    nx.putImageData(id,0,0);const c=fxClone(s);const x=c.getContext('2d');x.imageSmoothingEnabled=false;
+    x.globalCompositeOperation='overlay';x.globalAlpha=p.amt/100;x.drawImage(n,0,0,s.width,s.height);
+    x.globalAlpha=1;x.globalCompositeOperation='source-over';return c;}},
+ vignette:{name:'Vignette',params:[['size','Size',10,100,1,55,'%'],['dark','Darkness',0,100,1,60,'%']],colors:[],
+  apply:(s,p)=>{const c=fxClone(s);const x=c.getContext('2d');const r=Math.hypot(s.width,s.height)/2;
+    const g=x.createRadialGradient(s.width/2,s.height/2,r*p.size/100*0.7,s.width/2,s.height/2,r);
+    g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${p.dark/100})`);
+    x.fillStyle=g;x.fillRect(0,0,s.width,s.height);return c;}},
+ bloom:{name:'Bloom',params:[['thr','Threshold',0,100,1,58,'%'],['rad','Radius',0,40,1,16,'px'],['amt','Intensity',0,100,1,65,'%']],colors:[],
+  apply:(s,p)=>{const bright=fxPix(s,(d)=>{const t=p.thr*2.55;for(let i=0;i<d.length;i+=4){
+      const l=fxLum(d[i],d[i+1],d[i+2]);if(l<t){d[i]=d[i+1]=d[i+2]=0;}}});
+    return fxBlend(s,fxFilter(bright,`blur(${p.rad}px)`),p.amt/100,'lighter');}},
+ halation:{name:'Halation',params:[['rad','Radius',0,40,1,18,'px'],['amt','Intensity',0,100,1,55,'%']],colors:[['col','Glow','#ff3b1f']],
+  apply:(s,p)=>{const[cr,cg,cb]=hexRGB(p.col);
+    const bright=fxPix(s,(d)=>{for(let i=0;i<d.length;i+=4){const l=fxLum(d[i],d[i+1],d[i+2]);
+      const m=l>150?(l-150)/105:0;d[i]=cr*m;d[i+1]=cg*m;d[i+2]=cb*m;}});
+    return fxBlend(s,fxFilter(bright,`blur(${p.rad}px)`),p.amt/100,'screen');}},
+ rgbshift:{name:'RGB shift',params:[['amt','Amount',0,30,0.5,6,'px'],['ang','Angle',0,360,1,0,'°']],colors:[],
+  apply:(s,p)=>{const w=s.width,h=s.height,a=p.ang*Math.PI/180;
+    const dx=Math.round(Math.cos(a)*p.amt),dy=Math.round(Math.sin(a)*p.amt);
+    const sc=s.getContext('2d').getImageData(0,0,w,h).data;const c=fxC(w,h);const x=c.getContext('2d');
+    const out=x.createImageData(w,h);const d=out.data;
+    for(let y=0;y<h;y++)for(let xx=0;xx<w;xx++){const i=(y*w+xx)*4;
+      const xr=clamp(xx-dx,0,w-1),yr=clamp(y-dy,0,h-1),xb=clamp(xx+dx,0,w-1),yb=clamp(y+dy,0,h-1);
+      d[i]=sc[(yr*w+xr)*4];d[i+1]=sc[i+1];d[i+2]=sc[(yb*w+xb)*4+2];d[i+3]=255;}
+    x.putImageData(out,0,0);return c;}},
+ glitch:{name:'Glitch',params:[['slices','Slices',0,40,1,12,''],['shift','Shift',0,100,1,30,'%'],['seed','Seed',0,100,1,7,'']],colors:[],
+  apply:(s,p)=>{const c=fxClone(s);const x=c.getContext('2d');const rnd=fxRand(p.seed+1);
+    for(let i=0;i<p.slices;i++){const sy=Math.floor(rnd()*s.height);const sh=Math.floor(4+rnd()*s.height*0.06);
+      const off=Math.floor((rnd()-0.5)*s.width*0.25*(p.shift/100)*2);
+      x.drawImage(s,0,sy,s.width,sh,off,sy,s.width,sh);
+      if(rnd()>0.6){x.globalCompositeOperation='lighter';x.globalAlpha=0.35;
+        x.drawImage(s,0,sy,s.width,sh,off+6,sy,s.width,sh);x.globalAlpha=1;x.globalCompositeOperation='source-over';}}
+    return c;}},
+ scanlines:{name:'Scanlines',params:[['gap','Gap',2,12,1,4,'px'],['op','Opacity',0,100,1,42,'%']],colors:[],
+  apply:(s,p)=>{const c=fxClone(s);const x=c.getContext('2d');x.fillStyle=`rgba(0,0,0,${p.op/100})`;
+    for(let y=0;y<s.height;y+=p.gap)x.fillRect(0,y,s.width,Math.max(1,Math.floor(p.gap/2)));return c;}},
+ vhs:{name:'VHS',params:[['track','Tracking',0,100,1,40,'%'],['chroma','Chroma',0,20,1,5,'px'],['noise','Noise',0,100,1,28,'%']],colors:[],
+  apply:(s,p)=>{const w=s.width,h=s.height;let c=fxC(w,h);const x=c.getContext('2d');
+    for(let y=0;y<h;y+=2){const off=Math.sin(y*0.02)*p.track*0.06+(Math.random()-0.5)*p.track*0.04;
+      x.drawImage(s,0,y,w,2,off,y,w,2);}
+    c=FX_DEFS.rgbshift.apply(c,{amt:p.chroma,ang:0});
+    const x2=c.getContext('2d');
+    x2.fillStyle='rgba(255,255,255,0.06)';
+    const rnd=fxRand(Date.now()%9999);
+    for(let i=0;i<3;i++){const by=rnd()*h;x2.fillRect(0,by,w,2+rnd()*4);}
+    if(p.noise>0){x2.globalAlpha=p.noise/100*0.5;
+      for(let i=0;i<w*h/300;i++){x2.fillStyle=Math.random()>.5?'#fff':'#000';
+        x2.fillRect(Math.random()*w,Math.random()*h,1.5,1.5);}x2.globalAlpha=1;}
+    const sl=FX_DEFS.scanlines.apply(c,{gap:3,op:22});return sl;}},
+ pixelate:{name:'Pixelate',params:[['cell','Cell size',2,60,1,10,'px']],colors:[],
+  apply:(s,p)=>{const gw=Math.max(1,Math.round(s.width/p.cell)),gh=Math.max(1,Math.round(s.height/p.cell));
+    const t=fxC(gw,gh);t.getContext('2d').drawImage(s,0,0,gw,gh);
+    const c=fxC(s.width,s.height);const x=c.getContext('2d');x.imageSmoothingEnabled=false;
+    x.drawImage(t,0,0,s.width,s.height);return c;}},
+ halftonefx:{name:'Halftone',params:[['cell','Cell size',3,24,1,8,'px']],colors:[['ink','Ink','#14141a'],['paper','Paper','#f4f2ea']],
+  apply:(s,p)=>{const gw=Math.max(1,Math.round(s.width/p.cell)),gh=Math.max(1,Math.round(s.height/p.cell));
+    const t=fxC(gw,gh);const tx=t.getContext('2d');tx.drawImage(s,0,0,gw,gh);
+    const d=tx.getImageData(0,0,gw,gh).data;
+    const c=fxC(s.width,s.height);const x=c.getContext('2d');
+    x.fillStyle=p.paper;x.fillRect(0,0,s.width,s.height);x.fillStyle=p.ink;
+    const cs=s.width/gw;
+    for(let y=0;y<gh;y++)for(let xx=0;xx<gw;xx++){const i=(y*gw+xx)*4;
+      const l=fxLum(d[i],d[i+1],d[i+2])/255;const r=(1-l)*cs*0.62;
+      if(r>0.3){x.beginPath();x.arc(xx*cs+cs/2,y*cs+cs/2,r,0,6.2832);x.fill();}}
+    return c;}},
+ ditherfx:{name:'Dither',params:[['cell','Cell size',1,12,1,3,'px']],colors:[['ink','Ink','#14141a'],['paper','Paper','#f4f2ea']],
+  apply:(s,p)=>{const B=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+    const gw=Math.max(1,Math.round(s.width/p.cell)),gh=Math.max(1,Math.round(s.height/p.cell));
+    const t=fxC(gw,gh);const tx=t.getContext('2d');tx.drawImage(s,0,0,gw,gh);
+    const id=tx.getImageData(0,0,gw,gh);const d=id.data;
+    const[ir,ig,ib]=hexRGB(p.ink),[pr,pg,pb]=hexRGB(p.paper);
+    for(let y=0;y<gh;y++)for(let xx=0;xx<gw;xx++){const i=(y*gw+xx)*4;
+      const l=fxLum(d[i],d[i+1],d[i+2])/255;const on=l>(B[y%4][xx%4]+0.5)/16;
+      d[i]=on?pr:ir;d[i+1]=on?pg:ig;d[i+2]=on?pb:ib;}
+    tx.putImageData(id,0,0);
+    const c=fxC(s.width,s.height);const x=c.getContext('2d');x.imageSmoothingEnabled=false;
+    x.drawImage(t,0,0,s.width,s.height);return c;}},
+ thresholdfx:{name:'Threshold',params:[['lvl','Level',0,255,1,128,''],['soft','Softness',0,60,1,10,'']],colors:[],
+  apply:(s,p)=>fxPix(s,(d)=>{for(let i=0;i<d.length;i+=4){const l=fxLum(d[i],d[i+1],d[i+2]);
+    const t=p.soft<1?(l>=p.lvl?255:0):clamp((l-(p.lvl-p.soft))/(p.soft*2)*255,0,255);
+    d[i]=d[i+1]=d[i+2]=t;}})},
+ posterizefx:{name:'Posterize',params:[['lv','Levels',2,10,1,4,'']],colors:[],
+  apply:(s,p)=>fxPix(s,(d)=>{const st=255/(p.lv-1);for(let i=0;i<d.length;i+=4){
+    d[i]=Math.round(d[i]/st)*st;d[i+1]=Math.round(d[i+1]/st)*st;d[i+2]=Math.round(d[i+2]/st)*st;}})},
+ duotonefx:{name:'Duotone',params:[],colors:[['dark','Shadows','#14141a'],['light','Highlights','#f4f2ea']],
+  apply:(s,p)=>{const[dr,dg,db]=hexRGB(p.dark),[lr,lg,lb]=hexRGB(p.light);
+    return fxPix(s,(d)=>{for(let i=0;i<d.length;i+=4){const l=fxLum(d[i],d[i+1],d[i+2])/255;
+      d[i]=fxMix(dr,lr,l);d[i+1]=fxMix(dg,lg,l);d[i+2]=fxMix(db,lb,l);}});}},
+ gradmap:{name:'Gradient map',params:[],colors:[['c0','Shadows','#0b0b2a'],['c1','Midtones','#e2452a'],['c2','Highlights','#ffe08a']],
+  apply:(s,p)=>{const A=hexRGB(p.c0),B=hexRGB(p.c1),C=hexRGB(p.c2);
+    return fxPix(s,(d)=>{for(let i=0;i<d.length;i+=4){const l=fxLum(d[i],d[i+1],d[i+2])/255;
+      let r,g,b;if(l<0.5){const t=l*2;r=fxMix(A[0],B[0],t);g=fxMix(A[1],B[1],t);b=fxMix(A[2],B[2],t);}
+      else{const t=(l-0.5)*2;r=fxMix(B[0],C[0],t);g=fxMix(B[1],C[1],t);b=fxMix(B[2],C[2],t);}
+      d[i]=r;d[i+1]=g;d[i+2]=b;}});}},
+ invertfx:{name:'Invert',params:[],colors:[],apply:(s)=>fxFilter(s,'invert(1)')},
+ wash:{name:'Color wash',params:[['desat','Desaturate',0,100,1,45,'%']],colors:[['col','Tint','#8a6a45']],
+  apply:(s,p)=>{let c=fxFilter(s,`saturate(${100-p.desat}%)`);const x=c.getContext('2d');
+    x.globalCompositeOperation='soft-light';x.fillStyle=p.col;x.fillRect(0,0,c.width,c.height);
+    x.globalCompositeOperation='source-over';return c;}},
+ emboss:{name:'Emboss',params:[['amt','Amount',0,100,1,60,'%']],colors:[],
+  apply:(s,p)=>fxConv(s,[-2,-1,0,-1,1,1,0,1,2],p.amt/100)},
+ edges:{name:'Edge trace',params:[['amt','Amount',0,100,1,80,'%'],['inv','Invert (0/1)',0,1,1,1,'']],colors:[],
+  apply:(s,p)=>{const g=fxFilter(s,'grayscale(1)');
+    let c=fxConv(g,[-1,-1,-1,-1,8,-1,-1,-1,-1],1);
+    if(p.inv>0)c=fxFilter(c,'invert(1)');
+    return fxBlend(fxFilter(s,'grayscale(1)'),c,p.amt/100);}},
+ paper:{name:'Paper texture',params:[['fiber','Fibers',0,100,1,55,'%'],['crump','Crumple',0,100,1,30,'%']],colors:[],
+  apply:(s,p)=>{const w=s.width,h=s.height;
+    const n=fxC(Math.ceil(w/2),Math.ceil(h/2));const nx=n.getContext('2d');
+    const id=nx.createImageData(n.width,n.height);
+    for(let i=0;i<id.data.length;i+=4){const v=225+(Math.random()-0.5)*60*(p.fiber/100+0.2);
+      id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255;}
+    nx.putImageData(id,0,0);
+    let tex=fxC(w,h);const txx=tex.getContext('2d');txx.drawImage(n,0,0,w,h);
+    if(p.crump>0){const big=fxC(24,24);const bx=big.getContext('2d');
+      const bid=bx.createImageData(24,24);const rnd=fxRand(42);
+      for(let i=0;i<bid.data.length;i+=4){const v=200+(rnd()-0.5)*120*(p.crump/100);
+        bid.data[i]=bid.data[i+1]=bid.data[i+2]=v;bid.data[i+3]=255;}
+      bx.putImageData(bid,0,0);
+      txx.globalCompositeOperation='multiply';txx.globalAlpha=0.7;
+      txx.filter='blur(2px)';txx.drawImage(big,0,0,w,h);txx.filter='none';
+      txx.globalAlpha=1;txx.globalCompositeOperation='source-over';}
+    const c=fxClone(s);const x=c.getContext('2d');
+    x.globalCompositeOperation='multiply';x.drawImage(tex,0,0);
+    x.globalCompositeOperation='source-over';return c;}},
+ inkbleed:{name:'Ink bleed',params:[['rad','Bleed',0,20,0.5,6,'px'],['thr','Threshold',0,255,1,150,'']],colors:[],
+  apply:(s,p)=>{const b=fxFilter(s,`blur(${p.rad}px) grayscale(1)`);
+    return fxPix(b,(d)=>{for(let i=0;i<d.length;i+=4){
+      const t=clamp((d[i]-(p.thr-25))/50*255,0,255);d[i]=d[i+1]=d[i+2]=t;}});}},
+};
+
+/* ── Presets (stacks) · imitaciones de los presets de effect.app ── */
+const FX_PRESETS={
+ 'Fallen Angels':{lbl:'FALLEN',stack:[['duotonefx',100,{dark:'#050508',light:'#cfd4e0'}],['adjust',100,{cont:135}],['bloom',80,{thr:55,rad:18,amt:80}],['rgbshift',45,{amt:4}],['grain',40,{amt:35}],['vignette',70,{}]]},
+ 'Teleshopping':{lbl:'TELESHOP',stack:[['adjust',100,{sat:150,bright:106}],['temp',60,{t:35}],['blur',35,{r:2}],['vhs',70,{track:30,chroma:6,noise:22}]]},
+ 'Mixed Media':{lbl:'MIXED',stack:[['posterizefx',100,{lv:5}],['duotonefx',55,{dark:'#1a1330',light:'#f2e9d8'}],['halftonefx',45,{cell:7}],['paper',60,{fiber:60,crump:25}],['grain',30,{}]]},
+ 'Thin paper print':{lbl:'PAPER',stack:[['duotonefx',100,{dark:'#2a2a2e',light:'#f6f3ea'}],['adjust',100,{cont:88,bright:108}],['inkbleed',35,{rad:4,thr:150}],['paper',85,{fiber:70,crump:45}],['vignette',30,{dark:35}]]},
+ 'Wet paper':{lbl:'WET',stack:[['blur',50,{r:3}],['inkbleed',60,{rad:8,thr:140}],['temp',40,{t:-25}],['paper',90,{fiber:80,crump:70}]]},
+ 'Xerox':{lbl:'XEROX',stack:[['duotonefx',100,{dark:'#0a0a0a',light:'#ffffff'}],['thresholdfx',85,{lvl:135,soft:22}],['grain',45,{amt:40,size:1}],['paper',40,{fiber:35}]]},
+ 'Riso print':{lbl:'RISO',stack:[['duotonefx',100,{dark:'#d33a2c',light:'#f4efe4'}],['ditherfx',65,{cell:3,ink:'#d33a2c',paper:'#f4efe4'}],['grain',35,{}],['paper',50,{fiber:45}]]},
+ 'Y2K Blue':{lbl:'Y2K',stack:[['gradmap',85,{c0:'#020b2e',c1:'#1f5eff',c2:'#d8f3ff'}],['bloom',70,{thr:60,rad:16,amt:70}],['rgbshift',40,{amt:5}],['scanlines',35,{gap:4,op:30}]]},
+ 'Thermal camera':{lbl:'THERMAL',stack:[['gradmap',100,{c0:'#0a0348',c1:'#e2452a',c2:'#ffe95c'}],['pixelate',35,{cell:5}],['scanlines',30,{gap:3,op:25}],['grain',25,{}]]},
+ 'Cyanotype':{lbl:'CYANO',stack:[['duotonefx',100,{dark:'#0b2d5c',light:'#e8f1fb'}],['grain',25,{}],['vignette',35,{}]]},
+ 'Sepia':{lbl:'SEPIA',stack:[['wash',85,{col:'#8a6a45',desat:55}],['adjust',100,{cont:108,sat:80}],['vignette',40,{}]]},
+ 'VHS tape':{lbl:'VHS',stack:[['vhs',100,{}],['rgbshift',60,{amt:5}],['adjust',100,{sat:120}]]},
+ 'Angelic':{lbl:'ANGELIC',stack:[['adjust',100,{bright:112,cont:92}],['bloom',100,{thr:45,rad:22,amt:85}],['blur',30,{r:2}],['grain',20,{}]]},
+ 'Red lights':{lbl:'RED',stack:[['gradmap',95,{c0:'#000000',c1:'#c2181f',c2:'#ffd9c9'}],['bloom',75,{thr:50,rad:18,amt:75}],['grain',30,{}]]},
+ 'Nokia 3310':{lbl:'NOKIA',stack:[['pixelate',100,{cell:9}],['duotonefx',100,{dark:'#43523d',light:'#c7f0d8'}],['thresholdfx',70,{lvl:128,soft:6}]]},
+ 'Grunge dither':{lbl:'GRUNGE',stack:[['adjust',100,{cont:130}],['ditherfx',80,{cell:2}],['paper',70,{fiber:65,crump:55}],['grain',45,{}]]},
+};
+
+function fxNewLayer(type,strength,overrides){
+  const def=FX_DEFS[type];if(!def)return null;
+  const p={};def.params.forEach(([k,,,,,dv])=>p[k]=dv);def.colors.forEach(([k,,dv])=>p[k]=dv);
+  Object.assign(p,overrides||{});
+  return{id:FX.uid++,type,s:strength==null?100:strength,on:true,open:false,p};}
+function fxLoadPreset(name){const pr=FX_PRESETS[name];if(!pr)return;
+  FX.stack=pr.stack.map(([t,s,o])=>fxNewLayer(t,s,o));
+  buildFxPanel();fxRender();toast(name);}
+
+/* ── Fuente + render pipeline ── */
+function fxSource(){let w,h;
+  if(PHOTO){w=PHOTO.naturalWidth;h=PHOTO.naturalHeight;
+    const sc=Math.min(1,FX_MAX/Math.max(w,h));w=Math.round(w*sc);h=Math.round(h*sc);}
+  else{w=880;h=560;}
+  const c=fxC(w,h);const x=c.getContext('2d');
+  if(PHOTO){x.drawImage(PHOTO,0,0,w,h);}
+  else{const g=x.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,'#6c5ce7');g.addColorStop(0.5,'#fd79a8');g.addColorStop(1,'#ffe08a');
+    x.fillStyle=g;x.fillRect(0,0,w,h);
+    x.fillStyle='rgba(10,10,12,0.85)';x.beginPath();x.arc(w*0.62,h*0.45,h*0.28,0,6.2832);x.fill();
+    x.fillStyle='#f4f2ea';x.font='600 90px Inter,system-ui,sans-serif';x.fillText('Aa',w*0.16,h*0.62);}
+  return c;}
+function fxRender(){if(MODE!=='effects')return;if(fxRAF)return;
+  fxRAF=requestAnimationFrame(()=>{fxRAF=null;_fxRender();});}
+function _fxRender(){let cur=fxSource();
+  for(const L of FX.stack){if(!L.on)continue;let out;
+    try{out=FX_DEFS[L.type].apply(cur,L.p);}catch(e){continue;}
+    if(L.s>=100){cur=out;}
+    else{const m=fxClone(cur);const x=m.getContext('2d');
+      x.globalAlpha=L.s/100;x.drawImage(out,0,0,cur.width,cur.height);x.globalAlpha=1;cur=m;}}
+  fxview.width=cur.width;fxview.height=cur.height;fxctx.drawImage(cur,0,0);
+  document.getElementById('hud-b').textContent=cur.width+'×'+cur.height+' · '+FX.stack.filter(l=>l.on).length+' fx';}
+
+/* ── Panel: stack UI ── */
+const FX_EYE='<svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const FX_X='<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const FX_UP='<svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+const FX_DN='<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>';
+function buildFxPanel(){
+  let h=`<div class="grp"><div class="grp-title">Filter stack</div>`;
+  if(!FX.stack.length)h+=`<div class="hint">Sin filtros. Añade uno abajo o elige un preset del carril izquierdo.</div>`;
+  FX.stack.forEach((L,idx)=>{const def=FX_DEFS[L.type];
+    h+=`<div class="fxl ${L.on?'':'off'} ${L.open?'open':''}" data-lid="${L.id}">
+      <div class="fxl-head" data-fxhead="${L.id}">
+        <span class="fxl-name">${def.name}</span>
+        <button class="fxl-ico" data-fxup="${L.id}" title="Subir" ${idx===0?'style="opacity:.25;pointer-events:none"':''}>${FX_UP}</button>
+        <button class="fxl-ico" data-fxdn="${L.id}" title="Bajar" ${idx===FX.stack.length-1?'style="opacity:.25;pointer-events:none"':''}>${FX_DN}</button>
+        <button class="fxl-ico eye ${L.on?'on':''}" data-fxeye="${L.id}" title="Mostrar/ocultar">${FX_EYE}</button>
+        <button class="fxl-ico del" data-fxdel="${L.id}" title="Eliminar">${FX_X}</button>
+      </div>
+      <div class="fxl-body">
+        <div class="fxl-strength"><span class="ctl-label">Strength</span>
+          <input type="range" min="0" max="100" step="1" value="${L.s}" data-fxs="${L.id}">
+          <span class="ctl-val" id="fxsv-${L.id}">${L.s}%</span></div>`;
+    def.params.forEach(([k,label,min,max,step,,unit])=>{
+      h+=`<div class="ctl"><div class="ctl-head"><span class="ctl-label">${label}</span>
+        <span class="ctl-val" id="fxv-${L.id}-${k}">${L.p[k]}${unit}</span></div>
+        <input type="range" min="${min}" max="${max}" step="${step}" value="${L.p[k]}" data-fxp="${L.id}" data-fxk="${k}" data-u="${unit}"></div>`;});
+    if(def.colors.length){h+=`<div class="ctl"><div class="swatches">`;
+      def.colors.forEach(([k,label])=>{
+        h+=`<div class="swatch"><label>${label}</label><div class="swatch-btn">
+          <span class="chip" style="background:${L.p[k]}"></span>${L.p[k]}
+          <input type="color" value="${L.p[k]}" data-fxc="${L.id}" data-fxk="${k}"></div></div>`;});
+      h+=`</div></div>`;}
+    h+=`</div></div>`;});
+  h+=`</div>`;
+  h+=`<div class="grp"><div class="grp-title">Add filter</div><div class="fx-add">
+    <select class="sel" id="fx-add-sel">${Object.entries(FX_DEFS).map(([k,d])=>`<option value="${k}">${d.name}</option>`).join('')}</select>
+    <button class="mini-btn" id="fx-add-btn">Add</button></div></div>`;
+  h+=`<div class="grp"><div class="hint">Los filtros se aplican de arriba hacia abajo. Strength mezcla cada filtro con el resultado anterior. Motor Canvas 2D original — procesado en tu navegador.</div></div>`;
+  panel.innerHTML=h;wireFx();}
+const fxById=id=>FX.stack.find(l=>l.id===+id);
+function wireFx(){
+  panel.querySelectorAll('[data-fxhead]').forEach(el=>el.addEventListener('click',e=>{
+    if(e.target.closest('.fxl-ico'))return;
+    const L=fxById(el.dataset.fxhead);L.open=!L.open;buildFxPanel();}));
+  panel.querySelectorAll('[data-fxeye]').forEach(b=>b.addEventListener('click',()=>{
+    const L=fxById(b.dataset.fxeye);L.on=!L.on;buildFxPanel();fxRender();}));
+  panel.querySelectorAll('[data-fxdel]').forEach(b=>b.addEventListener('click',()=>{
+    FX.stack=FX.stack.filter(l=>l.id!==+b.dataset.fxdel);buildFxPanel();fxRender();}));
+  panel.querySelectorAll('[data-fxup]').forEach(b=>b.addEventListener('click',()=>{
+    const i=FX.stack.findIndex(l=>l.id===+b.dataset.fxup);
+    if(i>0){[FX.stack[i-1],FX.stack[i]]=[FX.stack[i],FX.stack[i-1]];buildFxPanel();fxRender();}}));
+  panel.querySelectorAll('[data-fxdn]').forEach(b=>b.addEventListener('click',()=>{
+    const i=FX.stack.findIndex(l=>l.id===+b.dataset.fxdn);
+    if(i<FX.stack.length-1){[FX.stack[i+1],FX.stack[i]]=[FX.stack[i],FX.stack[i+1]];buildFxPanel();fxRender();}}));
+  panel.querySelectorAll('[data-fxs]').forEach(r=>r.addEventListener('input',()=>{
+    const L=fxById(r.dataset.fxs);L.s=+r.value;
+    document.getElementById('fxsv-'+L.id).textContent=L.s+'%';fxRender();}));
+  panel.querySelectorAll('[data-fxp]').forEach(r=>r.addEventListener('input',()=>{
+    const L=fxById(r.dataset.fxp);L.p[r.dataset.fxk]=+r.value;
+    document.getElementById('fxv-'+L.id+'-'+r.dataset.fxk).textContent=r.value+(r.dataset.u||'');fxRender();}));
+  panel.querySelectorAll('[data-fxc]').forEach(inp=>inp.addEventListener('input',()=>{
+    const L=fxById(inp.dataset.fxc);L.p[inp.dataset.fxk]=inp.value;
+    inp.parentElement.querySelector('.chip').style.background=inp.value;
+    inp.parentElement.childNodes[2].textContent=inp.value;fxRender();}));
+  const ab=document.getElementById('fx-add-btn');
+  if(ab)ab.addEventListener('click',()=>{
+    const t=document.getElementById('fx-add-sel').value;
+    const L=fxNewLayer(t);L.open=true;FX.stack.push(L);buildFxPanel();fxRender();});}
+
 /* ═══════════════ Mode switch ═══════════════ */
 function setMode(m){
   MODE=m;
   document.querySelectorAll('.modesw button').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));
-  const compose=m==='compose', banner=m==='banner';
+  const compose=m==='compose', banner=m==='banner', effects=m==='effects';
   glview.style.display=compose?'block':'none';
-  view.style.display=(!compose&&!banner)?'block':'none';
+  view.style.display=(!compose&&!banner&&!effects)?'block':'none';
   bannerview.style.display=banner?'block':'none';
+  fxview.style.display=effects?'block':'none';
   document.getElementById('btn-animate').style.display=compose?'':'none';
-  document.getElementById('btn-random').style.display=(compose||banner)?'':'none';
+  document.getElementById('btn-random').style.display=(compose||banner||effects)?'':'none';
   document.getElementById('drop-hint').style.display=(banner||PHOTO)?'none':'';
+  document.getElementById('hud-a').textContent=effects?'EFFECTS':compose?'GRADIENT':banner?'BANNER':'REDUCE';
   buildRail();
   if(compose){buildComposePanel();glRender();}
   else if(banner){buildBannerPanel();bRender();}
+  else if(effects){buildFxPanel();fxRender();}
   else{buildReducePanel();render();}
 }
 document.querySelectorAll('.modesw button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
@@ -640,7 +964,7 @@ document.querySelectorAll('.modesw button').forEach(b=>b.addEventListener('click
 function loadFile(file){if(!file||!file.type.startsWith('image/')){toast('Not an image file');return;}
   const img=new Image();img.onload=()=>{PHOTO=img;S.img=img;dropHint.style.display='none';
     if(glOK)uploadPhoto(img);toast(`Loaded <b>${img.naturalWidth}×${img.naturalHeight}</b>`);
-    if(MODE==='compose')glRender();else render();};
+    if(MODE==='compose')glRender();else if(MODE==='effects')fxRender();else render();};
   img.onerror=()=>toast('Could not decode image');img.src=URL.createObjectURL(file);}
 const fileInput=document.getElementById('file');
 fileInput.addEventListener('change',e=>loadFile(e.target.files[0]));
@@ -658,11 +982,16 @@ document.getElementById('btn-export').addEventListener('click',()=>{
   let canvas;
   if(MODE==='compose'){glRender();canvas=glview;}
   else if(MODE==='banner'){bRender();canvas=bannerview;}
+  else if(MODE==='effects'){_fxRender();canvas=fxview;}
   else canvas=view;
   canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);
     a.download=`iris-${MODE}-${Date.now()}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Exported <b>PNG</b>');},'image/png');});
 
 document.getElementById('btn-random').addEventListener('click',()=>{
+  if(MODE==='effects'){
+    const keys=Object.keys(FX_PRESETS);
+    fxLoadPreset(keys[Math.floor(Math.random()*keys.length)]);return;
+  }
   if(MODE==='banner'){
     const keys=Object.keys(B_TEMPLATES);Object.assign(B,B_TEMPLATES[keys[Math.floor(Math.random()*keys.length)]]);
     const lays=['split-left','split-right','centered','overlay'];B.layout=lays[Math.floor(Math.random()*lays.length)];
@@ -691,6 +1020,8 @@ document.getElementById('btn-reset-all').addEventListener('click',()=>{
     document.getElementById('btn-animate').classList.remove('on');
     if(animRAF){cancelAnimationFrame(animRAF);animRAF=null;}
     buildComposePanel();glRender();
+  }else if(MODE==='effects'){
+    FX.stack=[];buildFxPanel();fxRender();
   }else{
     Object.assign(S,S_DEFAULTS);
     buildReducePanel();render();
