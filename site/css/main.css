@@ -260,12 +260,12 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   border: 1px solid var(--line);
   border-radius: 14px;
   overflow: hidden;
-  max-width: 320px;
+  max-width: 400px;
   width: 100%;
 }
 .cta-card__media {
   position: relative;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 10;
   /* PLACEHOLDER imagen: foto de contacto 4:3, sustituir en /assets */
   background:
     repeating-linear-gradient(45deg, #171717 0 12px, #141414 12px 24px);
@@ -584,7 +584,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     align-items: end;
     gap: var(--space-5);
   }
-  .cta-card { justify-self: end; }
+  .cta-card { justify-self: end; width: 380px; max-width: none; }
 }
 
 @media (min-width: 720px) {
