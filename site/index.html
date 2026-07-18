@@ -4,20 +4,99 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IRIS — Vemos el resultado</title>
-  <meta name="description" content="Iris — estudio premium. Vemos el resultado." />
+  <meta name="description" content="Iris — estudio de diseño. Vemos el resultado." />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Inter (display + cuerpo) · Geist Mono (micro-labels) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
   <link rel="stylesheet" href="/css/main.css" />
 </head>
 <body>
-  <!-- FASE 0: scaffold. El contenido real (hero, secciones) llega en FASE 2+. -->
-  <main id="app">
-    <section class="boot">
-      <p class="boot__tag">IRIS · scaffold</p>
-      <h1 class="boot__title">Setup listo</h1>
-      <p class="boot__hint" id="gsap-check">Comprobando GSAP…</p>
-    </section>
-  </main>
+
+  <!-- ===================== NAV ===================== -->
+  <header class="nav">
+    <div class="nav__inner">
+      <a class="nav__brand" href="/">IRIS<sup>®</sup></a>
+
+      <div class="nav__center">
+        <!-- TODO Iris: ubicación real del estudio -->
+        <span class="label">[Ciudad] (ES)</span>
+        <b class="label" id="clock" style="color:var(--text)">--:--</b>
+      </div>
+
+      <nav class="nav__right">
+        <a class="nav__link" href="#trabajo">Proyectos <span>[6]</span></a>
+        <button class="nav__menu" aria-label="Abrir menú"></button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero" id="inicio">
+    <!-- Fondo: CSS "vivo" como placeholder del vídeo full-bleed -->
+    <div class="hero__bg" aria-hidden="true"></div>
+    <!--
+      TODO recurso Iris — sustituir el .hero__bg por vídeo full-bleed:
+      <video class="hero__video" autoplay loop muted playsinline
+             poster="/assets/hero-poster.jpg">
+        <source src="/assets/hero.mp4" type="video/mp4" />
+      </video>
+      Formato: mp4 H.264, mudo, en loop, cover a pantalla (fuente 16:9).
+    -->
+    <span class="ph-note" aria-hidden="true">placeholder de vídeo · hero full-bleed (mp4, mudo, loop)</span>
+
+    <div class="hero__inner">
+      <!-- Wordmark + tagline -->
+      <div class="hero__head">
+        <span class="hero__eyebrow label">© Desde — [20XX]</span>
+        <h1 class="hero__wordmark">IRIS</h1>
+        <p class="hero__tagline">
+          Vemos el resultado.
+          <span class="muted">Diseñamos con el final en la cabeza.</span>
+        </p>
+      </div>
+
+      <!-- Fila inferior de conversión -->
+      <div class="hero__foot">
+        <!-- Prueba social -->
+        <div class="rating">
+          <div class="rating__avatars" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <p class="rating__meta">
+            <b>4.9/5</b> · <span>+[40] proyectos entregados</span>
+          </p>
+        </div>
+
+        <!-- Card de conversión -->
+        <div class="cta-card">
+          <div class="cta-card__media">
+            <span class="ph-tag">Foto 4:3 → /assets</span>
+            <span class="cta-card__slots"><i class="dot"></i> 2 huecos · [mes]</span>
+          </div>
+          <div class="cta-card__body">
+            <p class="cta-card__name">[Tu nombre]</p>
+            <p class="cta-card__role">Dirección de proyecto</p>
+            <p class="cta-card__price">Proyectos <b>desde [X.XXX] €</b></p>
+            <a class="cta-btn" href="#contacto">
+              Reserva una llamada de 15 min
+              <span class="cta-btn__arrow">↗</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Propuesta de valor -->
+        <p class="hero__pitch">
+          <b>Repensamos cómo nace un buen diseño.</b> Sin reuniones eternas,
+          sin promesas vacías. Solo trabajo excelente de un equipo sénior que
+          se convierte en una extensión del tuyo.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <script type="module" src="/js/main.js"></script>
 </body>
 </html>

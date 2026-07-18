@@ -1,23 +1,34 @@
 /* =========================================================
-   IRIS — tokens base (FASE 0)
-   Todos los valores se centralizan aquí como custom properties.
-   Los valores definitivos (paleta/tipografía exactas de Mugen)
-   se fijan tras la FASE 1 de inspección.
+   IRIS — hoja de estilos
+   Todos los tokens (color, tipografía, espaciado) viven aquí
+   como custom properties. Nada de valores hardcodeados sueltos.
+   Base visual modelada sobre Mugen (monocroma) + acento propio.
    ========================================================= */
 
 :root {
-  /* Color — placeholders provisionales, se ajustan en FASE 1 */
-  --bg:      #0a0a0a;
-  --surface: #111111;
-  --text:    #f5f5f5;
-  --muted:   #a3a3a3;
-  --accent:  #ffffff;
+  /* ---- Color (paleta exacta de Mugen, monocroma) ---- */
+  --bg:          #050505;   /* fondo base */
+  --surface:     #0d0d0d;   /* superficie elevada / nav */
+  --card:        #1c1c1c;   /* tarjetas oscuras, chips */
+  --line:        #363636;   /* bordes 1px, divisores */
+  --dim:         #545454;   /* texto muy secundario */
+  --muted:       #b8b8b8;   /* cuerpo secundario */
+  --text:        #ffffff;   /* texto principal */
+  --invert-bg:   #ffffff;   /* fondo de superficies claras / CTA */
+  --invert-text: #050505;
 
-  /* Tipografía — se fija en FASE 1 */
-  --font-display: system-ui, sans-serif;
-  --font-body:    system-ui, sans-serif;
+  /* ---- Acento de Iris (único color; solo CTA/hover/foco) ---- */
+  --accent:      #6e5bff;   /* violeta-iris — cámbialo aquí y afecta a todo */
+  --accent-ink:  #ffffff;   /* texto sobre el acento */
 
-  /* Espaciado (escala modular) */
+  /* ---- Tipografía ---- */
+  --font-display: 'Inter', system-ui, sans-serif; /* display + titulares + cuerpo */
+  --font-mono:    'Geist Mono', ui-monospace, monospace; /* micro-labels técnicos */
+  --tracking-display: -0.04em;  /* tracking apretado del display */
+  --tracking-tight:   -0.02em;
+  --weight-body: 600;           /* Mugen pone el cuerpo en semibold */
+
+  /* ---- Espaciado (escala modular) ---- */
   --space-1: 0.5rem;
   --space-2: 1rem;
   --space-3: 1.5rem;
@@ -26,52 +37,302 @@
   --space-6: 6rem;
   --space-7: 9rem;
 
-  /* Layout */
-  --maxw: 1280px;
-  --gutter: clamp(1rem, 5vw, 4rem);
+  /* ---- Layout ---- */
+  --maxw: 1440px;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --nav-h: 56px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; padding: 0; }
 
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-body);
+  font-family: var(--font-display);
+  font-weight: var(--weight-body);
+  font-size: 1rem;
   line-height: 1.5;
+  letter-spacing: var(--tracking-tight);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
-/* --- boot / scaffold placeholder --- */
-.boot {
+a { color: inherit; text-decoration: none; }
+img, video { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+/* Contenedor centrado */
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Micro-label técnico reutilizable (reloj, tags, contadores) */
+.label {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.6875rem;      /* 11px */
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   NAV — sticky, translúcido con blur. Minimalista.
+   Izq: wordmark · Centro: ubicación + reloj vivo · Der: link + menú
+   ========================================================= */
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 100;
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: linear-gradient(to bottom, rgba(5,5,5,0.55), rgba(5,5,5,0));
+}
+.nav__inner {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-2);
+}
+.nav__brand {
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  font-size: 0.95rem;
+}
+.nav__brand sup { font-size: 0.6em; vertical-align: super; color: var(--muted); }
+.nav__center {
+  justify-self: center;
+  display: none;                /* oculto en móvil, se muestra en desktop */
+  gap: var(--space-2);
+  align-items: baseline;
+}
+.nav__center b { color: var(--text); font-weight: 600; }
+.nav__right {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.nav__link { font-size: 0.85rem; font-weight: 600; }
+.nav__link span { color: var(--muted); font-family: var(--font-mono); font-size: 0.7em; }
+.nav__menu {
+  width: 26px; height: 12px; position: relative;
+}
+.nav__menu::before, .nav__menu::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 1.5px;
+  background: var(--text); transition: transform .3s ease;
+}
+.nav__menu::before { top: 0; }
+.nav__menu::after  { bottom: 0; }
+
+/* =========================================================
+   HERO — vídeo full-bleed + wordmark gigante + card de conversión
+   ========================================================= */
+.hero {
+  position: relative;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  text-align: center;
-  padding: var(--gutter);
+  overflow: hidden;
+  padding-top: var(--nav-h);
 }
-.boot__tag {
-  font-family: var(--font-body);
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 0.75rem;
+
+/* --- Fondo: PLACEHOLDER de vídeo ---
+   Sustituir por <video> full-bleed (mp4 H.264 mudo en loop, cover).
+   Mientras tanto, fondo CSS "vivo" para que el hero no salga vacío. */
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(120% 90% at 50% 12%, rgba(110,91,255,0.10), transparent 55%),
+    radial-gradient(80% 60% at 50% 100%, rgba(255,255,255,0.05), transparent 60%),
+    #050505;
+}
+.hero__bg::after {          /* prisma sutil como marcador del vídeo */
+  content: "";
+  position: absolute;
+  left: 50%; top: 52%;
+  width: min(70vw, 640px); aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotate(0deg);
+  background:
+    conic-gradient(from 0deg, rgba(255,255,255,0.06), rgba(110,91,255,0.05), rgba(255,255,255,0.02), rgba(255,255,255,0.06));
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  filter: blur(4px);
+  opacity: 0.7;
+  animation: heroSpin 40s linear infinite;
+}
+@keyframes heroSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+.hero__video {              /* activar cuando exista el asset */
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.hero__bg,
+.hero__video { pointer-events: none; }
+
+/* Placeholder-note flotante (solo dev): quitar al añadir vídeo real */
+.ph-note {
+  position: absolute; z-index: 3; left: 50%; bottom: 8px; transform: translateX(-50%);
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .05em;
+  color: var(--dim); border: 1px dashed var(--line); border-radius: 999px;
+  padding: 4px 10px; white-space: nowrap;
+}
+
+/* --- Contenido del hero por encima del fondo --- */
+.hero__inner {
+  position: relative; z-index: 2;
+  flex: 1;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  padding-block: var(--space-4) var(--space-4);
+}
+
+/* Bloque superior: wordmark + tagline */
+.hero__head { align-self: center; }
+.hero__eyebrow {
+  display: inline-flex; align-items: center; gap: .5em;
+  margin-bottom: var(--space-2);
+}
+.hero__wordmark {
+  font-weight: 700;
+  font-size: clamp(4.5rem, 22vw, 18rem);
+  line-height: 0.82;
+  letter-spacing: var(--tracking-display);
+  color: var(--text);
+}
+.hero__tagline {
+  margin-top: var(--space-3);
+  font-size: clamp(1.1rem, 2.4vw, 1.9rem);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+  max-width: 22ch;
+  color: var(--text);
+}
+.hero__tagline .muted { color: var(--muted); }
+
+/* Fila inferior: rating · card conversión · propuesta */
+.hero__foot {
+  align-self: end;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  padding-top: var(--space-5);
+}
+
+/* Rating / prueba social */
+.rating { display: flex; align-items: center; gap: var(--space-2); }
+.rating__avatars { display: flex; }
+.rating__avatars span {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 1.5px solid var(--bg);
+  margin-left: -8px;
+  background: linear-gradient(135deg, var(--card), var(--line));
+}
+.rating__avatars span:first-child { margin-left: 0; }
+.rating__meta { font-size: 0.8rem; }
+.rating__meta b { color: var(--text); }
+.rating__meta span { color: var(--muted); }
+
+/* Card de conversión flotante */
+.cta-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  max-width: 320px;
+  width: 100%;
+}
+.cta-card__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  /* PLACEHOLDER imagen: foto de contacto 4:3, sustituir en /assets */
+  background:
+    repeating-linear-gradient(45deg, #171717 0 12px, #141414 12px 24px);
+  display: grid; place-items: center;
+}
+.cta-card__media .ph-tag {
+  font-family: var(--font-mono); font-size: 10px; color: var(--dim);
+  letter-spacing: .08em; text-transform: uppercase;
+}
+.cta-card__slots {
+  position: absolute; left: 12px; top: 12px;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(5,5,5,0.7); backdrop-filter: blur(6px);
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 4px 10px; font-family: var(--font-mono); font-size: 10px;
   color: var(--muted);
 }
-.boot__title {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 8vw, 4rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+.cta-card__slots .dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
 }
-.boot__hint { color: var(--muted); font-size: 0.9rem; }
-.boot__hint.ok { color: #4ade80; }
+.cta-card__body { padding: var(--space-2); }
+.cta-card__name { font-weight: 700; font-size: 0.95rem; }
+.cta-card__role { color: var(--muted); font-size: 0.8rem; margin-bottom: var(--space-2); }
+.cta-card__price { color: var(--muted); font-size: 0.8rem; margin-bottom: var(--space-2); }
+.cta-card__price b { color: var(--text); }
+.cta-btn {
+  display: inline-flex; align-items: center; justify-content: space-between; gap: .75em;
+  width: 100%;
+  background: var(--invert-bg); color: var(--invert-text);
+  border-radius: 10px; padding: 12px 16px;
+  font-weight: 700; font-size: 0.9rem;
+  transition: background .25s ease, color .25s ease, transform .25s ease;
+}
+.cta-btn:hover { background: var(--accent); color: var(--accent-ink); transform: translateY(-1px); }
+.cta-btn__arrow { transition: transform .25s ease; }
+.cta-btn:hover .cta-btn__arrow { transform: translate(3px, -3px); }
 
+/* Propuesta de valor (texto con énfasis) */
+.hero__pitch {
+  font-size: 1rem;
+  font-weight: 600;
+  max-width: 42ch;
+  letter-spacing: var(--tracking-tight);
+  color: var(--muted);
+}
+.hero__pitch b { color: var(--text); font-weight: 600; }
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+@media (min-width: 720px) {
+  :root { --nav-h: 64px; }
+  .nav__center { display: flex; }
+  .hero__foot {
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+  }
+  .hero__foot .rating { align-self: end; }
+  .cta-card { justify-self: center; }
+  .hero__pitch { justify-self: end; text-align: left; }
+}
+
+@media (min-width: 1080px) {
+  .hero__tagline { font-size: clamp(1.5rem, 2.2vw, 2rem); }
+}
+
+/* Respeta preferencias de movimiento reducido */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

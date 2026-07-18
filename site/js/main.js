@@ -1,25 +1,18 @@
-// IRIS — entrada JS (FASE 0)
-// Confirma que GSAP y sus plugins cargan por npm. Las animaciones
-// reales se añaden por capas en la FASE 4.
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ScrollSmoother } from 'gsap/ScrollSmoother'
-import { SplitText } from 'gsap/SplitText'
+// IRIS — JS de la web
+// FASE 2: solo contenido "vivo" (reloj del nav). Las animaciones GSAP
+// (ScrollSmoother, reveals SplitText, etc.) se añaden por capas en la FASE 4.
 
-gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText)
-
-// Verificación visible de que el stack arranca
-const check = document.getElementById('gsap-check')
-if (check) {
-  const plugins = [
-    ['gsap', typeof gsap?.version === 'string'],
-    ['ScrollTrigger', !!ScrollTrigger],
-    ['ScrollSmoother', !!ScrollSmoother],
-    ['SplitText', !!SplitText],
-  ]
-  const ok = plugins.every(([, present]) => present)
-  check.textContent = ok
-    ? `GSAP ${gsap.version} + ScrollTrigger, ScrollSmoother, SplitText ✓`
-    : 'Fallo cargando algún plugin de GSAP'
-  check.classList.toggle('ok', ok)
+/* ---- Reloj en vivo del nav (detalle firma) ---- */
+const clockEl = document.getElementById('clock')
+if (clockEl) {
+  const fmt = new Intl.DateTimeFormat('es-ES', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    // TODO Iris: fija la zona horaria del estudio (ej. 'Europe/Madrid')
+    timeZone: 'Europe/Madrid',
+  })
+  const tick = () => { clockEl.textContent = fmt.format(new Date()) }
+  tick()
+  setInterval(tick, 1000 * 15)
 }
