@@ -260,12 +260,16 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   border: 1px solid var(--line);
   border-radius: 14px;
   overflow: hidden;
-  max-width: 400px;
   width: 100%;
+  max-width: 340px;
+  aspect-ratio: 1 / 1;      /* siempre cuadrada */
+  display: flex;
+  flex-direction: column;
 }
 .cta-card__media {
   position: relative;
-  aspect-ratio: 16 / 10;
+  flex: 1 1 auto;           /* la foto rellena el espacio para mantener el 1:1 */
+  min-height: 0;
   /* PLACEHOLDER imagen: foto de contacto 4:3, sustituir en /assets */
   background:
     repeating-linear-gradient(45deg, #171717 0 12px, #141414 12px 24px);
@@ -275,6 +279,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   font-family: var(--font-mono); font-size: 10px; color: var(--dim);
   letter-spacing: .08em; text-transform: uppercase;
 }
+.cta-card__media img { width: 100%; height: 100%; object-fit: cover; } /* tu foto rellena el cuadrado */
 .cta-card__slots {
   position: absolute; left: 12px; top: 12px;
   display: inline-flex; align-items: center; gap: 6px;
@@ -584,7 +589,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     align-items: end;
     gap: var(--space-5);
   }
-  .cta-card { justify-self: end; width: 380px; max-width: none; }
+  .cta-card { justify-self: end; width: 340px; max-width: none; }
 }
 
 @media (min-width: 720px) {
