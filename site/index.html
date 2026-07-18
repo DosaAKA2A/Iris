@@ -27,7 +27,7 @@
       </div>
 
       <nav class="nav__right">
-        <a class="nav__link" href="#trabajo">Proyectos <span>[6]</span></a>
+        <a class="nav__link" href="#proyectos">Proyectos <span>[6]</span></a>
         <button class="nav__menu" aria-label="Abrir menú"></button>
       </nav>
     </div>
@@ -97,12 +97,67 @@
     </div>
   </section>
 
-  <!-- ===================== CASE STUDIES ===================== -->
+  <!-- ===================== PROYECTOS (sticky-swap, como el Services de Mugen) ===================== -->
+  <!-- Contenido de MUESTRA. La imagen cambia al hacer scroll (JS: IntersectionObserver + sticky). -->
+  <section class="section proyectos" id="proyectos">
+    <div class="wrap">
+      <header class="section__head">
+        <span class="section__label label">[01] — Trabajo destacado</span>
+        <h2 class="section__title">Proyectos</h2>
+      </header>
+
+      <div class="swap">
+        <!-- Media sticky: cambia según el proyecto activo -->
+        <div class="swap__media">
+          <div class="swap__frame">
+            <div class="swap__img ph is-active" data-index="0"><span class="ph__tag">Aurora · imagen 4:3 → /assets</span></div>
+            <div class="swap__img ph" data-index="1"><span class="ph__tag">Vértice · imagen 4:3 → /assets</span></div>
+            <div class="swap__img ph" data-index="2"><span class="ph__tag">Cobalto · imagen 4:3 → /assets</span></div>
+            <div class="swap__img ph" data-index="3"><span class="ph__tag">Módulo · imagen 4:3 → /assets</span></div>
+          </div>
+        </div>
+
+        <!-- Lista de proyectos (cada uno es un "paso" del scroll) -->
+        <ol class="swap__list">
+          <li class="swap__step is-active" data-index="0">
+            <span class="swap__num label">01</span>
+            <h3 class="swap__title">Aurora</h3>
+            <p class="swap__cat label">Identidad &amp; Producto — 2025</p>
+            <p class="swap__desc">Rediseño de marca y sistema de producto para una fintech en expansión. [texto de muestra]</p>
+            <a class="swap__link" href="#">Ver caso <span aria-hidden="true">↗</span></a>
+          </li>
+          <li class="swap__step" data-index="1">
+            <span class="swap__num label">02</span>
+            <h3 class="swap__title">Vértice</h3>
+            <p class="swap__cat label">Marca &amp; Web — 2025</p>
+            <p class="swap__desc">Identidad y sitio para un estudio de arquitectura. [texto de muestra]</p>
+            <a class="swap__link" href="#">Ver caso <span aria-hidden="true">↗</span></a>
+          </li>
+          <li class="swap__step" data-index="2">
+            <span class="swap__num label">03</span>
+            <h3 class="swap__title">Cobalto</h3>
+            <p class="swap__cat label">Sistema de diseño — 2024</p>
+            <p class="swap__desc">Design system multiplataforma con documentación viva. [texto de muestra]</p>
+            <a class="swap__link" href="#">Ver caso <span aria-hidden="true">↗</span></a>
+          </li>
+          <li class="swap__step" data-index="3">
+            <span class="swap__num label">04</span>
+            <h3 class="swap__title">Módulo</h3>
+            <p class="swap__cat label">Identidad &amp; Producto — 2024</p>
+            <p class="swap__desc">Plataforma SaaS de gestión modular, de la marca al producto. [texto de muestra]</p>
+            <a class="swap__link" href="#">Ver caso <span aria-hidden="true">↗</span></a>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CASOS DE ESTUDIO (grid masonry) ===================== -->
   <!-- Contenido de MUESTRA (nombres/años inventados). Reemplaza por tus casos reales. -->
   <section class="section trabajo" id="trabajo">
     <div class="wrap">
       <header class="section__head">
-        <span class="section__label label">[01] — Trabajo seleccionado</span>
+        <span class="section__label label">[02] — El archivo</span>
         <h2 class="section__title">Casos de estudio</h2>
       </header>
 
@@ -183,37 +238,6 @@
     </div>
   </section>
 
-  <!-- ===================== SERVICIOS ===================== -->
-  <section class="section servicios" id="servicios">
-    <div class="wrap">
-      <header class="section__head section__head--split">
-        <div>
-          <span class="section__label label">[02] — Qué hacemos</span>
-          <h2 class="section__title">Servicios</h2>
-        </div>
-        <p class="section__intro">
-          Capacidades de diseño de espectro completo bajo un mismo techo. Tanto si
-          necesitas una renovación de marca completa como soporte creativo continuo,
-          tenemos el equipo sénior para entregarlo.
-        </p>
-      </header>
-
-      <!-- Lista sticky (izq) + media grande (der). El swap por scroll llega en FASE 4. -->
-      <div class="services">
-        <ul class="services__list">
-          <li class="services__item is-active"><span class="label">01</span> Identidad de marca</li>
-          <li class="services__item"><span class="label">02</span> Diseño digital</li>
-          <li class="services__item"><span class="label">03</span> Diseño de producto</li>
-          <li class="services__item"><span class="label">04</span> Marketing &amp; crecimiento</li>
-          <li class="services__item"><span class="label">05</span> Desarrollo</li>
-        </ul>
-        <div class="services__media ph">
-          <span class="ph__tag">Imagen 4:3 → /assets (cambia por servicio en FASE 4)</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- ===================== PROCESO ===================== -->
   <section class="section proceso" id="proceso">
     <div class="wrap">
@@ -247,12 +271,57 @@
     </div>
   </section>
 
+  <!-- ===================== SERVICIOS (qué hacemos) ===================== -->
+  <section class="section servicios" id="servicios">
+    <div class="wrap">
+      <header class="section__head section__head--split">
+        <div>
+          <span class="section__label label">[04] — Qué hacemos</span>
+          <h2 class="section__title">Servicios</h2>
+        </div>
+        <p class="section__intro">
+          Capacidades de diseño de espectro completo bajo un mismo techo. Tanto si
+          necesitas una renovación de marca completa como soporte creativo continuo,
+          tenemos el equipo sénior para entregarlo.
+        </p>
+      </header>
+
+      <ul class="svc">
+        <li class="svc__item">
+          <span class="svc__num label">01</span>
+          <h3 class="svc__name">Identidad de marca</h3>
+          <p class="svc__desc">Naming, sistemas visuales y guías que hacen tu marca inconfundible.</p>
+        </li>
+        <li class="svc__item">
+          <span class="svc__num label">02</span>
+          <h3 class="svc__name">Diseño digital</h3>
+          <p class="svc__desc">Webs e interfaces que convierten, no solo lucen bien.</p>
+        </li>
+        <li class="svc__item">
+          <span class="svc__num label">03</span>
+          <h3 class="svc__name">Diseño de producto</h3>
+          <p class="svc__desc">De la idea al producto usable, iterando con criterio.</p>
+        </li>
+        <li class="svc__item">
+          <span class="svc__num label">04</span>
+          <h3 class="svc__name">Marketing &amp; crecimiento</h3>
+          <p class="svc__desc">Creatividad que mueve las métricas del negocio.</p>
+        </li>
+        <li class="svc__item">
+          <span class="svc__num label">05</span>
+          <h3 class="svc__name">Desarrollo</h3>
+          <p class="svc__desc">Implementación limpia, lista para producción y para escalar.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
   <!-- ===================== PRICING ===================== -->
   <section class="section pricing" id="precios">
     <div class="wrap">
       <header class="section__head section__head--split">
         <div>
-          <span class="section__label label">[04] — Planes</span>
+          <span class="section__label label">[05] — Planes</span>
           <h2 class="section__title">Hecho para escalar</h2>
         </div>
         <p class="section__intro">
@@ -312,7 +381,7 @@
   <section class="section testimonios" id="testimonios">
     <div class="wrap">
       <header class="section__head">
-        <span class="section__label label">[05] — Confianza</span>
+        <span class="section__label label">[06] — Confianza</span>
         <h2 class="section__title">La confianza de equipos<br>que no se conforman.</h2>
       </header>
 
@@ -348,7 +417,7 @@
     <div class="wrap">
       <header class="section__head section__head--split">
         <div>
-          <span class="section__label label">[06] — Dudas</span>
+          <span class="section__label label">[07] — Dudas</span>
           <h2 class="section__title">Preguntas<br>frecuentes</h2>
         </div>
         <div class="faq__list">

@@ -379,24 +379,58 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .case__cat { color: var(--muted); font-size: .85rem; margin-top: 2px; }
 
 /* =========================================================
-   SERVICIOS — lista + media
+   PROYECTOS — sticky-swap (media fija + lista que hace scroll)
+   La imagen activa cambia con el scroll (JS: IntersectionObserver).
    ========================================================= */
-.services { display: grid; gap: var(--space-4); }
-.services__list { list-style: none; }
-.services__item {
-  display: flex; align-items: baseline; gap: var(--space-2);
-  padding-block: var(--space-3);
-  border-top: 1px solid var(--line);
-  font-size: clamp(1.5rem, 4vw, 2.2rem);
-  font-weight: 600; letter-spacing: var(--tracking-tight);
-  color: var(--dim);
-  transition: color .25s ease;
+.swap { display: grid; gap: var(--space-3); }
+.swap__media { position: sticky; top: calc(var(--nav-h) + var(--space-2)); z-index: 1; }
+.swap__frame {
+  position: relative; width: 100%;
+  aspect-ratio: 16 / 11;
+  border-radius: 14px; overflow: hidden;
+  border: 1px solid var(--line);
 }
-.services__item:last-child { border-bottom: 1px solid var(--line); }
-.services__item .label { color: var(--muted); }
-.services__item.is-active,
-.services__item:hover { color: var(--text); }
-.services__media { aspect-ratio: 4 / 3; border-radius: 12px; }
+.swap__img { position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease; }
+.swap__img.is-active { opacity: 1; }
+.swap__list { list-style: none; }
+.swap__step {
+  border-top: 1px solid var(--line);
+  padding-block: var(--space-4);
+  opacity: .38; transition: opacity .35s ease;
+}
+.swap__step:last-child { border-bottom: 1px solid var(--line); }
+.swap__step.is-active { opacity: 1; }
+.swap__num { display: block; color: var(--muted); margin-bottom: var(--space-2); }
+.swap__title {
+  font-size: clamp(2rem, 6vw, 3.25rem);
+  font-weight: 600; letter-spacing: var(--tracking-display); line-height: 1;
+}
+.swap__cat { display: block; color: var(--muted); margin-top: var(--space-2); }
+.swap__desc { color: var(--muted); margin-top: var(--space-2); max-width: 46ch; }
+.swap__link {
+  display: inline-flex; align-items: center; gap: .4em; margin-top: var(--space-3);
+  font-weight: 600; font-size: .9rem;
+  border-bottom: 1px solid var(--line); padding-bottom: 2px;
+  transition: border-color .25s ease;
+}
+.swap__link:hover { border-color: var(--accent); }
+
+/* =========================================================
+   SERVICIOS — lista con descripciones
+   ========================================================= */
+.svc { list-style: none; }
+.svc__item {
+  border-top: 1px solid var(--line);
+  padding-block: var(--space-3);
+  display: grid; gap: var(--space-1);
+}
+.svc__item:last-child { border-bottom: 1px solid var(--line); }
+.svc__num { color: var(--muted); }
+.svc__name {
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  font-weight: 600; letter-spacing: var(--tracking-tight);
+}
+.svc__desc { color: var(--muted); max-width: 52ch; }
 
 /* =========================================================
    PROCESO — pasos
@@ -561,8 +595,12 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
     align-items: end;
   }
   .cases { columns: 2; }
-  .services { grid-template-columns: 1fr 1.1fr; align-items: start; }
-  .services__list { position: sticky; top: calc(var(--nav-h) + var(--space-3)); }
+  .swap { grid-template-columns: 1fr 1.15fr; gap: var(--space-5); align-items: start; }
+  .swap__list { order: 1; }
+  .swap__media { order: 2; top: calc(var(--nav-h) + var(--space-4)); height: min(74vh, 660px); }
+  .swap__frame { aspect-ratio: auto; height: 100%; }
+  .swap__step { min-height: 62vh; display: flex; flex-direction: column; justify-content: center; }
+  .svc__item { grid-template-columns: 72px 1fr 1.4fr; align-items: baseline; gap: var(--space-3); }
   .steps { grid-template-columns: repeat(2, 1fr); column-gap: var(--space-4); }
   .plans { grid-template-columns: repeat(3, 1fr); }
   .quotes { grid-template-columns: repeat(3, 1fr); }

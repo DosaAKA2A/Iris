@@ -20,3 +20,24 @@ if (clocks.length) {
 /* ---- Año dinámico del footer ---- */
 const yearEl = document.getElementById('year')
 if (yearEl) yearEl.textContent = new Date().getFullYear()
+
+/* ---- Proyectos: sticky-swap (la imagen cambia con el scroll) ----
+   Versión base con IntersectionObserver. En la FASE 4 se pule con GSAP
+   (pin suave, crossfade, parallax). */
+const swap = document.querySelector('.proyectos .swap')
+if (swap) {
+  const steps = [...swap.querySelectorAll('.swap__step')]
+  const imgs = [...swap.querySelectorAll('.swap__img')]
+  const setActive = (i) => {
+    steps.forEach((s) => s.classList.toggle('is-active', Number(s.dataset.index) === i))
+    imgs.forEach((m) => m.classList.toggle('is-active', Number(m.dataset.index) === i))
+  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) setActive(Number(e.target.dataset.index)) })
+    },
+    // Banda de activación estrecha en el centro del viewport
+    { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
+  )
+  steps.forEach((s) => io.observe(s))
+}
