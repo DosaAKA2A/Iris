@@ -1,0 +1,82 @@
+/* =========================================================
+   IRIS — tokens base (FASE 0)
+   Todos los valores se centralizan aquí como custom properties.
+   Los valores definitivos (paleta/tipografía exactas de Mugen)
+   se fijan tras la FASE 1 de inspección.
+   ========================================================= */
+
+:root {
+  /* Color — placeholders provisionales, se ajustan en FASE 1 */
+  --bg:      #0a0a0a;
+  --surface: #111111;
+  --text:    #f5f5f5;
+  --muted:   #a3a3a3;
+  --accent:  #ffffff;
+
+  /* Tipografía — se fija en FASE 1 */
+  --font-display: system-ui, sans-serif;
+  --font-body:    system-ui, sans-serif;
+
+  /* Espaciado (escala modular) */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 4rem;
+  --space-6: 6rem;
+  --space-7: 9rem;
+
+  /* Layout */
+  --maxw: 1280px;
+  --gutter: clamp(1rem, 5vw, 4rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* --- boot / scaffold placeholder --- */
+.boot {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  text-align: center;
+  padding: var(--gutter);
+}
+.boot__tag {
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.boot__title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 8vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.boot__hint { color: var(--muted); font-size: 0.9rem; }
+.boot__hint.ok { color: #4ade80; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
