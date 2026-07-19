@@ -676,6 +676,45 @@ body.menu-open { overflow: hidden; }
   .case--c { margin-top: calc(var(--space-6) * -0.4); }
 }
 
+/* =========================================================
+   FASE 4 · capa 4 — hover & micro-interacciones
+   Subrayado animado, flechas deslizantes, hover de FAQ. El efecto
+   "imán" de los CTA se añade por JS (main.js). Todo se neutraliza
+   en prefers-reduced-motion (bloque de abajo).
+   ========================================================= */
+
+/* Subrayado que barre desde la izquierda (nav + footer) */
+.nav__link,
+.footer__nav a { position: relative; }
+.nav__link::after,
+.footer__nav a::after {
+  content: ""; position: absolute; left: 0; bottom: -3px;
+  width: 100%; height: 1px; background: currentColor;
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .35s cubic-bezier(.7, 0, .2, 1);
+}
+.nav__link:hover::after,
+.footer__nav a:hover::after { transform: scaleX(1); }
+.nav__link { transition: color .2s ease; }
+
+/* Flechas (↗) que se deslizan al pasar el ratón */
+.swap__link span,
+.menu__cta span { display: inline-block; transition: transform .25s ease; }
+.swap__link:hover span,
+.menu__cta:hover span { transform: translate(3px, -3px); }
+
+/* La flecha "Pedir presupuesto" del plan a medida también */
+.plan--quote .plan__btn span { display: inline-block; transition: transform .25s ease; }
+.plan--quote .plan__btn:hover span { transform: translate(3px, -3px); }
+
+/* FAQ: resaltar la pregunta al pasar por encima */
+.faq__item summary { transition: color .2s ease; }
+.faq__item summary:hover { color: var(--text); }
+.faq__item summary:hover::after { color: var(--accent); }
+
+/* Los CTA "imán" (JS) necesitan capa propia de composición */
+.cta-btn, .plan__btn, .menu__cta, .footer__field button, .nav__menu { will-change: transform; }
+
 /* Respeta preferencias de movimiento reducido */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

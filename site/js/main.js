@@ -107,6 +107,29 @@ if (!prefersReduced) {
   ;['.svc__item', '.step', '.plan', '.quote', '.faq__item'].forEach((s) => batchReveal(s))
 }
 
+/* ---- FASE 4 · capa 4: micro-interacciones — CTA "imán" ----
+   Los botones principales siguen sutilmente al cursor y vuelven a su sitio al
+   salir. gsap.quickTo da un seguimiento suave. Solo con puntero fino (ratón)
+   y sin prefers-reduced-motion; en táctil no aplica. */
+if (!prefersReduced && window.matchMedia('(pointer: fine)').matches) {
+  const magnets = document.querySelectorAll(
+    '.cta-btn, .plan__btn, .menu__cta, .footer__field button, .nav__menu'
+  )
+  magnets.forEach((el) => {
+    const xTo = gsap.quickTo(el, 'x', { duration: 0.5, ease: 'power3.out' })
+    const yTo = gsap.quickTo(el, 'y', { duration: 0.5, ease: 'power3.out' })
+    const strength = 0.35 // fracción del desplazamiento del cursor (sutil)
+    const max = 10 // tope en px para que no se despegue del layout
+    const clamp = (v) => Math.max(-max, Math.min(max, v))
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect()
+      xTo(clamp((e.clientX - (r.left + r.width / 2)) * strength))
+      yTo(clamp((e.clientY - (r.top + r.height / 2)) * strength))
+    })
+    el.addEventListener('pointerleave', () => { xTo(0); yTo(0) })
+  })
+}
+
 /* ---- Reloj en vivo (nav + footer, detalle firma) ---- */
 const clocks = [
   document.getElementById('clock'),
