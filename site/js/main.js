@@ -242,53 +242,30 @@ if (swap) {
       })
     )
   } else {
-    const mm = gsap.matchMedia()
-
-    // Desktop: la sección se CLAVA (pin) y la tira se desliza con el scroll.
-    mm.add('(min-width: 1024px)', () => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: swap,
-          start: 'center center',
-          // distancia del pin: ~0.7 viewports por transición (cambia antes)
-          end: () => '+=' + (n - 1) * window.innerHeight * 0.7,
-          pin: true,
-          scrub: 0.25, // seguimiento ágil (menos inercia = se posiciona antes)
-          // Snap por PROXIMIDAD: encaja en la imagen que quede mayoritariamente
-          // visible en el marco (la más cercana), sin forzar el sentido del
-          // scroll. Asentamiento breve para que se sienta natural.
-          snap: {
-            snapTo: 1 / (n - 1),
-            duration: { min: 0.12, max: 0.28 },
-            delay: 0.02,
-            ease: 'power1.out',
-            directional: false,
-          },
-          onUpdate: (self) => setStep(Math.round(self.progress * (n - 1))),
+    // Pin en todos los tamaños (el pin de ScrollTrigger sí funciona bien con
+    // ScrollSmoother; la CSS ajusta el layout 1 col en móvil / 2 col en desktop).
+    // La sección se CLAVA y la tira de imágenes se desliza con el scroll (scrub).
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: swap,
+        start: 'center center',
+        // distancia del pin: ~0.7 viewports por transición (cambia antes)
+        end: () => '+=' + (n - 1) * window.innerHeight * 0.7,
+        pin: true,
+        scrub: 0.25, // seguimiento ágil (menos inercia = se posiciona antes)
+        // Snap por PROXIMIDAD: encaja en la imagen que quede mayoritariamente
+        // visible en el marco (la más cercana), sin forzar el sentido del scroll.
+        snap: {
+          snapTo: 1 / (n - 1),
+          duration: { min: 0.12, max: 0.28 },
+          delay: 0.02,
+          ease: 'power1.out',
+          directional: false,
         },
-      })
-      tl.to(track, { yPercent: -(n - 1) * 100, ease: 'none' })
-      return () => {
-        if (tl.scrollTrigger) tl.scrollTrigger.kill()
-        tl.kill()
-        gsap.set(track, { clearProps: 'transform' })
-      }
+        onUpdate: (self) => setStep(Math.round(self.progress * (n - 1))),
+        invalidateOnRefresh: true, // recalcula distancia al rotar/redimensionar
+      },
     })
-
-    // Móvil: sin pin. Cada paso desliza la tira a su imagen al cruzar el viewport.
-    mm.add('(max-width: 1023px)', () => {
-      const trs = steps.map((s) =>
-        ScrollTrigger.create({
-          trigger: s, start: 'top 60%', end: 'bottom 40%',
-          onToggle: (self) => {
-            if (!self.isActive) return
-            const i = Number(s.dataset.index)
-            setStep(i)
-            gsap.to(track, { yPercent: -i * 100, duration: 0.5, ease: 'power2.out' })
-          },
-        })
-      )
-      return () => trs.forEach((t) => t.kill())
-    })
+    tl.to(track, { yPercent: -(n - 1) * 100, ease: 'none' })
   }
 }
