@@ -12,6 +12,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
-    assetsDir: 'assets',
+    // Bundles del home en /app para NO mezclarse con /assets (favicon, logos,
+    // imágenes de proyectos) al desplegar en la raíz del repo (iris.it.com).
+    assetsDir: 'app',
   },
 })
