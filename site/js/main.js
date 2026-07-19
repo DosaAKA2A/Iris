@@ -185,26 +185,69 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
   })
 })
 
-/* ---- Proyectos: sticky-swap (la imagen cambia con el scroll) ----
-   Versión base con IntersectionObserver. En la FASE 4 se pule con GSAP
-   (pin suave, crossfade, parallax). */
+/* ---- Proyectos: pin + tira de imágenes scrubbed ----
+   El marco queda fijo (pin) y la TIRA de imágenes se desliza DENTRO al ritmo
+   del scroll (scrub), a la vez que se resalta el proyecto en la lista. */
 const swap = document.querySelector('.proyectos .swap')
 if (swap) {
   const steps = [...swap.querySelectorAll('.swap__step')]
-  const imgs = [...swap.querySelectorAll('.swap__img')]
-  const setActive = (i) => {
+  const track = swap.querySelector('.swap__track')
+  const n = steps.length
+  const setStep = (i) =>
     steps.forEach((s) => s.classList.toggle('is-active', Number(s.dataset.index) === i))
-    imgs.forEach((m) => m.classList.toggle('is-active', Number(m.dataset.index) === i))
-  }
-  // El marco es estático (sticky por CSS) y la imagen de dentro cambia según el
-  // proyecto que cruza el centro del viewport. ScrollTrigger se sincroniza con
-  // ScrollSmoother. (Efecto "Services" de Mugen: marco fijo, imágenes al scroll.)
-  steps.forEach((s) => {
-    ScrollTrigger.create({
-      trigger: s,
-      start: 'top center',
-      end: 'bottom center',
-      onToggle: (self) => { if (self.isActive) setActive(Number(s.dataset.index)) },
+  setStep(0)
+
+  if (prefersReduced) {
+    // Sin animación: la tira salta a la imagen del proyecto que cruza el centro.
+    steps.forEach((s) =>
+      ScrollTrigger.create({
+        trigger: s, start: 'top center', end: 'bottom center',
+        onToggle: (self) => {
+          if (!self.isActive) return
+          const i = Number(s.dataset.index)
+          setStep(i)
+          gsap.set(track, { yPercent: -i * 100 })
+        },
+      })
+    )
+  } else {
+    const mm = gsap.matchMedia()
+
+    // Desktop: la sección se CLAVA (pin) y la tira se desliza con el scroll.
+    mm.add('(min-width: 1024px)', () => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: swap,
+          start: 'center center',
+          // distancia del pin: ~0.7 viewports por transición (cambia antes)
+          end: () => '+=' + (n - 1) * window.innerHeight * 0.7,
+          pin: true,
+          scrub: 0.4, // la imagen "persigue" al scroll con un pelín de inercia
+          onUpdate: (self) => setStep(Math.round(self.progress * (n - 1))),
+        },
+      })
+      tl.to(track, { yPercent: -(n - 1) * 100, ease: 'none' })
+      return () => {
+        if (tl.scrollTrigger) tl.scrollTrigger.kill()
+        tl.kill()
+        gsap.set(track, { clearProps: 'transform' })
+      }
     })
-  })
+
+    // Móvil: sin pin. Cada paso desliza la tira a su imagen al cruzar el viewport.
+    mm.add('(max-width: 1023px)', () => {
+      const trs = steps.map((s) =>
+        ScrollTrigger.create({
+          trigger: s, start: 'top 60%', end: 'bottom 40%',
+          onToggle: (self) => {
+            if (!self.isActive) return
+            const i = Number(s.dataset.index)
+            setStep(i)
+            gsap.to(track, { yPercent: -i * 100, duration: 0.5, ease: 'power2.out' })
+          },
+        })
+      )
+      return () => trs.forEach((t) => t.kill())
+    })
+  }
 }

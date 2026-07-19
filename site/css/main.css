@@ -447,12 +447,13 @@ body.menu-open { overflow: hidden; }
 .swap__media { z-index: 1; }
 .swap__frame {
   position: relative; width: 100%;
-  aspect-ratio: 16 / 11;
+  aspect-ratio: 4 / 3;
   border-radius: 14px; overflow: hidden;
   border: 1px solid var(--line);
 }
-.swap__img { position: absolute; inset: 0; opacity: 0; transform: scale(1.05); transition: opacity .6s ease, transform .8s cubic-bezier(.16,1,.3,1); }
-.swap__img.is-active { opacity: 1; transform: scale(1); }
+/* Tira vertical: las 4 imágenes apiladas; JS la desplaza con el scroll (scrub). */
+.swap__track { position: absolute; inset: 0; display: flex; flex-direction: column; height: 100%; will-change: transform; }
+.swap__img { flex: 0 0 100%; position: relative; border: 0; border-radius: 0; }
 /* Placeholders diferenciados por color: así se VE el cambio sin imágenes
    reales (cada proyecto tiene su tinte). Se elimina al poner tus fotos. */
 .swap__img::before {
@@ -479,11 +480,18 @@ body.menu-open { overflow: hidden; }
   font-weight: 600; letter-spacing: var(--tracking-display); line-height: 1.04;
 }
 .swap__cat { display: block; color: var(--muted); margin-top: var(--space-1); }
-.swap__desc { color: var(--muted); max-width: 46ch; margin-top: var(--space-2); }
-.swap__link {
-  display: inline-flex; align-items: center; gap: .4em; margin-top: var(--space-3);
-  font-weight: 600; font-size: .9rem;
+/* Descripción y enlace: colapsados salvo en el proyecto activo (acordeón) */
+.swap__desc, .swap__link {
+  overflow: hidden; max-height: 0; opacity: 0; margin-top: 0;
+  transition: max-height .5s cubic-bezier(.7,0,.2,1), opacity .4s ease, margin-top .4s ease;
 }
+.swap__desc { color: var(--muted); max-width: 46ch; }
+.swap__step.is-active .swap__desc { max-height: 8em; opacity: 1; margin-top: var(--space-2); }
+.swap__link {
+  display: flex; align-items: center; gap: .4em;
+  font-weight: 600; font-size: .9rem; width: fit-content;
+}
+.swap__step.is-active .swap__link { max-height: 3em; opacity: 1; margin-top: var(--space-2); }
 .swap__link:hover { color: var(--accent); }
 
 /* =========================================================
@@ -665,13 +673,11 @@ body.menu-open { overflow: hidden; }
     align-items: end;
   }
   .cases { columns: 2; }
-  .swap { grid-template-columns: 0.7fr 1.3fr; gap: var(--space-4); align-items: start; }
+  .swap { grid-template-columns: 0.6fr 1.4fr; gap: var(--space-4); align-items: center; }
   .swap__list { order: 1; }
-  /* Marco ESTÁTICO: sticky mientras la lista scrollea. La imagen cambia dentro. */
-  .swap__media { order: 2; position: sticky; top: 9vh; align-self: start; }
-  .swap__frame { aspect-ratio: 5 / 4; max-height: 82vh; }
-  /* Pasos altos: dan recorrido de scroll para ir cambiando la imagen */
-  .swap__step { min-height: 78vh; display: flex; flex-direction: column; justify-content: center; }
+  /* El marco lo mantiene fijo el PIN (JS); la tira de imágenes se desliza dentro. */
+  .swap__media { order: 2; }
+  .swap__frame { aspect-ratio: 5 / 4; max-height: 86vh; }
   .svc__item { grid-template-columns: 72px 1fr 1.4fr; align-items: baseline; gap: var(--space-3); }
   .steps { grid-template-columns: repeat(2, 1fr); column-gap: var(--space-4); }
   .plans { grid-template-columns: repeat(3, 1fr); }

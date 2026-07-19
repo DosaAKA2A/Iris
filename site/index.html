@@ -139,11 +139,15 @@
       <div class="swap">
         <!-- Media sticky: cambia según el proyecto activo -->
         <div class="swap__media">
+          <!-- Marco estático (overflow hidden). Dentro, la "tira" con las 4
+               imágenes apiladas se desplaza con el scroll (JS: scrub). -->
           <div class="swap__frame">
-            <div class="swap__img ph is-active" data-index="0"><span class="ph__tag">Herramientas Corlima · imagen 4:3 → /assets</span></div>
-            <div class="swap__img ph" data-index="1"><span class="ph__tag">Creative Tools · imagen 4:3 → /assets</span></div>
-            <div class="swap__img ph" data-index="2"><span class="ph__tag">SPACIO² · imagen 4:3 → /assets</span></div>
-            <div class="swap__img ph" data-index="3"><span class="ph__tag">WAVA · imagen 4:3 → /assets</span></div>
+            <div class="swap__track">
+              <div class="swap__img ph" data-index="0"><span class="ph__tag">Herramientas Corlima · imagen 4:3 → /assets</span></div>
+              <div class="swap__img ph" data-index="1"><span class="ph__tag">Creative Tools · imagen 4:3 → /assets</span></div>
+              <div class="swap__img ph" data-index="2"><span class="ph__tag">SPACIO² · imagen 4:3 → /assets</span></div>
+              <div class="swap__img ph" data-index="3"><span class="ph__tag">WAVA · imagen 4:3 → /assets</span></div>
+            </div>
           </div>
         </div>
 
