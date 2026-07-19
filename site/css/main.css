@@ -688,11 +688,10 @@ body.menu-open { overflow: hidden; }
 
 @media (min-width: 1080px) {
   .hero__tagline { font-size: clamp(1.5rem, 2.2vw, 2rem); }
-  .cases { columns: 3; }
+  /* Solo 2 casos con página pública → 2 columnas, con leve escalonado */
+  .cases { columns: 2; }
   .steps { grid-template-columns: repeat(3, 1fr); }
-  /* Escalonado de las columnas del grid de casos (feel Mugen) */
   .case--b { margin-top: var(--space-6); }
-  .case--c { margin-top: calc(var(--space-6) * -0.4); }
 }
 
 /* =========================================================

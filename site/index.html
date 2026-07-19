@@ -27,7 +27,7 @@
       </div>
 
       <nav class="nav__right">
-        <a class="nav__link" href="#proyectos">Proyectos <span>[6]</span></a>
+        <a class="nav__link" href="#proyectos">Proyectos <span>[4]</span></a>
         <button class="nav__menu" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu"></button>
       </nav>
     </div>
@@ -143,43 +143,46 @@
                imágenes apiladas se desplaza con el scroll (JS: scrub). -->
           <div class="swap__frame">
             <div class="swap__track">
-              <div class="swap__img ph" data-index="0"><span class="ph__tag">Herramientas Corlima · imagen 4:3 → /assets</span></div>
-              <div class="swap__img ph" data-index="1"><span class="ph__tag">Creative Tools · imagen 4:3 → /assets</span></div>
-              <div class="swap__img ph" data-index="2"><span class="ph__tag">SPACIO² · imagen 4:3 → /assets</span></div>
-              <div class="swap__img ph" data-index="3"><span class="ph__tag">WAVA · imagen 4:3 → /assets</span></div>
+              <div class="swap__img ph" data-index="0"><span class="ph__tag">EDERUS · imagen 4:3 → /assets</span></div>
+              <div class="swap__img ph" data-index="1"><span class="ph__tag">FISIO · imagen 4:3 → /assets</span></div>
+              <div class="swap__img ph" data-index="2"><span class="ph__tag">WAVA · imagen 4:3 → /assets</span></div>
+              <div class="swap__img ph" data-index="3"><span class="ph__tag">Corlima Tools · imagen 4:3 → /assets</span></div>
             </div>
           </div>
         </div>
 
-        <!-- Lista de proyectos (cada uno es un "paso" del scroll) -->
+        <!-- Lista de proyectos (cada uno es un "paso" del scroll).
+             TODO enlaces: EDERUS/FISIO/WAVA/Corlima están protegidos (modal) en
+             iris.it.com; de momento apuntan al portafolio. Sustituir por la URL
+             real de cada proyecto cuando esté disponible. -->
         <ol class="swap__list">
           <li class="swap__step is-active" data-index="0">
             <span class="swap__num label">01</span>
-            <h3 class="swap__title">Herramientas Corlima</h3>
-            <p class="swap__cat label">Automatización &amp; E-commerce — 2025</p>
-            <p class="swap__desc">Herramientas internas sobre PrestaShop para automatizar la gestión de la tienda y ganar velocidad.</p>
-            <a class="swap__link" href="#">Ver caso <span aria-hidden="true">↗</span></a>
+            <h3 class="swap__title">EDERUS</h3>
+            <p class="swap__cat label">E-commerce — 2024</p>
+            <p class="swap__desc">Tienda online a medida: de la ficha de producto al checkout, sin fricción.</p>
+            <a class="swap__link" href="https://iris.it.com/portafolio/" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
           </li>
           <li class="swap__step" data-index="1">
             <span class="swap__num label">02</span>
-            <h3 class="swap__title">Creative Tools</h3>
-            <p class="swap__cat label">Web &amp; WebGL — 2025</p>
-            <p class="swap__desc">Experiencias web con WebGL y diseño a medida, donde el producto se siente vivo.</p>
-            <a class="swap__link" href="#">Ver caso <span aria-hidden="true">↗</span></a>
+            <h3 class="swap__title">FISIO</h3>
+            <p class="swap__cat label">Branding &amp; Web — 2023</p>
+            <p class="swap__desc">Identidad y web para una clínica de fisioterapia: cercana, clara y profesional.</p>
+            <a class="swap__link" href="https://iris.it.com/portafolio/" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
           </li>
           <li class="swap__step" data-index="2">
             <span class="swap__num label">03</span>
-            <h3 class="swap__title">SPACIO²</h3>
-            <p class="swap__cat label">Diseño editorial — 2024</p>
-            <p class="swap__desc">Diseño editorial para el sector aeroespacial: sistema tipográfico y maquetación técnica.</p>
-            <a class="swap__link" href="#">Ver caso <span aria-hidden="true">↗</span></a>
-          </li>
-          <li class="swap__step" data-index="3">
-            <span class="swap__num label">04</span>
             <h3 class="swap__title">WAVA</h3>
             <p class="swap__cat label">Branding — 2024</p>
             <p class="swap__desc">Identidad de marca para alimentación: del naming al sistema visual completo.</p>
-            <a class="swap__link" href="#">Ver caso <span aria-hidden="true">↗</span></a>
+            <a class="swap__link" href="https://iris.it.com/portafolio/" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
+          </li>
+          <li class="swap__step" data-index="3">
+            <span class="swap__num label">04</span>
+            <h3 class="swap__title">Corlima Tools</h3>
+            <p class="swap__cat label">Automatización &amp; E-commerce — 2025</p>
+            <p class="swap__desc">Herramientas internas sobre PrestaShop para automatizar la gestión de la tienda y ganar velocidad.</p>
+            <a class="swap__link" href="https://iris.it.com/portafolio/" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
           </li>
         </ol>
       </div>
@@ -196,23 +199,11 @@
       </header>
 
       <div class="cases">
-        <!-- Cada card: nº · imagen (placeholder, ratio anotado) · título · categoría · año -->
+        <!-- Casos con página pública. nº · imagen (placeholder) · título · categoría · año -->
         <article class="case case--a">
-          <a class="case__media ph" href="#" aria-label="Ver caso">
+          <a class="case__media ph" href="https://iris.it.com/creative_tools.html" target="_blank" rel="noopener" aria-label="Ver caso Creative Tools">
             <span class="ph__tag">Imagen 4:5 → /assets</span>
             <span class="case__num label">[01]</span>
-            <span class="case__plus" aria-hidden="true">+</span>
-          </a>
-          <div class="case__meta">
-            <div><h3 class="case__title">Herramientas Corlima</h3><p class="case__cat">Automatización &amp; E-commerce</p></div>
-            <span class="case__year label">2025</span>
-          </div>
-        </article>
-
-        <article class="case case--b">
-          <a class="case__media ph" href="#" aria-label="Ver caso">
-            <span class="ph__tag">Imagen 4:3 → /assets</span>
-            <span class="case__num label">[02]</span>
             <span class="case__plus" aria-hidden="true">+</span>
           </a>
           <div class="case__meta">
@@ -221,51 +212,15 @@
           </div>
         </article>
 
-        <article class="case case--c">
-          <a class="case__media ph" href="#" aria-label="Ver caso">
-            <span class="ph__tag">Imagen 4:5 → /assets</span>
-            <span class="case__num label">[03]</span>
+        <article class="case case--b">
+          <a class="case__media ph" href="https://iris.it.com/spacio/spacio2.html" target="_blank" rel="noopener" aria-label="Ver caso SPACIO²">
+            <span class="ph__tag">Imagen 4:3 → /assets</span>
+            <span class="case__num label">[02]</span>
             <span class="case__plus" aria-hidden="true">+</span>
           </a>
           <div class="case__meta">
             <div><h3 class="case__title">SPACIO²</h3><p class="case__cat">Diseño editorial</p></div>
             <span class="case__year label">2024</span>
-          </div>
-        </article>
-
-        <article class="case case--d">
-          <a class="case__media ph" href="#" aria-label="Ver caso">
-            <span class="ph__tag">Imagen 4:3 → /assets</span>
-            <span class="case__num label">[04]</span>
-            <span class="case__plus" aria-hidden="true">+</span>
-          </a>
-          <div class="case__meta">
-            <div><h3 class="case__title">WAVA</h3><p class="case__cat">Branding</p></div>
-            <span class="case__year label">2024</span>
-          </div>
-        </article>
-
-        <article class="case case--e">
-          <a class="case__media ph" href="#" aria-label="Ver caso">
-            <span class="ph__tag">Imagen 4:3 → /assets</span>
-            <span class="case__num label">[05]</span>
-            <span class="case__plus" aria-hidden="true">+</span>
-          </a>
-          <div class="case__meta">
-            <div><h3 class="case__title">EDERUS</h3><p class="case__cat">E-commerce</p></div>
-            <span class="case__year label">2024</span>
-          </div>
-        </article>
-
-        <article class="case case--f">
-          <a class="case__media ph" href="#" aria-label="Ver caso">
-            <span class="ph__tag">Imagen 4:5 → /assets</span>
-            <span class="case__num label">[06]</span>
-            <span class="case__plus" aria-hidden="true">+</span>
-          </a>
-          <div class="case__meta">
-            <div><h3 class="case__title">FISIO</h3><p class="case__cat">Branding &amp; Web</p></div>
-            <span class="case__year label">2023</span>
           </div>
         </article>
       </div>

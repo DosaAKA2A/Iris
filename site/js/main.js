@@ -222,14 +222,16 @@ if (swap) {
           // distancia del pin: ~0.7 viewports por transición (cambia antes)
           end: () => '+=' + (n - 1) * window.innerHeight * 0.7,
           pin: true,
-          scrub: 0.4, // la imagen "persigue" al scroll con un pelín de inercia
-          // Snap magnético: al soltar, encaja en el proyecto más cercano con su
-          // imagen perfectamente centrada en el marco (puntos i/(n-1)).
+          scrub: 0.25, // seguimiento ágil (menos inercia = se posiciona antes)
+          // Snap por PROXIMIDAD: encaja en la imagen que quede mayoritariamente
+          // visible en el marco (la más cercana), sin forzar el sentido del
+          // scroll. Asentamiento breve para que se sienta natural.
           snap: {
             snapTo: 1 / (n - 1),
-            duration: { min: 0.2, max: 0.5 },
-            delay: 0.08,
-            ease: 'power2.inOut',
+            duration: { min: 0.12, max: 0.28 },
+            delay: 0.02,
+            ease: 'power1.out',
+            directional: false,
           },
           onUpdate: (self) => setStep(Math.round(self.progress * (n - 1))),
         },
