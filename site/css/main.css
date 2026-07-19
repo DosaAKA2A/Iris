@@ -479,18 +479,11 @@ body.menu-open { overflow: hidden; }
   font-weight: 600; letter-spacing: var(--tracking-display); line-height: 1.04;
 }
 .swap__cat { display: block; color: var(--muted); margin-top: var(--space-1); }
-/* Descripción y enlace: colapsados salvo en el proyecto activo (acordeón) */
-.swap__desc, .swap__link {
-  overflow: hidden; max-height: 0; opacity: 0; margin-top: 0;
-  transition: max-height .5s cubic-bezier(.7,0,.2,1), opacity .4s ease, margin-top .4s ease;
-}
-.swap__desc { color: var(--muted); max-width: 46ch; }
-.swap__step.is-active .swap__desc { max-height: 8em; opacity: 1; margin-top: var(--space-2); }
+.swap__desc { color: var(--muted); max-width: 46ch; margin-top: var(--space-2); }
 .swap__link {
-  display: flex; align-items: center; gap: .4em;
-  font-weight: 600; font-size: .9rem; width: fit-content;
+  display: inline-flex; align-items: center; gap: .4em; margin-top: var(--space-3);
+  font-weight: 600; font-size: .9rem;
 }
-.swap__step.is-active .swap__link { max-height: 3em; opacity: 1; margin-top: var(--space-2); }
 .swap__link:hover { color: var(--accent); }
 
 /* =========================================================
@@ -672,10 +665,13 @@ body.menu-open { overflow: hidden; }
     align-items: end;
   }
   .cases { columns: 2; }
-  .swap { grid-template-columns: 0.7fr 1.3fr; gap: var(--space-4); align-items: center; }
+  .swap { grid-template-columns: 0.7fr 1.3fr; gap: var(--space-4); align-items: start; }
   .swap__list { order: 1; }
-  .swap__media { order: 2; }
-  .swap__frame { aspect-ratio: 5 / 4; max-height: 84vh; }
+  /* Marco ESTÁTICO: sticky mientras la lista scrollea. La imagen cambia dentro. */
+  .swap__media { order: 2; position: sticky; top: 9vh; align-self: start; }
+  .swap__frame { aspect-ratio: 5 / 4; max-height: 82vh; }
+  /* Pasos altos: dan recorrido de scroll para ir cambiando la imagen */
+  .swap__step { min-height: 78vh; display: flex; flex-direction: column; justify-content: center; }
   .svc__item { grid-template-columns: 72px 1fr 1.4fr; align-items: baseline; gap: var(--space-3); }
   .steps { grid-template-columns: repeat(2, 1fr); column-gap: var(--space-4); }
   .plans { grid-template-columns: repeat(3, 1fr); }
@@ -687,7 +683,7 @@ body.menu-open { overflow: hidden; }
 @media (min-width: 1080px) {
   .hero__tagline { font-size: clamp(1.5rem, 2.2vw, 2rem); }
   .cases { columns: 3; }
-  .steps { grid-template-columns: repeat(4, 1fr); }
+  .steps { grid-template-columns: repeat(3, 1fr); }
   /* Escalonado de las columnas del grid de casos (feel Mugen) */
   .case--b { margin-top: var(--space-6); }
   .case--c { margin-top: calc(var(--space-6) * -0.4); }
