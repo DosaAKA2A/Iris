@@ -439,11 +439,12 @@ body.menu-open { overflow: hidden; }
 .case__cat { color: var(--muted); font-size: .85rem; margin-top: 2px; }
 
 /* =========================================================
-   PROYECTOS — sticky-swap (media fija + lista que hace scroll)
-   La imagen activa cambia con el scroll (JS: IntersectionObserver).
+   PROYECTOS — swap pinneado (como el "Services" de Mugen)
+   La sección se "clava" (pin, JS) y la imagen de la derecha cambia
+   según el proyecto activo mientras avanza el scroll.
    ========================================================= */
 .swap { display: grid; gap: var(--space-3); }
-.swap__media { position: sticky; top: calc(var(--nav-h) + var(--space-2)); z-index: 1; }
+.swap__media { z-index: 1; }
 .swap__frame {
   position: relative; width: 100%;
   aspect-ratio: 16 / 11;
@@ -452,28 +453,45 @@ body.menu-open { overflow: hidden; }
 }
 .swap__img { position: absolute; inset: 0; opacity: 0; transform: scale(1.05); transition: opacity .6s ease, transform .8s cubic-bezier(.16,1,.3,1); }
 .swap__img.is-active { opacity: 1; transform: scale(1); }
+/* Placeholders diferenciados por color: así se VE el cambio sin imágenes
+   reales (cada proyecto tiene su tinte). Se elimina al poner tus fotos. */
+.swap__img::before {
+  content: ""; position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(135deg, var(--sw-a, #1a1a1a), var(--sw-b, #0a0a0a));
+}
+.swap__img:nth-child(1) { --sw-a:#20202a; --sw-b:#0b0b12; }
+.swap__img:nth-child(2) { --sw-a:#122a26; --sw-b:#08120f; }
+.swap__img:nth-child(3) { --sw-a:#2a2118; --sw-b:#120c07; }
+.swap__img:nth-child(4) { --sw-a:#251826; --sw-b:#0f0813; }
+.swap__img .ph__tag { position: relative; z-index: 1; }
+
 .swap__list { list-style: none; }
 .swap__step {
   border-top: 1px solid var(--line);
-  padding-block: var(--space-4);
-  opacity: .38; transition: opacity .35s ease;
+  padding-block: var(--space-3);
+  opacity: .35; transition: opacity .4s ease;
 }
 .swap__step:last-child { border-bottom: 1px solid var(--line); }
 .swap__step.is-active { opacity: 1; }
-.swap__num { display: block; color: var(--muted); margin-bottom: var(--space-2); }
+.swap__num { display: block; color: var(--muted); margin-bottom: var(--space-1); }
 .swap__title {
-  font-size: clamp(2rem, 6vw, 3.25rem);
-  font-weight: 600; letter-spacing: var(--tracking-display); line-height: 1;
+  font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+  font-weight: 600; letter-spacing: var(--tracking-display); line-height: 1.02;
 }
-.swap__cat { display: block; color: var(--muted); margin-top: var(--space-2); }
-.swap__desc { color: var(--muted); margin-top: var(--space-2); max-width: 46ch; }
+.swap__cat { display: block; color: var(--muted); margin-top: var(--space-1); }
+/* Descripción y enlace: colapsados salvo en el proyecto activo (acordeón) */
+.swap__desc, .swap__link {
+  overflow: hidden; max-height: 0; opacity: 0; margin-top: 0;
+  transition: max-height .5s cubic-bezier(.7,0,.2,1), opacity .4s ease, margin-top .4s ease;
+}
+.swap__desc { color: var(--muted); max-width: 46ch; }
+.swap__step.is-active .swap__desc { max-height: 8em; opacity: 1; margin-top: var(--space-2); }
 .swap__link {
-  display: inline-flex; align-items: center; gap: .4em; margin-top: var(--space-3);
-  font-weight: 600; font-size: .9rem;
-  border-bottom: 1px solid var(--line); padding-bottom: 2px;
-  transition: border-color .25s ease;
+  display: flex; align-items: center; gap: .4em;
+  font-weight: 600; font-size: .9rem; width: fit-content;
 }
-.swap__link:hover { border-color: var(--accent); }
+.swap__step.is-active .swap__link { max-height: 3em; opacity: 1; margin-top: var(--space-2); }
+.swap__link:hover { color: var(--accent); }
 
 /* =========================================================
    SERVICIOS — lista con descripciones
@@ -654,11 +672,10 @@ body.menu-open { overflow: hidden; }
     align-items: end;
   }
   .cases { columns: 2; }
-  .swap { grid-template-columns: 1fr 1.15fr; gap: var(--space-5); align-items: start; }
+  .swap { grid-template-columns: 1fr 1.1fr; gap: var(--space-5); align-items: center; }
   .swap__list { order: 1; }
-  .swap__media { order: 2; top: calc(var(--nav-h) + var(--space-4)); height: min(74vh, 660px); }
-  .swap__frame { aspect-ratio: auto; height: 100%; }
-  .swap__step { min-height: 62vh; display: flex; flex-direction: column; justify-content: center; }
+  .swap__media { order: 2; }
+  .swap__frame { aspect-ratio: 4 / 3; max-height: 68vh; }
   .svc__item { grid-template-columns: 72px 1fr 1.4fr; align-items: baseline; gap: var(--space-3); }
   .steps { grid-template-columns: repeat(2, 1fr); column-gap: var(--space-4); }
   .plans { grid-template-columns: repeat(3, 1fr); }
@@ -683,19 +700,9 @@ body.menu-open { overflow: hidden; }
    en prefers-reduced-motion (bloque de abajo).
    ========================================================= */
 
-/* Subrayado que barre desde la izquierda (nav + footer) */
-.nav__link,
-.footer__nav a { position: relative; }
-.nav__link::after,
-.footer__nav a::after {
-  content: ""; position: absolute; left: 0; bottom: -3px;
-  width: 100%; height: 1px; background: currentColor;
-  transform: scaleX(0); transform-origin: left;
-  transition: transform .35s cubic-bezier(.7, 0, .2, 1);
-}
-.nav__link:hover::after,
-.footer__nav a:hover::after { transform: scaleX(1); }
+/* Enlaces de nav/footer: solo cambio de color al hover (sin subrayado) */
 .nav__link { transition: color .2s ease; }
+.nav__link:hover { color: var(--muted); }
 
 /* Flechas (↗) que se deslizan al pasar el ratón */
 .swap__link span,

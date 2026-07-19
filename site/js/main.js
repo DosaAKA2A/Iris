@@ -196,15 +196,42 @@ if (swap) {
     steps.forEach((s) => s.classList.toggle('is-active', Number(s.dataset.index) === i))
     imgs.forEach((m) => m.classList.toggle('is-active', Number(m.dataset.index) === i))
   }
-  // La imagen fija cambia según el proyecto que cruza el centro del viewport.
-  // ScrollTrigger se sincroniza con ScrollSmoother (el IntersectionObserver no
-  // seguía bien el scroll virtual y la imagen no cambiaba).
-  steps.forEach((s) => {
-    ScrollTrigger.create({
-      trigger: s,
-      start: 'top center',
-      end: 'bottom center',
-      onToggle: (self) => { if (self.isActive) setActive(Number(s.dataset.index)) },
+  // Toggle simple (sin pin): cada paso activa su índice al cruzar el viewport.
+  // Se usa en móvil y con prefers-reduced-motion.
+  const simpleToggle = () =>
+    steps.map((s) =>
+      ScrollTrigger.create({
+        trigger: s,
+        start: 'top 60%',
+        end: 'bottom 40%',
+        onToggle: (self) => { if (self.isActive) setActive(Number(s.dataset.index)) },
+      })
+    )
+
+  if (prefersReduced) {
+    simpleToggle()
+  } else {
+    // Desktop: la sección se CLAVA (pin) y el progreso del scroll recorre los
+    // proyectos, cambiando la imagen de la derecha (efecto "Services" de Mugen).
+    // Móvil: toggle simple, sin pin (evita jank en pantallas pequeñas).
+    const mm = gsap.matchMedia()
+    mm.add('(min-width: 1024px)', () => {
+      const st = ScrollTrigger.create({
+        trigger: swap,
+        start: 'center center',
+        end: () => '+=' + steps.length * window.innerHeight * 0.9,
+        pin: true,
+        pinSpacing: true,
+        onUpdate: (self) => {
+          const i = Math.min(steps.length - 1, Math.floor(self.progress * steps.length))
+          setActive(i)
+        },
+      })
+      return () => st.kill()
     })
-  })
+    mm.add('(max-width: 1023px)', () => {
+      const trs = simpleToggle()
+      return () => trs.forEach((t) => t.kill())
+    })
+  }
 }
