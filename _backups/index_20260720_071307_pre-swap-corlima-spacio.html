@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IRIS — Vemos el resultado</title>
+  <meta name="description" content="Iris — estudio de diseño. Vemos el resultado." />
+  <link rel="icon" href="./assets/iris-favicon.svg" type="image/svg+xml" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Inter (display + cuerpo) · Geist Mono (micro-labels) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <script type="module" crossorigin src="./app/index-D7lDpdQM.js"></script>
+  <link rel="stylesheet" crossorigin href="./app/index-B3eODo8y.css">
+
+  <!-- Overrides de marca: logo del hero como imagen (antes era texto) -->
+  <style>
+    .hero__wordmark--logo{line-height:0;font-size:0;margin:0}
+    .hero__wordmark--logo img{display:block;width:clamp(210px,49vw,830px);height:auto}
+    /* Logo pequeño de la top bar: mismo SVG del hero, a altura equivalente al texto anterior */
+    .hz-wordmark--logo{line-height:0;font-size:0}
+    .hz-wordmark--logo img{display:block;height:clamp(13px,1.15vw,16px);width:auto}
+    /* Tagline estructurado con el logo: mismo ancho de caja en desktop, muted en su propia línea */
+    .hero__tagline .muted{display:block;margin-top:.3em}
+    @media (min-width:861px){
+      .hero__tagline{max-width:clamp(420px,49vw,830px);text-wrap:balance;margin-top:calc(var(--space-3) * .75)}
+    }
+    /* Velo oscuro sobre el vídeo del hero: mantiene legible el logo y el texto */
+    .hero__scrim{position:absolute;inset:0;z-index:1;pointer-events:none;
+      background:linear-gradient(180deg,rgba(5,5,5,.5) 0%,rgba(5,5,5,.22) 38%,rgba(5,5,5,.62) 100%)}
+  </style>
+</head>
+<body>
+
+  <!-- ===================== MENÚ OVERLAY (portado de iris.it.com) =====================
+       Va FUERA de #smooth-wrapper porque es position:fixed. Lo abre el botón MENU
+       de la top bar del hero (toggleHnMenu → body.hn-open). -->
+  <div class="hn-overlay" id="hnOverlay" aria-hidden="true">
+    <div class="hn-panel">
+      <div class="hn-panel-left">
+        <nav class="hn-ov-links" aria-label="Navegación principal">
+          <a href="#inicio">Inicio</a>
+          <a href="#proyectos">Proyectos</a>
+          <a href="#trabajo">Casos de estudio</a>
+          <a href="#proceso">Proceso</a>
+          <a href="#servicios">Servicios</a>
+          <a href="#precios">Precios</a>
+          <a href="#faq">FAQ</a>
+          <a href="#contacto">Contacto</a>
+        </nav>
+        <div class="hn-author">
+          <div class="hn-author-photo"><img src="./assets/iris-favicon.svg" alt="IRIS" /></div>
+          <div class="hn-author-name"><span class="sq" aria-hidden="true"></span>IRIS STUDIO</div>
+          <div class="hn-author-role">DISEÑO &amp; AUTOMATIZACIÓN — MADRID</div>
+          <div class="hn-author-socials">
+            <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg></a>
+            <a href="#" aria-label="X / Twitter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4l16 16M20 4L4 20"/></svg></a>
+            <a href="#" aria-label="Behance"><svg viewBox="0 0 24 24" fill="currentColor"><text x="12" y="16.5" text-anchor="middle" font-size="13" font-weight="700" font-family="Inter,sans-serif">Bé</text></svg></a>
+            <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><text x="12" y="16.5" text-anchor="middle" font-size="13" font-weight="700" font-family="Inter,sans-serif">in</text></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="hn-panel-right">
+        <a class="hn-feature" href="https://iris.it.com/spacio/spacio2.html" target="_blank" rel="noopener"><span class="hn-feature-media" style="background:linear-gradient(135deg,#2a2118,#120c07)"></span><span>SPACIO²</span></a>
+        <a class="hn-feature" href="https://iris.it.com/portafolio/" target="_blank" rel="noopener"><span class="hn-feature-media" style="background:linear-gradient(135deg,#20202a,#0b0b12)"></span><span>PORTAFOLIO</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SCROLL SMOOTHER (FASE 4 · capa 1) =====================
+       Todo el contenido scrolleable va dentro de #smooth-wrapper > #smooth-content.
+       El nav y el menú (position:fixed) quedan FUERA a propósito: el transform del
+       scroll suave rompería su fijación al viewport. -->
+  <div id="smooth-wrapper">
+  <div id="smooth-content">
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero" id="inicio">
+    <!-- Top bar (portada de iris.it.com): botón MENU, wordmark, hora y CTA -->
+    <header class="hz-top">
+      <div class="hz-top-left">
+        <button class="hz-menu-btn" id="hnMenuBtn" onclick="toggleHnMenu()" aria-expanded="false" aria-controls="hnOverlay" aria-label="Abrir menú">
+          <span class="hz-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <span class="hn-menu-label" data-open="MENU" data-close="CERRAR">MENU</span>
+        </button>
+        <span class="hz-top-sep" aria-hidden="true"></span>
+        <a class="hz-wordmark hz-wordmark--logo" href="#inicio"><img src="./assets/iris-logo.svg" alt="IRIS" /></a>
+      </div>
+      <div class="hz-time" aria-hidden="true"><b id="hzTimeVal">--:--</b>&ensp;HORA&nbsp;LOCAL</div>
+      <a class="hz-cta" href="#contacto">
+        <span class="hz-cta-logo" aria-hidden="true"><img src="./assets/iris-favicon.svg" alt="" /></span>
+        <span class="hz-cta-txt">EMPEZAR&nbsp;PROYECTO&ensp;<em>/IRIS</em></span>
+        <span class="hz-cta-arrow" aria-hidden="true">→</span>
+      </a>
+    </header>
+
+    <!-- Fondo: vídeo full-bleed (mudo, loop). El gradiente queda de fallback. -->
+    <div class="hero__bg" aria-hidden="true"></div>
+    <video class="hero__video" autoplay loop muted playsinline preload="auto" poster="assets/hero-poster.jpg">
+      <source src="assets/hero.mp4" type="video/mp4" />
+    </video>
+    <div class="hero__scrim" aria-hidden="true"></div>
+    <!--
+      TODO recurso Iris — sustituir el .hero__bg por vídeo full-bleed:
+      <video class="hero__video" autoplay loop muted playsinline
+             poster="/assets/hero-poster.jpg">
+        <source src="/assets/hero.mp4" type="video/mp4" />
+      </video>
+      Formato: mp4 H.264, mudo, en loop, cover a pantalla (fuente 16:9).
+    -->
+
+    <div class="hero__inner">
+      <!-- Wordmark + tagline -->
+      <div class="hero__head">
+        <span class="hero__eyebrow label">© Estudio de diseño &amp; automatización — Madrid</span>
+        <h1 class="hero__wordmark hero__wordmark--logo"><img src="./assets/iris-logo.svg" alt="IRIS" /></h1>
+        <p class="hero__tagline">
+          Hacemos pocas webs al año. Por eso salen bien.
+          <span class="muted">A medida, de la primera idea al lanzamiento.</span>
+        </p>
+      </div>
+
+      <!-- Fila inferior de conversión -->
+      <div class="hero__foot">
+        <!-- Izquierda: prueba social + propuesta de valor -->
+        <div class="hero__foot-left">
+          <div class="rating">
+            <div class="rating__avatars" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <p class="rating__meta">
+              <b><span data-count="4.9" data-decimals="1">4.9</span>/5</b> ·
+              <span>+<span data-count="40">40</span> proyectos entregados</span>
+            </p>
+          </div>
+
+          <p class="hero__pitch">
+            <b>Hablas directamente con quien diseña y programa tu web.</b>
+            Sin gestores de cuenta ni cadenas de correos: presupuesto claro,
+            entregas por fases y respuesta en menos de 24&nbsp;h.
+          </p>
+        </div>
+
+        <!-- Derecha: card de DOSA -->
+        <div class="cta-card">
+          <div class="cta-card__media">
+            <span class="ph-tag">Foto 4:3 → /assets</span>
+            <span class="cta-card__slots"><i class="dot"></i> Disponible para proyectos</span>
+          </div>
+          <div class="cta-card__body">
+            <p class="cta-card__name">DOSA</p>
+            <p class="cta-card__role">Diseño &amp; dirección creativa</p>
+            <p class="cta-card__price">Proyectos <b>a medida</b></p>
+            <!-- Portafolio de DOSA (confirmado) -->
+            <a class="cta-btn" href="https://iris.it.com/portafolio/" target="_blank" rel="noopener">
+              Ver mi portafolio
+              <span class="cta-btn__arrow">↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PROYECTOS (sticky-swap, como el Services de Mugen) ===================== -->
+  <!-- Proyectos reales de IRIS. La imagen fija cambia al hacer scroll (JS: ScrollTrigger + sticky). -->
+  <section class="section proyectos" id="proyectos">
+    <div class="wrap">
+      <header class="section__head">
+        <span class="section__label label">[01] — Trabajo destacado</span>
+        <h2 class="section__title">Proyectos</h2>
+      </header>
+
+      <div class="swap">
+        <!-- Media sticky: cambia según el proyecto activo -->
+        <div class="swap__media">
+          <!-- Marco estático (overflow hidden). Dentro, la "tira" con las 4
+               imágenes apiladas se desplaza con el scroll (JS: scrub). -->
+          <div class="swap__frame">
+            <div class="swap__track">
+              <div class="swap__img ph" data-index="0"><span class="ph__tag">EDERUS · imagen 4:3 → /assets</span></div>
+              <div class="swap__img ph" data-index="1"><span class="ph__tag">FISIO · imagen 4:3 → /assets</span></div>
+              <div class="swap__img ph" data-index="2"><span class="ph__tag">WAVA · imagen 4:3 → /assets</span></div>
+              <div class="swap__img ph" data-index="3"><span class="ph__tag">Corlima Tools · imagen 4:3 → /assets</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de proyectos (cada uno es un "paso" del scroll). Enlaces reales:
+             EDERUS y FISIO (GitHub Pages), WAVA (/wava/), Corlima Tools
+             (/corlima/herramientas_corlima.html). -->
+        <ol class="swap__list">
+          <li class="swap__step is-active" data-index="0">
+            <span class="swap__num label">01</span>
+            <h3 class="swap__title">EDERUS</h3>
+            <p class="swap__cat label">E-commerce — 2024</p>
+            <p class="swap__desc">Tienda online a medida: de la ficha de producto al checkout, sin fricción.</p>
+            <a class="swap__link" href="https://dosaaka2a.github.io/EDERUS/" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
+          </li>
+          <li class="swap__step" data-index="1">
+            <span class="swap__num label">02</span>
+            <h3 class="swap__title">FISIO</h3>
+            <p class="swap__cat label">Branding &amp; Web — 2023</p>
+            <p class="swap__desc">Identidad y web para una clínica de fisioterapia: cercana, clara y profesional.</p>
+            <a class="swap__link" href="https://dosaaka2a.github.io/FISIO/" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
+          </li>
+          <li class="swap__step" data-index="2">
+            <span class="swap__num label">03</span>
+            <h3 class="swap__title">WAVA</h3>
+            <p class="swap__cat label">Branding — 2024</p>
+            <p class="swap__desc">Identidad de marca para alimentación: del naming al sistema visual completo.</p>
+            <a class="swap__link" href="https://iris.it.com/wava/" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
+          </li>
+          <li class="swap__step" data-index="3">
+            <span class="swap__num label">04</span>
+            <h3 class="swap__title">Corlima Tools</h3>
+            <p class="swap__cat label">Automatización &amp; E-commerce — 2025</p>
+            <p class="swap__desc">Herramientas internas sobre PrestaShop para automatizar la gestión de la tienda y ganar velocidad.</p>
+            <a class="swap__link" href="https://iris.it.com/corlima/herramientas_corlima.html" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CASOS DE ESTUDIO (grid masonry) ===================== -->
+  <!-- Proyectos reales de IRIS (años aproximados, ajústalos). Faltan las imágenes en /assets. -->
+  <section class="section trabajo" id="trabajo">
+    <div class="wrap">
+      <header class="section__head">
+        <span class="section__label label">[02] — El archivo</span>
+        <h2 class="section__title">Casos de estudio</h2>
+      </header>
+
+      <div class="cases">
+        <!-- REALES (con página pública) -->
+        <article class="case case--a">
+          <a class="case__media ph" href="https://iris.it.com/creative_tools.html" target="_blank" rel="noopener" aria-label="Ver caso Creative Tools">
+            <span class="ph__tag">Imagen 4:5 → /assets</span>
+            <span class="case__num label">[01]</span>
+            <span class="case__plus" aria-hidden="true">+</span>
+          </a>
+          <div class="case__meta">
+            <div><h3 class="case__title">Creative Tools</h3><p class="case__cat">Web &amp; WebGL</p></div>
+            <span class="case__year label">2025</span>
+          </div>
+        </article>
+
+        <article class="case case--b">
+          <a class="case__media ph" href="https://iris.it.com/spacio/spacio2.html" target="_blank" rel="noopener" aria-label="Ver caso SPACIO²">
+            <span class="ph__tag">Imagen 4:3 → /assets</span>
+            <span class="case__num label">[02]</span>
+            <span class="case__plus" aria-hidden="true">+</span>
+          </a>
+          <div class="case__meta">
+            <div><h3 class="case__title">SPACIO²</h3><p class="case__cat">Diseño editorial</p></div>
+            <span class="case__year label">2024</span>
+          </div>
+        </article>
+
+        <!-- MUESTRA — reemplazar por casos reales (título, categoría, año, imagen y enlace) -->
+        <article class="case case--c">
+          <a class="case__media ph" href="#" aria-label="Caso de muestra">
+            <span class="ph__tag">Muestra · Imagen 4:5 → /assets</span>
+            <span class="case__num label">[03]</span>
+            <span class="case__plus" aria-hidden="true">+</span>
+          </a>
+          <div class="case__meta">
+            <div><h3 class="case__title">Aurora</h3><p class="case__cat">Identidad &amp; Producto</p></div>
+            <span class="case__year label">2025</span>
+          </div>
+        </article>
+
+        <article class="case case--d">
+          <a class="case__media ph" href="#" aria-label="Caso de muestra">
+            <span class="ph__tag">Muestra · Imagen 4:3 → /assets</span>
+            <span class="case__num label">[04]</span>
+            <span class="case__plus" aria-hidden="true">+</span>
+          </a>
+          <div class="case__meta">
+            <div><h3 class="case__title">Vértice</h3><p class="case__cat">Marca &amp; Web</p></div>
+            <span class="case__year label">2024</span>
+          </div>
+        </article>
+
+        <article class="case case--e">
+          <a class="case__media ph" href="#" aria-label="Caso de muestra">
+            <span class="ph__tag">Muestra · Imagen 4:3 → /assets</span>
+            <span class="case__num label">[05]</span>
+            <span class="case__plus" aria-hidden="true">+</span>
+          </a>
+          <div class="case__meta">
+            <div><h3 class="case__title">Cobalto</h3><p class="case__cat">Sistema de diseño</p></div>
+            <span class="case__year label">2024</span>
+          </div>
+        </article>
+
+        <article class="case case--f">
+          <a class="case__media ph" href="#" aria-label="Caso de muestra">
+            <span class="ph__tag">Muestra · Imagen 4:5 → /assets</span>
+            <span class="case__num label">[06]</span>
+            <span class="case__plus" aria-hidden="true">+</span>
+          </a>
+          <div class="case__meta">
+            <div><h3 class="case__title">Nimbo</h3><p class="case__cat">Transformación digital</p></div>
+            <span class="case__year label">2023</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PROCESO ===================== -->
+  <section class="section proceso" id="proceso">
+    <div class="wrap">
+      <header class="section__head">
+        <span class="section__label label">[03] — Cómo trabajamos</span>
+        <h2 class="section__title">Cómo funciona, de la<br>primera reunión al mantenimiento.</h2>
+      </header>
+
+      <ol class="steps">
+        <li class="step">
+          <span class="step__num label">01</span>
+          <h3 class="step__title">Reunión &amp; planificación</h3>
+          <p class="step__text">Primera llamada para entender tu negocio, objetivos y a quién te diriges. Sin compromiso.</p>
+        </li>
+        <li class="step">
+          <span class="step__num label">02</span>
+          <h3 class="step__title">Propuesta &amp; alcance</h3>
+          <p class="step__text">Te enviamos propuesta, plazos y precio cerrado. Sin plantillas, sin sorpresas ni costes ocultos.</p>
+        </li>
+        <li class="step">
+          <span class="step__num label">03</span>
+          <h3 class="step__title">Diseño</h3>
+          <p class="step__text">Diseñamos a medida, iterando rápido y con criterio. Trabajo sénior, sin comités ni ruido.</p>
+        </li>
+        <li class="step">
+          <span class="step__num label">04</span>
+          <h3 class="step__title">Desarrollo</h3>
+          <p class="step__text">Implementación limpia y a medida, lista para producción y para escalar. Automatizamos lo que haga falta.</p>
+        </li>
+        <li class="step">
+          <span class="step__num label">05</span>
+          <h3 class="step__title">Entrega &amp; lanzamiento</h3>
+          <p class="step__text">Lanzamos en semanas, no meses. Hasta 3 revisiones y tu kit de diseño (.zip): tipografías, paletas y componentes.</p>
+        </li>
+        <li class="step">
+          <span class="step__num label">06</span>
+          <h3 class="step__title">Mantenimiento &amp; soporte</h3>
+          <p class="step__text">Soporte continuo, mejoras y automatizaciones si lo quieres. Respuesta directa en menos de 24 h.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===================== SERVICIOS (qué hacemos) ===================== -->
+  <section class="section servicios" id="servicios">
+    <div class="wrap">
+      <header class="section__head section__head--split">
+        <div>
+          <span class="section__label label">[04] — Qué hacemos</span>
+          <h2 class="section__title">Servicios</h2>
+        </div>
+        <p class="section__intro">
+          Diseño y automatización de espectro completo bajo un mismo techo. Del
+          concepto al código, sin plantillas: sistemas hechos para lanzar rápido,
+          escalar con criterio y convertir mejor.
+        </p>
+      </header>
+
+      <ul class="svc">
+        <li class="svc__item">
+          <span class="svc__num label">01</span>
+          <h3 class="svc__name">Diseño web</h3>
+          <p class="svc__desc">Webs a medida que convierten. Sin plantillas: del concepto al código.</p>
+        </li>
+        <li class="svc__item">
+          <span class="svc__num label">02</span>
+          <h3 class="svc__name">Desarrollo</h3>
+          <p class="svc__desc">Implementación limpia y a medida, lista para producción y para escalar.</p>
+        </li>
+        <li class="svc__item">
+          <span class="svc__num label">03</span>
+          <h3 class="svc__name">Automatización</h3>
+          <p class="svc__desc">Automatizamos procesos y herramientas internas para que ganes tiempo.</p>
+        </li>
+        <li class="svc__item">
+          <span class="svc__num label">04</span>
+          <h3 class="svc__name">Branding</h3>
+          <p class="svc__desc">Naming, sistemas visuales y guías que hacen tu marca inconfundible.</p>
+        </li>
+        <li class="svc__item">
+          <span class="svc__num label">05</span>
+          <h3 class="svc__name">E-commerce &amp; editorial</h3>
+          <p class="svc__desc">Tiendas online que venden y diseño editorial con criterio técnico.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================== PRICING ===================== -->
+  <section class="section pricing" id="precios">
+    <div class="wrap">
+      <header class="section__head section__head--split">
+        <div>
+          <span class="section__label label">[05] — Planes</span>
+          <h2 class="section__title">Hecho para escalar</h2>
+        </div>
+        <p class="section__intro">
+          Elige el modelo que encaja con tu momento. Empieza pequeño y crece con
+          confianza, o entra directo en proyectos transformadores. Sin costes
+          ocultos, sin sorpresas: precios transparentes que tienen sentido.
+        </p>
+      </header>
+
+      <div class="plans">
+        <article class="plan">
+          <p class="plan__name label">Esencial</p>
+          <p class="plan__price">890 €<span>· proyecto</span></p>
+          <p class="plan__for">Para lanzar una web esencial, rápido.</p>
+          <a class="plan__btn" href="#contacto">Empezar <span>+</span></a>
+          <p class="plan__inc label">Qué incluye</p>
+          <ul class="plan__list">
+            <li>Diseño y desarrollo a medida (sin plantillas)</li>
+            <li>Entrega en semanas, no meses</li>
+            <li>Hasta 3 revisiones tras el lanzamiento</li>
+            <li>Respuesta directa en menos de 24 h</li>
+          </ul>
+        </article>
+
+        <article class="plan plan--featured">
+          <span class="plan__badge label">Popular</span>
+          <p class="plan__name label">Estudio</p>
+          <p class="plan__price">2.450 €<span>· proyecto</span></p>
+          <p class="plan__for">Web + sistema de marca. El punto dulce.</p>
+          <a class="plan__btn plan__btn--solid" href="#contacto">Empezar <span>+</span></a>
+          <p class="plan__inc label">Qué incluye</p>
+          <ul class="plan__list">
+            <li>Todo lo de Esencial, con más alcance</li>
+            <li>Sistema visual y componentes reutilizables</li>
+            <li>Kit de diseño (.zip): tipografías, paletas y componentes</li>
+            <li>Pagos con Stripe y factura incluida</li>
+          </ul>
+        </article>
+
+        <article class="plan plan--quote">
+          <p class="plan__name label">Sistema · A medida</p>
+          <p class="plan__price">Desde 4.900 €</p>
+          <p class="plan__for">Proyectos grandes, producto y automatización.</p>
+          <a class="plan__btn" href="#contacto">Pedir presupuesto <span>↗</span></a>
+          <div class="plan__contact">
+            <div class="plan__avatar ph"><span class="ph__tag">Foto</span></div>
+            <div>
+              <p class="plan__cname">DOSA</p>
+              <p class="plan__crole label">Dirección de proyecto</p>
+            </div>
+          </div>
+          <p class="plan__note">Cuéntanos tus necesidades y te orientamos en 3–5 días.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TESTIMONIOS ===================== -->
+  <section class="section testimonios" id="testimonios">
+    <div class="wrap">
+      <header class="section__head">
+        <span class="section__label label">[06] — Confianza</span>
+        <h2 class="section__title">La confianza de equipos<br>que no se conforman.</h2>
+      </header>
+
+      <!-- Testimonios de MUESTRA — reemplazar por reseñas reales (con permiso del
+           cliente) antes de publicar. Fotos: randomuser.me (libre para prototipos);
+           self-hostéalas en /assets al ir a producción. -->
+      <div class="quotes">
+        <figure class="quote">
+          <blockquote class="quote__text">“Nos montaron la tienda en tres semanas y automatizaron medio trabajo que hacíamos a mano. Trato cercano y todo claro.”</blockquote>
+          <figcaption class="quote__by">
+            <img class="quote__avatar" src="https://randomuser.me/api/portraits/women/68.jpg" alt="" width="44" height="44" loading="lazy" />
+            <span><b>Laura Giménez</b><br><span class="label">Dueña, tienda online</span></span>
+          </figcaption>
+        </figure>
+        <figure class="quote">
+          <blockquote class="quote__text">“Le pasé una idea a medias y me devolvió algo mejor de lo que tenía en la cabeza. Sin rodeos ni reuniones eternas.”</blockquote>
+          <figcaption class="quote__by">
+            <img class="quote__avatar" src="https://randomuser.me/api/portraits/men/45.jpg" alt="" width="44" height="44" loading="lazy" />
+            <span><b>Marc Soler</b><br><span class="label">Fundador, startup</span></span>
+          </figcaption>
+        </figure>
+        <figure class="quote">
+          <blockquote class="quote__text">“Cero postureo, respuestas rápidas y todo funcionando desde el primer día. Repetiremos seguro.”</blockquote>
+          <figcaption class="quote__by">
+            <img class="quote__avatar" src="https://randomuser.me/api/portraits/women/32.jpg" alt="" width="44" height="44" loading="lazy" />
+            <span><b>Elena Ruiz</b><br><span class="label">Clínica de fisioterapia</span></span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FAQ ===================== -->
+  <section class="section faq" id="faq">
+    <div class="wrap">
+      <header class="section__head section__head--split">
+        <div>
+          <span class="section__label label">[07] — Dudas</span>
+          <h2 class="section__title">Preguntas<br>frecuentes</h2>
+        </div>
+        <div class="faq__list">
+          <details class="faq__item" open>
+            <summary>¿Cómo empezamos a trabajar juntos?</summary>
+            <p>Reservas una llamada de 15 minutos, entendemos tu necesidad y te proponemos el plan que encaja. Arrancamos en pocos días.</p>
+          </details>
+          <details class="faq__item">
+            <summary>¿Cuánto tardáis en entregar?</summary>
+            <p>Depende del alcance, pero trabajamos por ciclos cortos con entregas frecuentes para que veas avance constante.</p>
+          </details>
+          <details class="faq__item">
+            <summary>¿Trabajáis con equipos internos?</summary>
+            <p>Sí. Nos integramos como una extensión de tu equipo, con la cadencia de sincronización que necesites.</p>
+          </details>
+          <details class="faq__item">
+            <summary>¿Y si necesito algo puntual?</summary>
+            <p>Tenemos un modelo a medida para proyectos concretos. Pídenos un presupuesto y te orientamos.</p>
+          </details>
+        </div>
+      </header>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER (bookend con vídeo) ===================== -->
+  <footer class="footer" id="contacto">
+    <!-- Fondo: PLACEHOLDER de vídeo full-bleed (bookend del hero) -->
+    <div class="footer__bg" aria-hidden="true"></div>
+    <!--
+      TODO recurso Iris — sustituir .footer__bg por vídeo full-bleed:
+      <video class="footer__video" autoplay loop muted playsinline poster="/assets/footer-poster.jpg">
+        <source src="/assets/footer.mp4" type="video/mp4" />
+      </video>
+      Mismo formato que el hero (mp4 H.264, mudo, loop, cover).
+    -->
+    <span class="ph-note" aria-hidden="true">placeholder de vídeo · footer full-bleed (mp4, mudo, loop)</span>
+
+    <div class="footer__inner wrap">
+      <div class="footer__top">
+        <!-- Caja de consultas → backoffice de IRIS (Cloudflare Worker) -->
+        <div class="footer__cta">
+          <span class="section__label label">[08] — Contacto</span>
+          <h2 class="footer__title">Hablemos de lo que<br>estás construyendo.</h2>
+          <p class="footer__lead">
+            Cuéntanos tu proyecto y te respondemos en menos de 24 h.
+            ¿A la antigua? <a href="mailto:contacto@iris.it.com">contacto@iris.it.com</a>
+          </p>
+
+          <form class="contact-form" id="contact-form" novalidate>
+            <div class="contact-form__row">
+              <input id="cf-name" name="nombre" type="text" placeholder="Tu nombre *" required autocomplete="name" />
+              <input id="cf-email" name="email" type="email" placeholder="Tu e-mail *" required autocomplete="email" />
+            </div>
+            <textarea id="cf-msg" name="mensaje" rows="4" placeholder="Cuéntanos brevemente tu proyecto *" required></textarea>
+            <!-- Honeypot anti-bots (oculto; si se rellena, no se envía) -->
+            <input class="contact-form__hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <div class="contact-form__foot">
+              <button class="contact-form__btn" type="submit">Enviar mensaje <span aria-hidden="true">↗</span></button>
+              <p class="contact-form__status label" id="cf-status" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+        </div>
+
+        <!-- Datos reales del estudio -->
+        <div class="footer__cols">
+          <div class="footer__col">
+            <span class="footer__coltitle label">Estudio</span>
+            <p class="footer__about">Estudio de diseño y automatización. Identidad, producto digital y sistemas que crecen contigo.</p>
+            <p class="label footer__loc">Madrid (ES) · en remoto · <span id="clock-footer" style="color:var(--text)">--:--</span></p>
+          </div>
+          <div class="footer__col">
+            <span class="footer__coltitle label">Navegación</span>
+            <nav class="footer__links">
+              <a href="#proyectos">Proyectos</a>
+              <a href="#servicios">Servicios</a>
+              <a href="#precios">Precios</a>
+              <a href="#faq">FAQ</a>
+            </nav>
+          </div>
+          <div class="footer__col">
+            <span class="footer__coltitle label">Proyectos</span>
+            <nav class="footer__links">
+              <a href="https://iris.it.com/corlima/herramientas_corlima.html" target="_blank" rel="noopener">Corlima Tools</a>
+              <a href="https://iris.it.com/creative_tools.html" target="_blank" rel="noopener">Creative Tools</a>
+              <a href="https://iris.it.com/spacio/spacio2.html" target="_blank" rel="noopener">SPACIO²</a>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="footer__wordmark">IRIS</h2>
+
+      <div class="footer__bottom">
+        <nav class="footer__nav">
+          <a href="https://iris.it.com/aviso-legal.html" target="_blank" rel="noopener">Aviso legal</a>
+          <a href="https://iris.it.com/privacidad.html" target="_blank" rel="noopener">Privacidad</a>
+          <a href="https://iris.it.com/cookies.html" target="_blank" rel="noopener">Cookies</a>
+        </nav>
+        <p class="footer__legal label">© <span id="year">20XX</span> IRIS · Todos los derechos reservados</p>
+      </div>
+    </div>
+  </footer>
+
+  </div><!-- /#smooth-content -->
+  </div><!-- /#smooth-wrapper -->
+
+</body>
+</html>
