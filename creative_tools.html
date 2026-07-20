@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Creative Tools — IRIS</title>
-<link rel="icon" type="image/svg+xml" href="assets/dosa_favicon.svg">
+<link rel="icon" type="image/svg+xml" href="assets/iris-favicon.svg">
 <meta name="description" content="Laboratorio de imagen de IRIS. Gradientes mesh, óptica, dithering, halftone y ASCII en el navegador. Sin cuenta, sin límites.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -196,12 +196,17 @@
     .grp{border-bottom:none;border-right:1px solid var(--line-soft);min-width:240px}
   }
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  /* Boton de marca = logo completo (vuelve al landing) */
+  .brand{align-items:center}
+  .brand-home{display:inline-flex;align-items:center}
+  .brand-logo{display:block;height:22px;width:auto}
+  .brand-home:hover .brand-logo{opacity:.72;transition:opacity .15s}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="topbar">
-    <div class="brand"><a href="https://iris.it.com" class="brand-home" title="Volver a IRIS"><span class="iris">IRIS</span></a><span class="divider"></span><span class="tool">Creative Tools</span></div>
+    <div class="brand"><a href="https://iris.it.com" class="brand-home" title="Volver a IRIS"><img class="brand-logo" src="assets/iris-logo-full.svg" alt="IRIS" /></a><span class="divider"></span><span class="tool">Creative Tools</span></div>
     <span class="badge-free">Free · No account</span>
     <div class="modesw">
       <button data-mode="effects" class="active">Effects</button>
