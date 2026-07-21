@@ -29,6 +29,12 @@
     }
     /* Media real en el swap de proyectos (img/video sobre el gradiente fallback) */
     .swap__asset{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:block}
+    /* Swap de proyectos: imágenes sin borde ni esquinas redondeadas, y más grandes */
+    .swap__frame{border:0!important;border-radius:0!important;box-shadow:none!important}
+    @media (min-width:1024px){
+      .swap{grid-template-columns:.5fr 1.5fr;gap:var(--space-3)}
+      .swap__frame{max-height:92vh}
+    }
     /* Wordmark del footer: SVG a ancho completo, mismo comportamiento de margen */
     .footer__wordmark--logo{line-height:0;font-size:0}
     .footer__wordmark--logo img{display:block;width:100%;height:auto}
