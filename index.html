@@ -35,6 +35,11 @@
       .swap{grid-template-columns:.5fr 1.5fr;gap:var(--space-3)}
       .swap__frame{max-height:92vh}
     }
+    /* Escala general tipo Mugen: contenedor más ancho para que no se quede pequeño en monitores grandes */
+    :root{--maxw:1600px}
+    /* Títulos de la lista de proyectos más grandes (como los nombres de Services en Mugen) */
+    .swap__title{font-size:clamp(1.8rem,3.6vw,3rem)}
+    .swap__step{padding-block:var(--space-4)}
     /* Grano de película sutil sobre las imágenes del swap (overlay fijo, no degrada el JPEG) */
     .swap__frame::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
       background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='150'%20height='150'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.85'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='saturate'%20values='0'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23n)'/%3E%3C/svg%3E");
@@ -194,9 +199,16 @@
   <!-- Proyectos reales de IRIS. La imagen fija cambia al hacer scroll (JS: ScrollTrigger + sticky). -->
   <section class="section proyectos" id="proyectos">
     <div class="wrap">
-      <header class="section__head">
-        <span class="section__label label">[01] — Trabajo destacado</span>
-        <h2 class="section__title">Proyectos</h2>
+      <header class="section__head section__head--split">
+        <div>
+          <span class="section__label label">[01] — Trabajo destacado</span>
+          <h2 class="section__title">Proyectos</h2>
+        </div>
+        <p class="section__intro">
+          Una selección de trabajos recientes: identidad, web y producto digital,
+          del concepto al lanzamiento. Cada caso, diseñado y programado a medida —
+          sin plantillas, sin atajos.
+        </p>
       </header>
 
       <div class="swap">
