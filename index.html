@@ -92,6 +92,13 @@
     .pmodal__text{color:var(--muted);line-height:1.55;margin:0 0 1.4rem;max-width:40ch}
     .pmodal__tags{list-style:none;display:flex;flex-wrap:wrap;gap:.5rem;padding:0;margin:0}
     .pmodal__tags li{font-size:.8rem;padding:.5em .8em;border:1px solid var(--line);border-radius:999px;color:var(--text)}
+    .pmodal__input{width:100%;margin-top:.3rem;padding:.85rem 1rem;border-radius:12px;
+      background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--text);font-size:1rem;outline:none;transition:border-color .2s}
+    .pmodal__input:focus{border-color:var(--text)}
+    .pmodal__err{min-height:1.2em;margin:.5rem 2px 0;color:#e5484d;font-size:.85rem}
+    .pmodal__btn{width:100%;margin-top:.9rem;padding:.85rem;border-radius:12px;border:none;
+      background:var(--text);color:#0a0a0a;font-weight:600;font-size:.95rem;cursor:pointer;transition:opacity .2s}
+    .pmodal__btn:hover{opacity:.88}
     /* Grano de película sutil sobre las imágenes del swap (overlay fijo, no degrada el JPEG) */
     .swap__frame::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
       background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='150'%20height='150'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.85'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='saturate'%20values='0'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23n)'/%3E%3C/svg%3E");
@@ -358,7 +365,7 @@
         </article>
 
         <article class="case case--b">
-          <a class="case__media ph" href="https://iris.it.com/corlima/herramientas_corlima.html" target="_blank" rel="noopener" aria-label="Ver caso Corlima Tools">
+          <a class="case__media ph" href="#" data-corlima role="button" aria-label="Abrir Corlima Tools (acceso privado)">
             <span class="ph__tag">Imagen 4:3 → /assets</span>
             <span class="case__num label">[02]</span>
             <span class="case__plus" aria-hidden="true">+</span>
@@ -697,7 +704,7 @@
           <div class="footer__col">
             <span class="footer__coltitle label">Proyectos</span>
             <nav class="footer__links">
-              <a href="https://iris.it.com/corlima/herramientas_corlima.html" target="_blank" rel="noopener">Corlima Tools</a>
+              <a href="#" data-corlima role="button">Corlima Tools</a>
               <a href="https://iris.it.com/creative_tools.html" target="_blank" rel="noopener">Creative Tools</a>
               <a href="https://iris.it.com/spacio/spacio2.html" target="_blank" rel="noopener">SPACIO²</a>
             </nav>
@@ -720,6 +727,59 @@
 
   </div><!-- /#smooth-content -->
   </div><!-- /#smooth-wrapper -->
+
+  <!-- Modal de acceso privado a Corlima Tools (restaura el gate del IRIS antiguo) -->
+  <div class="pmodal" id="modalCorlima" role="dialog" aria-modal="true" aria-labelledby="modalCorlimaTitle" aria-hidden="true">
+    <div class="pmodal__box">
+      <button class="pmodal__close" type="button" data-close-corlima aria-label="Cerrar">&#215;</button>
+      <p class="pmodal__label label">Herramientas Corlima</p>
+      <h3 class="pmodal__title" id="modalCorlimaTitle">Acceso privado</h3>
+      <p class="pmodal__text">Introduce la contraseña para acceder a la suite de herramientas de Corlima.</p>
+      <input class="pmodal__input" type="password" id="corlimaPwd" placeholder="Contraseña" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <p class="pmodal__err" id="corlimaErr" role="alert"></p>
+      <button class="pmodal__btn" type="button" id="corlimaEnter">Entrar</button>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    var modal = document.getElementById('modalCorlima');
+    if(!modal) return;
+    var input = document.getElementById('corlimaPwd'), err = document.getElementById('corlimaErr');
+    var HASH = '7d72f11e2ce2b7bf5b2044162b41abe4b903026cde50ab60de41734ad93f03ae';
+    var KEY = 'corlimaAccess', DEST = 'corlima/herramientas_corlima.html';
+    function unlocked(){
+      if(sessionStorage.getItem(KEY)) return true;
+      try{ var it = localStorage.getItem(KEY); if(it){ var d = JSON.parse(it); if(Date.now() - d.ts < 86400000) return true; } }catch(e){}
+      return false;
+    }
+    function setUnlocked(){ localStorage.setItem(KEY, JSON.stringify({ts:Date.now()})); sessionStorage.setItem(KEY, '1'); }
+    function go(){ window.location.href = DEST; }
+    async function sha256(s){
+      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+      return Array.prototype.map.call(new Uint8Array(buf), function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+    }
+    function open(){
+      if(unlocked()){ go(); return; }
+      modal.classList.add('is-open'); modal.setAttribute('aria-hidden','false');
+      setTimeout(function(){ input.focus(); }, 60);
+    }
+    function close(){ modal.classList.remove('is-open'); modal.setAttribute('aria-hidden','true'); input.value=''; err.textContent=''; }
+    async function check(){
+      if(!crypto || !crypto.subtle){ err.textContent = 'El acceso requiere una conexión segura (https).'; return; }
+      var h = await sha256(input.value);
+      if(h === HASH){ setUnlocked(); go(); }
+      else { err.textContent = 'Contraseña incorrecta.'; input.value=''; input.focus(); }
+    }
+    Array.prototype.slice.call(document.querySelectorAll('[data-corlima]')).forEach(function(el){
+      el.addEventListener('click', function(e){ e.preventDefault(); open(); });
+    });
+    document.getElementById('corlimaEnter').addEventListener('click', check);
+    input.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); check(); } });
+    modal.addEventListener('click', function(e){ if(e.target === modal || e.target.hasAttribute('data-close-corlima')) close(); });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && modal.classList.contains('is-open')) close(); });
+  })();
+  </script>
 
   <!-- Modal privado de WAVA (proyecto en desarrollo, no público) -->
   <div class="pmodal" id="modalWava" role="dialog" aria-modal="true" aria-labelledby="modalWavaTitle" aria-hidden="true">
