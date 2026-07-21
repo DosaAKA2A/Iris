@@ -32,14 +32,26 @@
     /* Swap de proyectos: imágenes sin borde ni esquinas redondeadas, y más grandes */
     .swap__frame{border:0!important;border-radius:0!important;box-shadow:none!important}
     @media (min-width:1024px){
-      .swap{grid-template-columns:.5fr 1.5fr;gap:var(--space-3)}
-      .swap__frame{max-height:92vh}
+      .swap{grid-template-columns:.7fr 2.3fr;gap:var(--space-4);align-items:center}
+      .swap__frame{max-height:96vh;aspect-ratio:3 / 2}
     }
     /* Escala general tipo Mugen: contenedor más ancho para que no se quede pequeño en monitores grandes */
     :root{--maxw:1600px}
     /* Títulos de la lista de proyectos más grandes (como los nombres de Services en Mugen) */
     .swap__title{font-size:clamp(1.8rem,3.6vw,3rem)}
     .swap__step{padding-block:var(--space-4)}
+    .swap__step .swap__num{display:block;margin-bottom:.35rem;opacity:.6}
+    /* Caption del proyecto activo, sobre la imagen (estilo Mugen) */
+    .swap__caption{position:absolute;left:0;right:0;bottom:0;z-index:4;pointer-events:none;
+      display:flex;flex-direction:column;gap:.7rem;color:#fff;
+      padding:clamp(1.25rem,2.6vw,2.6rem);
+      background:linear-gradient(to top,rgba(0,0,0,.86) 0%,rgba(0,0,0,.5) 42%,rgba(0,0,0,0) 100%)}
+    .swap__caption .swap__cat{color:rgba(255,255,255,.7)}
+    .swap__caption .swap__desc{margin:0;max-width:56ch;font-size:clamp(1rem,1.25vw,1.2rem);line-height:1.45;color:rgba(255,255,255,.92)}
+    .swap__caption .swap__link{pointer-events:auto;align-self:flex-start;color:#fff;font-weight:600;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.45);padding-bottom:2px}
+    .swap__caption .swap__link:hover{border-color:#fff}
+    .swap__caption.is-anim .swap__cat,.swap__caption.is-anim .swap__desc,.swap__caption.is-anim .swap__link{animation:swapCapIn .5s ease both}
+    @keyframes swapCapIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
     /* Grano de película sutil sobre las imágenes del swap (overlay fijo, no degrada el JPEG) */
     .swap__frame::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
       background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='150'%20height='150'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.85'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='saturate'%20values='0'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23n)'/%3E%3C/svg%3E");
@@ -212,10 +224,9 @@
       </header>
 
       <div class="swap">
-        <!-- Media sticky: cambia según el proyecto activo -->
+        <!-- Media sticky: la imagen del proyecto activo domina la fila. La descripción
+             del proyecto se muestra sobre la imagen y cambia con el scroll (JS abajo). -->
         <div class="swap__media">
-          <!-- Marco estático (overflow hidden). Dentro, la "tira" con las 4
-               imágenes apiladas se desplaza con el scroll (JS: scrub). -->
           <div class="swap__frame">
             <div class="swap__track">
               <div class="swap__img" data-index="0"><img class="swap__asset" src="./assets/spacio-swap.jpg" alt="SPACIO² — editorial web de exploración espacial" loading="lazy" decoding="async" width="1500" height="1200"></div>
@@ -223,40 +234,45 @@
               <div class="swap__img" data-index="2"><img class="swap__asset" src="./assets/ederus-swap.jpg" alt="EDERUS — tienda online a medida" loading="lazy" decoding="async" width="1500" height="1200"></div>
               <div class="swap__img ph" data-index="3"><span class="ph__tag">WAVA · imagen → /assets</span></div>
             </div>
+            <!-- Caption sincronizada con el proyecto activo (rellenada por JS) -->
+            <div class="swap__caption" aria-live="polite">
+              <p class="swap__cat label" data-role="cat">Diseño editorial — 2024</p>
+              <p class="swap__desc" data-role="desc">Editorial web de exploración espacial: dirección de arte, tipografía y maquetación con carácter propio.</p>
+              <a class="swap__link" data-role="link" href="https://iris.it.com/spacio/spacio2.html" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
+            </div>
           </div>
         </div>
 
-        <!-- Lista de proyectos (cada uno es un "paso" del scroll). Enlaces reales:
-             SPACIO² (/spacio/spacio2.html), FISIO y EDERUS (GitHub Pages),
-             WAVA (/wava/). -->
+        <!-- Lista de proyectos: solo el nombre (como el Services de Mugen). Categoría,
+             descripción y enlace viven en la caption y se van cambiando con el scroll. -->
         <ol class="swap__list">
-          <li class="swap__step is-active" data-index="0">
+          <li class="swap__step is-active" data-index="0"
+              data-cat="Diseño editorial — 2024"
+              data-desc="Editorial web de exploración espacial: dirección de arte, tipografía y maquetación con carácter propio."
+              data-href="https://iris.it.com/spacio/spacio2.html">
             <span class="swap__num label">01</span>
             <h3 class="swap__title">SPACIO²</h3>
-            <p class="swap__cat label">Diseño editorial — 2024</p>
-            <p class="swap__desc">Editorial web de exploración espacial: dirección de arte, tipografía y maquetación con carácter propio.</p>
-            <a class="swap__link" href="https://iris.it.com/spacio/spacio2.html" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
           </li>
-          <li class="swap__step" data-index="1">
+          <li class="swap__step" data-index="1"
+              data-cat="Branding & Web — 2023"
+              data-desc="Identidad y web para una clínica de fisioterapia: cercana, clara y profesional."
+              data-href="https://dosaaka2a.github.io/FISIO/">
             <span class="swap__num label">02</span>
             <h3 class="swap__title">FISIO</h3>
-            <p class="swap__cat label">Branding &amp; Web — 2023</p>
-            <p class="swap__desc">Identidad y web para una clínica de fisioterapia: cercana, clara y profesional.</p>
-            <a class="swap__link" href="https://dosaaka2a.github.io/FISIO/" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
           </li>
-          <li class="swap__step" data-index="2">
+          <li class="swap__step" data-index="2"
+              data-cat="E-commerce — 2024"
+              data-desc="Tienda online a medida: de la ficha de producto al checkout, sin fricción."
+              data-href="https://dosaaka2a.github.io/EDERUS/">
             <span class="swap__num label">03</span>
             <h3 class="swap__title">EDERUS</h3>
-            <p class="swap__cat label">E-commerce — 2024</p>
-            <p class="swap__desc">Tienda online a medida: de la ficha de producto al checkout, sin fricción.</p>
-            <a class="swap__link" href="https://dosaaka2a.github.io/EDERUS/" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
           </li>
-          <li class="swap__step" data-index="3">
+          <li class="swap__step" data-index="3"
+              data-cat="Branding — 2024"
+              data-desc="Identidad de marca para alimentación: del naming al sistema visual completo."
+              data-href="https://iris.it.com/wava/">
             <span class="swap__num label">04</span>
             <h3 class="swap__title">WAVA</h3>
-            <p class="swap__cat label">Branding — 2024</p>
-            <p class="swap__desc">Identidad de marca para alimentación: del naming al sistema visual completo.</p>
-            <a class="swap__link" href="https://iris.it.com/wava/" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
           </li>
         </ol>
       </div>
@@ -649,6 +665,47 @@
 
   </div><!-- /#smooth-content -->
   </div><!-- /#smooth-wrapper -->
+
+  <!-- Sincroniza la caption del media con el proyecto activo del swap.
+       El bundle conmuta .is-active en .swap__step[data-index]; aquí lo observamos
+       y espejamos categoría/descripción/enlace en la caption sobre la imagen. -->
+  <script>
+  (function(){
+    var swap = document.querySelector('.proyectos .swap');
+    if(!swap) return;
+    var steps = Array.prototype.slice.call(swap.querySelectorAll('.swap__step'));
+    var cap = swap.querySelector('.swap__caption');
+    if(!cap || !steps.length) return;
+    var elCat = cap.querySelector('[data-role="cat"]');
+    var elDesc = cap.querySelector('[data-role="desc"]');
+    var elLink = cap.querySelector('[data-role="link"]');
+    var current = null;
+    function apply(step){
+      if(!step || step === current) return;
+      current = step;
+      if(elCat) elCat.textContent = step.getAttribute('data-cat') || '';
+      if(elDesc) elDesc.textContent = step.getAttribute('data-desc') || '';
+      if(elLink){
+        var href = step.getAttribute('data-href') || '';
+        if(href){ elLink.setAttribute('href', href); elLink.style.display = ''; }
+        else { elLink.style.display = 'none'; }
+      }
+      cap.classList.remove('is-anim'); void cap.offsetWidth; cap.classList.add('is-anim');
+    }
+    function activeStep(){
+      for(var i=0;i<steps.length;i++){ if(steps[i].classList.contains('is-active')) return steps[i]; }
+      return steps[0];
+    }
+    apply(activeStep());
+    var obs = new MutationObserver(function(muts){
+      for(var i=0;i<muts.length;i++){
+        var t = muts[i].target;
+        if(t.classList && t.classList.contains('is-active')){ apply(t); return; }
+      }
+    });
+    steps.forEach(function(s){ obs.observe(s, {attributes:true, attributeFilter:['class']}); });
+  })();
+  </script>
 
 </body>
 </html>
