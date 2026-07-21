@@ -32,8 +32,9 @@
     /* Swap de proyectos: imágenes sin borde ni esquinas redondeadas, y más grandes */
     .swap__frame{border:0!important;border-radius:0!important;box-shadow:none!important}
     @media (min-width:1024px){
-      .swap{grid-template-columns:.7fr 2.3fr;gap:var(--space-4);align-items:center}
-      .swap__frame{max-height:96vh;aspect-ratio:3 / 2}
+      .swap{grid-template-columns:.72fr 2.28fr;gap:var(--space-4);align-items:center}
+      /* Altura contenida para que la imagen + su caption entren en pantalla sin cortarse */
+      .swap__frame{max-height:72vh;aspect-ratio:3 / 2}
     }
     /* Escala general tipo Mugen: contenedor más ancho para que no se quede pequeño en monitores grandes */
     :root{--maxw:1600px}
