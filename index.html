@@ -49,10 +49,32 @@
     .swap__tags li:hover{border-color:var(--text)}
     .swap__tags.is-anim li{animation:swapTagIn .4s ease both}
     @keyframes swapTagIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-    /* Enlace bloqueado (EDERUS con contador) */
-    .swap__link.is-locked{color:var(--muted);cursor:default}
-    .swap__link.is-locked:hover{color:var(--muted)}
-    .swap__link .swap__timer{font-variant-numeric:tabular-nums}
+    /* EDERUS: bloque de lanzamiento con contador flip (reloj de carteles) */
+    .swap__launch{overflow:hidden;max-height:0;opacity:0;margin-top:0;
+      transition:max-height .55s cubic-bezier(.7,0,.2,1),opacity .4s ease,margin-top .4s ease}
+    .swap__step.is-active .swap__launch{max-height:16em;opacity:1;margin-top:var(--space-2)}
+    .swap__launch-label{display:block;margin-bottom:.75rem;color:var(--muted)}
+    .flipclock{display:flex;gap:.6rem;flex-wrap:wrap}
+    .flip-unit{display:flex;flex-direction:column;align-items:center;gap:.5rem}
+    .flip{perspective:260px}
+    .flip__card{position:relative;width:2.05em;height:1.7em;border-radius:9px;
+      font:700 clamp(1.5rem,2.1vw,2.1rem)/1.7em var(--font-mono,ui-monospace,monospace);
+      transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.25,1);will-change:transform}
+    .flip__card.no-anim{transition:none}
+    .flip__card.is-flipping{transform:rotateX(-180deg)}
+    .flip__front,.flip__back{position:absolute;inset:0;display:grid;place-items:center;
+      backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:9px;
+      background:linear-gradient(#1c1c21,#141418);color:#fff;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),0 8px 18px rgba(0,0,0,.4)}
+    .flip__front::after,.flip__back::after{content:"";position:absolute;left:0;right:0;top:50%;
+      height:1px;background:rgba(0,0,0,.55);transform:translateY(-.5px)}
+    .flip__back{transform:rotateX(180deg)}
+    .flip-unit__label{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+    .flip-sep{align-self:center;font:700 1.6rem/1 var(--font-mono,ui-monospace,monospace);color:var(--muted);padding-bottom:1.2rem}
+    .swap__launch-cta{display:inline-flex;align-items:center;gap:.4em;margin-top:var(--space-3);
+      font-weight:600;color:var(--text)}
+    .swap__launch-cta[hidden]{display:none}
+    .swap__launch.is-live .swap__launch-label{color:var(--accent,#3fb950)}
     /* Modal genérico (WAVA privado) */
     .pmodal{position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;
       padding:1.5rem;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
@@ -285,8 +307,19 @@
             <h3 class="swap__title">EDERUS</h3>
             <p class="swap__cat label">Web &amp; Microtransacciones — 2026</p>
             <p class="swap__desc">Sitio oficial del servidor ederus.com: microtransacciones y solicitudes que alteran el modo de juego de cada usuario, con una tienda a medida sin fricción.</p>
-            <a class="swap__link is-locked" id="ederusLink" href="https://ederus.com/" target="_blank" rel="noopener"
-               data-launch="2026-08-01T00:00:00" aria-disabled="true">Abre el 01 AGO · <span class="swap__timer" id="ederusTimer">—</span> <span aria-hidden="true">↗</span></a>
+            <div class="swap__launch" id="ederusLaunch" data-launch="2026-08-01T00:00:00">
+              <span class="swap__launch-label label">Se abre al público · 01 AGO 2026</span>
+              <div class="flipclock" role="timer" aria-label="Cuenta atrás para el lanzamiento de EDERUS">
+                <div class="flip-unit"><div class="flip" data-u="d"><div class="flip__card"><div class="flip__front">00</div><div class="flip__back">00</div></div></div><span class="flip-unit__label">Días</span></div>
+                <span class="flip-sep">:</span>
+                <div class="flip-unit"><div class="flip" data-u="h"><div class="flip__card"><div class="flip__front">00</div><div class="flip__back">00</div></div></div><span class="flip-unit__label">Horas</span></div>
+                <span class="flip-sep">:</span>
+                <div class="flip-unit"><div class="flip" data-u="m"><div class="flip__card"><div class="flip__front">00</div><div class="flip__back">00</div></div></div><span class="flip-unit__label">Min</span></div>
+                <span class="flip-sep">:</span>
+                <div class="flip-unit"><div class="flip" data-u="s"><div class="flip__card"><div class="flip__front">00</div><div class="flip__back">00</div></div></div><span class="flip-unit__label">Seg</span></div>
+              </div>
+              <a class="swap__launch-cta" id="ederusLink" href="https://ederus.com/" target="_blank" rel="noopener" hidden>Ver caso <span aria-hidden="true">↗</span></a>
+            </div>
           </li>
           <li class="swap__step" data-index="3"
               data-tags="Naming,Branding,Identidad visual,Web animada,Packaging">
@@ -732,26 +765,45 @@
       }
     }
 
-    // EDERUS: contador hasta el lanzamiento público (01/08/2026)
-    var link = document.getElementById('ederusLink'), timer = document.getElementById('ederusTimer');
-    if(link && timer){
-      var LAUNCH = new Date(link.getAttribute('data-launch') || '2026-08-01T00:00:00').getTime();
+    // EDERUS: contador flip (reloj de carteles) hasta el lanzamiento público (01/08/2026)
+    var launch = document.getElementById('ederusLaunch');
+    if(launch){
+      var TARGET = new Date(launch.getAttribute('data-launch') || '2026-08-01T00:00:00').getTime();
+      var cta = document.getElementById('ederusLink');
+      var lbl = launch.querySelector('.swap__launch-label');
+      var flips = {};
+      ['d','h','m','s'].forEach(function(u){
+        var el = launch.querySelector('.flip[data-u="' + u + '"]');
+        if(el) flips[u] = { card: el.querySelector('.flip__card'), front: el.querySelector('.flip__front'), back: el.querySelector('.flip__back') };
+      });
       function pad(n){ return n < 10 ? '0' + n : '' + n; }
-      function live(){ return Date.now() >= LAUNCH; }
+      function setFlip(u, next){
+        var f = flips[u]; if(!f || f.front.textContent === next) return;
+        f.back.textContent = next;
+        f.card.classList.add('is-flipping');
+        setTimeout(function(){
+          f.card.classList.add('no-anim');
+          f.card.classList.remove('is-flipping');
+          f.front.textContent = next;
+          void f.card.offsetWidth;
+          f.card.classList.remove('no-anim');
+        }, 500);
+      }
       function tick(){
-        if(live()){
-          link.classList.remove('is-locked');
-          link.removeAttribute('aria-disabled');
-          link.innerHTML = 'Ver caso <span aria-hidden="true">&#8599;</span>';
+        var ms = TARGET - Date.now();
+        if(ms <= 0){
+          ['d','h','m','s'].forEach(function(u){ setFlip(u, '00'); });
+          launch.classList.add('is-live');
+          if(lbl) lbl.textContent = 'Ya disponible';
+          if(cta) cta.hidden = false;
           clearInterval(iv);
           return;
         }
-        var ms = LAUNCH - Date.now();
-        var d = Math.floor(ms/86400000), h = Math.floor(ms%86400000/3600000),
-            mi = Math.floor(ms%3600000/60000), s = Math.floor(ms%60000/1000);
-        timer.textContent = d + 'd ' + pad(h) + ':' + pad(mi) + ':' + pad(s);
+        setFlip('d', pad(Math.floor(ms/86400000)));
+        setFlip('h', pad(Math.floor(ms%86400000/3600000)));
+        setFlip('m', pad(Math.floor(ms%3600000/60000)));
+        setFlip('s', pad(Math.floor(ms%60000/1000)));
       }
-      link.addEventListener('click', function(e){ if(!live()) e.preventDefault(); });
       var iv = setInterval(tick, 1000); tick();
     }
 
