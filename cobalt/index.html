@@ -276,48 +276,39 @@
       t();setInterval(t,10000);
     })();
 
-    // Descarga: coge la última versión publicada en GitHub Releases
+    // Descarga: busca en la lista de releases el instalador Windows y el APK
+    // por separado (el release más reciente puede ser el de Android).
     (async function(){
       const REPO='DosaAKA2A/Cobalt';
       const fallback='https://github.com/'+REPO+'/releases/latest';
       try{
-        const r=await fetch('https://api.github.com/repos/'+REPO+'/releases/latest',{headers:{'Accept':'application/vnd.github+json'}});
-        if(!r.ok) throw 0;
-        const d=await r.json();
-        const assets=d.assets||[];
-        const setup=assets.find(a=>/setup.*\.exe$/i.test(a.name));
-        const portable=assets.find(a=>/\.exe$/i.test(a.name) && !/setup/i.test(a.name));
-        const ver=d.tag_name||'';
-        if(setup){
+        const rr=await fetch('https://api.github.com/repos/'+REPO+'/releases',{headers:{'Accept':'application/vnd.github+json'}});
+        if(!rr.ok) throw 0;
+        const rels=await rr.json();
+        // Windows: primer release (más nuevo) con un Setup .exe
+        for(const rel of rels){
+          const setup=(rel.assets||[]).find(a=>/setup.*\.exe$/i.test(a.name));
+          if(!setup) continue;
+          const portable=(rel.assets||[]).find(a=>/\.exe$/i.test(a.name) && !/setup/i.test(a.name));
           document.getElementById('dl-main').href=setup.browser_download_url;
           document.getElementById('dl-hero').href=setup.browser_download_url;
-          const mb=Math.round(setup.size/1048576);
-          if(mb) document.getElementById('size-main').textContent='~'+mb+' MB';
+          if(portable) document.getElementById('dl-portable').href=portable.browser_download_url;
+          const mb=Math.round(setup.size/1048576); if(mb) document.getElementById('size-main').textContent='~'+mb+' MB';
+          document.getElementById('ver-main').textContent=rel.tag_name||'';
+          document.getElementById('ver-hero').textContent=rel.tag_name||'Última versión';
+          break;
         }
-        if(portable) document.getElementById('dl-portable').href=portable.browser_download_url;
-        if(ver){
-          document.getElementById('ver-main').textContent=ver;
-          document.getElementById('ver-hero').textContent=ver;
-          document.getElementById('dl-main-label').textContent='Descargar '+ver;
+        // Android: primer release con un .apk
+        for(const rel of rels){
+          const apk=(rel.assets||[]).find(a=>/\.apk$/i.test(a.name));
+          if(apk){ document.getElementById('dl-android').href=apk.browser_download_url; break; }
         }
       }catch(e){
         document.getElementById('dl-main').href=fallback;
         document.getElementById('dl-hero').href=fallback;
         document.getElementById('dl-portable').href=fallback;
+        document.getElementById('dl-android').href='https://github.com/'+REPO+'/releases';
       }
-      // APK de Android: busca el .apk más reciente en todos los releases
-      try{
-        const rr=await fetch('https://api.github.com/repos/'+REPO+'/releases',{headers:{'Accept':'application/vnd.github+json'}});
-        if(rr.ok){
-          const rels=await rr.json();
-          let apk=null,tag='';
-          for(const rel of rels){ const a=(rel.assets||[]).find(x=>/\.apk$/i.test(x.name)); if(a){apk=a;tag=rel.tag_name;break;} }
-          if(apk){
-            document.getElementById('dl-android').href=apk.browser_download_url;
-            document.getElementById('dl-android-label').textContent='Descargar APK Android';
-          }
-        }
-      }catch(e){}
     })();
   </script>
 </body>
