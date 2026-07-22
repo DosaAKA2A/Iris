@@ -54,11 +54,11 @@
       transition:max-height .55s cubic-bezier(.7,0,.2,1),opacity .4s ease,margin-top .4s ease}
     .swap__step.is-active .swap__launch{max-height:16em;opacity:1;margin-top:var(--space-2)}
     .swap__launch-label{display:block;margin-bottom:.75rem;color:var(--muted)}
-    .flipclock{display:flex;gap:.6rem;flex-wrap:wrap}
-    .flip-unit{display:flex;flex-direction:column;align-items:center;gap:.5rem}
-    .flip{perspective:260px}
-    .flip__card{position:relative;width:2.05em;height:1.7em;border-radius:9px;
-      font:700 clamp(1.5rem,2.1vw,2.1rem)/1.7em var(--font-mono,ui-monospace,monospace);
+    .flipclock{display:flex;gap:.3rem;flex-wrap:nowrap;align-items:flex-start}
+    .flip-unit{display:flex;flex-direction:column;align-items:center;gap:.4rem}
+    .flip{perspective:220px}
+    .flip__card{position:relative;width:1.85em;height:1.45em;border-radius:7px;
+      font:700 clamp(.95rem,1.5vw,1.3rem)/1.45em var(--font-mono,ui-monospace,monospace);
       transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.25,1);will-change:transform}
     .flip__card.no-anim{transition:none}
     .flip__card.is-flipping{transform:rotateX(-180deg)}
@@ -69,8 +69,9 @@
     .flip__front::after,.flip__back::after{content:"";position:absolute;left:0;right:0;top:50%;
       height:1px;background:rgba(0,0,0,.55);transform:translateY(-.5px)}
     .flip__back{transform:rotateX(180deg)}
-    .flip-unit__label{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
-    .flip-sep{align-self:center;font:700 1.6rem/1 var(--font-mono,ui-monospace,monospace);color:var(--muted);padding-bottom:1.2rem}
+    .flip-unit__label{font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+    .flip-sep{align-self:flex-start;font-weight:700;font-family:var(--font-mono,ui-monospace,monospace);
+      font-size:clamp(.95rem,1.5vw,1.3rem);line-height:1.45em;color:var(--muted)}
     .swap__launch-cta{display:inline-flex;align-items:center;gap:.4em;margin-top:var(--space-3);
       font-weight:600;color:var(--text)}
     .swap__launch-cta[hidden]{display:none}
