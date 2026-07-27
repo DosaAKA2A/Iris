@@ -89,11 +89,11 @@
       m.style.transform = 'rotateX(7deg) rotateY(-11deg) rotateZ(-7.5deg)';
       // Óptica más marcada: foco en el reloj/buscador, bordes fundidos
       const dof = document.querySelector('.dof'), vig = document.querySelector('.vig');
-      dof.style.backdropFilter = 'blur(4.5px)';
-      const mask = 'radial-gradient(78% 68% at 42% 32%, transparent 42%, rgba(0,0,0,.6) 70%, #000 94%)';
+      dof.style.backdropFilter = 'blur(2.6px)';
+      const mask = 'radial-gradient(78% 68% at 42% 32%, transparent 52%, rgba(0,0,0,.55) 76%, #000 96%)';
       dof.style.webkitMaskImage = mask; dof.style.maskImage = mask;
       vig.style.background = 'radial-gradient(108% 95% at 43% 34%, transparent 52%, rgba(0,0,0,.5) 100%)';
-      document.querySelector('.scan').style.opacity = '.3';
+      document.querySelector('.scan').style.opacity = '.14';
       document.querySelector('.floor').style.display = 'none';
     }
   </script>
