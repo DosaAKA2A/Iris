@@ -38,17 +38,17 @@
   .wm{position:absolute;right:-170px;top:-190px;width:520px;height:520px;opacity:.035;transform:rotate(12deg)}
   .wm svg{width:100%;height:100%;fill:#fff}
 
-  /* Chip de marca arriba a la izquierda */
-  .brand{position:absolute;left:34px;top:30px;display:flex;align-items:center;gap:10px;z-index:3}
-  .brand .mark{width:22px;height:22px;display:flex}
+  /* Chip de marca centrado arriba (despejado de las esquinas: la cartilla pone [05] y + encima) */
+  .brand{position:absolute;left:50%;top:30px;transform:translateX(-50%);display:flex;align-items:center;gap:11px;z-index:3}
+  .brand .mark{width:24px;height:24px;display:flex}
   .brand .mark svg{width:100%;height:100%;fill:#fff}
-  .brand .name{font-weight:800;font-size:15px;letter-spacing:-.02em}
-  .brand .dom{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.08em;margin-top:2px}
+  .brand .name{font-weight:800;font-size:16px;letter-spacing:-.02em;line-height:1.15}
+  .brand .dom{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.08em}
 
-  /* ===== Mockup del navegador en perspectiva 3/4 ===== */
-  .stage{position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);perspective:1500px;perspective-origin:60% 30%;width:660px;z-index:2}
+  /* ===== Mockup del navegador: frontal con tilt suave (como el hero de naviris.site) ===== */
+  .stage{position:absolute;left:50%;top:63%;transform:translate(-50%,-50%);perspective:1700px;perspective-origin:50% 0%;width:790px;z-index:2}
   .mock{position:relative;border-radius:14px;background:#0a0a0c;border:1px solid #26262b;overflow:hidden;aspect-ratio:16/10.6;
-    transform:rotateX(9deg) rotateY(-13deg) rotateZ(1.5deg);
+    transform:rotateX(14deg);
     box-shadow:
       0 60px 110px rgba(0,0,0,.72),
       0 24px 48px rgba(0,0,0,.55),
@@ -79,7 +79,7 @@
   .m-side i svg{width:15px;height:15px}
 
   /* Toast de AutoClaim flotando sobre el mockup: cuenta la historia del producto */
-  .float-toast{position:absolute;left:14%;bottom:21%;z-index:4;
+  .float-toast{position:absolute;left:8%;bottom:12%;z-index:4;
     display:inline-flex;align-items:center;gap:9px;padding:11px 16px;border-radius:12px;
     background:rgba(13,13,16,.92);border:1px solid #2c2c33;font-size:12.5px;color:var(--text);
     box-shadow:0 22px 48px rgba(0,0,0,.6);backdrop-filter:blur(6px);
@@ -87,7 +87,7 @@
   .float-toast .pill{font-family:var(--mono);font-size:10.5px;color:var(--violet);letter-spacing:.06em}
 
   /* Reflejo en el suelo */
-  .floor{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);width:640px;height:120px;z-index:1;
+  .floor{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);width:730px;height:120px;z-index:1;
     background:radial-gradient(50% 100% at 50% 0%,rgba(122,84,190,.14) 0%,transparent 70%);
     filter:blur(2px)}
 </style>
