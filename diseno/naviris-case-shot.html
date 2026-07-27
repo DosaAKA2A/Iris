@@ -2,163 +2,84 @@
 <html lang="es">
 <head>
 <meta charset="utf-8" />
-<title>Naviris — case shot (macro de pantalla)</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<title>Naviris — case shot (captura real de la app)</title>
 <style>
-  /* Fotografía macro simulada: esquina de un monitor con Naviris abierto.
-     Referencias: primer plano en ángulo, bisel visible, scanlines, reflejo
-     espectral y profundidad de campo (centro nítido, esquinas desenfocadas). */
-  :root{
-    --violet:#b98cff; --green:#9ee2b8;
-    --font:'Inter',system-ui,sans-serif; --mono:'Geist Mono',ui-monospace,monospace;
-  }
+  /* Escena 4:3 con una captura REAL de Naviris (tomada por CDP de la app en vivo).
+     El navegador se ve entero: pestañas, sidebar de addons, página de nueva pestaña
+     y el badge de versión. Variantes: ?v=1 (ángulo suave) · ?v=2 (frontal). */
+  :root{ --violet:#b98cff }
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{width:880px;height:660px;overflow:hidden}
-  body{background:#060607;font-family:var(--font);-webkit-font-smoothing:antialiased;line-height:1.5;color:#ececef}
+  body{background:#060607}
 
-  .scene{position:relative;width:880px;height:660px;overflow:hidden;background:#060607}
-
-  /* Pared tras el monitor: penumbra con un resto de luz violeta */
-  .wall{position:absolute;inset:0;
+  .scene{position:relative;width:880px;height:660px;overflow:hidden;
     background:
-      radial-gradient(130% 90% at 88% 8%, rgba(122,84,190,.28) 0%, rgba(122,84,190,.08) 40%, transparent 70%),
-      linear-gradient(160deg,#0d0c11 0%,#060607 55%)}
+      radial-gradient(95% 75% at 50% 26%, rgba(122,84,190,.17) 0%, rgba(122,84,190,.05) 45%, transparent 72%),
+      radial-gradient(120% 100% at 50% 115%, #0c0b10 0%, #060607 60%)}
+  /* Rejilla técnica sutil */
+  .scene::before{content:"";position:absolute;inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+    background-size:44px 44px;
+    -webkit-mask-image:radial-gradient(80% 70% at 50% 40%,#000 30%,transparent 80%);
+    mask-image:radial-gradient(80% 70% at 50% 40%,#000 30%,transparent 80%)}
 
-  /* ===== Monitor: solo asoma su esquina superior izquierda, girado ===== */
-  .monitor{position:absolute;left:-175px;top:-48px;width:1900px;height:1240px;
-    transform:perspective(1600px) rotateX(3deg) rotateY(-7deg) rotateZ(-8.5deg);
-    transform-origin:20% 20%;
-    border-radius:26px;background:#020203;padding:34px 34px 0 40px;
-    box-shadow:0 60px 140px rgba(0,0,0,.85),0 0 0 1px #101012,
-      inset 0 1px 0 rgba(255,255,255,.09),inset 2px 0 0 rgba(255,255,255,.03)}
-  /* Canto del bisel que recibe la luz */
-  .monitor::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;border-radius:26px 26px 0 0;
-    background:linear-gradient(90deg,rgba(255,255,255,.13),rgba(255,255,255,.04) 60%,transparent)}
-
-  .screen{position:relative;width:100%;height:100%;overflow:hidden;border-radius:8px 8px 0 0;
-    background:#0a0a0d;
-    box-shadow:inset 0 0 60px rgba(0,0,0,.5)}
-
-  /* ===== Chrome del navegador, sobredimensionado (estamos MUY cerca) ===== */
-  .tabstrip{display:flex;align-items:flex-end;gap:14px;height:88px;padding:16px 26px 0 26px;background:#070709}
-  .tab{display:flex;align-items:center;gap:14px;height:62px;padding:0 30px;border-radius:16px 16px 0 0;font-size:23px}
-  .tab.active{background:#141419;color:#ececef;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
-  .tab.active .fav{width:26px;height:26px;display:flex}
-  .tab.active .fav svg{width:100%;height:100%;fill:#fff}
-  .tab.ghost{color:#6a6c74;background:#0d0d10;height:56px;font-size:22px}
-  .tab.ghost .tdot{width:11px;height:11px;border-radius:50%;background:#3c3d44}
-  .tab.farm{color:var(--green);border:2px solid rgba(158,226,184,.32);border-bottom:none;background:rgba(158,226,184,.06);height:56px;font-size:22px}
-  .tab.farm svg{width:22px;height:22px}
-  .tab .close{margin-left:10px;color:#5c5e64;font-size:20px}
-
-  .toolbar{display:flex;align-items:center;gap:22px;height:84px;padding:0 30px;background:#0e0e12;color:#5c5e64;font-size:26px;border-bottom:1px solid #17171a}
-  .urlpill{flex:1;max-width:1080px;height:54px;border-radius:999px;background:#08080a;border:1.5px solid #202024;display:flex;align-items:center;gap:16px;padding:0 26px;font-size:23px;color:#a9abb2;letter-spacing:.01em}
-  .urlpill .lock{width:20px;height:20px;color:#8b8d94}
-  .urlpill .domain{color:#ececef;font-weight:600}
-  .urlpill .path{color:#5c5e64}
-
-  /* ===== Página: hero de naviris.site ===== */
-  .page{position:relative;height:calc(100% - 172px);background:
-    radial-gradient(90% 60% at 46% 0%,#16161b 0%,#0a0a0d 60%);
-    padding:120px 0 0 150px}
-  .eyebrow{display:inline-flex;align-items:center;gap:14px;padding:12px 24px;border:1.5px solid #232327;border-radius:999px;background:rgba(255,255,255,.02);font-family:var(--mono);font-size:19px;letter-spacing:.14em;text-transform:uppercase;color:#8b8d94}
-  .eyebrow .dot{width:11px;height:11px;border-radius:50%;background:var(--violet);box-shadow:0 0 16px rgba(185,140,255,.8)}
-  .wordmark{display:flex;align-items:center;gap:34px;margin-top:56px}
-  .wordmark .logo{width:120px;height:120px;display:flex}
-  .wordmark .logo svg{width:100%;height:100%;fill:#fff}
-  .wordmark h1{font-size:150px;font-weight:900;letter-spacing:-.04em;line-height:1;color:#fff}
-  .tagline{margin-top:40px;font-size:34px;color:#8b8d94;max-width:900px;line-height:1.45}
-  .cta{display:inline-flex;align-items:center;gap:16px;margin-top:52px;background:#e8e9ec;color:#0a0a0a;font-size:28px;font-weight:700;padding:26px 46px;border-radius:20px}
-  .cta svg{width:30px;height:30px}
-
-  /* ===== Capas fotográficas sobre la pantalla ===== */
-  /* Subpíxeles: columnas verticales finas */
-  .px{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:.5;
-    background:repeating-linear-gradient(90deg,rgba(255,255,255,.045) 0 1px,transparent 1px 3px)}
-  /* Scanlines horizontales */
-  .scan{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:.55;
-    background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 1px,transparent 1px 4px)}
-  /* Banda de reflejo espectral (como el arcoíris del cristal en las fotos) */
-  .spectral{position:absolute;inset:0;z-index:6;pointer-events:none;opacity:.16;
-    background:linear-gradient(64deg,transparent 30%,rgba(255,120,120,.5) 40%,rgba(255,220,130,.45) 45%,rgba(140,255,190,.4) 50%,rgba(130,180,255,.5) 55%,rgba(200,140,255,.45) 60%,transparent 70%)}
+  .stage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);perspective:1900px;perspective-origin:50% 30%;z-index:2}
+  .monitor{position:relative;width:806px;border-radius:16px;background:#040405;padding:11px;
+    transform:rotateX(7deg) rotateY(-7deg) rotateZ(-1.2deg);
+    box-shadow:
+      0 54px 110px rgba(0,0,0,.78),
+      0 20px 44px rgba(0,0,0,.55),
+      0 0 110px rgba(122,84,190,.12),
+      0 0 0 1px #101013,
+      inset 0 1px 0 rgba(255,255,255,.08)}
+  .screen{position:relative;border-radius:8px;overflow:hidden;background:#0a0a0d}
+  .screen img{display:block;width:100%;height:auto;filter:brightness(1.24) contrast(1.05) saturate(1.06)}
   /* Brillo del cristal */
-  .glass{position:absolute;inset:0;z-index:6;pointer-events:none;
-    background:linear-gradient(115deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,.03) 22%,transparent 40%)}
-  /* Luz de la pantalla sangrando en el bisel inferior de la foto */
-  .bleed{position:absolute;inset:0;z-index:4;pointer-events:none;
-    background:radial-gradient(60% 40% at 40% 30%,rgba(185,140,255,.06),transparent 70%)}
+  .glare{position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(112deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,.02) 24%,transparent 42%)}
+  /* Scanlines muy finas, casi subliminales a este tamaño */
+  .scan{position:absolute;inset:0;pointer-events:none;opacity:.16;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.35) 0 1px,transparent 1px 3px)}
 
-  /* ===== Capas fotográficas sobre TODA la escena ===== */
-  /* Profundidad de campo: nítido en el foco (tab + URL), desenfocado hacia los bordes */
-  .dof{position:absolute;inset:-20px;z-index:8;pointer-events:none;backdrop-filter:blur(7px);
-    -webkit-mask-image:radial-gradient(95% 85% at 40% 34%,transparent 32%,rgba(0,0,0,.55) 62%,#000 88%);
-    mask-image:radial-gradient(95% 85% at 40% 34%,transparent 32%,rgba(0,0,0,.55) 62%,#000 88%)}
-  .dof2{position:absolute;inset:-20px;z-index:8;pointer-events:none;backdrop-filter:blur(2.5px);
-    -webkit-mask-image:radial-gradient(80% 70% at 40% 34%,transparent 42%,#000 78%);
-    mask-image:radial-gradient(80% 70% at 40% 34%,transparent 42%,#000 78%)}
-  /* Viñeta de objetivo */
+  /* Resplandor de la pantalla sobre la "mesa" */
+  .floor{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);width:760px;height:110px;z-index:1;
+    background:radial-gradient(50% 100% at 50% 0%,rgba(122,84,190,.16) 0%,transparent 70%);filter:blur(3px)}
+
+  /* Óptica: desenfoque leve solo en los bordes del cuadro + viñeta + grano */
+  .dof{position:absolute;inset:-16px;z-index:8;pointer-events:none;backdrop-filter:blur(2px);
+    -webkit-mask-image:radial-gradient(92% 84% at 50% 46%,transparent 70%,#000 96%);
+    mask-image:radial-gradient(92% 84% at 50% 46%,transparent 70%,#000 96%)}
   .vig{position:absolute;inset:0;z-index:9;pointer-events:none;
-    background:radial-gradient(115% 100% at 42% 36%,transparent 52%,rgba(0,0,0,.5) 100%)}
-  /* Grano fotográfico */
-  .grain{position:absolute;inset:0;z-index:10;pointer-events:none;opacity:.055;mix-blend-mode:overlay;
+    background:radial-gradient(120% 105% at 50% 44%,transparent 58%,rgba(0,0,0,.34) 100%)}
+  .grain{position:absolute;inset:0;z-index:10;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E")}
 </style>
 </head>
 <body>
-  <svg width="0" height="0" style="position:absolute">
-    <defs>
-      <g id="icoTwitch"><path fill-rule="evenodd" d="M4.5 1L2 3.5v9h3V15l2.5-2.5h2L14 8V1H4.5zM13 7.5l-2 2H9l-1.75 1.75V9.5H5V2h8v5.5z"/><path d="M11.5 3.75h-1v3h1v-3zM8.75 3.75h-1v3h1v-3z"/></g>
-      <path id="logoNaviris" d="M1.08,582.41L0,302.19C-.65,131.46,130.07-1.65,303,.02l306.38,2.95c152.34,1.47,267.72,141.24,266.88,290.55l-1.72,307.39c-.86,154.14-136.95,274.21-288.33,273.92l-299.69-.58C128.09,873.93,1.69,742.98,1.08,582.41ZM670.98,820.63c85.92-7.81,145.77-71.41,151.41-157.79,5.07-77.74-16.57-152.57-53.84-222.68-82.97-156.09-213.93-281-375.71-352.86-56.61-25.15-115.91-37.9-176.04-34.9C124.83,56.97,57.47,124.72,53.55,217.62c-11.51,273.02,343.75,627.9,617.43,603.01Z"/>
-    </defs>
-  </svg>
-
   <div class="scene">
-    <div class="wall"></div>
-
-    <div class="monitor">
-      <div class="screen">
-        <div class="tabstrip">
-          <div class="tab active">
-            <span class="fav"><svg viewBox="0 0 876.27 874.83"><use href="#logoNaviris"/></svg></span>
-            Naviris — El navegador de Iris
-            <span class="close">✕</span>
-          </div>
-          <div class="tab farm"><svg viewBox="0 0 16 16" fill="currentColor"><use href="#icoTwitch"/></svg>Canal en farmeo</div>
-          <div class="tab ghost"><span class="tdot"></span>Nueva pestaña</div>
+    <div class="floor"></div>
+    <div class="stage">
+      <div class="monitor">
+        <div class="screen">
+          <img src="naviris-app-clean.webp" alt="Naviris — captura real de la aplicación" />
+          <div class="scan"></div>
+          <div class="glare"></div>
         </div>
-        <div class="toolbar">
-          <span>←</span><span>→</span><span>↻</span>
-          <div class="urlpill">
-            <svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-            <span><span class="domain">naviris.site</span><span class="path">/descargas</span></span>
-          </div>
-        </div>
-        <div class="page">
-          <span class="eyebrow"><span class="dot"></span>Naviris 3 — ya disponible</span>
-          <div class="wordmark">
-            <span class="logo"><svg viewBox="0 0 876.27 874.83"><use href="#logoNaviris"/></svg></span>
-            <h1>Naviris</h1>
-          </div>
-          <p class="tagline">El navegador de Estudio de Iris. Twitch farmeando solo, descargas sin sitios raros y Watch Party con los tuyos.</p>
-          <span class="cta">Descargar para Windows
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m6 11 6 6 6-6"/><path d="M5 21h14"/></svg>
-          </span>
-        </div>
-
-        <div class="bleed"></div>
-        <div class="px"></div>
-        <div class="scan"></div>
-        <div class="spectral"></div>
-        <div class="glass"></div>
       </div>
     </div>
-
     <div class="dof"></div>
-    <div class="dof2"></div>
     <div class="vig"></div>
     <div class="grain"></div>
   </div>
+
+  <script>
+    // ?v=2 → toma frontal (sin giro), pantalla más grande
+    const v = new URLSearchParams(location.search).get('v') || '1';
+    if (v === '2') {
+      const m = document.querySelector('.monitor');
+      m.style.transform = 'rotateX(4deg)';
+      m.style.width = '820px';
+    }
+  </script>
 </body>
 </html>
