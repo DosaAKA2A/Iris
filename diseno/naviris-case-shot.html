@@ -73,12 +73,28 @@
   </div>
 
   <script>
-    // ?v=2 → toma frontal (sin giro), pantalla más grande
+    // ?v=2 → toma frontal · ?v=3 → macro en diagonal (la pantalla desborda el cuadro)
     const v = new URLSearchParams(location.search).get('v') || '1';
+    const m = document.querySelector('.monitor');
+    const stage = document.querySelector('.stage');
     if (v === '2') {
-      const m = document.querySelector('.monitor');
       m.style.transform = 'rotateX(4deg)';
       m.style.width = '820px';
+    }
+    if (v === '3') {
+      stage.style.left = '48%';
+      stage.style.top = '64%';
+      stage.style.perspectiveOrigin = '42% 20%';
+      m.style.width = '1170px';
+      m.style.transform = 'rotateX(7deg) rotateY(-11deg) rotateZ(-7.5deg)';
+      // Óptica más marcada: foco en el reloj/buscador, bordes fundidos
+      const dof = document.querySelector('.dof'), vig = document.querySelector('.vig');
+      dof.style.backdropFilter = 'blur(4.5px)';
+      const mask = 'radial-gradient(78% 68% at 42% 32%, transparent 42%, rgba(0,0,0,.6) 70%, #000 94%)';
+      dof.style.webkitMaskImage = mask; dof.style.maskImage = mask;
+      vig.style.background = 'radial-gradient(108% 95% at 43% 34%, transparent 52%, rgba(0,0,0,.5) 100%)';
+      document.querySelector('.scan').style.opacity = '.3';
+      document.querySelector('.floor').style.display = 'none';
     }
   </script>
 </body>
