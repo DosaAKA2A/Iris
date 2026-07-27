@@ -29,6 +29,8 @@
     }
     /* Media real en el swap de proyectos (img/video sobre el gradiente fallback) */
     .swap__asset{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:block}
+    /* Imagen real en las cartillas de casos (sobre el placeholder rayado) */
+    .case__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
     /* Swap de proyectos: imágenes sin borde ni esquinas redondeadas, y más grandes */
     .swap__frame{border:0!important;border-radius:0!important;box-shadow:none!important}
     @media (min-width:1024px){
@@ -404,7 +406,7 @@
 
         <article class="case case--e">
           <a class="case__media ph" href="https://naviris.site/" aria-label="Naviris — navegador de Iris Studio">
-            <span class="ph__tag">Navegador · Descarga → /cobalt</span>
+            <img class="case__img" src="./assets/naviris-case.webp" alt="Mockup del navegador Naviris con AutoClaim de Twitch activo" width="1760" height="1320" loading="lazy" decoding="async">
             <span class="case__num label">[05]</span>
             <span class="case__plus" aria-hidden="true">+</span>
           </a>
