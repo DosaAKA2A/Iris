@@ -731,8 +731,8 @@
       <button class="pmodal__close" type="button" data-close-corlima aria-label="Cerrar">&#215;</button>
       <p class="pmodal__label label">Herramientas Corlima</p>
       <h3 class="pmodal__title" id="modalCorlimaTitle">Acceso privado</h3>
-      <p class="pmodal__text">Introduce el PIN para acceder a la suite de herramientas de Corlima.</p>
-      <input class="pmodal__input" type="password" id="corlimaPwd" placeholder="PIN" inputmode="numeric" pattern="[0-9]*" maxlength="7" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <p class="pmodal__text">Introduce la contraseña para acceder a la suite de herramientas de Corlima.</p>
+      <input class="pmodal__input" type="password" id="corlimaPwd" placeholder="Contraseña" maxlength="32" autocomplete="off" autocapitalize="off" spellcheck="false">
       <p class="pmodal__err" id="corlimaErr" role="alert"></p>
       <button class="pmodal__btn" type="button" id="corlimaEnter">Entrar</button>
     </div>
@@ -743,7 +743,7 @@
     var modal = document.getElementById('modalCorlima');
     if(!modal) return;
     var input = document.getElementById('corlimaPwd'), err = document.getElementById('corlimaErr');
-    var HASH = 'cbc43d0f51d68483e00c6536345347984d84477df9ae0388b68ad7b70a73ba14';
+    var HASH = '7d72f11e2ce2b7bf5b2044162b41abe4b903026cde50ab60de41734ad93f03ae';
     var KEY = 'corlimaAccess', DEST = 'corlima/herramientas_corlima.html';
     function unlocked(){
       if(sessionStorage.getItem(KEY)) return true;
