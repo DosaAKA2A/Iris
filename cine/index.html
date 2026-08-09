@@ -71,17 +71,17 @@ svg{display:block}
   background:rgba(6,6,8,.86); z-index:5;
 }
 .veil.hidden{display:none}
+/* La biblioteca ES la landing: capa opaca a pantalla completa con scroll */
+#loader{background:var(--bg); align-items:flex-start; overflow-y:auto}
 .lib{
-  position:relative; width:min(880px,calc(100% - 48px));
-  max-height:calc(100% - 56px); overflow-y:auto;
-  background:var(--surface); border:1px solid var(--line);
-  border-radius:16px; padding:26px 26px 24px;
+  position:relative; width:min(1080px,100%);
+  padding:38px 34px 46px; margin:0 auto;
 }
-.lib h1{font-size:17px; font-weight:700; letter-spacing:-.01em}
-.lib .sub{margin-top:6px; font-size:12.8px; color:var(--muted); line-height:1.6}
+.lib h1{font-size:24px; font-weight:700; letter-spacing:-.015em}
+.lib .sub{margin-top:8px; font-size:13.5px; color:var(--muted); line-height:1.65; max-width:560px}
 #lib-grid{
-  margin-top:18px; display:grid; gap:14px;
-  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  margin-top:26px; display:grid; gap:16px;
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
 }
 .lib-card{
   display:flex; flex-direction:column; text-align:left;
@@ -107,8 +107,14 @@ svg{display:block}
 .lib-info{padding:10px 12px 12px}
 .lib-tit{font-size:13px; font-weight:700; line-height:1.35}
 .lib-nota{margin-top:3px; font-size:11.5px; color:var(--muted); line-height:1.5}
-.lib-otra{margin-top:22px; border-top:1px solid var(--line); padding-top:4px}
+.lib-otra{margin-top:30px; border-top:1px solid var(--line); padding-top:8px; max-width:640px}
 .lib-vacia{grid-column:1/-1; color:var(--dim); font-size:12.5px; padding:18px 0; text-align:center}
+.lib-pie{
+  margin-top:34px; padding-top:14px; border-top:1px solid var(--line);
+  font-size:11.5px; color:var(--dim); display:flex; gap:14px; align-items:center;
+}
+.lib-pie a{color:var(--dim); text-decoration:none; border-bottom:1px solid var(--line-2)}
+.lib-pie a:hover{color:var(--muted)}
 .lbl{
   margin:18px 2px 8px; font-family:var(--mono); font-size:10px; font-weight:700;
   letter-spacing:.18em; text-transform:uppercase; color:var(--dim);
@@ -360,8 +366,8 @@ svg{display:block}
         <button id="loader-close" title="Cerrar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18L18 6M6 6L18 18"/></svg>
         </button>
-        <h1>Biblioteca</h1>
-        <div class="sub">Elige un título: en una sala se abre solo en la pantalla de todos.</div>
+        <h1>Cine de IRIS</h1>
+        <div class="sub">La biblioteca del estudio. Elige un título y, si están en una sala de Watch Party, se abre solo en la pantalla de todos.</div>
         <div id="lib-grid"></div>
         <div class="lib-otra">
           <div class="lbl">Otra fuente</div>
@@ -373,6 +379,10 @@ svg{display:block}
             <button id="btn-file" class="filebtn">Archivo de este equipo</button>
             <button id="btn-subs" class="filebtn">Subtítulos .srt o .vtt</button>
           </div>
+        </div>
+        <div class="lib-pie">
+          <span>IRIS Studio</span>
+          <a href="admin.html">Backoffice</a>
         </div>
         <input id="in-file" type="file" accept="video/*,.mkv" hidden />
         <input id="in-subs" type="file" accept=".srt,.vtt" hidden />
@@ -571,12 +581,14 @@ function addTrack(label, vttUrl, activar) {
   return tt;
 }
 async function addTrackURL(label, url) {
+  // Siempre fetch -> blob: un <track> con URL de otro origen (p. ej. el bucket
+  // R2) exige CORS en el elemento <video>; el blob es del propio origen y
+  // funciona con cualquier fuente de video. Además convierte .srt al vuelo.
   const activar = (localStorage.cineSubs || '') === label;
-  if (/\.vtt(\?|#|$)/i.test(url)) { addTrack(label, url, activar); return; }
   try {
     const text = await fetch(url).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); });
     addTrack(label, URL.createObjectURL(new Blob([aVtt(text)], { type: 'text/vtt' })), activar);
-  } catch (e) { /* pista rota: no se lista */ }
+  } catch (e) { /* pista rota o sin CORS: no se lista */ }
 }
 function cargarSubs(file) {
   const rd = new FileReader();
@@ -787,8 +799,12 @@ function pintaBiblioteca(bib) {
     grid.appendChild(card);
   });
 }
-fetch('biblioteca.json', { cache: 'no-cache' })
+// El catálogo vive en R2 y lo sirve el worker (lo edita el backoffice). El
+// biblioteca.json del repo queda de respaldo por si el worker no responde.
+const CATALOGO_API = 'https://cine.studio-iris2026.workers.dev/catalogo';
+fetch(CATALOGO_API, { cache: 'no-store' })
   .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .catch(() => fetch('biblioteca.json', { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }))
   .then((b) => { bibData = b; pintaBiblioteca(b); aplicaCatalogoActual(); })
   .catch(() => pintaBiblioteca(null));
 

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Backoffice — Cine IRIS</title>
+<link rel="icon" type="image/svg+xml" href="/assets/iris-favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#0a0a0a; --surface:#121214; --text:#f5f5f5;
+  --muted:rgba(245,245,245,.6); --dim:rgba(245,245,245,.38);
+  --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16);
+  --red:#dc402a; --ok:#9ee2b8; --err:#e6a9b4;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text); min-height:100vh;
+  font-family:Inter,system-ui,-apple-system,sans-serif; font-size:14px; line-height:1.5;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,textarea{font:inherit}
+svg{display:block}
+a{color:inherit}
+
+header{
+  display:flex; align-items:center; gap:14px; height:52px; padding:0 18px;
+  border-bottom:1px solid var(--line);
+}
+header .logo{display:inline-flex; color:var(--text)}
+header .logo svg{height:15px; width:auto}
+header .sep{width:1px; height:18px; background:var(--line-2)}
+header .tag{font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.22em; color:var(--red)}
+header .right{margin-left:auto; font-size:12.5px}
+header .right a{color:var(--muted); text-decoration:none}
+header .right a:hover{color:var(--text)}
+
+main{width:min(880px,100%); margin:0 auto; padding:34px 24px 60px}
+h1{font-size:20px; font-weight:700; letter-spacing:-.01em}
+.sub{margin-top:6px; font-size:12.8px; color:var(--muted); line-height:1.6}
+.lbl{
+  margin:16px 2px 7px; font-family:var(--mono); font-size:10px; font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--dim);
+}
+.in{
+  width:100%; background:var(--bg); color:var(--text);
+  border:1px solid var(--line-2); border-radius:10px; padding:11px 13px;
+  font-size:13px; outline:none; transition:border-color .12s;
+}
+.in:focus{border-color:var(--red)}
+.in::placeholder{color:var(--dim)}
+.row{display:flex; gap:8px; align-items:center}
+.btn{
+  padding:10px 16px; border-radius:10px; font-size:12.5px; font-weight:700;
+  background:rgba(255,255,255,.08); transition:background .12s; flex:none;
+}
+.btn:hover{background:rgba(255,255,255,.14)}
+.btn.red{background:var(--red); color:#fff}
+.btn.red:hover{background:#e5533d}
+.btn:disabled{background:rgba(255,255,255,.05); color:var(--dim); cursor:default}
+.btn.peligro{color:var(--err)}
+.btn.chico{padding:7px 11px; font-size:11.5px}
+.filebtn{
+  width:100%; padding:10px 13px; border-radius:10px; border:1px dashed var(--line-2);
+  color:var(--muted); font-size:12.5px; text-align:center; transition:border-color .12s,color .12s;
+}
+.filebtn:hover{border-color:var(--muted); color:var(--text)}
+.card{
+  background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:20px 20px 22px; margin-top:18px;
+}
+.hidden{display:none!important}
+
+/* Lista de títulos */
+.fila{
+  display:flex; gap:14px; align-items:center; padding:12px 0;
+  border-bottom:1px solid var(--line);
+}
+.fila:last-child{border-bottom:none}
+.fila .mini{
+  width:92px; aspect-ratio:16/9; border-radius:8px; background:#141416;
+  object-fit:cover; flex:none; display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:13px; color:var(--dim); overflow:hidden;
+}
+.fila .mini img{width:100%; height:100%; object-fit:cover}
+.fila .datos{flex:1; min-width:0}
+.fila .t{font-size:13.5px; font-weight:700}
+.fila .n{font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.fila .meta{font-family:var(--mono); font-size:10.5px; color:var(--dim); margin-top:2px}
+.fila .acc{display:flex; gap:6px; flex:none}
+.tagr2{color:var(--ok)}
+.tagext{color:var(--muted)}
+
+/* Subida */
+.prog{margin-top:10px}
+.prog .barra{height:6px; border-radius:3px; background:rgba(255,255,255,.1); overflow:hidden}
+.prog .barra i{display:block; height:100%; width:0%; background:var(--red); border-radius:3px; transition:width .3s}
+.prog .txt{margin-top:6px; font-family:var(--mono); font-size:11px; color:var(--muted)}
+.poster-prev{
+  width:240px; aspect-ratio:16/9; border-radius:10px; background:#141416;
+  object-fit:cover; border:1px solid var(--line);
+}
+.sub-fila{display:flex; gap:8px; margin-top:8px; align-items:center}
+.sub-fila .in{flex:0 0 180px}
+.sub-fila .archivo{flex:1; font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.aviso{margin-top:10px; font-size:12px; color:var(--muted); line-height:1.6}
+.aviso.err{color:var(--err)}
+#toast{
+  position:fixed; left:50%; bottom:26px; transform:translateX(-50%);
+  background:var(--surface); border:1px solid var(--line-2); border-radius:10px;
+  padding:10px 16px; font-size:12.8px; opacity:0; pointer-events:none;
+  transition:opacity .2s; z-index:50; max-width:min(480px,calc(100vw - 40px));
+}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/" aria-label="IRIS Studio">
+    <svg viewBox="0 0 1705.36 523.43" fill="currentColor" aria-hidden="true">
+      <path d="M87.79.43h0c48.46,0,87.79,39.34,87.79,87.79v435.12H0V88.22C0,39.77,39.34.43,87.79.43Z"/>
+      <path d="M1705.36,355.5c0,46.36-18.79,88.32-49.16,118.7-30.38,30.37-72.35,49.16-118.7,49.16h-215.23v.07h-301.59c-41.02,0-74.26-33.25-74.26-74.26h0c0-41.02,33.25-74.26,74.26-74.26h301.59s0,.3,0,.3h187.26c10.91,0,20.14-8.64,20.24-19.54.05-5.54-2.17-10.54-5.78-14.16-3.57-3.57-8.5-5.78-13.96-5.78h-266.02c-92.9,0-169.81-76.01-169.12-168.9.34-45.78,19.03-87.2,49.1-117.26,30.33-30.34,72.24-49.1,118.53-49.1h314.78c3.07,0,6.11.09,9.13.28,95.04,5.78,89.98,147.79-5.24,147.79h-290.69c-10.61,0-19.64,8.25-20.02,18.85-.4,11.12,8.5,20.26,19.55,20.26h267.47c92.71,0,167.86,75.16,167.86,167.86Z"/>
+      <path d="M956.74.43h0c48.46,0,87.79,39.34,87.79,87.79v435.12h-175.59V88.22c0-48.46,39.34-87.79,87.79-87.79Z"/>
+      <path d="M661.69,375.2h27.42c81.77,0,148.16,66.39,148.16,148.16h-175.59v-148.16h0Z"/>
+      <path d="M688.74,0H207.25v187.46h-45.19c-41.02,0-74.27,33.25-74.27,74.27h0c0,41.02,33.25,74.27,74.27,74.27h45.19v187.36h175.59v-187.36h305.9c82.04,0,148.54-66.5,148.54-148.54v-38.92C837.28,66.5,770.78,0,688.74,0ZM655.99,181.76c-3.53,3.52-8.4,5.7-13.77,5.7h-259.38v-38.92h258.89c10.75,0,19.85,8.51,19.96,19.26.05,5.46-2.14,10.4-5.7,13.96Z"/>
+    </svg>
+  </a>
+  <span class="sep"></span>
+  <span class="tag">CINE · BACKOFFICE</span>
+  <div class="right"><a href="./">Ver el cine</a></div>
+</header>
+
+<main>
+  <!-- Puerta: token -->
+  <section id="gate">
+    <h1>Backoffice del Cine</h1>
+    <div class="sub">Introduce la clave de administración para gestionar la biblioteca.</div>
+    <div class="card">
+      <div class="lbl">Clave</div>
+      <div class="row">
+        <input id="g-tok" class="in" type="password" placeholder="Clave de administración" />
+        <button id="g-entrar" class="btn red">Entrar</button>
+      </div>
+      <div id="g-err" class="aviso err hidden">Clave incorrecta o el servidor no responde.</div>
+    </div>
+  </section>
+
+  <!-- Panel -->
+  <section id="panel" class="hidden">
+    <div class="row" style="justify-content:space-between">
+      <div>
+        <h1>Biblioteca</h1>
+        <div class="sub" id="p-resumen"></div>
+      </div>
+      <button id="p-nuevo" class="btn red">Nuevo título</button>
+    </div>
+
+    <!-- Formulario de alta -->
+    <div id="form" class="card hidden">
+      <h1 style="font-size:15px">Nuevo título</h1>
+      <div class="lbl">Título</div>
+      <input id="f-titulo" class="in" maxlength="80" placeholder="Nombre de la película" />
+      <div class="lbl">Nota (opcional)</div>
+      <input id="f-nota" class="in" maxlength="140" placeholder="Descripción corta" />
+
+      <div class="lbl">Video</div>
+      <div class="row">
+        <button id="f-vid-btn" class="filebtn">Elegir archivo de video (se sube al almacén)</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <input id="f-vid-url" class="in" type="url" placeholder="O enlace directo externo (https://…/pelicula.mp4)" />
+      </div>
+      <div id="f-vid-info" class="aviso hidden"></div>
+
+      <div id="f-poster-zona" class="hidden">
+        <div class="lbl">Póster (fotograma automático)</div>
+        <div class="row" style="align-items:flex-start">
+          <img id="f-poster" class="poster-prev" alt="" />
+          <div style="display:flex; flex-direction:column; gap:8px">
+            <button id="f-poster-otro" class="btn chico">Otro fotograma</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lbl">Subtítulos (opcional, .srt o .vtt)</div>
+      <div id="f-subs"></div>
+      <button id="f-sub-add" class="btn chico" style="margin-top:8px">Agregar pista</button>
+
+      <div id="f-prog" class="prog hidden">
+        <div class="barra"><i id="f-prog-i"></i></div>
+        <div class="txt" id="f-prog-t"></div>
+      </div>
+      <div id="f-err" class="aviso err hidden"></div>
+      <div class="row" style="margin-top:16px">
+        <button id="f-guardar" class="btn red">Publicar en la biblioteca</button>
+        <button id="f-cancelar" class="btn">Cancelar</button>
+      </div>
+      <input id="f-vid-file" type="file" accept="video/*,.mkv" hidden />
+    </div>
+
+    <div class="card"><div id="lista"></div></div>
+  </section>
+</main>
+
+<div id="toast"></div>
+
+<script>
+(() => {
+'use strict';
+const W = 'https://cine.studio-iris2026.workers.dev';
+const PUB = 'https://pub-f825f6bcd8a04ddeb4517f1c7ca0652f.r2.dev';
+const PARTE = 48 * 1024 * 1024;   // 48 MB por parte (el worker admite ~100)
+
+const $ = (s) => document.querySelector(s);
+let TOK = localStorage.cineAdminTok || '';
+let catalogo = { titulos: [] };
+
+let toastT = 0;
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 3200); }
+const H = () => ({ Authorization: 'Bearer ' + TOK });
+function fmtT(s) {
+  if (typeof s !== 'number' || !isFinite(s)) return '';
+  s = Math.max(0, Math.round(s));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), ss = String(s % 60).padStart(2, '0');
+  return h ? h + ':' + String(m).padStart(2, '0') + ':' + ss : m + ':' + ss;
+}
+function slugDe(t) {
+  return (t || 'titulo').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48) || 'titulo';
+}
+function aVtt(text) {
+  text = String(text).replace(/\r/g, '');
+  if (!/^WEBVTT/.test(text)) text = 'WEBVTT\n\n' + text.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2');
+  return text;
+}
+
+/* ---------- Puerta ---------- */
+async function entrar(clave) {
+  TOK = clave.trim();
+  const ok = await fetch(W + '/api/check', { headers: H() }).then((r) => r.ok).catch(() => false);
+  if (!ok) { TOK = ''; $('#g-err').classList.remove('hidden'); return; }
+  localStorage.cineAdminTok = TOK;
+  $('#gate').classList.add('hidden');
+  $('#panel').classList.remove('hidden');
+  await cargaCatalogo();
+}
+$('#g-entrar').addEventListener('click', () => entrar($('#g-tok').value));
+$('#g-tok').addEventListener('keydown', (e) => { if (e.key === 'Enter') entrar($('#g-tok').value); });
+
+/* ---------- Lista ---------- */
+async function cargaCatalogo() {
+  catalogo = await fetch(W + '/catalogo', { cache: 'no-store' }).then((r) => r.json()).catch(() => ({ titulos: [] }));
+  if (!Array.isArray(catalogo.titulos)) catalogo.titulos = [];
+  pintaLista();
+}
+async function guardaCatalogo() {
+  const r = await fetch(W + '/api/catalogo', {
+    method: 'PUT', headers: { ...H(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(catalogo, null, 2)
+  });
+  if (r.status === 401) { localStorage.cineAdminTok = ''; location.reload(); return false; }
+  if (!r.ok) { toast('No se pudo guardar el catálogo'); return false; }
+  return true;
+}
+function pintaLista() {
+  const el = $('#lista'); el.innerHTML = '';
+  $('#p-resumen').textContent = catalogo.titulos.length
+    ? catalogo.titulos.length + ' título' + (catalogo.titulos.length === 1 ? '' : 's') + ' publicados en iris.it.com/cine'
+    : 'La biblioteca está vacía: agrega el primer título.';
+  catalogo.titulos.forEach((t, idx) => {
+    const fila = document.createElement('div'); fila.className = 'fila';
+    const mini = document.createElement('div'); mini.className = 'mini';
+    if (t.poster) { const im = document.createElement('img'); im.src = new URL(t.poster, 'https://iris.it.com/cine/').href; im.alt = ''; mini.appendChild(im); }
+    else mini.textContent = (t.titulo || '?').slice(0, 2).toUpperCase();
+    fila.appendChild(mini);
+    const datos = document.createElement('div'); datos.className = 'datos';
+    const tt = document.createElement('div'); tt.className = 't'; tt.textContent = t.titulo || 'Sin título'; datos.appendChild(tt);
+    if (t.nota) { const nn = document.createElement('div'); nn.className = 'n'; nn.textContent = t.nota; datos.appendChild(nn); }
+    const meta = document.createElement('div'); meta.className = 'meta';
+    const enR2 = (t.url || '').indexOf(PUB) === 0;
+    meta.innerHTML = (t.dur ? t.dur + ' · ' : '') +
+      (enR2 ? '<span class="tagr2">almacén R2</span>' : '<span class="tagext">fuente externa</span>') +
+      ((t.subs && t.subs.length) ? ' · ' + t.subs.length + ' pista' + (t.subs.length === 1 ? '' : 's') : '');
+    datos.appendChild(meta);
+    fila.appendChild(datos);
+    const acc = document.createElement('div'); acc.className = 'acc';
+    const ed = document.createElement('button'); ed.className = 'btn chico'; ed.textContent = 'Editar';
+    ed.addEventListener('click', () => editar(idx));
+    const del = document.createElement('button'); del.className = 'btn chico peligro'; del.textContent = 'Borrar';
+    del.addEventListener('click', () => borrar(idx));
+    acc.appendChild(ed); acc.appendChild(del);
+    fila.appendChild(acc);
+    el.appendChild(fila);
+  });
+}
+async function editar(idx) {
+  const t = catalogo.titulos[idx];
+  const nuevo = prompt('Título:', t.titulo || '');
+  if (nuevo === null) return;
+  const nota = prompt('Nota:', t.nota || '');
+  if (nota === null) return;
+  t.titulo = nuevo.trim() || t.titulo;
+  t.nota = nota.trim();
+  if (await guardaCatalogo()) { toast('Guardado'); pintaLista(); }
+}
+async function borrar(idx) {
+  const t = catalogo.titulos[idx];
+  if (!confirm('Borrar "' + (t.titulo || 'Sin título') + '" de la biblioteca?' +
+    ((t.url || '').indexOf(PUB) === 0 ? ' También se borran sus archivos del almacén.' : ''))) return;
+  // Archivos alojados en el bucket: se borran también.
+  const claves = [];
+  const claveDe = (u) => (u && u.indexOf(PUB + '/') === 0) ? u.slice(PUB.length + 1) : null;
+  [t.url, t.poster].forEach((u) => { const k = claveDe(u); if (k) claves.push(k); });
+  (t.subs || []).forEach((s) => { const k = claveDe(s.url); if (k) claves.push(k); });
+  for (const k of claves) {
+    await fetch(W + '/api/objeto?key=' + encodeURIComponent(k), { method: 'DELETE', headers: H() }).catch(() => {});
+  }
+  catalogo.titulos.splice(idx, 1);
+  if (await guardaCatalogo()) { toast('Título borrado'); pintaLista(); }
+}
+
+/* ---------- Alta ---------- */
+let vidFile = null, vidDur = 0, posterBlob = null, posterPct = 0.35;
+const PCTS = [0.35, 0.5, 0.65, 0.8, 0.2];
+
+$('#p-nuevo').addEventListener('click', () => { limpiaForm(); $('#form').classList.remove('hidden'); $('#f-titulo').focus(); });
+$('#f-cancelar').addEventListener('click', () => $('#form').classList.add('hidden'));
+$('#f-vid-btn').addEventListener('click', () => $('#f-vid-file').click());
+$('#f-vid-file').addEventListener('change', () => { if ($('#f-vid-file').files[0]) usaVideo($('#f-vid-file').files[0]); });
+$('#f-poster-otro').addEventListener('click', () => {
+  posterPct = PCTS[(PCTS.indexOf(posterPct) + 1) % PCTS.length];
+  if (vidFile) capturaPoster();
+});
+$('#f-sub-add').addEventListener('click', () => filaSub());
+
+function limpiaForm() {
+  vidFile = null; vidDur = 0; posterBlob = null; posterPct = 0.35;
+  $('#f-titulo').value = ''; $('#f-nota').value = ''; $('#f-vid-url').value = '';
+  $('#f-vid-file').value = '';
+  $('#f-vid-info').classList.add('hidden');
+  $('#f-poster-zona').classList.add('hidden');
+  $('#f-subs').innerHTML = ''; filaSub();
+  $('#f-prog').classList.add('hidden'); $('#f-err').classList.add('hidden');
+  $('#f-guardar').disabled = false;
+}
+function filaSub() {
+  const fila = document.createElement('div'); fila.className = 'sub-fila';
+  const lab = document.createElement('input'); lab.className = 'in'; lab.placeholder = 'Idioma (Español…)'; lab.maxLength = 30;
+  const btn = document.createElement('button'); btn.className = 'filebtn'; btn.textContent = 'Elegir .srt o .vtt'; btn.style.flex = '1';
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.srt,.vtt'; inp.hidden = true;
+  btn.addEventListener('click', () => inp.click());
+  inp.addEventListener('change', () => { if (inp.files[0]) { btn.textContent = inp.files[0].name; if (!lab.value) lab.value = 'Español'; } });
+  fila.appendChild(lab); fila.appendChild(btn); fila.appendChild(inp);
+  fila._label = lab; fila._input = inp;
+  $('#f-subs').appendChild(fila);
+}
+function usaVideo(file) {
+  vidFile = file;
+  $('#f-vid-url').value = '';
+  const v = document.createElement('video');
+  v.muted = true; v.preload = 'metadata'; v.src = URL.createObjectURL(file);
+  v.addEventListener('loadedmetadata', () => {
+    vidDur = v.duration || 0;
+    $('#f-vid-info').textContent = file.name + ' · ' + (file.size / 1024 / 1024 / 1024 >= 1
+      ? (file.size / 1024 / 1024 / 1024).toFixed(2) + ' GB' : Math.round(file.size / 1024 / 1024) + ' MB')
+      + (vidDur ? ' · ' + fmtT(vidDur) : '');
+    $('#f-vid-info').classList.remove('hidden');
+    if (!$('#f-titulo').value) $('#f-titulo').value = file.name.replace(/\.[a-z0-9]{2,5}$/i, '');
+    capturaPoster();
+  });
+  v.addEventListener('error', () => {
+    $('#f-vid-info').textContent = 'No se pudo leer el archivo como video.';
+    $('#f-vid-info').classList.remove('hidden');
+  });
+}
+function capturaPoster() {
+  const v = document.createElement('video');
+  v.muted = true; v.preload = 'auto'; v.src = URL.createObjectURL(vidFile);
+  v.addEventListener('loadedmetadata', () => { v.currentTime = Math.max(0.1, Math.min(v.duration * posterPct, v.duration - 0.1)); });
+  v.addEventListener('seeked', () => {
+    const Wc = Math.min(640, v.videoWidth || 640);
+    const Hc = Math.round(Wc * (v.videoHeight || 360) / (v.videoWidth || 640));
+    const c = document.createElement('canvas'); c.width = Wc; c.height = Hc;
+    c.getContext('2d').drawImage(v, 0, 0, Wc, Hc);
+    c.toBlob((b) => {
+      posterBlob = b;
+      $('#f-poster').src = URL.createObjectURL(b);
+      $('#f-poster-zona').classList.remove('hidden');
+    }, 'image/jpeg', 0.8);
+  });
+}
+
+/* Subida por partes con progreso */
+async function subeMultipart(key, file, contentType, alProgresar) {
+  const crea = await fetch(W + '/api/multipart/create', {
+    method: 'POST', headers: { ...H(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key, contentType })
+  }).then((r) => r.json());
+  if (!crea.uploadId) throw new Error('no se pudo iniciar la subida');
+  const partes = [];
+  try {
+    for (let i = 0, p = 1; i < file.size; i += PARTE, p++) {
+      const trozo = file.slice(i, Math.min(i + PARTE, file.size));
+      const r = await fetch(W + '/api/multipart/part?key=' + encodeURIComponent(key) + '&uploadId=' + encodeURIComponent(crea.uploadId) + '&part=' + p, {
+        method: 'PUT', headers: H(), body: trozo
+      }).then((r) => r.json());
+      if (!r.etag) throw new Error(r.error || 'fallo en la parte ' + p);
+      partes.push({ part: p, etag: r.etag });
+      alProgresar(Math.min(i + PARTE, file.size), file.size);
+    }
+    const fin = await fetch(W + '/api/multipart/complete', {
+      method: 'POST', headers: { ...H(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, uploadId: crea.uploadId, parts: partes })
+    }).then((r) => r.json());
+    if (!fin.ok) throw new Error(fin.error || 'no se pudo completar la subida');
+  } catch (e) {
+    await fetch(W + '/api/multipart/abort', {
+      method: 'POST', headers: { ...H(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, uploadId: crea.uploadId })
+    }).catch(() => {});
+    throw e;
+  }
+}
+async function subeObjeto(key, cuerpo, contentType) {
+  const r = await fetch(W + '/api/objeto?key=' + encodeURIComponent(key), {
+    method: 'PUT', headers: { ...H(), 'Content-Type': contentType }, body: cuerpo
+  }).then((r) => r.json());
+  if (!r.ok) throw new Error(r.error || 'no se pudo subir ' + key);
+}
+
+$('#f-guardar').addEventListener('click', async () => {
+  const titulo = $('#f-titulo').value.trim();
+  const nota = $('#f-nota').value.trim();
+  const urlExt = $('#f-vid-url').value.trim();
+  const err = (m) => { $('#f-err').textContent = m; $('#f-err').classList.remove('hidden'); };
+  $('#f-err').classList.add('hidden');
+  if (!titulo) { err('Falta el título.'); return; }
+  if (!vidFile && !urlExt) { err('Elige un archivo de video o pega un enlace externo.'); return; }
+
+  $('#f-guardar').disabled = true;
+  const slug = slugDe(titulo);
+  const base = 'peliculas/' + slug + '/';
+  const prog = $('#f-prog'), progI = $('#f-prog-i'), progT = $('#f-prog-t');
+  const paso = (t) => { progT.textContent = t; prog.classList.remove('hidden'); };
+
+  try {
+    const entrada = { titulo, url: urlExt || '', nota: nota || undefined };
+    if (vidDur) entrada.dur = fmtT(vidDur);
+
+    if (vidFile) {
+      const ext = (vidFile.name.match(/\.([a-z0-9]{2,5})$/i) || [0, 'mp4'])[1].toLowerCase();
+      const keyVid = base + 'video.' + ext;
+      paso('Subiendo video…');
+      await subeMultipart(keyVid, vidFile, vidFile.type || 'video/mp4', (hecho, total) => {
+        progI.style.width = Math.round(hecho / total * 100) + '%';
+        progT.textContent = 'Subiendo video… ' + Math.round(hecho / total * 100) + '% (' +
+          Math.round(hecho / 1024 / 1024) + ' de ' + Math.round(total / 1024 / 1024) + ' MB)';
+      });
+      entrada.url = PUB + '/' + keyVid;
+    }
+
+    if (posterBlob) {
+      paso('Subiendo póster…');
+      await subeObjeto(base + 'poster.jpg', posterBlob, 'image/jpeg');
+      entrada.poster = PUB + '/' + base + 'poster.jpg';
+    }
+
+    const pistas = [];
+    const filas = [...document.querySelectorAll('.sub-fila')];
+    for (let i = 0; i < filas.length; i++) {
+      const f = filas[i];
+      const file = f._input.files[0];
+      if (!file) continue;
+      const label = f._label.value.trim() || 'Subtítulos';
+      paso('Subiendo subtítulos (' + label + ')…');
+      const texto = aVtt(await file.text());
+      const keySub = base + 'subs/' + (i + 1) + '-' + slugDe(label) + '.vtt';
+      await subeObjeto(keySub, new Blob([texto], { type: 'text/vtt' }), 'text/vtt');
+      pistas.push({ label, url: PUB + '/' + keySub });
+    }
+    if (pistas.length) entrada.subs = pistas;
+
+    paso('Publicando en el catálogo…');
+    catalogo.titulos.unshift(entrada);
+    if (!(await guardaCatalogo())) {
+      catalogo.titulos.shift();
+      throw new Error('no se pudo guardar el catálogo');
+    }
+    toast('Publicado: ' + titulo);
+    $('#form').classList.add('hidden');
+    pintaLista();
+  } catch (e) {
+    err('Error: ' + (e.message || e));
+    $('#f-guardar').disabled = false;
+  }
+});
+
+/* ---------- Arranque ---------- */
+if (TOK) entrar(TOK); else $('#g-tok').focus();
+window.CINEADMIN = { entrar, cargaCatalogo, catalogo: () => catalogo };
+})();
+</script>
+</body>
+</html>
