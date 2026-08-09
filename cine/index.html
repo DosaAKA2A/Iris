@@ -208,6 +208,15 @@ svg{display:block}
   flex:1; min-width:0; margin:0 8px; font-size:12.5px; color:var(--muted);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;
 }
+#cc-menu{
+  position:absolute; right:130px; bottom:58px; min-width:180px;
+  background:var(--surface); border:1px solid var(--line-2); border-radius:10px;
+  padding:5px; display:flex; flex-direction:column; gap:2px; z-index:6;
+}
+#cc-menu.hidden{display:none}
+.cc-it{text-align:left; padding:8px 11px; border-radius:7px; font-size:12.5px; color:var(--muted)}
+.cc-it:hover{background:rgba(255,255,255,.08); color:var(--text)}
+.cc-it.on{color:var(--red); font-weight:700}
 
 /* ============================ Panel Watch Party ============================ */
 #party{
@@ -506,7 +515,12 @@ function cargarURL(url, opts) {
   curV = url;
   video.src = url;
   video.load();
-  ponNombre(opts.nombre || tituloDe(url));
+  limpiaSubs();
+  // Si la URL está en la biblioteca, se toman su nombre y sus pistas de
+  // subtítulos (también cuando la manda la sala y no un clic en la tarjeta).
+  const ent = entradaDe(url);
+  ponNombre(opts.nombre || (ent && ent.titulo) || tituloDe(url));
+  if (ent) (ent.subs || []).forEach((s) => addTrackURL(s.label || 'Subtítulos', absCat(s.url)));
   $('#loader').classList.add('hidden');
   actualizarShare();
   if (!opts.remoto && sala && (sala.host || !sala.navLock)) {
@@ -519,6 +533,7 @@ function cargarArchivo(file) {
   curV = null;
   video.src = URL.createObjectURL(file);
   video.load();
+  limpiaSubs();
   ponNombre(file.name.replace(/\.[a-z0-9]{2,5}$/i, ''));
   $('#loader').classList.add('hidden');
   actualizarShare();
@@ -537,29 +552,56 @@ function vDe(url) {
   try { return new URL(url).searchParams.get('v'); } catch (e) { return null; }
 }
 
-/* Subtítulos: .vtt directo; .srt se convierte (coma -> punto en los tiempos). */
+/* Subtítulos: cada título de la biblioteca puede traer pistas (.vtt o .srt) y
+   además se puede cargar un archivo propio. El botón CC abre un menú para
+   elegir pista o apagarlas; la elección se recuerda entre películas. */
+function aVtt(text) {
+  text = String(text).replace(/\r/g, '');
+  if (!/^WEBVTT/.test(text)) text = 'WEBVTT\n\n' + text.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2');
+  return text;
+}
+function limpiaSubs() { video.querySelectorAll('track').forEach((t) => t.remove()); ccPinta(); }
+function addTrack(label, vttUrl, activar) {
+  const tr = document.createElement('track');
+  tr.kind = 'subtitles'; tr.label = label; tr.src = vttUrl;
+  video.appendChild(tr);
+  const tt = video.textTracks[video.textTracks.length - 1];
+  tt.mode = activar ? 'showing' : 'hidden';
+  ccPinta();
+  return tt;
+}
+async function addTrackURL(label, url) {
+  const activar = (localStorage.cineSubs || '') === label;
+  if (/\.vtt(\?|#|$)/i.test(url)) { addTrack(label, url, activar); return; }
+  try {
+    const text = await fetch(url).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); });
+    addTrack(label, URL.createObjectURL(new Blob([aVtt(text)], { type: 'text/vtt' })), activar);
+  } catch (e) { /* pista rota: no se lista */ }
+}
 function cargarSubs(file) {
   const rd = new FileReader();
   rd.onload = () => {
-    let text = String(rd.result).replace(/\r/g, '');
-    if (!/^WEBVTT/.test(text)) {
-      text = 'WEBVTT\n\n' + text.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2');
-    }
-    const old = video.querySelector('track'); if (old) old.remove();
-    const tr = document.createElement('track');
-    tr.kind = 'subtitles'; tr.label = 'Subtítulos'; tr.default = true;
-    tr.src = URL.createObjectURL(new Blob([text], { type: 'text/vtt' }));
-    video.appendChild(tr);
-    tr.addEventListener('load', () => { if (video.textTracks[0]) video.textTracks[0].mode = 'showing'; ccPinta(); });
-    setTimeout(() => { if (video.textTracks[0]) video.textTracks[0].mode = 'showing'; ccPinta(); }, 300);
+    const nombre = file.name.replace(/\.[a-z0-9]{2,5}$/i, '');
+    eligeSub(null);
+    addTrack(nombre, URL.createObjectURL(new Blob([aVtt(rd.result)], { type: 'text/vtt' })), true);
+    localStorage.cineSubs = nombre;
     toast('Subtítulos cargados: ' + file.name);
   };
   rd.readAsText(file);
 }
+function eligeSub(label) {
+  for (let i = 0; i < video.textTracks.length; i++) {
+    const tt = video.textTracks[i];
+    tt.mode = (label !== null && tt.label === label) ? 'showing' : 'hidden';
+  }
+  localStorage.cineSubs = label === null ? '' : label;
+  ccPinta();
+}
 function ccPinta() {
-  const tt = video.textTracks[0];
-  $('#c-cc').classList.toggle('off', !tt);
-  $('#c-cc').classList.toggle('accent', !!tt && tt.mode === 'showing');
+  let activo = false;
+  for (let i = 0; i < video.textTracks.length; i++) if (video.textTracks[i].mode === 'showing') activo = true;
+  $('#c-cc').classList.toggle('off', !video.textTracks.length);
+  $('#c-cc').classList.toggle('accent', activo);
 }
 
 /* ============================ Controles ============================ */
@@ -619,11 +661,31 @@ $('#c-fs').addEventListener('click', () => {
   if (document.fullscreenElement) document.exitFullscreen();
   else stage.requestFullscreen().catch(() => {});
 });
+/* Menú CC: pistas del título + apagar + archivo propio */
+const ccMenu = document.createElement('div');
+ccMenu.id = 'cc-menu'; ccMenu.className = 'hidden';
+$('#bar').appendChild(ccMenu);
+function ccMuestra() {
+  ccMenu.innerHTML = '';
+  const item = (texto, marcado, fn) => {
+    const b = document.createElement('button');
+    b.className = 'cc-it' + (marcado ? ' on' : ''); b.textContent = texto;
+    b.addEventListener('click', () => { fn(); ccMenu.classList.add('hidden'); });
+    ccMenu.appendChild(b);
+  };
+  let alguno = false;
+  for (let i = 0; i < video.textTracks.length; i++) {
+    const tt = video.textTracks[i];
+    if (tt.mode === 'showing') alguno = true;
+    item(tt.label || 'Pista ' + (i + 1), tt.mode === 'showing', () => eligeSub(tt.label));
+  }
+  item('Sin subtítulos', !alguno, () => eligeSub(null));
+  item('Cargar archivo…', false, () => $('#in-subs').click());
+  ccMenu.classList.remove('hidden');
+}
 $('#c-cc').addEventListener('click', () => {
-  const tt = video.textTracks[0];
-  if (!tt) { $('#in-subs').click(); return; }
-  tt.mode = tt.mode === 'showing' ? 'hidden' : 'showing';
-  ccPinta();
+  if (ccMenu.classList.contains('hidden')) ccMuestra();
+  else ccMenu.classList.add('hidden');
 });
 $('#c-open').addEventListener('click', () => {
   $('#loader').classList.remove('hidden');
@@ -679,7 +741,21 @@ $('#loader-close').addEventListener('click', () => $('#loader').classList.add('h
 
 /* Biblioteca: catálogo estático en biblioteca.json (mismo directorio). Añadir
    un título = añadir una entrada ahí; el video puede vivir en el repo o en
-   cualquier URL directa. */
+   cualquier URL directa (p. ej. R2). */
+let bibData = null;
+const absCat = (u) => { try { return new URL(u, location.href).href; } catch (e) { return u; } };
+function entradaDe(url) {
+  if (!bibData || !url) return null;
+  return (bibData.titulos || []).find((t) => absCat(t.url) === url) || null;
+}
+// La película pudo llegar antes que el catálogo (?v= o latido de la sala):
+// al llegar este, se completan nombre y pistas.
+function aplicaCatalogoActual() {
+  const ent = entradaDe(curV);
+  if (!ent) return;
+  ponNombre(ent.titulo);
+  if (!video.querySelector('track')) (ent.subs || []).forEach((s) => addTrackURL(s.label || 'Subtítulos', absCat(s.url)));
+}
 function pintaBiblioteca(bib) {
   const grid = $('#lib-grid');
   grid.innerHTML = '';
@@ -691,12 +767,11 @@ function pintaBiblioteca(bib) {
     return;
   }
   tt.forEach((t) => {
-    const abs = (u) => { try { return new URL(u, location.href).href; } catch (e) { return u; } };
     const card = document.createElement('button'); card.className = 'lib-card';
     const th = document.createElement('div'); th.className = 'lib-thumb';
     if (t.poster) {
       const img = document.createElement('img'); img.loading = 'lazy'; img.alt = '';
-      img.src = abs(t.poster); th.appendChild(img);
+      img.src = absCat(t.poster); th.appendChild(img);
     } else {
       const ini = document.createElement('span'); ini.className = 'ini';
       ini.textContent = (t.titulo || '?').slice(0, 2).toUpperCase(); th.appendChild(ini);
@@ -708,13 +783,13 @@ function pintaBiblioteca(bib) {
     info.appendChild(tit);
     if (t.nota) { const no = document.createElement('div'); no.className = 'lib-nota'; no.textContent = t.nota; info.appendChild(no); }
     card.appendChild(info);
-    card.addEventListener('click', () => { cargarURL(abs(t.url), { nombre: t.titulo }); playSafe(); });
+    card.addEventListener('click', () => { cargarURL(absCat(t.url), { nombre: t.titulo }); playSafe(); });
     grid.appendChild(card);
   });
 }
 fetch('biblioteca.json', { cache: 'no-cache' })
   .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-  .then(pintaBiblioteca)
+  .then((b) => { bibData = b; pintaBiblioteca(b); aplicaCatalogoActual(); })
   .catch(() => pintaBiblioteca(null));
 
 /* ============================ Watch Party ============================ */

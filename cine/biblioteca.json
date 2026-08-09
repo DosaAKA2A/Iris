@@ -1,12 +1,16 @@
 {
-  "_como_agregar": "Cada título: { titulo, url (directa al video, relativa al sitio o absoluta), dur (m:ss, opcional), nota (opcional), poster (opcional). Los pósters viven en cine/posters/.",
+  "_como_agregar": "Cada título: { titulo, url (directa al video, relativa al sitio o absoluta), dur (m:ss, opcional), nota (opcional), poster (opcional), subs (opcional: [{label, url}] con .vtt o .srt). Pósters en cine/posters/, subtítulos en cine/subs/.",
   "titulos": [
     {
       "titulo": "Hero IRIS",
       "url": "/assets/hero.mp4",
       "dur": "0:20",
       "nota": "Clip de prueba — el video de la portada de IRIS",
-      "poster": "posters/hero.jpg"
+      "poster": "posters/hero.jpg",
+      "subs": [
+        { "label": "Español", "url": "subs/hero.es.vtt" },
+        { "label": "English", "url": "subs/hero.en.vtt" }
+      ]
     },
     {
       "titulo": "SPACIO — Velaro",
