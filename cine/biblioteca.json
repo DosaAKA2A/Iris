@@ -1,6 +1,41 @@
 {
-  "_como_agregar": "Cada título: { titulo, url (directa al video, relativa al sitio o absoluta), dur (m:ss, opcional), nota (opcional), poster (opcional), subs (opcional: [{label, url}] con .vtt o .srt). Pósters en cine/posters/, subtítulos en cine/subs/.",
+  "_como_agregar": "Cada título: { titulo, url (directa al video, relativa al sitio o absoluta), tam (bytes, opcional), dur (m:ss, opcional), nota (opcional), poster (opcional), audios (opcional: [{label, url, tam}]; la PRIMERA es la pista que ya trae el video y va sin url), subs (opcional: [{label, url, tam}] con .vtt o .srt). Pósters en cine/posters/, subtítulos en cine/subs/, o todo en el bucket R2.",
   "titulos": [
+    {
+      "titulo": "Obsesión",
+      "url": "https://pub-f825f6bcd8a04ddeb4517f1c7ca0652f.r2.dev/peliculas/obsesion-2025/video.mp4",
+      "tam": 3021790711,
+      "dur": "1:48:53",
+      "nota": "Terror, 2025 — Curry Barker. Audio latino e inglés.",
+      "poster": "https://pub-f825f6bcd8a04ddeb4517f1c7ca0652f.r2.dev/peliculas/obsesion-2025/poster.jpg",
+      "audios": [
+        {
+          "label": "Español latino"
+        },
+        {
+          "label": "Inglés",
+          "url": "https://pub-f825f6bcd8a04ddeb4517f1c7ca0652f.r2.dev/peliculas/obsesion-2025/audio-ingles.m4a",
+          "tam": 159056146
+        }
+      ],
+      "subs": [
+        {
+          "label": "Español",
+          "url": "https://pub-f825f6bcd8a04ddeb4517f1c7ca0652f.r2.dev/peliculas/obsesion-2025/subs/espanol.vtt",
+          "tam": 85778
+        },
+        {
+          "label": "Inglés",
+          "url": "https://pub-f825f6bcd8a04ddeb4517f1c7ca0652f.r2.dev/peliculas/obsesion-2025/subs/ingles.vtt",
+          "tam": 95886
+        },
+        {
+          "label": "Forzados",
+          "url": "https://pub-f825f6bcd8a04ddeb4517f1c7ca0652f.r2.dev/peliculas/obsesion-2025/subs/forzados.vtt",
+          "tam": 284
+        }
+      ]
+    },
     {
       "titulo": "Hero IRIS",
       "url": "/assets/hero.mp4",
@@ -8,8 +43,14 @@
       "nota": "Clip de prueba — el video de la portada de IRIS",
       "poster": "posters/hero.jpg",
       "subs": [
-        { "label": "Español", "url": "subs/hero.es.vtt" },
-        { "label": "English", "url": "subs/hero.en.vtt" }
+        {
+          "label": "Español",
+          "url": "subs/hero.es.vtt"
+        },
+        {
+          "label": "English",
+          "url": "subs/hero.en.vtt"
+        }
       ]
     },
     {

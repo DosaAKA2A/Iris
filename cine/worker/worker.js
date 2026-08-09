@@ -2,6 +2,7 @@
    ---------------------------------------------------------------------------
    Público:
      GET /catalogo                 -> biblioteca.json guardado en el bucket
+     GET /descargar?key=&n=        -> el objeto como adjunto (con rangos)
    Con token (Authorization: Bearer <CINE_TOKEN>, secret de wrangler):
      GET  /api/check               -> comprueba el token
      PUT  /api/catalogo            -> reemplaza biblioteca.json (valida JSON)
@@ -42,6 +43,40 @@ export default {
       return new Response(obj.body, {
         headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
       });
+    }
+
+    /* Descarga con nombre. El bucket público no manda Content-Disposition, así
+       que un enlace directo ABRE la película en el navegador en vez de
+       guardarla; para el Watch Party cada persona necesita su copia en disco.
+       Pasa los rangos para que la descarga se pueda reanudar. */
+    if (url.pathname === '/descargar' && (req.method === 'GET' || req.method === 'HEAD')) {
+      const key = url.searchParams.get('key') || '';
+      if (!key || key === 'biblioteca.json' || key.indexOf('..') !== -1) {
+        return json({ error: 'key invalida' }, 400);
+      }
+      const rango = req.headers.get('range');
+      let obj;
+      try { obj = await env.CINE.get(key, { range: req.headers }); }
+      catch (e) { return json({ error: 'rango invalido' }, 416); }
+      if (!obj) return json({ error: 'no existe' }, 404);
+      const nombre = (url.searchParams.get('n') || key.split('/').pop() || 'descarga')
+        .replace(/[^A-Za-z0-9._-]+/g, '-').slice(0, 120);
+      const h = new Headers(cors);
+      obj.writeHttpMetadata(h);
+      h.set('Content-Disposition', 'attachment; filename="' + nombre + '"');
+      h.set('Accept-Ranges', 'bytes');
+      h.set('ETag', obj.httpEtag);
+      h.set('Cache-Control', 'public, max-age=31536000, immutable');
+      const cuerpo = req.method === 'HEAD' ? null : obj.body;
+      if (rango && obj.range) {
+        const ini = obj.range.offset || 0;
+        const largo = obj.range.length != null ? obj.range.length : obj.size - ini;
+        h.set('Content-Range', 'bytes ' + ini + '-' + (ini + largo - 1) + '/' + obj.size);
+        h.set('Content-Length', String(largo));
+        return new Response(cuerpo, { status: 206, headers: h });
+      }
+      h.set('Content-Length', String(obj.size));
+      return new Response(cuerpo, { headers: h });
     }
 
     /* ---- de aquí en adelante hace falta el token ----

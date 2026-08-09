@@ -186,6 +186,13 @@ h1{font-size:20px; font-weight:700; letter-spacing:-.01em}
         </div>
       </div>
 
+      <div class="lbl">Idioma del audio que trae el video</div>
+      <input id="f-audio-main" class="in" maxlength="30" placeholder="Original" />
+
+      <div class="lbl">Otras pistas de audio (opcional, .m4a o .mp3)</div>
+      <div id="f-audios"></div>
+      <button id="f-audio-add" class="btn chico" style="margin-top:8px">Agregar pista de audio</button>
+
       <div class="lbl">Subtítulos (opcional, .srt o .vtt)</div>
       <div id="f-subs"></div>
       <button id="f-sub-add" class="btn chico" style="margin-top:8px">Agregar pista</button>
@@ -284,6 +291,7 @@ function pintaLista() {
     const enR2 = (t.url || '').indexOf(PUB) === 0;
     meta.innerHTML = (t.dur ? t.dur + ' · ' : '') +
       (enR2 ? '<span class="tagr2">almacén R2</span>' : '<span class="tagext">fuente externa</span>') +
+      ((t.audios && t.audios.length > 1) ? ' · ' + t.audios.length + ' audios' : '') +
       ((t.subs && t.subs.length) ? ' · ' + t.subs.length + ' pista' + (t.subs.length === 1 ? '' : 's') : '');
     datos.appendChild(meta);
     fila.appendChild(datos);
@@ -315,7 +323,7 @@ async function borrar(idx) {
   const claves = [];
   const claveDe = (u) => (u && u.indexOf(PUB + '/') === 0) ? u.slice(PUB.length + 1) : null;
   [t.url, t.poster].forEach((u) => { const k = claveDe(u); if (k) claves.push(k); });
-  (t.subs || []).forEach((s) => { const k = claveDe(s.url); if (k) claves.push(k); });
+  (t.subs || []).concat(t.audios || []).forEach((s) => { const k = claveDe(s.url); if (k) claves.push(k); });
   for (const k of claves) {
     await fetch(W + '/api/objeto?key=' + encodeURIComponent(k), { method: 'DELETE', headers: H() }).catch(() => {});
   }
@@ -336,28 +344,38 @@ $('#f-poster-otro').addEventListener('click', () => {
   if (vidFile) capturaPoster();
 });
 $('#f-sub-add').addEventListener('click', () => filaSub());
+$('#f-audio-add').addEventListener('click', () => filaAudio());
 
 function limpiaForm() {
   vidFile = null; vidDur = 0; posterBlob = null; posterPct = 0.35;
   $('#f-titulo').value = ''; $('#f-nota').value = ''; $('#f-vid-url').value = '';
-  $('#f-vid-file').value = '';
+  $('#f-vid-file').value = ''; $('#f-audio-main').value = '';
   $('#f-vid-info').classList.add('hidden');
   $('#f-poster-zona').classList.add('hidden');
   $('#f-subs').innerHTML = ''; filaSub();
+  $('#f-audios').innerHTML = ''; filaAudio();
   $('#f-prog').classList.add('hidden'); $('#f-err').classList.add('hidden');
   $('#f-guardar').disabled = false;
 }
-function filaSub() {
+/* Una fila = una pista. El video solo puede sonar la suya, así que los demás
+   idiomas se suben como archivos aparte y el reproductor los engancha. */
+function filaPista(destino, aceptar, textoBtn, ejemplo) {
   const fila = document.createElement('div'); fila.className = 'sub-fila';
-  const lab = document.createElement('input'); lab.className = 'in'; lab.placeholder = 'Idioma (Español…)'; lab.maxLength = 30;
-  const btn = document.createElement('button'); btn.className = 'filebtn'; btn.textContent = 'Elegir .srt o .vtt'; btn.style.flex = '1';
-  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.srt,.vtt'; inp.hidden = true;
+  const lab = document.createElement('input'); lab.className = 'in'; lab.placeholder = ejemplo; lab.maxLength = 30;
+  const btn = document.createElement('button'); btn.className = 'filebtn'; btn.textContent = textoBtn; btn.style.flex = '1';
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = aceptar; inp.hidden = true;
   btn.addEventListener('click', () => inp.click());
-  inp.addEventListener('change', () => { if (inp.files[0]) { btn.textContent = inp.files[0].name; if (!lab.value) lab.value = 'Español'; } });
+  inp.addEventListener('change', () => {
+    if (!inp.files[0]) return;
+    btn.textContent = inp.files[0].name;
+    if (!lab.value) lab.value = inp.files[0].name.replace(/\.[a-z0-9]{2,5}$/i, '');
+  });
   fila.appendChild(lab); fila.appendChild(btn); fila.appendChild(inp);
   fila._label = lab; fila._input = inp;
-  $('#f-subs').appendChild(fila);
+  $(destino).appendChild(fila);
 }
+function filaSub() { filaPista('#f-subs', '.srt,.vtt', 'Elegir .srt o .vtt', 'Idioma (Español…)'); }
+function filaAudio() { filaPista('#f-audios', 'audio/*,.m4a,.mp3,.aac,.opus', 'Elegir audio', 'Idioma (Inglés…)'); }
 function usaVideo(file) {
   vidFile = file;
   $('#f-vid-url').value = '';
@@ -461,6 +479,7 @@ $('#f-guardar').addEventListener('click', async () => {
           Math.round(hecho / 1024 / 1024) + ' de ' + Math.round(total / 1024 / 1024) + ' MB)';
       });
       entrada.url = PUB + '/' + keyVid;
+      entrada.tam = vidFile.size;
     }
 
     if (posterBlob) {
@@ -469,8 +488,31 @@ $('#f-guardar').addEventListener('click', async () => {
       entrada.poster = PUB + '/' + base + 'poster.jpg';
     }
 
+    /* Pistas de audio: un MP4 solo suena la que lleva dentro, así que los
+       demás idiomas van en archivos aparte y el reproductor los engancha.
+       La primera entrada de audios[] es siempre la del propio video (sin url). */
+    const pistasAudio = [];
+    const filasAudio = [...document.querySelectorAll('#f-audios .sub-fila')];
+    for (let i = 0; i < filasAudio.length; i++) {
+      const f = filasAudio[i];
+      const file = f._input.files[0];
+      if (!file) continue;
+      const label = f._label.value.trim() || 'Audio ' + (i + 1);
+      const ext = (file.name.match(/\.([a-z0-9]{2,5})$/i) || [0, 'm4a'])[1].toLowerCase();
+      const keyAud = base + 'audio-' + slugDe(label) + '.' + ext;
+      paso('Subiendo audio (' + label + ')…');
+      await subeMultipart(keyAud, file, file.type || 'audio/mp4', (hecho, total) => {
+        progI.style.width = Math.round(hecho / total * 100) + '%';
+        progT.textContent = 'Subiendo audio ' + label + '… ' + Math.round(hecho / total * 100) + '%';
+      });
+      pistasAudio.push({ label, url: PUB + '/' + keyAud, tam: file.size });
+    }
+    if (pistasAudio.length) {
+      entrada.audios = [{ label: $('#f-audio-main').value.trim() || 'Original' }].concat(pistasAudio);
+    }
+
     const pistas = [];
-    const filas = [...document.querySelectorAll('.sub-fila')];
+    const filas = [...document.querySelectorAll('#f-subs .sub-fila')];
     for (let i = 0; i < filas.length; i++) {
       const f = filas[i];
       const file = f._input.files[0];
@@ -478,9 +520,10 @@ $('#f-guardar').addEventListener('click', async () => {
       const label = f._label.value.trim() || 'Subtítulos';
       paso('Subiendo subtítulos (' + label + ')…');
       const texto = aVtt(await file.text());
+      const cuerpo = new Blob([texto], { type: 'text/vtt' });
       const keySub = base + 'subs/' + (i + 1) + '-' + slugDe(label) + '.vtt';
-      await subeObjeto(keySub, new Blob([texto], { type: 'text/vtt' }), 'text/vtt');
-      pistas.push({ label, url: PUB + '/' + keySub });
+      await subeObjeto(keySub, cuerpo, 'text/vtt');
+      pistas.push({ label, url: PUB + '/' + keySub, tam: cuerpo.size });
     }
     if (pistas.length) entrada.subs = pistas;
 

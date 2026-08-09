@@ -115,6 +115,57 @@ svg{display:block}
 }
 .lib-pie a{color:var(--dim); text-decoration:none; border-bottom:1px solid var(--line-2)}
 .lib-pie a:hover{color:var(--muted)}
+.lib-dl{
+  position:absolute; left:7px; bottom:7px; width:28px; height:28px; padding:0;
+  display:flex; align-items:center; justify-content:center; border-radius:7px;
+  background:rgba(0,0,0,.74); color:var(--muted);
+  opacity:0; transition:opacity .15s,color .12s;
+}
+.lib-card:hover .lib-dl,.lib-dl:focus-visible{opacity:1}
+.lib-dl:hover{color:var(--text)}
+.lib-dl svg{width:14px; height:14px}
+
+/* ---------- Hoja de descarga ---------- */
+/* Para el Watch Party conviene tener la copia en el disco: así nadie se
+   queda esperando al buffer y la sincronización no pelea con la red. */
+#dl{z-index:8; background:rgba(6,6,8,.9)}
+.dl-card{
+  width:min(540px,calc(100vw - 36px)); max-height:calc(100% - 60px); overflow-y:auto;
+  background:var(--surface); border:1px solid var(--line-2); border-radius:14px;
+  padding:22px; margin:auto;
+}
+.dl-card h2{font-size:16px; font-weight:700; letter-spacing:-.012em}
+.dl-card .sub{margin-top:8px; font-size:12.5px; color:var(--muted); line-height:1.65}
+.dl-list{margin-top:16px; display:flex; flex-direction:column; gap:7px}
+.dl-it{
+  display:flex; align-items:center; gap:11px; padding:11px 13px;
+  border:1px solid var(--line); border-radius:10px;
+  text-decoration:none; color:var(--text); text-align:left;
+  transition:border-color .12s,background .12s;
+}
+.dl-it:hover{border-color:var(--muted); background:rgba(255,255,255,.04)}
+.dl-it svg{width:15px; height:15px; color:var(--red); flex:none}
+.dl-it .n{flex:1; min-width:0; font-size:12.8px; font-weight:600}
+.dl-it .n span{display:block; font-weight:400; font-size:11px; color:var(--dim); margin-top:2px}
+.dl-it .s{font-family:var(--mono); font-size:11px; color:var(--muted); flex:none}
+.dl-foot{margin-top:18px; display:flex; gap:8px}
+.dl-foot .btn{flex:1; text-align:center}
+
+/* ---------- Película de la sala, en el panel ---------- */
+#p-peli{
+  margin-top:10px; padding:9px 10px;
+  border:1px solid var(--line); border-radius:9px; background:rgba(255,255,255,.03);
+}
+#p-peli.hidden{display:none}
+#p-peli .t{font-size:12px; font-weight:700; line-height:1.4}
+#p-peli .d{margin-top:3px; font-size:11px; color:var(--dim); line-height:1.5}
+#p-peli .r{margin-top:8px; display:flex; gap:6px}
+#p-peli .r button{
+  flex:1; padding:6px 8px; border-radius:7px; border:1px solid var(--line-2);
+  font-size:11px; font-weight:600; color:var(--muted);
+  transition:color .12s,border-color .12s;
+}
+#p-peli .r button:hover{color:var(--text); border-color:var(--muted)}
 .lbl{
   margin:18px 2px 8px; font-family:var(--mono); font-size:10px; font-weight:700;
   letter-spacing:.18em; text-transform:uppercase; color:var(--dim);
@@ -214,15 +265,31 @@ svg{display:block}
   flex:1; min-width:0; margin:0 8px; font-size:12.5px; color:var(--muted);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;
 }
-#cc-menu{
-  position:absolute; right:130px; bottom:58px; min-width:180px;
+.menu{
+  position:absolute; bottom:58px; min-width:190px;
+  max-width:min(300px,calc(100vw - 32px));
   background:var(--surface); border:1px solid var(--line-2); border-radius:10px;
   padding:5px; display:flex; flex-direction:column; gap:2px; z-index:6;
 }
-#cc-menu.hidden{display:none}
+.menu.hidden{display:none}
+#cc-menu{right:222px}
+#audio-menu{right:264px}
+.menu-t{
+  padding:7px 11px 5px; font-family:var(--mono); font-size:9.5px; font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--dim);
+}
 .cc-it{text-align:left; padding:8px 11px; border-radius:7px; font-size:12.5px; color:var(--muted)}
 .cc-it:hover{background:rgba(255,255,255,.08); color:var(--text)}
 .cc-it.on{color:var(--red); font-weight:700}
+.cc-it .tag{
+  margin-left:7px; font-family:var(--mono); font-size:9.5px; letter-spacing:.1em;
+  color:var(--dim); font-weight:400;
+}
+@media (max-width:560px){#cc-menu,#audio-menu{right:12px}}
+#movie-name .loc{
+  margin-left:7px; padding:1px 6px; border-radius:5px; border:1px solid var(--line-2);
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.12em; color:var(--dim);
+}
 
 /* ============================ Panel Watch Party ============================ */
 #party{
@@ -359,6 +426,10 @@ svg{display:block}
 <main id="row">
   <section id="stage">
     <video id="v" playsinline></video>
+    <!-- Pista de audio alternativa: el MP4 solo puede sonar la suya, así que
+         los demás idiomas viajan en archivos aparte y este elemento los
+         mantiene pegados al video (ver sincroAudio). -->
+    <audio id="a2" preload="auto"></audio>
 
     <!-- Biblioteca (velo de inicio y de cambio de película) -->
     <div id="loader" class="veil">
@@ -376,16 +447,36 @@ svg{display:block}
             <button id="btn-url" class="btn red">Cargar</button>
           </div>
           <div class="fieldrow" style="margin-top:8px">
-            <button id="btn-file" class="filebtn">Archivo de este equipo</button>
+            <button id="btn-file" class="filebtn">Archivos de este equipo</button>
             <button id="btn-subs" class="filebtn">Subtítulos .srt o .vtt</button>
+          </div>
+          <div class="hint" style="margin-top:8px; font-size:11.5px; color:var(--dim)">
+            Puedes elegir de una vez el video, sus pistas de audio y sus subtítulos.
           </div>
         </div>
         <div class="lib-pie">
           <span>IRIS Studio</span>
           <a href="admin.html">Backoffice</a>
         </div>
-        <input id="in-file" type="file" accept="video/*,.mkv" hidden />
+        <input id="in-file" type="file" accept="video/*,audio/*,.mkv,.m4a,.srt,.vtt" multiple hidden />
         <input id="in-subs" type="file" accept=".srt,.vtt" hidden />
+      </div>
+    </div>
+
+    <!-- Hoja de descarga -->
+    <div id="dl" class="veil hidden">
+      <div class="dl-card">
+        <h2 id="dl-tit">Descargar</h2>
+        <div class="sub">
+          Para el Watch Party, cada persona reproduce su propia copia. Bajen estos
+          archivos antes de empezar y luego ábranlos con “Ya la descargué”: la
+          reproducción va sincronizada y sin cortes de red.
+        </div>
+        <div class="dl-list" id="dl-list"></div>
+        <div class="dl-foot">
+          <button class="btn red" id="dl-local">Ya la descargué</button>
+          <button class="btn" id="dl-cerrar">Cerrar</button>
+        </div>
       </div>
     </div>
 
@@ -404,6 +495,7 @@ svg{display:block}
         <button id="c-play" class="cbtn" title="Reproducir / pausar"></button>
         <span id="t-cur">0:00</span><span class="tsep">/</span><span id="t-dur">0:00</span>
         <div id="movie-name"></div>
+        <button id="c-audio" class="cbtn" title="Pista de audio" style="display:none"></button>
         <button id="c-cc" class="cbtn off" title="Subtítulos"></button>
         <button id="c-open" class="cbtn" title="Cambiar película"></button>
         <button id="c-mute" class="cbtn" title="Silenciar"></button>
@@ -450,6 +542,14 @@ svg{display:block}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>
             Copiar enlace de invitación
           </button>
+          <div id="p-peli" class="hidden">
+            <div class="t" id="p-peli-t"></div>
+            <div class="d" id="p-peli-d"></div>
+            <div class="r">
+              <button id="p-peli-dl">Descargar</button>
+              <button id="p-peli-local">Usar mi copia</button>
+            </div>
+          </div>
           <div id="p-locks" style="display:none">
             <label class="lockrow"><input id="p-lock" type="checkbox" />Solo el anfitrión controla la reproducción</label>
             <label class="lockrow"><input id="p-navlock" type="checkbox" checked />Solo el anfitrión cambia la película</label>
@@ -483,7 +583,7 @@ const DRIFT = 1.5;     // segundos de desvío tolerado antes de re-seek
 const ECHO_MS = 900;   // ventana ignorando eventos locales tras aplicar un remoto
 
 const $ = (s) => document.querySelector(s);
-const video = $('#v'), stage = $('#stage');
+const video = $('#v'), stage = $('#stage'), a2 = $('#a2');
 
 /* ============================ Utilidades ============================ */
 function fmtT(s) {
@@ -503,51 +603,105 @@ function toast(text) {
 }
 
 /* ============================ Película ============================ */
-let curV = null;        // URL de la película (null = archivo local o nada)
+let curV = null;        // identidad de la película (la que viaja por la sala)
 let nombrePeli = '';
+let esLocal = false;    // la imagen sale del disco, pero curV sigue mandando en la sala
+let blobsVivos = [];    // object URLs de la película actual, a liberar al cambiar
+
+const norm = (s) => String(s || '').toLowerCase()
+  .replace(/[áàâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i')
+  .replace(/[óòôö]/g, 'o').replace(/[úùûü]/g, 'u').replace(/ñ/g, 'n')
+  .replace(/[^a-z0-9]+/g, '');
+const sinExt = (n) => String(n || '').replace(/\.[a-z0-9]{2,5}$/i, '');
+// ¿El archivo que trae la persona es esta pista del catálogo? (audio-ingles.m4a -> "Inglés")
+function casaCon(nombreArchivo, etiqueta) {
+  const a = norm(sinExt(nombreArchivo)), b = norm(etiqueta);
+  return !!(a && b) && (a.indexOf(b) !== -1 || b.indexOf(a) !== -1);
+}
 
 function tituloDe(url) {
   try {
     const base = decodeURIComponent(new URL(url).pathname.split('/').pop() || '');
-    return base.replace(/\.[a-z0-9]{2,5}$/i, '') || 'Película';
+    return sinExt(base) || 'Película';
   } catch (e) { return 'Película'; }
 }
 function ponNombre(n) {
   nombrePeli = n || '';
-  $('#movie-name').textContent = nombrePeli;
+  const el = $('#movie-name');
+  el.textContent = nombrePeli;
+  if (esLocal && nombrePeli) {
+    const chip = document.createElement('span');
+    chip.className = 'loc'; chip.textContent = 'LOCAL';
+    el.appendChild(chip);
+  }
   document.title = (nombrePeli ? nombrePeli + ' — ' : '') + 'Cine IRIS';
 }
+/* Carga una película.
+   url    identidad para la sala (la del catálogo; null si es un archivo suelto)
+   opts   nombre, remoto, src (blob del disco), blobs (a liberar después),
+          audios/subs extra que ha traído la persona en local */
 function cargarURL(url, opts) {
   opts = opts || {};
   // Cambiar de fuente dispara pause/seek espurios del propio player: que no
   // se difundan como acciones de la persona.
   mute = Date.now() + ECHO_MS;
-  curV = url;
-  video.src = url;
+  curV = url || null;
+  esLocal = !!opts.src;
+  blobsVivos.forEach((u) => { try { URL.revokeObjectURL(u); } catch (e) { /* nada */ } });
+  blobsVivos = opts.blobs || [];
+  video.src = opts.src || url;
   video.load();
   limpiaSubs();
-  // Si la URL está en la biblioteca, se toman su nombre y sus pistas de
-  // subtítulos (también cuando la manda la sala y no un clic en la tarjeta).
-  const ent = entradaDe(url);
-  ponNombre(opts.nombre || (ent && ent.titulo) || tituloDe(url));
-  if (ent) (ent.subs || []).forEach((s) => addTrackURL(s.label || 'Subtítulos', absCat(s.url)));
+  // Si la URL está en la biblioteca, se toman su nombre y sus pistas (también
+  // cuando la manda la sala y no un clic en la tarjeta).
+  const ent = entradaDe(curV);
+  ponNombre(opts.nombre || (ent && ent.titulo) || (url ? tituloDe(url) : 'Película'));
+  ponAudios(ent ? ent.audios : null, opts.audios);
+  ponSubs(ent ? ent.subs : null, opts.subs);
   $('#loader').classList.add('hidden');
+  $('#dl').classList.add('hidden');
   actualizarShare();
+  pintaPeli();
   if (!opts.remoto && sala && (sala.host || !sala.navLock)) {
     send({ t: 'ev', kind: 'nav', url: shareUrl(), at: Date.now() });
     logAct(sala.name, 'cambió la película de la sala');
   }
+  if (opts.remoto && sala && !esLocal && ent && Date.now() - avisoDescarga > 60000) {
+    avisoDescarga = Date.now();
+    logSys('Descárgala desde el panel y ábrela con "Usar mi copia": se ve sin cortes');
+  }
 }
-function cargarArchivo(file) {
-  mute = Date.now() + ECHO_MS;
-  curV = null;
-  video.src = URL.createObjectURL(file);
-  video.load();
-  limpiaSubs();
-  ponNombre(file.name.replace(/\.[a-z0-9]{2,5}$/i, ''));
-  $('#loader').classList.add('hidden');
-  actualizarShare();
-  if (sala && sala.host) logSys('Estás con un archivo local: cada persona debe cargar su propia copia');
+/* Archivos del disco: el video y, si vienen, sus pistas de audio y de
+   subtítulos. Si ya había un título del catálogo puesto, la identidad de la
+   sala se conserva: la copia local sigue sincronizada con los demás. */
+function cargarArchivos(lista) {
+  const arr = Array.from(lista || []);
+  if (!arr.length) return;
+  const esVid = (f) => /^video\//.test(f.type) || /\.(mp4|m4v|webm|mkv|mov|ogv)$/i.test(f.name);
+  const esAud = (f) => /^audio\//.test(f.type) || /\.(m4a|aac|mp3|opus|ogg|oga|wav|flac)$/i.test(f.name);
+  const esSub = (f) => /\.(vtt|srt)$/i.test(f.name);
+  const vid = arr.find(esVid);
+  const auds = arr.filter((f) => !esVid(f) && esAud(f));
+  const subs = arr.filter(esSub);
+  const blobs = [];
+  const bl = (f) => { const u = URL.createObjectURL(f); blobs.push(u); return u; };
+
+  if (!vid) {
+    // Solo pistas sueltas: se enganchan a lo que ya se está viendo.
+    if (!auds.length && !subs.length) { toast('No reconocí video, audio ni subtítulos ahí'); return; }
+    auds.forEach((f) => sumaAudio({ label: sinExt(f.name), url: bl(f), local: true }));
+    subs.forEach((f) => cargarSubs(f));
+    blobsVivos = blobsVivos.concat(blobs);
+    toast('Pistas añadidas a la película');
+    return;
+  }
+  cargarURL(curV, {
+    src: bl(vid), blobs,
+    nombre: curV ? undefined : sinExt(vid.name),
+    audios: auds.map((f) => ({ nombre: f.name, label: sinExt(f.name), url: bl(f), local: true })),
+    subs: subs.map((f) => ({ nombre: f.name, label: sinExt(f.name), file: f, local: true }))
+  });
+  if (sala && sala.host && !curV) logSys('Estás con un archivo local: cada persona debe cargar su propia copia');
 }
 function shareUrl() {
   return location.origin + location.pathname + (curV ? '?v=' + encodeURIComponent(curV) : '');
@@ -590,16 +744,31 @@ async function addTrackURL(label, url) {
     addTrack(label, URL.createObjectURL(new Blob([aVtt(text)], { type: 'text/vtt' })), activar);
   } catch (e) { /* pista rota o sin CORS: no se lista */ }
 }
-function cargarSubs(file) {
+function addTrackFile(label, file, activar) {
   const rd = new FileReader();
-  rd.onload = () => {
-    const nombre = file.name.replace(/\.[a-z0-9]{2,5}$/i, '');
-    eligeSub(null);
-    addTrack(nombre, URL.createObjectURL(new Blob([aVtt(rd.result)], { type: 'text/vtt' })), true);
-    localStorage.cineSubs = nombre;
-    toast('Subtítulos cargados: ' + file.name);
-  };
+  rd.onload = () => addTrack(label,
+    URL.createObjectURL(new Blob([aVtt(rd.result)], { type: 'text/vtt' })),
+    activar !== undefined ? activar : (localStorage.cineSubs || '') === label);
   rd.readAsText(file);
+}
+/* Las pistas del catálogo, salvo las que la persona ya tiene en su disco: si
+   trajo su copia se usa esa y no se pide nada por la red. */
+function ponSubs(cat, locales) {
+  const loc = (locales || []).slice();
+  (cat || []).forEach((s) => {
+    const label = s.label || 'Subtítulos';
+    const mio = loc.find((l) => !l.usado && casaCon(l.nombre, label));
+    if (mio) { mio.usado = true; addTrackFile(label, mio.file); }
+    else addTrackURL(label, absCat(s.url));
+  });
+  loc.filter((l) => !l.usado).forEach((l) => addTrackFile(l.label, l.file));
+}
+function cargarSubs(file) {
+  const nombre = sinExt(file.name);
+  eligeSub(null);
+  addTrackFile(nombre, file, true);
+  localStorage.cineSubs = nombre;
+  toast('Subtítulos cargados: ' + file.name);
 }
 function eligeSub(label) {
   for (let i = 0; i < video.textTracks.length; i++) {
@@ -616,6 +785,104 @@ function ccPinta() {
   $('#c-cc').classList.toggle('accent', activo);
 }
 
+/* ============================ Pistas de audio ============================
+   Un <video> solo suena la pista incrustada en su archivo, así que los demás
+   idiomas viajan en archivos aparte y suenan en un <audio> paralelo. Para que
+   no se despeguen, la corrección es doble: los desvíos pequeños se arreglan
+   estirando la velocidad un 3 % (no se nota) y los grandes con un salto seco. */
+let audios = [];        // [{label, url}] — url vacía = la pista del propio video
+let audioSel = '';
+let audioExt = false;   // ahora mismo suena una pista externa
+let userVol = 1, userMute = false;
+
+function ponAudios(cat, locales) {
+  const loc = (locales || []).slice();
+  audios = [];
+  (cat || []).forEach((a) => {
+    if (!a || !a.label) return;
+    const mio = loc.find((l) => !l.usado && casaCon(l.nombre, a.label));
+    if (mio) mio.usado = true;
+    audios.push({ label: a.label, url: mio ? mio.url : (a.url ? absCat(a.url) : ''), local: !!mio });
+  });
+  if (!audios.length) audios.push({ label: 'Original', url: '' });
+  loc.filter((l) => !l.usado).forEach((l) => audios.push({ label: l.label, url: l.url, local: true }));
+  const guardado = localStorage.cineAudio || '';
+  audioSel = audios.some((a) => a.label === guardado) ? guardado : audios[0].label;
+  aplicaAudio();
+}
+function sumaAudio(pista) {
+  audios.push({ label: pista.label, url: pista.url, local: !!pista.local });
+  audioPinta();
+}
+function ponTiempoAudio() {
+  try { a2.currentTime = video.currentTime || 0; } catch (e) { /* aún sin metadatos */ }
+}
+function aplicaAudio() {
+  const p = audios.find((a) => a.label === audioSel) || audios[0] || { url: '' };
+  audioExt = !!p.url;
+  if (!audioExt) {
+    a2.pause();
+    if (a2.dataset.url) { a2.dataset.url = ''; a2.removeAttribute('src'); a2.load(); }
+  } else if (a2.dataset.url !== p.url) {
+    a2.dataset.url = p.url;
+    a2.src = p.url;
+    a2.load();
+    ponTiempoAudio();
+  }
+  a2.playbackRate = video.playbackRate || 1;
+  aplicaVolumen();
+  audioPinta();
+  if (audioExt && !video.paused) audioPlay();
+}
+function aplicaVolumen() {
+  // El volumen y el silencio son de la persona, no del elemento: se aplican a
+  // la fuente que esté sonando y el video se calla cuando manda la externa.
+  if (audioExt) {
+    video.muted = true;
+    a2.muted = userMute; a2.volume = userVol;
+  } else {
+    video.muted = userMute; video.volume = userVol;
+    a2.muted = true;
+  }
+  vol.value = Math.round(userVol * 100);
+  vol.style.setProperty('--p', vol.value + '%');
+  $('#c-mute').innerHTML = (userMute || !userVol) ? IC.mute : IC.vol;
+}
+function audioPlay() {
+  if (!audioExt) return;
+  const d = video.currentTime - a2.currentTime;
+  if (!isFinite(d) || Math.abs(d) > 0.5) ponTiempoAudio();
+  a2.play().catch(() => { if (!video.paused) $('#tapveil').classList.remove('hidden'); });
+}
+function eligeAudio(label) {
+  audioSel = label;
+  localStorage.cineAudio = label;
+  aplicaAudio();
+  toast('Audio: ' + label);
+}
+function audioPinta() {
+  const b = $('#c-audio');
+  b.style.display = audios.length > 1 ? '' : 'none';
+  b.classList.toggle('accent', audioExt);
+}
+video.addEventListener('play', () => { if (audioExt) audioPlay(); });
+video.addEventListener('pause', () => a2.pause());
+video.addEventListener('seeking', () => { if (audioExt) a2.pause(); });
+video.addEventListener('seeked', () => { if (audioExt) { ponTiempoAudio(); if (!video.paused) audioPlay(); } });
+video.addEventListener('waiting', () => { if (audioExt) a2.pause(); });
+video.addEventListener('playing', () => { if (audioExt && !video.paused) audioPlay(); });
+video.addEventListener('ratechange', () => { a2.playbackRate = video.playbackRate || 1; });
+a2.addEventListener('loadedmetadata', () => { if (audioExt) { ponTiempoAudio(); if (!video.paused) audioPlay(); } });
+setInterval(() => {
+  if (!audioExt || video.paused || a2.paused || a2.readyState < 2) return;
+  const base = video.playbackRate || 1;
+  const d = video.currentTime - a2.currentTime;   // > 0: el audio va por detrás
+  if (!isFinite(d)) return;
+  if (Math.abs(d) > 0.45) { ponTiempoAudio(); a2.playbackRate = base; }
+  else if (Math.abs(d) > 0.06) a2.playbackRate = base * (1 + Math.max(-0.03, Math.min(0.03, d)));
+  else if (a2.playbackRate !== base) a2.playbackRate = base;
+}, 400);
+
 /* ============================ Controles ============================ */
 const IC = {
   play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72c0 .83.9 1.34 1.61.9l10.9-6.86a1.06 1.06 0 0 0 0-1.8L9.61 4.24A1.06 1.06 0 0 0 8 5.14Z"/></svg>',
@@ -624,9 +891,12 @@ const IC = {
   mute: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 4.06a1 1 0 0 0-1.63-.78L7.6 6.75H4.5A1.5 1.5 0 0 0 3 8.25v7.5a1.5 1.5 0 0 0 1.5 1.5h3.1l4.27 3.47a1 1 0 0 0 1.63-.78V4.06Z"/><path d="m20.03 9.97-1.06-1.06L17 10.88l-1.97-1.97-1.06 1.06L15.94 12l-1.97 1.97 1.06 1.06L17 13.06l1.97 1.97 1.06-1.06L18.06 12l1.97-2.03Z"/></svg>',
   cc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M10.5 10.2a2.2 2.2 0 1 0 0 3.6M17 10.2a2.2 2.2 0 1 0 0 3.6"/></svg>',
   open: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/></svg>',
-  fs: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>'
+  fs: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>',
+  audio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.62a48.47 48.47 0 0 1 6-.37m0 0c1.12 0 2.23.04 3.33.11M9 5.25V3m3.33 2.36C11.18 10.66 7.69 15.08 3 17.5m9.33-12.14c.9.06 1.79.15 2.67.26m-4.59 8.5a18.02 18.02 0 0 1-3.83-5.8"/></svg>',
+  descarga: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>'
 };
 $('#c-play').innerHTML = IC.play;
+$('#c-audio').innerHTML = IC.audio;
 $('#c-cc').innerHTML = IC.cc;
 $('#c-open').innerHTML = IC.open;
 $('#c-mute').innerHTML = IC.vol;
@@ -658,46 +928,77 @@ seek.addEventListener('change', () => {
   if (video.duration) video.currentTime = seek.value / 1000 * video.duration;
 });
 vol.addEventListener('input', () => {
-  video.volume = vol.value / 100; video.muted = false;
-  vol.style.setProperty('--p', vol.value + '%');
+  userVol = vol.value / 100; userMute = false;
   localStorage.cineVol = vol.value;
-  $('#c-mute').innerHTML = vol.value === '0' ? IC.mute : IC.vol;
+  aplicaVolumen();
 });
-if (localStorage.cineVol) { vol.value = localStorage.cineVol; video.volume = vol.value / 100; vol.style.setProperty('--p', vol.value + '%'); }
-$('#c-mute').addEventListener('click', () => {
-  video.muted = !video.muted;
-  $('#c-mute').innerHTML = video.muted ? IC.mute : IC.vol;
-});
+if (localStorage.cineVol) userVol = Math.max(0, Math.min(1, localStorage.cineVol / 100));
+$('#c-mute').addEventListener('click', () => { userMute = !userMute; aplicaVolumen(); });
+aplicaVolumen();
 $('#c-play').addEventListener('click', () => { if (video.src) { video.paused ? playSafe() : video.pause(); } });
 $('#c-fs').addEventListener('click', () => {
   if (document.fullscreenElement) document.exitFullscreen();
   else stage.requestFullscreen().catch(() => {});
 });
-/* Menú CC: pistas del título + apagar + archivo propio */
-const ccMenu = document.createElement('div');
-ccMenu.id = 'cc-menu'; ccMenu.className = 'hidden';
-$('#bar').appendChild(ccMenu);
+/* Menús de pistas, como en un MKV: audio a la izquierda, subtítulos al lado. */
+function creaMenu(id) {
+  const el = document.createElement('div');
+  el.id = id; el.className = 'menu hidden';
+  $('#bar').appendChild(el);
+  return el;
+}
+const ccMenu = creaMenu('cc-menu'), audioMenu = creaMenu('audio-menu');
+function menuItem(menu, texto, marcado, fn, etiqueta) {
+  const b = document.createElement('button');
+  b.className = 'cc-it' + (marcado ? ' on' : '');
+  b.textContent = texto;
+  if (etiqueta) {
+    const s = document.createElement('span');
+    s.className = 'tag'; s.textContent = etiqueta;
+    b.appendChild(s);
+  }
+  b.addEventListener('click', () => { fn(); menu.classList.add('hidden'); });
+  menu.appendChild(b);
+  return b;
+}
+function menuTitulo(menu, texto) {
+  const t = document.createElement('div');
+  t.className = 'menu-t'; t.textContent = texto;
+  menu.appendChild(t);
+}
 function ccMuestra() {
+  audioMenu.classList.add('hidden');
   ccMenu.innerHTML = '';
-  const item = (texto, marcado, fn) => {
-    const b = document.createElement('button');
-    b.className = 'cc-it' + (marcado ? ' on' : ''); b.textContent = texto;
-    b.addEventListener('click', () => { fn(); ccMenu.classList.add('hidden'); });
-    ccMenu.appendChild(b);
-  };
+  menuTitulo(ccMenu, 'Subtítulos');
   let alguno = false;
   for (let i = 0; i < video.textTracks.length; i++) {
     const tt = video.textTracks[i];
     if (tt.mode === 'showing') alguno = true;
-    item(tt.label || 'Pista ' + (i + 1), tt.mode === 'showing', () => eligeSub(tt.label));
+    menuItem(ccMenu, tt.label || 'Pista ' + (i + 1), tt.mode === 'showing', () => eligeSub(tt.label));
   }
-  item('Sin subtítulos', !alguno, () => eligeSub(null));
-  item('Cargar archivo…', false, () => $('#in-subs').click());
+  menuItem(ccMenu, 'Sin subtítulos', !alguno, () => eligeSub(null));
+  menuItem(ccMenu, 'Cargar archivo…', false, () => $('#in-subs').click());
   ccMenu.classList.remove('hidden');
+}
+function audioMuestra() {
+  ccMenu.classList.add('hidden');
+  audioMenu.innerHTML = '';
+  menuTitulo(audioMenu, 'Audio');
+  audios.forEach((a) => menuItem(audioMenu, a.label, a.label === audioSel,
+    () => eligeAudio(a.label), a.local ? 'de tu copia' : (a.url ? '' : 'del video')));
+  audioMenu.classList.remove('hidden');
 }
 $('#c-cc').addEventListener('click', () => {
   if (ccMenu.classList.contains('hidden')) ccMuestra();
   else ccMenu.classList.add('hidden');
+});
+$('#c-audio').addEventListener('click', () => {
+  if (audioMenu.classList.contains('hidden')) audioMuestra();
+  else audioMenu.classList.add('hidden');
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#cc-menu,#c-cc')) ccMenu.classList.add('hidden');
+  if (!e.target.closest('#audio-menu,#c-audio')) audioMenu.classList.add('hidden');
 });
 $('#c-open').addEventListener('click', () => {
   $('#loader').classList.remove('hidden');
@@ -737,6 +1038,7 @@ function playSafe() {
 $('#tap-btn').addEventListener('click', () => {
   $('#tapveil').classList.add('hidden');
   video.play().catch(() => {});
+  audioPlay();
 });
 
 /* Cargador */
@@ -746,10 +1048,65 @@ $('#btn-url').addEventListener('click', () => {
 });
 $('#in-url').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#btn-url').click(); });
 $('#btn-file').addEventListener('click', () => $('#in-file').click());
-$('#in-file').addEventListener('change', () => { if ($('#in-file').files[0]) { cargarArchivo($('#in-file').files[0]); playSafe(); } });
+$('#in-file').addEventListener('change', (e) => {
+  if (e.target.files.length) { cargarArchivos(e.target.files); playSafe(); }
+  e.target.value = '';   // volver a elegir el mismo archivo debe funcionar
+});
 $('#btn-subs').addEventListener('click', () => $('#in-subs').click());
-$('#in-subs').addEventListener('change', () => { if ($('#in-subs').files[0]) cargarSubs($('#in-subs').files[0]); });
+$('#in-subs').addEventListener('change', (e) => {
+  if (e.target.files[0]) cargarSubs(e.target.files[0]);
+  e.target.value = '';
+});
 $('#loader-close').addEventListener('click', () => $('#loader').classList.add('hidden'));
+
+/* ============================ Descarga ============================
+   Watch Party = cada persona reproduce su copia. Streaming va bien, pero con
+   la película en el disco no hay buffers que descuadren la sincronización.
+   Los enlaces pasan por el worker para que el navegador la GUARDE en vez de
+   abrirla: el bucket público no manda Content-Disposition. */
+const R2_PUB = /^https:\/\/pub-[a-z0-9]+\.r2\.dev\//;
+const DESCARGA_API = 'https://cine.studio-iris2026.workers.dev/descargar';
+function nombreDescarga(key) {
+  const p = key.split('/').filter(Boolean);
+  const base = p[p.length - 1];
+  return p.length > 1 ? p[1] + '-' + base : base;
+}
+function urlDescarga(url) {
+  const u = absCat(url);
+  if (!R2_PUB.test(u)) return u;
+  const key = decodeURIComponent(u.replace(R2_PUB, ''));
+  return DESCARGA_API + '?key=' + encodeURIComponent(key) + '&n=' + encodeURIComponent(nombreDescarga(key));
+}
+function fmtTam(b) {
+  if (!b) return '';
+  const u = ['B', 'KB', 'MB', 'GB']; let n = b, i = 0;
+  while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
+  return (i < 2 || n >= 100 ? Math.round(n) : n.toFixed(1)) + ' ' + u[i];
+}
+function abreDescarga(ent) {
+  if (!ent) { toast('Esta película no está en la biblioteca'); return; }
+  $('#dl-tit').textContent = 'Descargar ' + (ent.titulo || 'la película');
+  const lista = $('#dl-list');
+  lista.innerHTML = '';
+  const fila = (titulo, detalle, url, tam) => {
+    const a = document.createElement('a');
+    a.className = 'dl-it'; a.href = urlDescarga(url); a.download = '';
+    a.innerHTML = IC.descarga;
+    const n = document.createElement('div'); n.className = 'n'; n.textContent = titulo;
+    if (detalle) { const s = document.createElement('span'); s.textContent = detalle; n.appendChild(s); }
+    a.appendChild(n);
+    const s = document.createElement('div'); s.className = 's'; s.textContent = fmtTam(tam);
+    a.appendChild(s);
+    lista.appendChild(a);
+  };
+  fila('Video', 'Con el audio principal incluido', ent.url, ent.tam);
+  (ent.audios || []).forEach((a) => { if (a.url) fila('Audio: ' + a.label, 'Pista aparte', a.url, a.tam); });
+  (ent.subs || []).forEach((s) => fila('Subtítulos: ' + s.label, '', s.url, s.tam));
+  $('#dl').classList.remove('hidden');
+}
+$('#dl-cerrar').addEventListener('click', () => $('#dl').classList.add('hidden'));
+$('#dl-local').addEventListener('click', () => $('#in-file').click());
+$('#dl').addEventListener('click', (e) => { if (e.target.id === 'dl') $('#dl').classList.add('hidden'); });
 
 /* Biblioteca: catálogo estático en biblioteca.json (mismo directorio). Añadir
    un título = añadir una entrada ahí; el video puede vivir en el repo o en
@@ -764,9 +1121,11 @@ function entradaDe(url) {
 // al llegar este, se completan nombre y pistas.
 function aplicaCatalogoActual() {
   const ent = entradaDe(curV);
+  pintaPeli();
   if (!ent) return;
   ponNombre(ent.titulo);
-  if (!video.querySelector('track')) (ent.subs || []).forEach((s) => addTrackURL(s.label || 'Subtítulos', absCat(s.url)));
+  if (audios.length < 2) ponAudios(ent.audios, null);
+  if (!video.querySelector('track')) ponSubs(ent.subs, null);
 }
 function pintaBiblioteca(bib) {
   const grid = $('#lib-grid');
@@ -789,6 +1148,12 @@ function pintaBiblioteca(bib) {
       ini.textContent = (t.titulo || '?').slice(0, 2).toUpperCase(); th.appendChild(ini);
     }
     if (t.dur) { const d = document.createElement('span'); d.className = 'lib-dur'; d.textContent = t.dur; th.appendChild(d); }
+    const dl = document.createElement('span');
+    dl.className = 'lib-dl'; dl.title = 'Descargar para verla sin cortes';
+    dl.setAttribute('role', 'button'); dl.tabIndex = 0;
+    dl.innerHTML = IC.descarga;
+    dl.addEventListener('click', (e) => { e.stopPropagation(); abreDescarga(t); });
+    th.appendChild(dl);
     card.appendChild(th);
     const info = document.createElement('div'); info.className = 'lib-info';
     const tit = document.createElement('div'); tit.className = 'lib-tit'; tit.textContent = t.titulo || 'Sin título';
@@ -815,6 +1180,7 @@ let beatTimer = null;
 let lastEv = { k: '', at: 0 };
 let lockWarned = 0;
 let hintLocal = 0;
+let avisoDescarga = 0;
 
 function send(obj) {
   try { if (sala && sala.ws && sala.ws.readyState === 1) sala.ws.send(JSON.stringify(obj)); } catch (e) { /* nada */ }
@@ -891,11 +1257,31 @@ function pintarChat() {
 }
 
 /* --- Estado del panel --- */
+/* La película de la sala, con el atajo para bajarla: el invitado necesita su
+   propia copia antes de empezar (aquí no se transmite video, solo señales). */
+function pintaPeli() {
+  const box = $('#p-peli');
+  if (!box) return;
+  const ent = entradaDe(curV);
+  const hay = !!(sala && ent);
+  box.classList.toggle('hidden', !hay);
+  if (!hay) return;
+  $('#p-peli-t').textContent = ent.titulo || 'Película de la sala';
+  $('#p-peli-d').textContent = esLocal
+    ? 'Suena tu copia del disco, sincronizada con la sala.'
+    : 'La estás viendo por internet. Descárgala y no habrá cortes.';
+  $('#p-peli-dl').style.display = esLocal ? 'none' : '';
+  $('#p-peli-local').textContent = esLocal ? 'Cambiar de archivo' : 'Usar mi copia';
+}
+$('#p-peli-dl').addEventListener('click', () => abreDescarga(entradaDe(curV)));
+$('#p-peli-local').addEventListener('click', () => $('#in-file').click());
+
 function pintaSala() {
   const dentro = !!sala;
   $('#p-setup').style.display = dentro ? 'none' : '';
   $('#p-room').style.display = dentro ? 'flex' : 'none';
   $('#btn-party').classList.toggle('live', dentro);
+  pintaPeli();
   if (!dentro) return;
   $('#p-code-t').textContent = sala.code;
   $('#p-locks').style.display = sala.host ? '' : 'none';
@@ -1110,7 +1496,10 @@ pintaSala();
 ccPinta();
 
 // Gancho de consola para pruebas: window.CINE.sala() / cargar(url) / video
-window.CINE = { sala: () => sala, cargar: cargarURL, video, enviar: send };
+window.CINE = {
+  sala: () => sala, cargar: cargarURL, video, audio: a2, enviar: send,
+  audios: () => audios, eligeAudio, descarga: () => abreDescarga(entradaDe(curV))
+};
 })();
 </script>
 </body>
