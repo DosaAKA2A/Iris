@@ -1,0 +1,12 @@
+name = "quiebra"
+main = "worker.js"
+compatibility_date = "2026-07-01"
+
+[[durable_objects.bindings]]
+name = "SALA"
+class_name = "Sala"
+
+# new_sqlite_classes: los Durable Objects con SQLite son los del plan gratuito.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Sala"]

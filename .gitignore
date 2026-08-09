@@ -1,0 +1,3 @@
+# Estado local de wrangler dev (nunca al repo)
+quiebra/worker/.wrangler/
+node_modules/

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QUIEBRA — arruina a tus amigos</title>
+  <meta name="description" content="QUIEBRA: juego web multijugador para 4. Compra el barrio, sabotea a tus amigos y gana los minijuegos. Un juego de IRIS Studio." />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <meta property="og:title" content="QUIEBRA — arruina a tus amigos" />
+  <meta property="og:description" content="Juego web multijugador para 4 personas. De IRIS Studio." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./quiebra.css" />
+</head>
+<body>
+
+  <!-- =============== PORTADA / LOBBY =============== -->
+  <section class="pantalla" id="scr-portada">
+    <div class="portada">
+      <h1 class="marca" aria-label="QUIEBRA">
+        <span>Q</span><span>U</span><span>I</span><span>E</span><span>B</span><span>R</span><span class="marca__cae">A</span>
+      </h1>
+      <p class="marca__lema">Arruina a tus amigos.</p>
+
+      <div class="portada__form">
+        <label class="campo">
+          <span class="campo__label">Tu nombre</span>
+          <input id="in-nombre" maxlength="14" autocomplete="nickname" placeholder="p. ej. Dosa" />
+        </label>
+        <div class="portada__botones">
+          <button class="btn btn--primario" id="bt-crear">Crear sala</button>
+          <div class="portada__union">
+            <input id="in-codigo" maxlength="4" placeholder="CÓDIGO" autocapitalize="characters" autocomplete="off" spellcheck="false" />
+            <button class="btn" id="bt-entrar">Entrar</button>
+          </div>
+        </div>
+        <p class="portada__err" id="portada-err" role="alert"></p>
+      </div>
+
+      <div class="portada__reglas">
+        <h2 class="portada__h2">Cómo se juega</h2>
+        <ul>
+          <li>2 a 4 personas en la misma sala, cada una desde su navegador.</li>
+          <li>Tablero de 24 casillas: compra negocios, cobra rentas, reforma.</li>
+          <li>Cuando alguien cae en MINIJUEGO, juegan LOS CUATRO a la vez.</li>
+          <li>Cartas de AZAR para sabotear: dados trucados, okupas, expropiaciones.</li>
+          <li>A las 10 rondas se corta: gana el mayor patrimonio, no el último vivo.</li>
+        </ul>
+      </div>
+      <p class="portada__firma">Un juego de IRIS Studio — <a href="https://iris.it.com" rel="noopener">iris.it.com</a></p>
+    </div>
+  </section>
+
+  <!-- =============== SALA DE ESPERA =============== -->
+  <section class="pantalla oculta" id="scr-sala">
+    <div class="sala">
+      <header class="sala__cab">
+        <p class="sala__label">Sala</p>
+        <p class="sala__codigo" id="sala-codigo">····</p>
+        <button class="btn btn--mini" id="bt-copiar">Copiar enlace</button>
+      </header>
+
+      <div class="sala__jugadores" id="sala-jugadores"></div>
+
+      <div class="sala__personajes">
+        <h2 class="portada__h2">Elige tu personaje</h2>
+        <div class="fichas" id="sala-fichas"></div>
+      </div>
+
+      <div class="sala__pie">
+        <label class="sala__rondas" id="sala-rondas-wrap">
+          <span>Rondas</span>
+          <select id="sel-rondas">
+            <option value="8">8 — rápida</option>
+            <option value="10" selected>10 — normal</option>
+            <option value="14">14 — larga</option>
+          </select>
+        </label>
+        <button class="btn btn--primario" id="bt-empezar">Empezar</button>
+        <p class="sala__nota" id="sala-nota">Esperando jugadores…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============== PARTIDA =============== -->
+  <section class="pantalla oculta" id="scr-juego">
+    <div class="juego">
+      <div class="tablero-caja">
+        <div class="tablero" id="tablero"></div>
+        <div class="mesa" id="mesa">
+          <p class="mesa__marca">QUIEBRA</p>
+          <div class="mesa__dados" id="mesa-dados"></div>
+          <p class="mesa__ronda" id="mesa-ronda"></p>
+          <p class="mesa__bote" id="mesa-bote"></p>
+          <p class="mesa__aviso" id="mesa-aviso"></p>
+        </div>
+        <div class="peones" id="peones"></div>
+      </div>
+
+      <aside class="lateral">
+        <div class="panelistas" id="panelistas"></div>
+
+        <div class="acciones" id="acciones"></div>
+
+        <div class="mano" id="mano"></div>
+
+        <div class="registro" id="registro" aria-live="polite"></div>
+
+        <div class="charla">
+          <div class="charla__frases" id="charla-frases"></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- =============== OVERLAYS =============== -->
+  <div class="velo oculta" id="velo-mini">
+    <div class="mini" id="mini-caja"></div>
+  </div>
+
+  <div class="velo oculta" id="velo-final">
+    <div class="final" id="final-caja"></div>
+  </div>
+
+  <div class="brindis" id="brindis" aria-live="polite"></div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
