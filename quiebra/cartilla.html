@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QUIEBRA — cartilla del proyecto | IRIS Studio</title>
+  <meta name="description" content="Cartilla del caso QUIEBRA: cómo diseñamos y construimos un juego web multijugador para 4 personas en una noche. Reglas, personajes, minijuegos y arquitectura." />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0b0d12; --panel: #12151d; --panel-2: #171b26; --linea: #232838;
+      --tinta: #f2f3f7; --muted: #8b90a3; --billete: #59d98c; --peligro: #ff5d5d;
+      --cobre: #c98a5e; --jade: #3fb950; --violeta: #7b69ff; --oro: #e8b93c;
+      --f-display: 'Archivo Black', system-ui, sans-serif;
+      --f-cuerpo: 'Inter', system-ui, sans-serif;
+      --f-mono: 'Geist Mono', ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--tinta); font-family: var(--f-cuerpo); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    .wrap { width: min(880px, 92vw); margin: 0 auto; }
+    a { color: var(--violeta); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .label { font-family: var(--f-mono); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+    .cab { padding: 4.5rem 0 3rem; }
+    .cab__marca { font-family: var(--f-display); font-size: clamp(3rem, 10vw, 5.4rem); line-height: 1; display: inline-flex; margin: .5rem 0 .8rem; }
+    .cab__marca span { display: inline-block; }
+    .cab__cae { transform: rotate(9deg) translateY(.09em); transform-origin: top left; color: var(--peligro); }
+    .cab__lema { font-size: 1.2rem; color: var(--muted); max-width: 52ch; }
+    .cab__ctas { display: flex; gap: .8rem; flex-wrap: wrap; margin-top: 1.6rem; }
+    .btn { display: inline-block; border: 1px solid var(--linea); background: var(--panel); color: var(--tinta); border-radius: 12px; padding: .75rem 1.4rem; font-weight: 600; }
+    .btn:hover { border-color: var(--muted); text-decoration: none; }
+    .btn--primario { background: var(--billete); border-color: var(--billete); color: #06240f; }
+    .btn--primario:hover { background: #6ee8a0; }
+
+    .seccion { padding: 2.6rem 0; border-top: 1px solid var(--linea); }
+    .seccion h2 { font-family: var(--f-display); font-size: clamp(1.4rem, 4vw, 2rem); margin: .4rem 0 1.2rem; line-height: 1.15; }
+    .seccion p + p { margin-top: .9rem; }
+    .seccion .muted { color: var(--muted); }
+
+    .filas { display: grid; gap: .7rem; margin-top: 1.2rem; }
+    .fila { display: grid; grid-template-columns: 8.5rem 1fr; gap: 1rem; background: var(--panel); border: 1px solid var(--linea); border-radius: 12px; padding: .9rem 1.1rem; }
+    .fila b { font-family: var(--f-mono); font-weight: 500; font-size: .82rem; color: var(--oro); letter-spacing: .06em; text-transform: uppercase; padding-top: .15em; }
+
+    .personajes { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: .8rem; margin-top: 1.2rem; }
+    .pj { background: var(--panel); border: 1px solid var(--linea); border-radius: 14px; padding: 1.2rem 1rem; text-align: center; }
+    .pj svg { width: 64px; height: 64px; }
+    .pj h3 { font-family: var(--f-display); font-size: 1rem; margin-top: .5rem; }
+    .pj .apodo { color: var(--muted); font-size: .8rem; }
+    .pj p { font-size: .85rem; color: #c9cdd9; margin-top: .5rem; }
+
+    .figura { margin: 1.4rem 0 0; }
+    .figura img { width: 100%; height: auto; display: block; border-radius: 14px; border: 1px solid var(--linea); }
+    .figura figcaption { font-size: .82rem; color: var(--muted); margin-top: .5rem; font-family: var(--f-mono); }
+
+    .arqui { display: grid; grid-template-columns: 1fr auto 1fr; gap: .6rem; align-items: center; margin-top: 1.4rem; }
+    .arqui__caja { background: var(--panel); border: 1px solid var(--linea); border-radius: 14px; padding: 1rem; text-align: center; }
+    .arqui__caja b { display: block; font-family: var(--f-mono); font-weight: 500; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--billete); margin-bottom: .3rem; }
+    .arqui__caja span { font-size: .82rem; color: var(--muted); }
+    .arqui__flecha { font-family: var(--f-mono); color: var(--muted); text-align: center; font-size: .8rem; }
+    @media (max-width: 640px) { .arqui { grid-template-columns: 1fr; } .arqui__flecha { transform: rotate(90deg); } }
+
+    .pie { padding: 3rem 0 4rem; border-top: 1px solid var(--linea); color: var(--muted); font-size: .9rem; }
+    .pie a { color: var(--tinta); }
+  </style>
+</head>
+<body>
+
+  <header class="cab wrap">
+    <p class="label">Cartilla — Casos de estudio de IRIS Studio</p>
+    <h1 class="cab__marca" aria-label="QUIEBRA"><span>Q</span><span>U</span><span>I</span><span>E</span><span>B</span><span>R</span><span class="cab__cae">A</span></h1>
+    <p class="cab__lema">Un juego web multijugador para 4 personas, diseñado y construido
+    de cero en una noche: tablero, minijuegos, sabotaje y un servidor autoritativo
+    que cabe en el plan gratuito de Cloudflare.</p>
+    <div class="cab__ctas">
+      <a class="btn btn--primario" href="./">Jugar ahora</a>
+      <a class="btn" href="https://iris.it.com">Volver a IRIS</a>
+    </div>
+  </header>
+
+  <section class="seccion wrap">
+    <p class="label">[01] — La idea</p>
+    <h2>Monopoly era el punto de partida, no la meta</h2>
+    <p>El encargo: un juego para cuatro amigos en el navegador, con la referencia de
+    Monopoly pero yendo más allá, en la línea de los party games caóticos que se juegan
+    en grupo. La respuesta fue QUIEBRA: se conserva lo que funciona del clásico
+    (comprar, cobrar rentas, arruinar al prójimo) y se corta lo que lo hace eterno.</p>
+    <p>Tres decisiones lo separan de su referencia: los <strong>minijuegos simultáneos</strong>
+    — cuando alguien cae en la casilla, juegan los cuatro a la vez y nadie mira el teléfono —,
+    las <strong>cartas de sabotaje dirigidas</strong> — dados trucados, okupas, expropiaciones —
+    y el <strong>final por rondas</strong>: a las 10 rondas se corta y gana el mayor patrimonio,
+    no el último superviviente de una agonía de tres horas.</p>
+  </section>
+
+  <section class="seccion wrap">
+    <p class="label">[02] — Cómo se juega</p>
+    <h2>Veinticuatro casillas, diez rondas, cero piedad</h2>
+    <div class="filas">
+      <div class="fila"><b>Tablero</b><span>Anillo de 24 casillas: 12 negocios en 4 barrios (COBRE, JADE, VIOLETA, ORO), 3 casillas de minijuego, 3 de azar, impuestos, EL BACHE, EL BOTE y dos esquinas especiales.</span></div>
+      <div class="fila"><b>Turno</b><span>Puedes jugar una carta, tiras 2d6, resuelves la casilla y puedes reformar un negocio. Timer de 45 segundos: si te duermes, el dado rueda solo.</span></div>
+      <div class="fila"><b>Minijuegos</b><span>DUELO DE CLICS, SEMÁFORO, MEMORIA y CAZAMONEDAS. Juegan todos a la vez con la misma semilla; premios de $150/$75/$25 y trofeo para quien gana.</span></div>
+      <div class="fila"><b>Cartas</b><span>DADO TRUCADO, MUDANZA FORZOSA, ALQUILER CONGELADO, IMPUESTO REVOLUCIONARIO, OKUPA y SEGURO, más sucesos instantáneos como CUMPLEAÑOS o APAGÓN.</span></div>
+      <div class="fila"><b>Victoria</b><span>Patrimonio final = efectivo + lo invertido en negocios y reformas + $100 por trofeo. Quebrar te deja "en la lona", mirando cómo terminan los demás.</span></div>
+    </div>
+  </section>
+
+  <section class="seccion wrap">
+    <p class="label">[03] — Personajes</p>
+    <h2>Cuatro fichas con ventajas que no se pisan</h2>
+    <div class="personajes" id="personajes"></div>
+  </section>
+
+  <section class="seccion wrap">
+    <p class="label">[04] — El resultado</p>
+    <h2>Una partida real, en pantalla</h2>
+    <figure class="figura">
+      <img src="./assets/tablero.jpg" alt="Tablero de QUIEBRA en plena partida: dados 4 y 1, turno de Ana, panel de jugadores y registro a la derecha" width="650" height="400" loading="lazy" />
+      <figcaption>El tablero: barrios con neón propio, dados en la mesa y el registro contando la ruina ajena.</figcaption>
+    </figure>
+    <figure class="figura">
+      <img src="./assets/minijuego.jpg" alt="Minijuego MEMORIA: cuatro luces de colores y la consigna de repetir la secuencia" width="285" height="245" loading="lazy" style="max-width:340px" />
+      <figcaption>MEMORIA: los cuatro jugadores ven la misma secuencia a la vez, gana quien la repite más rápido.</figcaption>
+    </figure>
+  </section>
+
+  <section class="seccion wrap">
+    <p class="label">[05] — Cómo está hecho</p>
+    <h2>Un Durable Object por sala y el cliente solo pinta</h2>
+    <div class="arqui">
+      <div class="arqui__caja"><b>Cliente</b><span>iris.it.com/quiebra — vanilla JS, módulos ES, sin build. Pinta el estado y pide acciones.</span></div>
+      <div class="arqui__flecha">WebSocket</div>
+      <div class="arqui__caja"><b>Servidor</b><span>Worker "quiebra" en Cloudflare. Un Durable Object SQLite por sala decide dados, rentas, cartas y rankings.</span></div>
+    </div>
+    <div class="filas">
+      <div class="fila"><b>Autoridad</b><span>Todo lo decide el servidor; hacer trampa desde la consola no altera dados ni dinero. Los minijuegos comparten semilla determinista: los 4 ven exactamente la misma partida.</span></div>
+      <div class="fila"><b>Resiliencia</b><span>El estado se persiste en cada jugada y los timers usan alarms: la partida sobrevive a hibernaciones del objeto, despliegues y desconexiones. Cada jugador tiene un token de reconexión por pestaña.</span></div>
+      <div class="fila"><b>Una fuente</b><span>shared/data.js define tablero, precios, cartas y personajes una sola vez; lo importan el worker y el navegador.</span></div>
+      <div class="fila"><b>Cero assets</b><span>Personajes e iconos son SVG dibujados a mano y el sonido se sintetiza con WebAudio: no hay ni una imagen ni un audio binario en el juego.</span></div>
+      <div class="fila"><b>Costo</b><span>GitHub Pages para el estático y Durable Objects con SQLite del plan gratuito de Workers: infraestructura a $0.</span></div>
+    </div>
+  </section>
+
+  <footer class="pie wrap">
+    <p>QUIEBRA es un proyecto de <a href="https://iris.it.com">IRIS Studio</a>. Documento de diseño completo en el repositorio (quiebra/DISENO.md).</p>
+  </footer>
+
+  <script type="module">
+    import { PERSONAJES } from './shared/data.js';
+    import { cara } from './js/personajes.js';
+    const cont = document.getElementById('personajes');
+    for (const [id, p] of Object.entries(PERSONAJES)) {
+      cont.insertAdjacentHTML('beforeend', `
+        <div class="pj">
+          ${cara(id)}
+          <h3 style="color:${p.color}">${p.nombre}</h3>
+          <div class="apodo">${p.apodo}</div>
+          <p>${p.desc}</p>
+        </div>`);
+    }
+  </script>
+</body>
+</html>
