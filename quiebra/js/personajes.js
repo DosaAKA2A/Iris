@@ -46,13 +46,23 @@ export function cara(char, cls = '') {
   return `<svg class="${cls}" viewBox="0 0 64 64" aria-hidden="true">${dib()}</svg>`;
 }
 
-/* Peón: la cara sobre un chip del color del personaje. */
+/* Peón: la cara sobre una ficha de casino del color del personaje.
+   Muescas en el canto, brillo arriba y sombra abajo para que tenga cuerpo. */
 export function peon(char, color, cls = '') {
   const dib = CARAS[char] ? CARAS[char]() : '';
+  const muescas = Array.from({ length: 12 }, (_, i) =>
+    `<rect x="30.5" y="0.5" width="3" height="7" rx="1.2" fill="rgba(255,255,255,.5)"
+       transform="rotate(${i * 30} 32 32)"/>`).join('');
   return `<svg class="${cls}" viewBox="0 0 64 64" aria-hidden="true">
+    <ellipse cx="32" cy="60" rx="21" ry="4" fill="rgba(0,0,0,.45)"/>
+    <circle cx="32" cy="33.5" r="30" fill="rgba(0,0,0,.55)"/>
     <circle cx="32" cy="32" r="30" fill="${color}"/>
-    <circle cx="32" cy="32" r="30" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="2"/>
-    <g transform="translate(8,8) scale(.75)">${dib}</g>
+    ${muescas}
+    <circle cx="32" cy="32" r="24" fill="rgba(0,0,0,.22)"/>
+    <circle cx="32" cy="32" r="23" fill="${color}"/>
+    <path d="M32 2 a30 30 0 0 1 30 30 a30 30 0 0 0 -60 0 a30 30 0 0 1 30 -30 z" fill="rgba(255,255,255,.16)"/>
+    <g transform="translate(9.5,9.5) scale(.70)">${dib}</g>
+    <circle cx="32" cy="32" r="30" fill="none" stroke="rgba(0,0,0,.45)" stroke-width="2"/>
   </svg>`;
 }
 
@@ -66,4 +76,6 @@ export const ICONOS = {
   calavera: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 a9 8 0 0 0 -9 8 q0 4 3 6 v4 h3 v-2 h2 v2 h2 v-2 h2 v2 h3 v-4 q3 -2 3 -6 a9 8 0 0 0 -9 -8 z M8.5 12 a2 2 0 1 1 0.01 0 z M15.5 12 a2 2 0 1 1 0.01 0 z"/></svg>',
   risa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 10 L10 11 M16 10 L14 11 M7.5 14 a5 5 0 0 0 9 0 z" fill="currentColor"/></svg>',
   dado: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8.5" cy="8.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.4" fill="currentColor" stroke="none"/></svg>',
+  sonido: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9 H7 L12 5 V19 L7 15 H4 Z" fill="currentColor"/><path d="M16 9.5 a4 4 0 0 1 0 5"/><path d="M18.6 7 a8 8 0 0 1 0 10"/></svg>',
+  mudo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9 H7 L12 5 V19 L7 15 H4 Z" fill="currentColor"/><path d="M16.5 9.5 L21 14 M21 9.5 L16.5 14"/></svg>',
 };

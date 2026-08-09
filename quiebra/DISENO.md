@@ -100,8 +100,39 @@ Mayor patrimonio gana. Desempate: más trofeos, luego más efectivo.
 ## Social
 
 Chat rápido de frases prehechas (sin texto libre, sin moderación que mantener) y
-reacciones que flotan sobre el panel del jugador. Sonido sintetizado con WebAudio
-(sin binarios). Sin emojis en la UI: iconos SVG propios.
+reacciones que flotan sobre el panel del jugador. Sin emojis en la UI: todo icono es SVG.
+
+## Puesta en escena
+
+El servidor manda el resultado entero de golpe (dados + posición + dinero). El cliente
+lo reparte en el tiempo con una cola de animación: primero ruedan los dados 3D, después
+el peón salta casilla a casilla, y solo cuando aterriza se revelan las cartas y se mueve
+el dinero. Para eso los avisos de efecto (`fx`) se guardan en un buzón y se consumen
+cuando llega el estado que los explica; mientras dura la escena, el panel de acciones
+enseña "fulano avanza…" en vez de destripar dónde va a caer.
+
+Si la pestaña está en segundo plano (Chrome estrangula los `setTimeout`) o la escena se
+alarga más de 9 s, las esperas se saltan enteras y se va directo al estado final: nunca
+se pierde el turno mirando una animación.
+
+`js/fx.js` es el motor de efectos: un único canvas a pantalla completa para partículas
+(monedas, chispas, confeti, humo), números flotantes en DOM, sacudidas, viñetas y
+contadores. El bucle de `requestAnimationFrame` solo corre mientras hay partículas
+vivas; en reposo no queda nada girando.
+
+## Créditos de los assets
+
+Sonido e iconos son de **Kenney** (<https://kenney.nl>), dominio público (CC0 1.0):
+
+- *Casino Audio* — dados, fichas y cartas.
+- *Interface Sounds* — clics, confirmaciones y errores.
+- *Impact Sounds* — golpes y cristal.
+- *Music Jingles* — remates de victoria y derrota.
+- *Board Game Icons* — los trazados de `js/iconos.js` (convertidos a paths inline para
+  que hereden `currentColor`).
+
+Las caras de los personajes y los peones (`js/personajes.js`) son vector propio.
+Tipografías: Archivo Black, Inter y Geist Mono (Google Fonts).
 
 ## Arquitectura
 

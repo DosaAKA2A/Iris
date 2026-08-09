@@ -8,11 +8,13 @@
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <meta property="og:title" content="QUIEBRA — arruina a tus amigos" />
   <meta property="og:description" content="Juego web multijugador para 4 personas. De IRIS Studio." />
+  <meta name="theme-color" content="#07090e" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./quiebra.css" />
+  <link rel="stylesheet" href="./minijuegos.css" />
 </head>
 <body>
 
@@ -44,7 +46,7 @@
         <ul>
           <li>2 a 4 personas en la misma sala, cada una desde su navegador.</li>
           <li>Tablero de 24 casillas: compra negocios, cobra rentas, reforma.</li>
-          <li>Cuando alguien cae en MINIJUEGO, juegan LOS CUATRO a la vez.</li>
+          <li>Cuando alguien cae en MINIJUEGO, juegan los cuatro a la vez.</li>
           <li>Cartas de AZAR para sabotear: dados trucados, okupas, expropiaciones.</li>
           <li>A las 10 rondas se corta: gana el mayor patrimonio, no el último vivo.</li>
         </ul>
@@ -125,6 +127,11 @@
   </div>
 
   <div class="brindis" id="brindis" aria-live="polite"></div>
+
+  <!-- Controles siempre visibles -->
+  <div class="barra">
+    <button class="btn btn--mini" id="bt-sonido" aria-label="Sonido" title="Sonido"></button>
+  </div>
 
   <script type="module" src="./js/app.js"></script>
 </body>
