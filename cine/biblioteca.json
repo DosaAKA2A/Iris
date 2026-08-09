@@ -1,0 +1,40 @@
+{
+  "_como_agregar": "Cada título: { titulo, url (directa al video, relativa al sitio o absoluta), dur (m:ss, opcional), nota (opcional), poster (opcional). Los pósters viven en cine/posters/.",
+  "titulos": [
+    {
+      "titulo": "Hero IRIS",
+      "url": "/assets/hero.mp4",
+      "dur": "0:20",
+      "nota": "Clip de prueba — el video de la portada de IRIS",
+      "poster": "posters/hero.jpg"
+    },
+    {
+      "titulo": "SPACIO — Velaro",
+      "url": "/spacio/velaro-hero-quality.mp4",
+      "dur": "0:16",
+      "nota": "Corto aeroespacial del estudio SPACIO",
+      "poster": "posters/velaro.jpg"
+    },
+    {
+      "titulo": "Hero video",
+      "url": "/assets/hero_video.mp4",
+      "dur": "0:10",
+      "nota": "Clip corto de prueba",
+      "poster": "posters/hero_video.jpg"
+    },
+    {
+      "titulo": "Hero video A",
+      "url": "/assets/hero_video_a.mp4",
+      "dur": "0:12",
+      "nota": "Clip corto de prueba",
+      "poster": "posters/hero_video_a.jpg"
+    },
+    {
+      "titulo": "Hero video B",
+      "url": "/assets/hero_video_b.mp4",
+      "dur": "0:12",
+      "nota": "Clip corto de prueba",
+      "poster": "posters/hero_video_b.jpg"
+    }
+  ]
+}
