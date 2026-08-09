@@ -120,16 +120,35 @@ se pierde el turno mirando una animación.
 contadores. El bucle de `requestAnimationFrame` solo corre mientras hay partículas
 vivas; en reposo no queda nada girando.
 
+## El tablero
+
+Las cuatro caras del anillo son simétricas de verdad: la cinta del barrio siempre mira
+al centro de la mesa (arriba abajo, abajo arriba, izquierda a la derecha y viceversa),
+igual que en un tablero de cartón. El lado se decide en `ladoDe()` y el CSS coloca cinta,
+franja del dueño y marcas de reforma/okupa según la clase `casilla--abajo|arriba|izq|der`.
+
+El color del barrio no es solo la cinta: tiñe toda la casilla, y el aro del centro repite
+esos cuatro colores en el cuarto de círculo que le toca a cada lado. Cada casilla lleva
+además su propio dibujo (empanadas, lavadora, teclado, pesas, navaja, café, sushi,
+joystick, copa, torres, tragamonedas, helicóptero).
+
+Cada casilla deja libre su borde exterior: es el **carril** por donde caminan los peones,
+para que no le tapen el nombre. `colocarPeon()` mide la casilla real (`offsetLeft` y el
+relleno ya calculado) en vez de rehacer la retícula a mano, así el peón sigue cuadrado
+aunque cambien las proporciones del tablero.
+
 ## Créditos de los assets
 
-Sonido e iconos son de **Kenney** (<https://kenney.nl>), dominio público (CC0 1.0):
+**Iconos**: [game-icons.net](https://game-icons.net) — CC BY 3.0, de Delapouite, Lorc,
+Faithtoken, Caro Asercion y John Colburn. En `js/iconos.js` van como paths inline sin
+fondo ni fill, para que hereden `currentColor`. El crédito está en la portada.
+
+**Sonido**: [Kenney](https://kenney.nl) — dominio público (CC0 1.0):
 
 - *Casino Audio* — dados, fichas y cartas.
 - *Interface Sounds* — clics, confirmaciones y errores.
 - *Impact Sounds* — golpes y cristal.
 - *Music Jingles* — remates de victoria y derrota.
-- *Board Game Icons* — los trazados de `js/iconos.js` (convertidos a paths inline para
-  que hereden `currentColor`).
 
 Las caras de los personajes y los peones (`js/personajes.js`) son vector propio.
 Tipografías: Archivo Black, Inter y Geist Mono (Google Fonts).

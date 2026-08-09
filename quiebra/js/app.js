@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   construirTablero();
   construirFrases();
+  construirElenco();
 
   // Reconexión directa: si ya tienes token de esta sala, entras sin pasar por el botón.
   const cod = (url.get('sala') || '').toUpperCase();
@@ -318,6 +319,20 @@ function pintarSala() {
     : `Rondas: ${g.maxRounds}. El anfitrión da la salida.`;
 }
 
+/* Los cuatro personajes en la portada: enseña qué se está eligiendo antes
+   de entrar y le quita el vacío a la pantalla de inicio. */
+function construirElenco() {
+  const cont = $('portada-elenco');
+  if (!cont) return;
+  cont.innerHTML = Object.entries(PERSONAJES).map(([id, c]) => `
+    <div class="elenco__ficha" style="--pc:${c.color}">
+      ${cara(id, 'elenco__cara')}
+      <p class="elenco__nombre">${c.nombre}</p>
+      <p class="elenco__apodo">${c.apodo}</p>
+      <p class="elenco__desc">${c.desc}</p>
+    </div>`).join('');
+}
+
 function copiarEnlace() {
   const url = location.origin + location.pathname + '?sala=' + sala;
   S.clic();
@@ -343,13 +358,31 @@ const ICONO_CASILLA = {
   impuestos: 'impuestos', bote: 'bote', siesta: 'siesta', mudanza: 'mudanza',
 };
 
+/* Cada negocio tiene su dibujo. Va por índice de casilla porque el icono es
+   cosa del cliente: `shared/data.js` la comparte el worker y no le interesa. */
+const ICONO_NEGOCIO = {
+  1: 'empanadas', 3: 'lavanderia', 5: 'ciber',
+  7: 'gimnasio', 9: 'barberia', 11: 'cafeteria',
+  13: 'sushi', 15: 'arcade', 17: 'rooftop',
+  19: 'torre', 21: 'casino', 23: 'helipuerto',
+};
+
+/* De qué lado del tablero cuelga la casilla: manda hacia dónde mira la cinta
+   de color (siempre al centro de la mesa, como en un tablero de verdad). */
+function ladoDe(fila, col) {
+  if (fila === 6) return 'abajo';
+  if (fila === 0) return 'arriba';
+  if (col === 0) return 'izq';
+  return 'der';
+}
+
 function construirTablero() {
   const t = $('tablero');
   t.innerHTML = '';
   CASILLAS.forEach((c, i) => {
     const [fila, col] = idxACelda(i);
     const esquina = [0, 6, 12, 18].includes(i);
-    const clases = ['casilla'];
+    const clases = ['casilla', 'casilla--' + ladoDe(fila, col)];
     if (esquina) clases.push('casilla--esquina', 'casilla--' + c.t);
     else if (c.t === 'negocio') clases.push('casilla--negocio');
     else clases.push('casilla--especial', 'casilla--' + c.t);
@@ -358,8 +391,10 @@ function construirTablero() {
     div.id = 'cas-' + i;
     div.style.gridArea = `${fila + 1} / ${col + 1}`;
     if (c.barrio) div.style.setProperty('--neon', BARRIOS[c.barrio].color);
+    const icono = ICONO_NEGOCIO[i] || ICONO_CASILLA[c.t];
     div.innerHTML = `
-      ${ICONO_CASILLA[c.t] ? ico(ICONO_CASILLA[c.t], 'casilla__icono') : ''}
+      <span class="casilla__cinta"></span>
+      ${icono ? ico(icono, 'casilla__icono') : ''}
       <span class="casilla__nombre">${c.nombre}</span>
       ${c.precio ? `<span class="casilla__precio">$${c.precio}</span>` : ''}
       <span class="casilla__extras"></span>`;
@@ -427,9 +462,6 @@ function clicCasilla(i) {
 
 /* ------------------------------ peones ------------------------------ */
 
-const UNIDAD = 100 / 7.7;   // pistas del tablero: 1.35 + 5×1 + 1.35
-const centroPista = (k) => (k === 0 ? 1.35 / 2 : k === 6 ? 7.7 - 1.35 / 2 : 1.35 + (k - 1) + 0.5) * UNIDAD;
-
 function elPeon(p) {
   let el = $('peon-' + p.id);
   if (!el) {
@@ -443,17 +475,40 @@ function elPeon(p) {
   return el;
 }
 
-/* Coloca un peón según posVisual, repartiendo los que comparten casilla. */
+/* Coloca un peón según posVisual. Se mide la casilla real en vez de calcular
+   la retícula a mano: así el peón sigue cuadrado aunque cambien las pistas.
+   Los peones caminan por el carril exterior para no taparle el nombre ni el
+   dibujo a la casilla, y se reparten a lo largo del lado si comparten sitio. */
 function colocarPeon(p, lento = false) {
   const el = elPeon(p);
-  const mia = posVisual[p.id];
-  const juntos = g.players.filter((q) => posVisual[q.id] === mia && !q.lona);
-  const k = juntos.findIndex((q) => q.id === p.id);
-  const off = juntos.length > 1 ? (k - (juntos.length - 1) / 2) * 3.4 : 0;
-  const [fila, col] = idxACelda(mia);
+  const cas = $('cas-' + posVisual[p.id]);
+  if (!cas) return;
+  const [fila, col] = idxACelda(posVisual[p.id]);
+  const lado = ladoDe(fila, col);
+  const vertical = lado === 'izq' || lado === 'der';
+
+  // El carril es el relleno que la casilla deja libre en su borde exterior.
+  // Se lee del estilo ya calculado para que nunca se desfase con el CSS.
+  const est = getComputedStyle(cas);
+  let x = cas.offsetLeft + cas.offsetWidth / 2;
+  let y = cas.offsetTop + cas.offsetHeight / 2;
+  if (lado === 'abajo') y = cas.offsetTop + cas.offsetHeight - parseFloat(est.paddingBottom) / 2;
+  else if (lado === 'arriba') y = cas.offsetTop + parseFloat(est.paddingTop) / 2;
+  else if (lado === 'izq') x = cas.offsetLeft + parseFloat(est.paddingLeft) / 2;
+  else x = cas.offsetLeft + cas.offsetWidth - parseFloat(est.paddingRight) / 2;
+
+  const juntos = g.players.filter((q) => posVisual[q.id] === posVisual[p.id] && !q.lona);
+  if (juntos.length > 1) {
+    const k = juntos.findIndex((q) => q.id === p.id);
+    const largo = vertical ? cas.offsetHeight : cas.offsetWidth;
+    const paso = Math.min(20, largo / (juntos.length + 0.6));
+    const desvio = (k - (juntos.length - 1) / 2) * paso;
+    if (vertical) y += desvio; else x += desvio;
+  }
+
   el.classList.toggle('peon--lento', lento);
-  el.style.left = centroPista(col) + off + '%';
-  el.style.top = centroPista(fila) + (juntos.length > 2 ? (k % 2) * 3 - 1.5 : 0) + '%';
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
   el.style.display = p.lona ? 'none' : '';
   el.classList.toggle('peon--turno', g.phase === 'turn' && actual()?.id === p.id);
 }

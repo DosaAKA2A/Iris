@@ -8,14 +8,14 @@
 :root {
   --bg: #07090e;
   --bg-2: #0c1017;
-  --panel: #12151d;
-  --panel-2: #171b26;
-  --panel-3: #1d2231;
-  --linea: #242a3a;
-  --linea-2: #2f3750;
+  --panel: #161b27;
+  --panel-2: #1d2434;
+  --panel-3: #262e44;
+  --linea: #303a54;
+  --linea-2: #3d4867;
   --tinta: #f2f3f7;
-  --tinta-2: #c9cdd9;
-  --muted: #8b90a3;
+  --tinta-2: #d2d7e4;
+  --muted: #99a1b8;
   --billete: #59d98c;
   --peligro: #ff5d5d;
   --cobre: #c98a5e;
@@ -50,14 +50,15 @@ body::before {
   content: "";
   position: fixed; inset: 0; z-index: -2; pointer-events: none;
   background:
-    radial-gradient(120% 80% at 50% -10%, rgba(123, 105, 255, .13), transparent 60%),
-    radial-gradient(90% 60% at 50% 105%, rgba(89, 217, 140, .07), transparent 65%),
-    linear-gradient(180deg, var(--bg-2), var(--bg) 55%);
+    radial-gradient(90% 55% at 15% 0%, rgba(232, 185, 60, .09), transparent 60%),
+    radial-gradient(120% 80% at 50% -10%, rgba(123, 105, 255, .22), transparent 62%),
+    radial-gradient(90% 60% at 85% 105%, rgba(89, 217, 140, .12), transparent 65%),
+    linear-gradient(180deg, #10141f, var(--bg) 60%);
 }
 body::after {
   content: "";
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  opacity: .05;
+  opacity: .07;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -172,7 +173,28 @@ svg { display: block; }
   width: 5px; height: 5px; border-radius: 2px; background: var(--violeta);
   box-shadow: 0 0 8px var(--violeta);
 }
-.portada__firma { margin-top: 1.6rem; color: var(--muted); font-size: .85rem; }
+/* Elenco de la portada */
+.portada__elenco { margin-top: 2rem; text-align: left; }
+.elenco { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6rem; }
+.elenco__ficha {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--pc) 14%, var(--panel-2)), var(--panel));
+  border: 1px solid color-mix(in srgb, var(--pc) 32%, var(--linea));
+  border-radius: var(--radio);
+  padding: .9rem .6rem; text-align: center;
+  display: grid; gap: .15rem; justify-items: center;
+  box-shadow: var(--luz), var(--sombra-1);
+  transition: transform .18s cubic-bezier(.2, .9, .3, 1.5), box-shadow .18s;
+}
+.elenco__ficha:hover { transform: translateY(-4px); box-shadow: var(--luz), var(--sombra-2); }
+.elenco__cara { width: 56px; height: 56px; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .6)); }
+.elenco__nombre { font-family: var(--f-display); font-size: .92rem; color: var(--pc); margin-top: .3rem; }
+.elenco__apodo { font-size: .72rem; color: var(--muted); }
+.elenco__desc { font-size: .72rem; color: var(--tinta-2); line-height: 1.3; margin-top: .25rem; }
+
+.portada__firma { margin-top: 1.8rem; color: var(--muted); font-size: .85rem; }
+.portada__licencia { margin-top: .4rem; color: #6f7690; font-size: .74rem; }
+.portada__licencia a { color: #8b93ad; text-decoration: none; }
+.portada__licencia a:hover { text-decoration: underline; }
 .portada__firma a { color: var(--violeta); text-decoration: none; }
 .portada__firma a:hover { text-decoration: underline; }
 
@@ -245,121 +267,200 @@ svg { display: block; }
   align-items: start;
 }
 
+/* La mesa: paño con trama, marco con volumen y luz cenital. */
 .tablero-caja {
   position: relative;
   width: min(92vw, calc(100dvh - 3rem), 840px);
   aspect-ratio: 1;
-  padding: 10px;
-  border-radius: 26px;
+  border-radius: 24px;
   background:
-    radial-gradient(120% 120% at 50% 0%, #1b2030, #0d111a 70%);
-  border: 1px solid var(--linea);
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, .022) 0 2px, transparent 2px 5px),
+    repeating-linear-gradient(-45deg, rgba(0, 0, 0, .18) 0 2px, transparent 2px 5px),
+    radial-gradient(110% 90% at 50% -10%, #2a3350, #141a2b 55%, #0d1220 100%);
+  border: 1px solid #3a4568;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .06),
-    inset 0 0 60px rgba(0, 0, 0, .8),
-    var(--sombra-3);
+    inset 0 2px 0 rgba(255, 255, 255, .12),
+    inset 0 -2px 0 rgba(0, 0, 0, .6),
+    inset 0 0 70px rgba(0, 0, 0, .55),
+    0 0 0 1px rgba(0, 0, 0, .6),
+    var(--sombra-3),
+    0 0 90px rgba(123, 105, 255, .16);
 }
 .tablero {
-  position: absolute; inset: 10px;
+  position: absolute; inset: 14px;
   display: grid;
-  grid-template-columns: 1.35fr repeat(5, 1fr) 1.35fr;
-  grid-template-rows: 1.35fr repeat(5, 1fr) 1.35fr;
-  gap: 4px;
+  grid-template-columns: 1.4fr repeat(5, 1fr) 1.4fr;
+  grid-template-rows: 1.4fr repeat(5, 1fr) 1.4fr;
+  gap: 5px;
 }
 
 /* ------------------------------ casillas ------------------------------ */
 
 .casilla {
-  background: linear-gradient(170deg, var(--panel-2), #0f131b);
-  border: 1px solid var(--linea);
-  border-radius: 9px;
+  --cinta: clamp(9px, 1.5vw, 15px);
+  --carril: clamp(17px, 2.5vw, 28px);
   position: relative;
   overflow: hidden;
-  display: flex; flex-direction: column; justify-content: flex-end;
-  padding: .3rem .38rem;
-  font-size: clamp(.5rem, 1.05vw, .68rem);
-  line-height: 1.2;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 2px 6px rgba(0, 0, 0, .4);
-  transition: box-shadow .2s, border-color .2s, transform .2s, background .35s;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #232b40, #171d2b);
+  border: 1px solid #333d59;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: .1em;
+  padding: .3rem;
+  text-align: center;
+  font-size: clamp(.5rem, 1.02vw, .67rem);
+  line-height: 1.18;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09), 0 2px 6px rgba(0, 0, 0, .5);
+  transition: box-shadow .2s, border-color .2s, transform .2s, background .4s;
 }
-.casilla--negocio { cursor: default; }
-.casilla__nombre { font-weight: 600; color: #d7dae3; overflow-wrap: anywhere; position: relative; z-index: 2; }
-.casilla__precio { font-family: var(--f-mono); color: var(--muted); font-size: .92em; position: relative; z-index: 2; }
 
-/* Cinta de neón del barrio */
-.casilla--negocio::before {
-  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px;
-  background: linear-gradient(180deg, var(--neon, var(--linea)), color-mix(in srgb, var(--neon, var(--linea)) 55%, black));
-  box-shadow: 0 0 14px var(--neon, transparent), inset 0 -1px 0 rgba(0, 0, 0, .4);
+/* Sitio para la cinta según el lado del tablero: siempre mira al centro. */
+/* El borde exterior queda libre: es el carril por donde caminan los peones,
+   para que no le tapen el nombre ni el dibujo a la casilla. */
+.casilla--abajo  { padding-top: calc(var(--cinta) + .3rem); padding-bottom: var(--carril); }
+.casilla--arriba { padding-bottom: calc(var(--cinta) + .3rem); padding-top: var(--carril); }
+.casilla--izq    { padding-right: calc(var(--cinta) + .3rem); padding-left: var(--carril); }
+.casilla--der    { padding-left: calc(var(--cinta) + .3rem); padding-right: var(--carril); }
+
+.casilla__cinta { position: absolute; display: none; z-index: 2; }
+.casilla--negocio .casilla__cinta {
+  display: block;
+  background: linear-gradient(var(--giro, 180deg), var(--neon), color-mix(in srgb, var(--neon) 45%, #000));
+  box-shadow: 0 0 16px var(--neon), inset 0 0 0 1px rgba(0, 0, 0, .35);
 }
-/* Resplandor del dueño, por debajo del texto */
+.casilla--abajo  .casilla__cinta { top: 0; left: 0; right: 0; height: var(--cinta); }
+.casilla--arriba .casilla__cinta { bottom: 0; left: 0; right: 0; height: var(--cinta); --giro: 0deg; }
+.casilla--izq    .casilla__cinta { right: 0; top: 0; bottom: 0; width: var(--cinta); --giro: 270deg; }
+.casilla--der    .casilla__cinta { left: 0; top: 0; bottom: 0; width: var(--cinta); --giro: 90deg; }
+
+/* El barrio tiñe toda la casilla, no solo la cinta: así el tablero tiene color. */
+.casilla--negocio {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--neon) 15%, #232b40), color-mix(in srgb, var(--neon) 6%, #151b28));
+  border-color: color-mix(in srgb, var(--neon) 34%, #333d59);
+}
+/* Baño del color del dueño por encima del barrio. */
 .casilla--negocio::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--pcolor, transparent) 32%, transparent), transparent 62%);
-  opacity: 0; transition: opacity .45s;
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--pcolor, transparent) 42%, transparent), transparent 70%);
+  opacity: 0; transition: opacity .5s;
 }
 .casilla--propia::after { opacity: 1; }
+.casilla--propia { border-color: color-mix(in srgb, var(--pcolor) 55%, #333d59); }
 
+.casilla__icono {
+  width: 2.5em; height: 2.5em; position: relative; z-index: 3;
+  color: color-mix(in srgb, var(--neon, #aab2cc) 70%, #ffffff);
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, .75));
+  opacity: .95;
+}
+.casilla__nombre {
+  font-weight: 600; color: #e7eaf3; overflow-wrap: anywhere;
+  position: relative; z-index: 3;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
+}
+.casilla__precio {
+  font-family: var(--f-mono); color: #a9b2c9; font-size: .92em;
+  position: relative; z-index: 3;
+}
+
+/* Esquinas: más grandes, con acento diagonal. */
 .casilla--esquina {
-  align-items: center; justify-content: center; text-align: center;
-  background: linear-gradient(160deg, #1a2030, #0c1017);
+  background: linear-gradient(140deg, #2b3555, #151b2b 70%);
+  border-color: #3d4a6d;
+  gap: .25em;
 }
-.casilla--esquina .casilla__nombre { font-family: var(--f-display); font-size: 1.05em; color: var(--tinta); letter-spacing: .02em; }
-.casilla--especial {
-  align-items: center; justify-content: center; text-align: center;
-  background: linear-gradient(170deg, var(--panel-3), #0f131b);
+.casilla--esquina::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(140deg, var(--acento, transparent) -30%, transparent 55%);
+  opacity: .5;
 }
-.casilla--especial .casilla__nombre { color: var(--tinta-2); font-family: var(--f-mono); font-size: .82em; letter-spacing: .06em; }
-.casilla--mini .casilla__icono { color: var(--violeta); }
-.casilla--azar .casilla__icono { color: var(--oro); }
-.casilla--bache .casilla__icono { color: var(--peligro); }
-.casilla--impuestos .casilla__icono, .casilla--bote .casilla__icono { color: var(--billete); }
-.casilla--siesta .casilla__icono { color: var(--muted); }
-.casilla--mudanza .casilla__icono { color: var(--cobre); }
-.casilla__icono { width: 1.9em; height: 1.9em; margin-bottom: .2rem; opacity: .95; filter: drop-shadow(0 2px 5px rgba(0, 0, 0, .6)); }
-.casilla--esquina .casilla__icono { width: 2.3em; height: 2.3em; }
+.casilla--esquina .casilla__nombre {
+  font-family: var(--f-display); font-size: 1.1em; color: #fff; letter-spacing: .03em;
+}
+.casilla--esquina .casilla__icono { width: 3em; height: 3em; }
 
-/* Elegible: se levanta y late en el borde */
+.casilla--salida  { --acento: var(--billete); }
+.casilla--siesta  { --acento: var(--violeta); }
+.casilla--bote    { --acento: var(--oro); }
+.casilla--mudanza { --acento: var(--cobre); }
+
+/* Especiales del anillo: cada una lleva un punto de su color, para que el
+   tablero no tenga huecos apagados entre negocio y negocio. */
+.casilla--mini      { --acento: var(--violeta); }
+.casilla--azar      { --acento: var(--oro); }
+.casilla--bache     { --acento: var(--peligro); }
+.casilla--impuestos { --acento: var(--billete); }
+.casilla--especial {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--acento) 13%, #212940), #151b28);
+  border-color: color-mix(in srgb, var(--acento) 26%, #333d59);
+}
+.casilla--especial .casilla__nombre {
+  color: #c4cbdd; font-family: var(--f-mono); font-size: .8em; letter-spacing: .05em;
+}
+.casilla--mini .casilla__icono { color: #a99cff; }
+.casilla--azar .casilla__icono { color: #f5cf6a; }
+.casilla--bache .casilla__icono { color: #ff8080; }
+.casilla--impuestos .casilla__icono, .casilla--bote .casilla__icono { color: #7ce8ab; }
+.casilla--siesta .casilla__icono { color: #a99cff; }
+.casilla--mudanza .casilla__icono { color: #e0a578; }
+.casilla--salida .casilla__icono { color: #7ce8ab; }
+
+/* Elegible: se levanta y late en el borde. */
 .casilla--activa {
   cursor: pointer;
-  border-color: var(--tinta);
+  border-color: #fff;
   transform: translateY(-2px);
-  box-shadow: 0 0 0 1px var(--tinta), 0 0 22px rgba(242, 243, 247, .22), 0 8px 18px rgba(0, 0, 0, .5);
   animation: casillaLate 1.1s ease-in-out infinite;
 }
 @keyframes casillaLate {
-  0%, 100% { box-shadow: 0 0 0 1px var(--tinta), 0 0 14px rgba(242, 243, 247, .16), 0 8px 18px rgba(0, 0, 0, .5); }
-  50% { box-shadow: 0 0 0 2px var(--tinta), 0 0 30px rgba(242, 243, 247, .34), 0 8px 18px rgba(0, 0, 0, .5); }
+  0%, 100% { box-shadow: 0 0 0 1px #fff, 0 0 14px rgba(255, 255, 255, .2), 0 8px 18px rgba(0, 0, 0, .5); }
+  50% { box-shadow: 0 0 0 2px #fff, 0 0 32px rgba(255, 255, 255, .4), 0 8px 18px rgba(0, 0, 0, .5); }
 }
 .casilla--activa:hover { transform: translateY(-4px) scale(1.02); }
 
-/* Franja del dueño bajo la cinta de neón */
+/* Extras: no crea contexto propio, así sus hijos se colocan sobre la casilla. */
+.casilla__extras { display: contents; }
+
+/* Franja del dueño, pegada por dentro a la cinta del barrio. */
 .casilla__dueno {
-  position: absolute; top: 6px; left: 0; right: 0; height: 5px;
+  position: absolute; z-index: 3;
   background: var(--pcolor, transparent);
-  box-shadow: 0 0 10px var(--pcolor);
-  transform-origin: left; z-index: 2;
+  box-shadow: 0 0 12px var(--pcolor);
   animation: entraDueno .5s cubic-bezier(.2, .9, .3, 1.4);
 }
-@keyframes entraDueno { from { transform: scaleX(0); } }
+.casilla--abajo  .casilla__dueno { top: var(--cinta); left: 0; right: 0; height: 4px; transform-origin: left; }
+.casilla--arriba .casilla__dueno { bottom: var(--cinta); left: 0; right: 0; height: 4px; transform-origin: right; }
+.casilla--izq    .casilla__dueno { right: var(--cinta); top: 0; bottom: 0; width: 4px; transform-origin: top; }
+.casilla--der    .casilla__dueno { left: var(--cinta); top: 0; bottom: 0; width: 4px; transform-origin: bottom; }
+@keyframes entraDueno { from { transform: scale(0); } }
 
+/* Reforma y okupa: siempre contra el borde exterior. */
+.casilla__reforma, .casilla__okupa {
+  position: absolute; z-index: 4; width: 1.5em; height: 1.5em;
+}
 .casilla__reforma {
-  position: absolute; top: .5rem; right: .3rem; width: 1.25em; height: 1.25em;
-  color: var(--oro); z-index: 3;
-  filter: drop-shadow(0 0 6px rgba(232, 185, 60, .7));
+  color: var(--oro);
+  filter: drop-shadow(0 0 7px rgba(232, 185, 60, .85));
   animation: entraReforma .5s cubic-bezier(.2, .9, .3, 1.6);
 }
+.casilla__okupa { color: var(--peligro); filter: drop-shadow(0 0 7px rgba(255, 93, 93, .85)); }
 @keyframes entraReforma { from { transform: translateY(8px) scale(.2); opacity: 0; } }
-.casilla__okupa {
-  position: absolute; top: .5rem; left: .3rem; width: 1.2em; height: 1.2em;
-  color: var(--peligro); z-index: 3;
-  filter: drop-shadow(0 0 6px rgba(255, 93, 93, .7));
-}
 
-/* Destello al comprar / cobrar en una casilla */
+.casilla--abajo  .casilla__reforma { bottom: 2px; right: 2px; }
+.casilla--abajo  .casilla__okupa   { bottom: 2px; left: 2px; }
+.casilla--arriba .casilla__reforma { top: 2px; right: 2px; }
+.casilla--arriba .casilla__okupa   { top: 2px; left: 2px; }
+.casilla--izq    .casilla__reforma { left: 2px; bottom: 2px; }
+.casilla--izq    .casilla__okupa   { left: 2px; top: 2px; }
+.casilla--der    .casilla__reforma { right: 2px; bottom: 2px; }
+.casilla--der    .casilla__okupa   { right: 2px; top: 2px; }
+
+/* Destello al comprar / cobrar en una casilla. */
 .casilla--brilla { animation: casillaBrilla .7s ease; }
 @keyframes casillaBrilla {
-  0% { filter: brightness(2.6) saturate(1.4); transform: scale(1.06); }
+  0% { filter: brightness(2.4) saturate(1.5); transform: scale(1.06); }
   100% { filter: none; transform: none; }
 }
 
@@ -367,33 +468,46 @@ svg { display: block; }
 
 .mesa {
   position: absolute;
-  inset: 17.5% 17.5%;
+  inset: 18.2% 18.2%;
   border-radius: 50%;
   display: grid; place-content: center; gap: .45rem; text-align: center;
   pointer-events: none;
   background:
-    repeating-conic-gradient(from 0deg, rgba(255, 255, 255, .012) 0deg 6deg, transparent 6deg 12deg),
-    radial-gradient(circle at 50% 30%, #1b2438, #0a0e16 70%);
+    repeating-conic-gradient(from 0deg, rgba(255, 255, 255, .02) 0deg 4deg, transparent 4deg 8deg),
+    radial-gradient(circle at 50% 26%, #2a3352, #141b2c 62%, #0e1420 100%);
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, .06),
-    inset 0 0 70px rgba(0, 0, 0, .9),
-    0 0 0 1px var(--linea),
-    0 0 0 9px rgba(10, 14, 22, .85),
-    0 0 0 10px rgba(255, 255, 255, .05);
+    inset 0 3px 0 rgba(255, 255, 255, .1),
+    inset 0 0 70px rgba(0, 0, 0, .75),
+    0 0 0 2px rgba(0, 0, 0, .55),
+    0 0 0 4px rgba(255, 255, 255, .07),
+    0 0 60px rgba(123, 105, 255, .18);
 }
 /* Aro interior punteado: le da borde a la mesa sin robarle sitio a los dados. */
 .mesa::before {
-  content: ""; position: absolute; inset: 7%;
+  content: ""; position: absolute; inset: 6%;
   border-radius: 50%;
-  border: 1px dashed rgba(255, 255, 255, .06);
+  border: 1px dashed rgba(255, 255, 255, .12);
 }
 .mesa > * { position: relative; z-index: 2; }
-.mesa__marca {
-  font-family: var(--f-display); font-size: clamp(1.2rem, 3vw, 2.1rem); letter-spacing: .06em;
-  color: rgba(255, 255, 255, .022); user-select: none;
-  -webkit-text-stroke: 1px rgba(255, 255, 255, .1);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, .04);
+/* Aro de barrios: cada cuarto del anillo lleva el color del lado del tablero
+   que tiene enfrente (arriba violeta, derecha oro, abajo cobre, izquierda jade). */
+.mesa__aro {
+  position: absolute; inset: 1.5%; z-index: 1; border-radius: 50%;
+  background: conic-gradient(from 0deg,
+    var(--violeta) 0 44deg, var(--oro) 46deg 134deg,
+    var(--cobre) 136deg 224deg, var(--jade) 226deg 314deg,
+    var(--violeta) 316deg 360deg);
+  -webkit-mask: radial-gradient(closest-side, transparent 0 97%, #000 97.8%);
+  mask: radial-gradient(closest-side, transparent 0 97%, #000 97.8%);
+  opacity: .85;
 }
+.mesa__marca {
+  font-family: var(--f-display); font-size: clamp(1.3rem, 3.2vw, 2.3rem); letter-spacing: .07em;
+  color: rgba(255, 255, 255, .05); user-select: none;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, .18);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .4);
+}
+
 .mesa__ronda { font-family: var(--f-mono); font-size: .76rem; color: var(--muted); letter-spacing: .12em; }
 .mesa__bote {
   font-family: var(--f-mono); font-size: 1rem; color: var(--oro); min-height: 1.3em;
@@ -465,9 +579,9 @@ svg { display: block; }
 
 /* ------------------------------ peones ------------------------------ */
 
-.peones { position: absolute; inset: 10px; pointer-events: none; }
+.peones { position: absolute; inset: 14px; pointer-events: none; }
 .peon {
-  position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px;
+  position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px;
   transition: left .18s cubic-bezier(.35, 0, .25, 1), top .18s cubic-bezier(.35, 0, .25, 1);
   z-index: 3;
 }
@@ -884,6 +998,7 @@ svg { display: block; }
 }
 @media (max-width: 520px) {
   .sala__jugadores { grid-template-columns: repeat(2, 1fr); }
+  .elenco { grid-template-columns: repeat(2, 1fr); }
   .casilla { font-size: .48rem; padding: .2rem .25rem; border-radius: 6px; }
   .casilla__icono { width: 1.5em; height: 1.5em; }
   .peon { width: 22px; height: 22px; margin: -11px 0 0 -11px; }
