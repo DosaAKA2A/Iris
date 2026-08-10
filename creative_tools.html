@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache: 20260709a -->
+<!-- cache: 20260810a -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -157,6 +157,7 @@
   .fxb-card:hover .fxb-name{color:var(--ink)}
   .fxb-thumb{position:relative;aspect-ratio:1/1.15;border-radius:8px;border:1px solid var(--line);overflow:hidden;transition:.15s;display:flex;align-items:center;justify-content:center}
   .fxb-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .fxb-thumb canvas.fxth{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .fxb-ph{font-family:var(--mono);font-size:20px;font-weight:600;color:rgba(255,255,255,.28);letter-spacing:.05em}
   .fxb-name{font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;color:var(--ink-dim);line-height:1.3}
   .fxb-card.active .fxb-thumb{border-color:var(--safe);box-shadow:0 0 0 1px var(--safe)}
@@ -518,9 +519,11 @@ function applyAdjust(d){const c=S.contrast/100,br=S.brightness/100,sat=S.saturat
     r=(r-128)*c+128;g=(g-128)*c+128;b=(b-128)*c+128;r*=br;g*=br;b*=br;
     if(S.invert){r=255-r;g=255-g;b=255-b;}
     d[i]=clamp(r,0,255);d[i+1]=clamp(g,0,255);d[i+2]=clamp(b,0,255);}}
+function reduceSrc(){return S.img||(typeof FXDEMO!=='undefined'&&FXDEMO.complete&&FXDEMO.naturalWidth?FXDEMO:null);}
 function gridBuffer(gw,gh){const off=document.createElement('canvas');off.width=gw;off.height=gh;
   const oc=off.getContext('2d',{willReadFrequently:true});oc.imageSmoothingEnabled=true;
-  if(S.img)oc.drawImage(S.img,0,0,gw,gh);else demoRamp(oc,gw,gh);
+  const src=reduceSrc();
+  if(src)oc.drawImage(src,0,0,gw,gh);else demoRamp(oc,gw,gh);
   const id=oc.getImageData(0,0,gw,gh);applyAdjust(id.data);return id;}
 function demoRamp(ctx,w,h){const g=ctx.createImageData(w,h);
   for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4;const rad=Math.hypot(x/w-0.62,y/h-0.4);
@@ -590,7 +593,7 @@ function renderPixel(w,h){const gw=Math.max(1,Math.round(w/S.cell)),gh=Math.max(
   setHud(gw,gh);}
 function renderNone(w,h){const id=gridBuffer(w,h);view.width=w;view.height=h;vctx.imageSmoothingEnabled=false;vctx.putImageData(id,0,0);document.getElementById('hud-b').textContent=w+'×'+h;}
 function setHud(gw,gh){document.getElementById('hud-b').textContent=gw+'×'+gh+' cells';}
-function reduceSize(){let w,h;if(S.img){w=S.img.naturalWidth;h=S.img.naturalHeight;}else{w=880;h=560;}
+function reduceSize(){let w,h;const src=reduceSrc();if(src){w=src.naturalWidth;h=src.naturalHeight;}else{w=880;h=560;}
   const s=Math.min(1,MAX_DIM/Math.max(w,h));return[Math.round(w*s),Math.round(h*s)];}
 let rRAF=null;
 function render(){if(MODE!=='reduce')return;if(rRAF)return;rRAF=requestAnimationFrame(()=>{rRAF=null;const[w,h]=reduceSize();
@@ -676,6 +679,7 @@ function buildRail(){
     rail.querySelectorAll('[data-style]').forEach(b=>b.addEventListener('click',()=>{
       rail.querySelectorAll('.fxb-card').forEach(x=>x.classList.remove('active'));b.classList.add('active');
       S.style=b.dataset.style;buildReducePanel();render();}));
+    fxThumbsPaint(rail);
   }
 }
 
@@ -1122,11 +1126,15 @@ const FX_PRESETS={
  'Grunge dither':{stack:[['contrastfx',100,{c:130}],['ditherfx',80,{cell:2}],['paper',70,{fiber:65,crump:55}],['grain',45,{}]]},
 };
 
-function fxNewLayer(type,strength,overrides){
-  const def=FX_DEFS[type];if(!def)return null;
-  const p={};def.params.forEach(([k,,,,,dv])=>p[k]=dv);def.colors.forEach(([k,,dv])=>p[k]=dv);
+function fxDefaultParams(type){
+  const def=FX_DEFS[type];const p={};
+  def.params.forEach(([k,,,,,dv])=>p[k]=dv);def.colors.forEach(([k,,dv])=>p[k]=dv);
   (def.texts||[]).forEach(([k,,dv])=>p[k]=dv);
   if(def.init)def.init(p);
+  return p;}
+function fxNewLayer(type,strength,overrides){
+  const def=FX_DEFS[type];if(!def)return null;
+  const p=fxDefaultParams(type);
   Object.assign(p,overrides||{});
   return{id:FX.uid++,type,s:strength==null?100:strength,on:true,open:false,p};}
 function fxLoadPreset(name){const pr=FX_PRESETS[name];if(!pr)return;
@@ -1136,7 +1144,7 @@ function fxLoadPreset(name){const pr=FX_PRESETS[name];if(!pr)return;
 /* ── Fuente + render ── */
 const FXDEMO=new Image();
 FXDEMO.src='assets/fx/demo.jpg?v=20260717a';
-FXDEMO.onload=()=>{if(MODE==='effects'&&!PHOTO)fxRender();};
+FXDEMO.onload=()=>{if(!PHOTO){if(MODE==='effects')fxRender();else if(MODE!=='compose')render();fxThumbsInvalidate();}};
 function fxSource(){let w,h;
   const SRC=PHOTO||(FXDEMO.complete&&FXDEMO.naturalWidth?FXDEMO:null);
   if(SRC){w=SRC.naturalWidth;h=SRC.naturalHeight;
@@ -1167,8 +1175,97 @@ function fxHue(name){let h=0;for(let i=0;i<name.length;i++)h=(h*31+name.charCode
 function fxThumb(id,name,preset){
   const h=fxHue(name);
   const grad=`linear-gradient(135deg,hsl(${h},42%,26%),hsl(${(h+55)%360},48%,14%))`;
-  const src=preset?`assets/fx/p-${id}.jpg`:`assets/fx/${id}.jpg`;
-  return `<div class="fxb-thumb" style="background:${grad}"><img src="${src}" loading="lazy" alt="" onerror="this.style.display='none'"><span class="fxb-ph">${name.slice(0,2)}</span></div>`;}
+  const key=preset?'p:'+name:(id.indexOf('r-')===0?'r:'+id.slice(2):'e:'+id);
+  return `<div class="fxb-thumb" style="background:${grad}"><span class="fxb-ph">${name.slice(0,2)}</span><canvas class="fxth" data-th="${key.replace(/"/g,'&quot;')}"></canvas></div>`;}
+
+/* ═══════════ Miniaturas en vivo ═══════════
+   Cada miniatura se genera aplicando el efecto real (o el stack del preset)
+   a la imagen cargada por el usuario — o a la demo — recortada a cover. */
+const FXTH={cache:new Map(),queue:[],busy:false};
+const TH_W=148,TH_H=170;
+function fxThumbSource(){
+  const c=fxC(TH_W,TH_H);const x=c.getContext('2d');
+  const img=PHOTO||(FXDEMO.complete&&FXDEMO.naturalWidth?FXDEMO:null);
+  if(img){const iw=img.naturalWidth,ih=img.naturalHeight;
+    const sc=Math.max(TH_W/iw,TH_H/ih),dw=iw*sc,dh=ih*sc;
+    x.drawImage(img,(TH_W-dw)/2,(TH_H-dh)/2,dw,dh);}
+  else{const g=x.createLinearGradient(0,0,TH_W,TH_H);
+    g.addColorStop(0,'#6c5ce7');g.addColorStop(0.5,'#fd79a8');g.addColorStop(1,'#ffe08a');
+    x.fillStyle=g;x.fillRect(0,0,TH_W,TH_H);
+    x.fillStyle='rgba(10,10,12,0.85)';x.beginPath();x.arc(TH_W*0.62,TH_H*0.42,TH_H*0.22,0,6.2832);x.fill();}
+  return c;}
+/* Efectos cuyos parámetros por defecto son (casi) identidad: se exageran solo en la miniatura */
+const TH_OVR={
+  adjust:{hue:130,sat:160},contrastfx:{c:165},exposure:{e:55},levels:{ib:50,iw:205},
+  colorbalance:{sr:55,mg:30,hb:60},temp:{t:80},rgbgain:{r:155,g:85,b:70},
+  colormatrix:{rr:0,rg:100,rb:0,gr:0,gg:0,gb:100,br:100,bg:0,bb:0},
+  curves:p=>{p.m=[[0,0],[0.28,0.1],[0.72,0.9],[1,1]];},
+  huecurves:p=>{p.hc=[[0,0.5],[0.5,0.83],[1,0.5]];},
+  blursharp:{amt:55},sharpen:{amt:100},transformfx:{sc:76,rot:12},
+  textfx:{size:30},elasticgrid:{amt:40,freq:14},grading:{bal:25},
+};
+function thDots(s){const cell=8;const gw=Math.max(1,Math.round(s.width/cell)),gh=Math.max(1,Math.round(s.height/cell));
+  const t=fxC(gw,gh);const tx=t.getContext('2d');tx.drawImage(s,0,0,gw,gh);
+  const d=tx.getImageData(0,0,gw,gh).data;
+  const c=fxC(s.width,s.height);const x=c.getContext('2d');
+  x.fillStyle='#000';x.fillRect(0,0,c.width,c.height);
+  for(let y=0;y<gh;y++)for(let xx=0;xx<gw;xx++){const i=(y*gw+xx)*4;
+    const L=fxLum(d[i],d[i+1],d[i+2])/255;const r=Math.max(L,0.15)*cell*0.5;
+    if(r<0.3)continue;x.fillStyle=`rgb(${d[i]},${d[i+1]},${d[i+2]})`;
+    x.beginPath();x.arc(xx*cell+cell/2,y*cell+cell/2,r,0,6.2832);x.fill();}
+  return c;}
+const TH_REDUCE={
+  dither:s=>FX_DEFS.ditherfx.apply(s,{cell:2,ink:'#14141a',paper:'#f4f2ea'}),
+  halftone:s=>FX_DEFS.halftonefx.apply(s,{cell:7,ink:'#14141a',paper:'#f4f2ea'}),
+  ascii:s=>FX_DEFS.asciifx.apply(s,{cell:6,ink:'#e8e6df',paper:'#0b0b0d'}),
+  dots:thDots,
+  pixel:s=>FX_DEFS.pixelate.apply(s,{cell:8}),
+  none:s=>fxClone(s),
+};
+function fxThumbCompute(key){
+  const src=fxThumbSource();
+  const kind=key[0],id=key.slice(2);
+  try{
+    if(kind==='e'){const p=fxDefaultParams(id);const o=TH_OVR[id];
+      if(typeof o==='function')o(p);else if(o)Object.assign(p,o);
+      return FX_DEFS[id].apply(src,p);}
+    if(kind==='p'){const pr=FX_PRESETS[id];if(!pr)return src;let cur=src;
+      for(const[t,st,ov]of pr.stack){
+        const p=Object.assign(fxDefaultParams(t),ov||{});
+        let out;try{out=FX_DEFS[t].apply(cur,p);}catch(e){continue;}
+        if(st==null||st>=100)cur=out;
+        else{const m=fxClone(cur);const x=m.getContext('2d');
+          x.globalAlpha=st/100;x.drawImage(out,0,0);x.globalAlpha=1;cur=m;}}
+      return cur;}
+    if(kind==='r')return (TH_REDUCE[id]||fxClone)(src);
+  }catch(e){}
+  return src;}
+function fxThumbDraw(cv,out){cv.width=out.width;cv.height=out.height;
+  cv.getContext('2d').drawImage(out,0,0);cv.dataset.done='1';}
+function fxThumbsPaint(scope){
+  const cvs=[...(scope||document).querySelectorAll('canvas[data-th]')].filter(c=>!c.dataset.done);
+  const miss=[];
+  for(const cv of cvs){const hit=FXTH.cache.get(cv.dataset.th);
+    if(hit)fxThumbDraw(cv,hit);else miss.push(cv);}
+  FXTH.queue=miss;
+  if(miss.length&&!FXTH.busy)fxThumbStep();}
+function fxThumbStep(){
+  if(!FXTH.queue.length){FXTH.busy=false;return;}
+  FXTH.busy=true;
+  requestAnimationFrame(()=>{
+    let n=0;
+    while(FXTH.queue.length&&n<4){
+      const cv=FXTH.queue.shift();
+      if(!cv.isConnected||cv.dataset.done)continue;
+      const key=cv.dataset.th;
+      let out=FXTH.cache.get(key);
+      if(!out){out=fxThumbCompute(key);FXTH.cache.set(key,out);}
+      fxThumbDraw(cv,out);n++;}
+    fxThumbStep();});}
+function fxThumbsInvalidate(){
+  FXTH.cache.clear();FXTH.queue=[];
+  document.querySelectorAll('canvas[data-th]').forEach(c=>delete c.dataset.done);
+  fxThumbsPaint();}
 function buildFxBrowser(){
   const q=FX.q.toLowerCase();
   let h=`<div class="fxb">
@@ -1205,6 +1302,7 @@ function buildFxBrowser(){
     const L=fxNewLayer(b.dataset.fxadd);L.open=true;FX.stack.push(L);
     buildFxPanel();fxRender();toast(FX_DEFS[b.dataset.fxadd].name);}));
   rail.querySelectorAll('[data-fxpr]').forEach(b=>b.addEventListener('click',()=>fxLoadPreset(b.dataset.fxpr)));
+  fxThumbsPaint(rail);
 }
 
 /* ═══════════ Panel derecho: layers/stack ═══════════ */
@@ -1262,7 +1360,7 @@ function buildFxPanel(){
       <button class="mini-btn" id="fx-send-compose" style="flex:1;padding:10px 0">→ Compose</button>
       <button class="mini-btn" id="fx-send-reduce" style="flex:1;padding:10px 0">→ Reduce</button>
     </div></div>`;
-  h+=`<div class="grp"><div class="hint">Los filtros se aplican de arriba hacia abajo. Strength mezcla cada capa con el resultado anterior. Miniaturas: sube <b>assets/fx/&lt;id&gt;.jpg</b> (efectos) o <b>assets/fx/p-&lt;preset&gt;.jpg</b> y aparecerán solas.</div></div>`;
+  h+=`<div class="grp"><div class="hint">Los filtros se aplican de arriba hacia abajo. Strength mezcla cada capa con el resultado anterior. Las miniaturas se generan con tu imagen (o la de demo) y el efecto aplicado.</div></div>`;
   panel.innerHTML=h;wireFx();}
 const fxById=id=>FX.stack.find(l=>l.id===+id);
 
@@ -1350,7 +1448,7 @@ function wireFx(){
   if(sr)sr.addEventListener('click',()=>fxSendTo('reduce'));}
 function fxSendTo(mode){_fxRender();
   fxview.toBlob(blob=>{const img=new Image();img.onload=()=>{
-    PHOTO=img;S.img=img;setMode(mode);
+    PHOTO=img;S.img=img;setMode(mode);fxThumbsInvalidate();
     toast('Sent to <b>'+(mode==='compose'?'Compose':'Reduce')+'</b>');};
     img.src=URL.createObjectURL(blob);},'image/png');}
 
@@ -1377,7 +1475,8 @@ document.querySelectorAll('.modesw button').forEach(b=>b.addEventListener('click
 function loadFile(file){if(!file||!file.type.startsWith('image/')){toast('Not an image file');return;}
   const img=new Image();img.onload=()=>{PHOTO=img;S.img=img;
     if(glOK)uploadPhoto(img);toast(`Loaded <b>${img.naturalWidth}×${img.naturalHeight}</b>`);
-    if(MODE==='compose')glRender();else if(MODE==='effects')fxRender();else render();};
+    if(MODE==='compose')glRender();else if(MODE==='effects')fxRender();else render();
+    fxThumbsInvalidate();};
   img.onerror=()=>toast('Could not decode image');img.src=URL.createObjectURL(file);}
 const fileInput=document.getElementById('file');
 fileInput.addEventListener('change',e=>loadFile(e.target.files[0]));
@@ -1388,7 +1487,7 @@ stage.addEventListener('drop',e=>{e.preventDefault();stage.classList.remove('dra
 window.addEventListener('paste',e=>{const it=[...e.clipboardData.items].find(i=>i.type.startsWith('image/'));if(it)loadFile(it.getAsFile());});
 
 function sendToReduce(){if(!glOK)return;glRender();
-  glview.toBlob(blob=>{const img=new Image();img.onload=()=>{PHOTO=img;S.img=img;setMode('reduce');toast('Sent composite to <b>Reduce</b>');};img.src=URL.createObjectURL(blob);},'image/png');}
+  glview.toBlob(blob=>{const img=new Image();img.onload=()=>{PHOTO=img;S.img=img;setMode('reduce');fxThumbsInvalidate();toast('Sent composite to <b>Reduce</b>');};img.src=URL.createObjectURL(blob);},'image/png');}
 
 document.getElementById('btn-export').addEventListener('click',()=>{
   let canvas;
@@ -1649,7 +1748,9 @@ function wireBanner(){
 
 /* ═══════════════ Init ═══════════════ */
 try{glInit();}catch(e){console.error('GL init:',e);glOK=false;toast('WebGL error — Compose disabled');}
-setMode('effects');
+const QS=new URLSearchParams(location.search);
+if(QS.get('tab')==='presets')FX.tab='presets';
+setMode(['compose','reduce','effects'].includes(QS.get('mode'))?QS.get('mode'):'effects');
 window.addEventListener('resize',()=>{if(MODE==='compose')glRender();else render();});
 </script>
 </body>
