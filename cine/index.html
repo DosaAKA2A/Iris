@@ -60,10 +60,26 @@ svg{display:block}
   display:flex; align-items:center; justify-content:center;
 }
 #v{width:100%; height:100%; object-fit:contain; background:#000}
-#v::cue{
-  background:rgba(0,0,0,.72); color:#fff;
-  font-family:Inter,system-ui,sans-serif; font-size:clamp(16px,2.6vh,26px);
+/* Subtítulos. Se pintan en una capa propia y no con ::cue del navegador: así
+   el tamaño lo elige la persona y, sobre todo, suben cuando aparece la barra
+   de controles en vez de quedar tapados por ella. */
+#subs{
+  position:absolute; left:0; right:0; bottom:6%; z-index:3;
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  padding:0 6%; pointer-events:none; transition:bottom .2s;
 }
+#stage.controls #subs{bottom:96px}
+#subs .cue{
+  max-width:100%; padding:2px 12px; border-radius:4px;
+  background:rgba(0,0,0,.72); color:#fff; text-align:center;
+  white-space:pre-line; line-height:1.34; font-weight:500;
+  text-shadow:0 1px 4px rgba(0,0,0,.55);
+  font-size:var(--cue,clamp(19px,3.5vh,42px));
+}
+#subs.cue-s{--cue:clamp(15px,2.6vh,30px)}
+#subs.cue-m{--cue:clamp(19px,3.5vh,42px)}
+#subs.cue-l{--cue:clamp(23px,4.5vh,54px)}
+#subs.cue-xl{--cue:clamp(28px,5.7vh,70px)}
 
 /* ---------- Velos sobre el video ---------- */
 .veil{
@@ -285,6 +301,19 @@ svg{display:block}
   margin-left:7px; font-family:var(--mono); font-size:9.5px; letter-spacing:.1em;
   color:var(--dim); font-weight:400;
 }
+.cc-tam{display:flex; gap:4px; padding:1px 6px 4px}
+.cc-tam button{
+  flex:1; height:34px; border-radius:7px; border:1px solid var(--line);
+  color:var(--muted); line-height:1;
+  display:flex; align-items:center; justify-content:center;
+  transition:color .12s,border-color .12s;
+}
+.cc-tam button:hover{color:var(--text); border-color:var(--muted)}
+.cc-tam button.on{color:var(--red); border-color:var(--red); font-weight:700}
+.cc-tam button:nth-child(1){font-size:11px}
+.cc-tam button:nth-child(2){font-size:14px}
+.cc-tam button:nth-child(3){font-size:17px}
+.cc-tam button:nth-child(4){font-size:21px}
 @media (max-width:560px){#cc-menu,#audio-menu{right:12px}}
 #movie-name .loc{
   margin-left:7px; padding:1px 6px; border-radius:5px; border:1px solid var(--line-2);
@@ -430,6 +459,7 @@ svg{display:block}
          los demás idiomas viajan en archivos aparte y este elemento los
          mantiene pegados al video (ver sincroAudio). -->
     <audio id="a2" preload="auto"></audio>
+    <div id="subs"></div>
 
     <!-- Biblioteca (velo de inicio y de cambio de película) -->
     <div id="loader" class="veil">
@@ -724,14 +754,24 @@ function aVtt(text) {
   if (!/^WEBVTT/.test(text)) text = 'WEBVTT\n\n' + text.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2');
   return text;
 }
-function limpiaSubs() { video.querySelectorAll('track').forEach((t) => t.remove()); ccPinta(); }
+/* Todas las pistas se quedan en modo 'hidden': el navegador las analiza y
+   avisa de los cambios de línea, pero quien decide qué se ve es subSel y
+   quien lo dibuja es pintaCues(), en la capa #subs. */
+let subSel = null;
+function limpiaSubs() {
+  video.querySelectorAll('track').forEach((t) => t.remove());
+  subSel = null;
+  pintaCues(); ccPinta();
+}
 function addTrack(label, vttUrl, activar) {
   const tr = document.createElement('track');
   tr.kind = 'subtitles'; tr.label = label; tr.src = vttUrl;
   video.appendChild(tr);
   const tt = video.textTracks[video.textTracks.length - 1];
-  tt.mode = activar ? 'showing' : 'hidden';
-  ccPinta();
+  tt.mode = 'hidden';
+  tt.addEventListener('cuechange', pintaCues);
+  if (activar) subSel = label;
+  pintaCues(); ccPinta();
   return tt;
 }
 async function addTrackURL(label, url) {
@@ -745,45 +785,74 @@ async function addTrackURL(label, url) {
   } catch (e) { /* pista rota o sin CORS: no se lista */ }
 }
 function addTrackFile(label, file, activar) {
-  const rd = new FileReader();
-  rd.onload = () => addTrack(label,
-    URL.createObjectURL(new Blob([aVtt(rd.result)], { type: 'text/vtt' })),
-    activar !== undefined ? activar : (localStorage.cineSubs || '') === label);
-  rd.readAsText(file);
+  return new Promise((listo) => {
+    const rd = new FileReader();
+    rd.onload = () => {
+      addTrack(label, URL.createObjectURL(new Blob([aVtt(rd.result)], { type: 'text/vtt' })),
+        activar !== undefined ? activar : (localStorage.cineSubs || '') === label);
+      listo();
+    };
+    rd.onerror = () => listo();
+    rd.readAsText(file);
+  });
 }
 /* Las pistas del catálogo, salvo las que la persona ya tiene en su disco: si
-   trajo su copia se usa esa y no se pide nada por la red. */
-function ponSubs(cat, locales) {
+   trajo su copia se usa esa y no se pide nada por la red. Van en serie para
+   que el menú las liste en el orden del catálogo y no en el que respondan. */
+async function ponSubs(cat, locales) {
   const loc = (locales || []).slice();
-  (cat || []).forEach((s) => {
+  for (const s of cat || []) {
     const label = s.label || 'Subtítulos';
     const mio = loc.find((l) => !l.usado && casaCon(l.nombre, label));
-    if (mio) { mio.usado = true; addTrackFile(label, mio.file); }
-    else addTrackURL(label, absCat(s.url));
-  });
-  loc.filter((l) => !l.usado).forEach((l) => addTrackFile(l.label, l.file));
+    if (mio) { mio.usado = true; await addTrackFile(label, mio.file); }
+    else await addTrackURL(label, absCat(s.url));
+  }
+  for (const l of loc.filter((x) => !x.usado)) await addTrackFile(l.label, l.file);
 }
 function cargarSubs(file) {
   const nombre = sinExt(file.name);
-  eligeSub(null);
-  addTrackFile(nombre, file, true);
-  localStorage.cineSubs = nombre;
-  toast('Subtítulos cargados: ' + file.name);
+  addTrackFile(nombre, file, true).then(() => {
+    localStorage.cineSubs = nombre;
+    toast('Subtítulos cargados: ' + file.name);
+  });
+}
+function pistaSel() {
+  if (subSel === null) return null;
+  for (let i = 0; i < video.textTracks.length; i++) {
+    if (video.textTracks[i].label === subSel) return video.textTracks[i];
+  }
+  return null;
 }
 function eligeSub(label) {
-  for (let i = 0; i < video.textTracks.length; i++) {
-    const tt = video.textTracks[i];
-    tt.mode = (label !== null && tt.label === label) ? 'showing' : 'hidden';
-  }
+  subSel = label;
   localStorage.cineSubs = label === null ? '' : label;
-  ccPinta();
+  pintaCues(); ccPinta();
+}
+function pintaCues() {
+  const capa = $('#subs');
+  capa.textContent = '';
+  const tt = pistaSel();
+  if (!tt || !tt.activeCues) return;
+  for (let i = 0; i < tt.activeCues.length; i++) {
+    const linea = document.createElement('div');
+    linea.className = 'cue';
+    // getCueAsHTML respeta las cursivas del subtítulo y no mete HTML ajeno.
+    linea.appendChild(tt.activeCues[i].getCueAsHTML());
+    capa.appendChild(linea);
+  }
 }
 function ccPinta() {
-  let activo = false;
-  for (let i = 0; i < video.textTracks.length; i++) if (video.textTracks[i].mode === 'showing') activo = true;
   $('#c-cc').classList.toggle('off', !video.textTracks.length);
-  $('#c-cc').classList.toggle('accent', activo);
+  $('#c-cc').classList.toggle('accent', !!pistaSel());
 }
+/* Tamaño de los subtítulos: lo elige la persona en el menú CC y se recuerda. */
+const TAM_SUBS = [['s', 'Pequeño'], ['m', 'Mediano'], ['l', 'Grande'], ['xl', 'Enorme']];
+function ponTamSub(t) {
+  if (!TAM_SUBS.some((x) => x[0] === t)) t = 'm';
+  localStorage.cineSubTam = t;
+  TAM_SUBS.forEach((x) => $('#subs').classList.toggle('cue-' + x[0], x[0] === t));
+}
+ponTamSub(localStorage.cineSubTam || 'm');
 
 /* ============================ Pistas de audio ============================
    Un <video> solo suena la pista incrustada en su archivo, así que los demás
@@ -970,14 +1039,29 @@ function ccMuestra() {
   audioMenu.classList.add('hidden');
   ccMenu.innerHTML = '';
   menuTitulo(ccMenu, 'Subtítulos');
-  let alguno = false;
   for (let i = 0; i < video.textTracks.length; i++) {
     const tt = video.textTracks[i];
-    if (tt.mode === 'showing') alguno = true;
-    menuItem(ccMenu, tt.label || 'Pista ' + (i + 1), tt.mode === 'showing', () => eligeSub(tt.label));
+    menuItem(ccMenu, tt.label || 'Pista ' + (i + 1), tt.label === subSel, () => eligeSub(tt.label));
   }
-  menuItem(ccMenu, 'Sin subtítulos', !alguno, () => eligeSub(null));
+  menuItem(ccMenu, 'Sin subtítulos', subSel === null, () => eligeSub(null));
   menuItem(ccMenu, 'Cargar archivo…', false, () => $('#in-subs').click());
+  menuTitulo(ccMenu, 'Tamaño');
+  const tams = document.createElement('div');
+  tams.className = 'cc-tam';
+  const actual = localStorage.cineSubTam || 'm';
+  TAM_SUBS.forEach((t) => {
+    const b = document.createElement('button');
+    b.textContent = 'A'; b.title = t[1];
+    if (t[0] === actual) b.classList.add('on');
+    // No cierra el menú: así se ve el cambio y se puede comparar.
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      ponTamSub(t[0]);
+      [...tams.children].forEach((c) => c.classList.toggle('on', c === b));
+    });
+    tams.appendChild(b);
+  });
+  ccMenu.appendChild(tams);
   ccMenu.classList.remove('hidden');
 }
 function audioMuestra() {
@@ -1498,7 +1582,8 @@ ccPinta();
 // Gancho de consola para pruebas: window.CINE.sala() / cargar(url) / video
 window.CINE = {
   sala: () => sala, cargar: cargarURL, video, audio: a2, enviar: send,
-  audios: () => audios, eligeAudio, descarga: () => abreDescarga(entradaDe(curV))
+  audios: () => audios, eligeAudio, eligeSub, tamSub: ponTamSub,
+  descarga: () => abreDescarga(entradaDe(curV))
 };
 })();
 </script>
