@@ -70,11 +70,20 @@ svg{display:block}
 }
 #stage.controls #subs{bottom:96px}
 #subs .cue{
-  max-width:100%; padding:2px 12px; border-radius:4px;
-  background:rgba(0,0,0,.72); color:#fff; text-align:center;
-  white-space:pre-line; line-height:1.34; font-weight:500;
-  text-shadow:0 1px 4px rgba(0,0,0,.55);
+  max-width:min(100%,58ch); padding:2px 12px; border-radius:4px;
+  color:#fff; text-align:center;
+  line-height:1.34; font-weight:500; text-wrap:balance;
   font-size:var(--cue,clamp(19px,3.5vh,42px));
+}
+/* Tres acabados, como en cualquier plataforma: recuadro, sombra o contorno.
+   Las medidas van en em para que acompañen al tamaño elegido. */
+#subs.est-caja .cue{background:rgba(0,0,0,.72)}
+#subs.est-sombra .cue{text-shadow:0 .07em .14em rgba(0,0,0,.98),0 0 .35em rgba(0,0,0,.85)}
+#subs.est-borde .cue{
+  text-shadow:
+    -.055em -.055em 0 #000, .055em -.055em 0 #000,
+    -.055em .055em 0 #000, .055em .055em 0 #000,
+    0 -.075em 0 #000, 0 .075em 0 #000, -.075em 0 0 #000, .075em 0 0 #000;
 }
 #subs.cue-s{--cue:clamp(15px,2.6vh,30px)}
 #subs.cue-m{--cue:clamp(19px,3.5vh,42px)}
@@ -301,19 +310,31 @@ svg{display:block}
   margin-left:7px; font-family:var(--mono); font-size:9.5px; letter-spacing:.1em;
   color:var(--dim); font-weight:400;
 }
-.cc-tam{display:flex; gap:4px; padding:1px 6px 4px}
-.cc-tam button{
+.cc-chips{display:flex; gap:4px; padding:1px 6px 4px}
+.cc-chips button{
   flex:1; height:34px; border-radius:7px; border:1px solid var(--line);
   color:var(--muted); line-height:1;
   display:flex; align-items:center; justify-content:center;
   transition:color .12s,border-color .12s;
 }
-.cc-tam button:hover{color:var(--text); border-color:var(--muted)}
-.cc-tam button.on{color:var(--red); border-color:var(--red); font-weight:700}
+.cc-chips button:hover{color:var(--text); border-color:var(--muted)}
+.cc-chips button.on{border-color:var(--red)}
+.cc-tam button.on{color:var(--red); font-weight:700}
 .cc-tam button:nth-child(1){font-size:11px}
 .cc-tam button:nth-child(2){font-size:14px}
 .cc-tam button:nth-child(3){font-size:17px}
 .cc-tam button:nth-child(4){font-size:21px}
+/* Cada muestra se dibuja con su propio acabado, sobre un gris que hace de
+   video para que se distingan el recuadro y el contorno. */
+.cc-est button{background:rgba(255,255,255,.13); color:#fff; font-size:13px; font-weight:600}
+.cc-est button:hover{color:#fff}
+.cc-est .m-caja{background:rgba(0,0,0,.72); padding:1px 6px; border-radius:3px}
+.cc-est .m-sombra{text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 5px rgba(0,0,0,.8)}
+.cc-est .m-borde{
+  text-shadow:
+    -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000,
+    0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000, 1px 0 0 #000;
+}
 @media (max-width:560px){#cc-menu,#audio-menu{right:12px}}
 #movie-name .loc{
   margin-left:7px; padding:1px 6px; border-radius:5px; border:1px solid var(--line-2);
@@ -828,31 +849,70 @@ function eligeSub(label) {
   localStorage.cineSubs = label === null ? '' : label;
   pintaCues(); ccPinta();
 }
+/* Los .srt vienen partidos para pantallas estrechas (aquí hay 54 diálogos de
+   tres líneas o más). Con el ancho que tenemos, esos saltos solo estorban: se
+   juntan y que el ancho de la caja decida dónde cortar. El salto SÍ se respeta
+   cuando marca cambio de interlocutor, o sea cuando la línea empieza por guion. */
+function reflow(frag) {
+  const lineas = [[]];
+  frag.childNodes.forEach((n) => {
+    if (n.nodeType === 3) {
+      n.data.split('\n').forEach((t, i) => {
+        if (i) lineas.push([]);
+        if (t) lineas[lineas.length - 1].push(document.createTextNode(t));
+      });
+    } else if (n.nodeName === 'BR') {
+      lineas.push([]);
+    } else {
+      // Cursivas y demás formato: se clonan enteras dentro de la línea.
+      lineas[lineas.length - 1].push(n.cloneNode(true));
+    }
+  });
+  const texto = (l) => l.map((n) => n.textContent).join('').trim();
+  const salida = document.createDocumentFragment();
+  lineas.filter((l) => texto(l)).forEach((l, i) => {
+    if (i) {
+      salida.appendChild(/^[-–—]/.test(texto(l))
+        ? document.createElement('br')
+        : document.createTextNode(' '));
+    }
+    l.forEach((n) => salida.appendChild(n));
+  });
+  return salida;
+}
 function pintaCues() {
   const capa = $('#subs');
   capa.textContent = '';
   const tt = pistaSel();
   if (!tt || !tt.activeCues) return;
   for (let i = 0; i < tt.activeCues.length; i++) {
-    const linea = document.createElement('div');
-    linea.className = 'cue';
+    const caja = document.createElement('div');
+    caja.className = 'cue';
     // getCueAsHTML respeta las cursivas del subtítulo y no mete HTML ajeno.
-    linea.appendChild(tt.activeCues[i].getCueAsHTML());
-    capa.appendChild(linea);
+    caja.appendChild(reflow(tt.activeCues[i].getCueAsHTML()));
+    capa.appendChild(caja);
   }
 }
 function ccPinta() {
   $('#c-cc').classList.toggle('off', !video.textTracks.length);
   $('#c-cc').classList.toggle('accent', !!pistaSel());
 }
-/* Tamaño de los subtítulos: lo elige la persona en el menú CC y se recuerda. */
+/* Aspecto de los subtítulos: tamaño y acabado. Los elige la persona en el
+   menú CC y se recuerdan entre sesiones. */
 const TAM_SUBS = [['s', 'Pequeño'], ['m', 'Mediano'], ['l', 'Grande'], ['xl', 'Enorme']];
+const EST_SUBS = [['caja', 'Recuadro'], ['sombra', 'Sombra'], ['borde', 'Bordes']];
 function ponTamSub(t) {
   if (!TAM_SUBS.some((x) => x[0] === t)) t = 'm';
   localStorage.cineSubTam = t;
   TAM_SUBS.forEach((x) => $('#subs').classList.toggle('cue-' + x[0], x[0] === t));
 }
+function ponEstSub(e) {
+  if (!EST_SUBS.some((x) => x[0] === e)) e = 'caja';
+  localStorage.cineSubEst = e;
+  EST_SUBS.forEach((x) => $('#subs').classList.toggle('est-' + x[0], x[0] === e));
+}
 ponTamSub(localStorage.cineSubTam || 'm');
+ponEstSub(localStorage.cineSubEst || 'caja');
 
 /* ============================ Pistas de audio ============================
    Un <video> solo suena la pista incrustada en su archivo, así que los demás
@@ -1045,24 +1105,33 @@ function ccMuestra() {
   }
   menuItem(ccMenu, 'Sin subtítulos', subSel === null, () => eligeSub(null));
   menuItem(ccMenu, 'Cargar archivo…', false, () => $('#in-subs').click());
-  menuTitulo(ccMenu, 'Tamaño');
-  const tams = document.createElement('div');
-  tams.className = 'cc-tam';
-  const actual = localStorage.cineSubTam || 'm';
-  TAM_SUBS.forEach((t) => {
+  // Filas de muestras: no cierran el menú, así se compara sobre la escena.
+  chips('Tamaño', 'cc-tam', TAM_SUBS, localStorage.cineSubTam || 'm', ponTamSub,
+    () => document.createTextNode('A'));
+  chips('Estilo', 'cc-est', EST_SUBS, localStorage.cineSubEst || 'caja', ponEstSub, (id) => {
+    const s = document.createElement('span');
+    s.className = 'm-' + id; s.textContent = 'Aa';
+    return s;
+  });
+  ccMenu.classList.remove('hidden');
+}
+function chips(titulo, clase, opciones, actual, aplica, muestra) {
+  menuTitulo(ccMenu, titulo);
+  const fila = document.createElement('div');
+  fila.className = 'cc-chips ' + clase;
+  opciones.forEach((o) => {
     const b = document.createElement('button');
-    b.textContent = 'A'; b.title = t[1];
-    if (t[0] === actual) b.classList.add('on');
-    // No cierra el menú: así se ve el cambio y se puede comparar.
+    b.title = o[1];
+    b.appendChild(muestra(o[0]));
+    if (o[0] === actual) b.classList.add('on');
     b.addEventListener('click', (e) => {
       e.stopPropagation();
-      ponTamSub(t[0]);
-      [...tams.children].forEach((c) => c.classList.toggle('on', c === b));
+      aplica(o[0]);
+      [...fila.children].forEach((c) => c.classList.toggle('on', c === b));
     });
-    tams.appendChild(b);
+    fila.appendChild(b);
   });
-  ccMenu.appendChild(tams);
-  ccMenu.classList.remove('hidden');
+  ccMenu.appendChild(fila);
 }
 function audioMuestra() {
   ccMenu.classList.add('hidden');
@@ -1582,7 +1651,7 @@ ccPinta();
 // Gancho de consola para pruebas: window.CINE.sala() / cargar(url) / video
 window.CINE = {
   sala: () => sala, cargar: cargarURL, video, audio: a2, enviar: send,
-  audios: () => audios, eligeAudio, eligeSub, tamSub: ponTamSub,
+  audios: () => audios, eligeAudio, eligeSub, tamSub: ponTamSub, estSub: ponEstSub,
   descarga: () => abreDescarga(entradaDe(curV))
 };
 })();
