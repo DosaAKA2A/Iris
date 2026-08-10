@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex" />
-<title>Cine — IRIS Studio</title>
+<title>MOOVIN — IRIS Studio</title>
 <link rel="icon" type="image/svg+xml" href="/assets/iris-favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -40,6 +40,9 @@ svg{display:block}
   font-family:var(--mono); font-size:11px; font-weight:700;
   letter-spacing:.22em; color:var(--red);
 }
+/* La marca es el camino de vuelta a la biblioteca. */
+button.tag{padding:6px 2px; transition:opacity .12s}
+button.tag:hover{opacity:.7}
 #top .right{margin-left:auto; display:flex; align-items:center; gap:10px}
 #btn-party{
   display:flex; align-items:center; gap:8px; padding:8px 14px;
@@ -465,7 +468,7 @@ svg{display:block}
     </svg>
   </a>
   <span class="sep"></span>
-  <span class="tag">CINE</span>
+  <button class="tag" id="marca" title="Volver a la biblioteca">MOOVIN</button>
   <div class="right">
     <button id="btn-party" title="Abrir Watch Party">
       <span class="dot"></span>
@@ -490,7 +493,7 @@ svg{display:block}
         <button id="loader-close" title="Cerrar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18L18 6M6 6L18 18"/></svg>
         </button>
-        <h1>Cine de IRIS</h1>
+        <h1>MOOVIN</h1>
         <div class="sub">La biblioteca del estudio. Elige un título y, si están en una sala de Watch Party, se abre solo en la pantalla de todos.</div>
         <div id="lib-grid"></div>
         <div class="lib-otra">
@@ -641,7 +644,7 @@ svg{display:block}
 <div id="toast"></div>
 
 <script>
-/* Cine IRIS — reproductor con Watch Party integrado.
+/* MOOVIN — el cine de IRIS Studio, con Watch Party integrado.
    Habla el MISMO protocolo que el addon Watch Party de Naviris contra el relay
    naviris-party (join / ev / beat / chat): una sala creada aquí y una creada
    desde el addon son intercambiables. Anfitrión-autoritativo: late cada 2 s
@@ -742,7 +745,7 @@ function ponNombre(n) {
     chip.className = 'loc'; chip.textContent = 'LOCAL';
     el.appendChild(chip);
   }
-  document.title = (nombrePeli ? nombrePeli + ' — ' : '') + 'Cine IRIS';
+  document.title = (nombrePeli ? nombrePeli + ' — ' : '') + 'MOOVIN';
 }
 /* Carga una película.
    url    identidad para la sala (la del catálogo; null si es un archivo suelto)
@@ -1214,10 +1217,14 @@ document.addEventListener('click', (e) => {
   if (!e.target.closest('#cc-menu,#c-cc')) ccMenu.classList.add('hidden');
   if (!e.target.closest('#audio-menu,#c-audio')) audioMenu.classList.add('hidden');
 });
-$('#c-open').addEventListener('click', () => {
+/* Volver a la biblioteca, desde la marca del encabezado o desde los controles.
+   La X para cerrarla solo sale si hay algo a lo que volver. */
+function abreBiblioteca() {
   $('#loader').classList.remove('hidden');
-  $('#loader-close').style.display = 'flex';
-});
+  $('#loader-close').style.display = video.src ? 'flex' : 'none';
+}
+$('#c-open').addEventListener('click', abreBiblioteca);
+$('#marca').addEventListener('click', abreBiblioteca);
 video.addEventListener('click', () => { if (video.src) { video.paused ? playSafe() : video.pause(); } });
 video.addEventListener('dblclick', () => $('#c-fs').click());
 
