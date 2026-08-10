@@ -219,12 +219,22 @@ h1{font-size:20px; font-weight:700; letter-spacing:-.01em}
 (() => {
 'use strict';
 const W = 'https://cine.studio-iris2026.workers.dev';
-const PUB = 'https://pub-f825f6bcd8a04ddeb4517f1c7ca0652f.r2.dev';
+// El bucket ya no es publico: los archivos se piden al worker, que exige pase.
+const MEDIA = W + '/media?key=';
+const urlDe = (key) => MEDIA + encodeURIComponent(key);
+const claveDe = (u) => {
+  if (!u || String(u).indexOf(MEDIA) !== 0) return null;
+  try { return new URL(u).searchParams.get('key') || null; } catch (e) { return null; }
+};
 const PARTE = 48 * 1024 * 1024;   // 48 MB por parte (el worker admite ~100)
 
 const $ = (s) => document.querySelector(s);
 let TOK = localStorage.cineAdminTok || '';
 let catalogo = { titulos: [] };
+let paseTok = '';
+// Token de un dia para que las miniaturas del bucket se puedan ver aqui.
+const conPase = (u) => (paseTok && String(u).indexOf(W) === 0)
+  ? u + (u.indexOf('?') === -1 ? '?' : '&') + 't=' + encodeURIComponent(paseTok) : u;
 
 let toastT = 0;
 function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 3200); }
@@ -251,6 +261,8 @@ async function entrar(clave) {
   const ok = await fetch(W + '/api/check', { headers: H() }).then((r) => r.ok).catch(() => false);
   if (!ok) { TOK = ''; $('#g-err').classList.remove('hidden'); return; }
   localStorage.cineAdminTok = TOK;
+  paseTok = await fetch(W + '/api/pase', { headers: H() })
+    .then((r) => r.json()).then((j) => j.token || '').catch(() => '');
   $('#gate').classList.add('hidden');
   $('#panel').classList.remove('hidden');
   await cargaCatalogo();
@@ -260,7 +272,7 @@ $('#g-tok').addEventListener('keydown', (e) => { if (e.key === 'Enter') entrar($
 
 /* ---------- Lista ---------- */
 async function cargaCatalogo() {
-  catalogo = await fetch(W + '/catalogo', { cache: 'no-store' }).then((r) => r.json()).catch(() => ({ titulos: [] }));
+  catalogo = await fetch(W + '/catalogo', { cache: 'no-store', headers: H() }).then((r) => r.json()).catch(() => ({ titulos: [] }));
   if (!Array.isArray(catalogo.titulos)) catalogo.titulos = [];
   pintaLista();
 }
@@ -281,14 +293,18 @@ function pintaLista() {
   catalogo.titulos.forEach((t, idx) => {
     const fila = document.createElement('div'); fila.className = 'fila';
     const mini = document.createElement('div'); mini.className = 'mini';
-    if (t.poster) { const im = document.createElement('img'); im.src = new URL(t.poster, 'https://iris.it.com/cine/').href; im.alt = ''; mini.appendChild(im); }
+    if (t.poster) {
+      const im = document.createElement('img'); im.alt = '';
+      im.src = conPase(new URL(t.poster, 'https://iris.it.com/cine/').href);
+      mini.appendChild(im);
+    }
     else mini.textContent = (t.titulo || '?').slice(0, 2).toUpperCase();
     fila.appendChild(mini);
     const datos = document.createElement('div'); datos.className = 'datos';
     const tt = document.createElement('div'); tt.className = 't'; tt.textContent = t.titulo || 'Sin título'; datos.appendChild(tt);
     if (t.nota) { const nn = document.createElement('div'); nn.className = 'n'; nn.textContent = t.nota; datos.appendChild(nn); }
     const meta = document.createElement('div'); meta.className = 'meta';
-    const enR2 = (t.url || '').indexOf(PUB) === 0;
+    const enR2 = !!claveDe(t.url);
     meta.innerHTML = (t.dur ? t.dur + ' · ' : '') +
       (enR2 ? '<span class="tagr2">almacén R2</span>' : '<span class="tagext">fuente externa</span>') +
       ((t.audios && t.audios.length > 1) ? ' · ' + t.audios.length + ' audios' : '') +
@@ -318,10 +334,9 @@ async function editar(idx) {
 async function borrar(idx) {
   const t = catalogo.titulos[idx];
   if (!confirm('Borrar "' + (t.titulo || 'Sin título') + '" de la biblioteca?' +
-    ((t.url || '').indexOf(PUB) === 0 ? ' También se borran sus archivos del almacén.' : ''))) return;
+    (!!claveDe(t.url) ? ' También se borran sus archivos del almacén.' : ''))) return;
   // Archivos alojados en el bucket: se borran también.
   const claves = [];
-  const claveDe = (u) => (u && u.indexOf(PUB + '/') === 0) ? u.slice(PUB.length + 1) : null;
   [t.url, t.poster].forEach((u) => { const k = claveDe(u); if (k) claves.push(k); });
   (t.subs || []).concat(t.audios || []).forEach((s) => { const k = claveDe(s.url); if (k) claves.push(k); });
   for (const k of claves) {
@@ -478,14 +493,14 @@ $('#f-guardar').addEventListener('click', async () => {
         progT.textContent = 'Subiendo video… ' + Math.round(hecho / total * 100) + '% (' +
           Math.round(hecho / 1024 / 1024) + ' de ' + Math.round(total / 1024 / 1024) + ' MB)';
       });
-      entrada.url = PUB + '/' + keyVid;
+      entrada.url = urlDe(keyVid);
       entrada.tam = vidFile.size;
     }
 
     if (posterBlob) {
       paso('Subiendo póster…');
       await subeObjeto(base + 'poster.jpg', posterBlob, 'image/jpeg');
-      entrada.poster = PUB + '/' + base + 'poster.jpg';
+      entrada.poster = urlDe(base + 'poster.jpg');
     }
 
     /* Pistas de audio: un MP4 solo suena la que lleva dentro, así que los
@@ -505,7 +520,7 @@ $('#f-guardar').addEventListener('click', async () => {
         progI.style.width = Math.round(hecho / total * 100) + '%';
         progT.textContent = 'Subiendo audio ' + label + '… ' + Math.round(hecho / total * 100) + '%';
       });
-      pistasAudio.push({ label, url: PUB + '/' + keyAud, tam: file.size });
+      pistasAudio.push({ label, url: urlDe(keyAud), tam: file.size });
     }
     if (pistasAudio.length) {
       entrada.audios = [{ label: $('#f-audio-main').value.trim() || 'Original' }].concat(pistasAudio);
@@ -523,7 +538,7 @@ $('#f-guardar').addEventListener('click', async () => {
       const cuerpo = new Blob([texto], { type: 'text/vtt' });
       const keySub = base + 'subs/' + (i + 1) + '-' + slugDe(label) + '.vtt';
       await subeObjeto(keySub, cuerpo, 'text/vtt');
-      pistas.push({ label, url: PUB + '/' + keySub, tam: cuerpo.size });
+      pistas.push({ label, url: urlDe(keySub), tam: cuerpo.size });
     }
     if (pistas.length) entrada.subs = pistas;
 

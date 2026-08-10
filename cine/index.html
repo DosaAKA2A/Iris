@@ -154,6 +154,8 @@ svg{display:block}
 /* Para el Watch Party conviene tener la copia en el disco: así nadie se
    queda esperando al buffer y la sincronización no pelea con la red. */
 #dl{z-index:8; background:rgba(6,6,8,.9)}
+#pase{z-index:9; background:var(--bg)}
+#pase .in.code{letter-spacing:2px}
 .dl-card{
   width:min(540px,calc(100vw - 36px)); max-height:calc(100% - 60px); overflow-y:auto;
   background:var(--surface); border:1px solid var(--line-2); border-radius:14px;
@@ -531,6 +533,24 @@ svg{display:block}
       </div>
     </div>
 
+    <!-- Pase de acceso: la biblioteca es privada y el worker no sirve nada sin él -->
+    <div id="pase" class="veil hidden">
+      <div class="dl-card" style="max-width:400px">
+        <h2>Biblioteca privada</h2>
+        <div class="sub">
+          Escribe el pase para entrar. En Naviris se pone solo: guárdalo en
+          Ajustes y no vuelve a aparecer esta pantalla.
+        </div>
+        <div class="fieldrow" style="margin-top:16px">
+          <input id="pase-in" class="in code" maxlength="24" placeholder="Pase" autocomplete="off" />
+          <button id="pase-ok" class="btn red">Entrar</button>
+        </div>
+        <div id="pase-err" class="hint" style="margin-top:10px; color:var(--err); display:none">
+          Ese pase no vale.
+        </div>
+      </div>
+    </div>
+
     <!-- Velo de autoplay bloqueado -->
     <div id="tapveil" class="veil hidden">
       <button id="tap-btn">
@@ -630,6 +650,7 @@ svg{display:block}
 'use strict';
 
 const SERVER = localStorage.__navPartyServer || 'wss://naviris-party.studio-iris2026.workers.dev';
+const CINE_API = 'https://cine.studio-iris2026.workers.dev';
 const DRIFT = 1.5;     // segundos de desvío tolerado antes de re-seek
 const ECHO_MS = 900;   // ventana ignorando eventos locales tras aplicar un remoto
 
@@ -652,6 +673,42 @@ function toast(text) {
   const el = $('#toast'); el.textContent = text; el.classList.add('show');
   clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 3200);
 }
+
+/* ============================ Pase ============================
+   La biblioteca es privada: el bucket ya no tiene URL pública y el worker no
+   suelta ni el catálogo ni un solo archivo sin un token firmado. El token sale
+   del pase, dura un día y se pide en cada carga; el pase se queda guardado
+   aquí. Naviris lo pone solo (window.__navCinePase desde su preload), así que
+   allí esta pantalla no llega a verse. */
+let pase = { token: '', exp: 0 };
+
+async function entrar(codigo) {
+  if (!codigo) return false;
+  try {
+    const r = await fetch(CINE_API + '/entrar', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pase: String(codigo).trim() })
+    });
+    if (!r.ok) return false;
+    const j = await r.json();
+    if (!j.token) return false;
+    pase = { token: j.token, exp: j.exp || 0 };
+    localStorage.cinePase = String(codigo).trim();
+    return true;
+  } catch (e) { return false; }
+}
+/* Añade el token a lo que sirve el worker. Lo demás (blobs del disco, rutas
+   del propio sitio) se queda como está. Ojo: la identidad de la película que
+   viaja por la sala NO lleva token, solo la URL con la que se pide el archivo. */
+function conPase(u) {
+  if (!u || !pase.token || String(u).indexOf(CINE_API) !== 0) return u;
+  return u + (u.indexOf('?') === -1 ? '?' : '&') + 't=' + encodeURIComponent(pase.token);
+}
+// El token dura un día; se renueva sin molestar cuando le queda poco.
+setInterval(() => {
+  const quedan = pase.exp - Math.floor(Date.now() / 1000);
+  if (pase.token && quedan < 3600) entrar(localStorage.cinePase);
+}, 15 * 60 * 1000);
 
 /* ============================ Película ============================ */
 let curV = null;        // identidad de la película (la que viaja por la sala)
@@ -700,7 +757,7 @@ function cargarURL(url, opts) {
   esLocal = !!opts.src;
   blobsVivos.forEach((u) => { try { URL.revokeObjectURL(u); } catch (e) { /* nada */ } });
   blobsVivos = opts.blobs || [];
-  video.src = opts.src || url;
+  video.src = opts.src || conPase(url);
   video.load();
   limpiaSubs();
   // Si la URL está en la biblioteca, se toman su nombre y sus pistas (también
@@ -826,7 +883,7 @@ async function ponSubs(cat, locales) {
     const label = s.label || 'Subtítulos';
     const mio = loc.find((l) => !l.usado && casaCon(l.nombre, label));
     if (mio) { mio.usado = true; await addTrackFile(label, mio.file); }
-    else await addTrackURL(label, absCat(s.url));
+    else await addTrackURL(label, conPase(absCat(s.url)));
   }
   for (const l of loc.filter((x) => !x.usado)) await addTrackFile(l.label, l.file);
 }
@@ -931,7 +988,11 @@ function ponAudios(cat, locales) {
     if (!a || !a.label) return;
     const mio = loc.find((l) => !l.usado && casaCon(l.nombre, a.label));
     if (mio) mio.usado = true;
-    audios.push({ label: a.label, url: mio ? mio.url : (a.url ? absCat(a.url) : ''), local: !!mio });
+    audios.push({
+      label: a.label,
+      url: mio ? mio.url : (a.url ? conPase(absCat(a.url)) : ''),
+      local: !!mio
+    });
   });
   if (!audios.length) audios.push({ label: 'Original', url: '' });
   loc.filter((l) => !l.usado).forEach((l) => audios.push({ label: l.label, url: l.url, local: true }));
@@ -1217,18 +1278,20 @@ $('#loader-close').addEventListener('click', () => $('#loader').classList.add('h
    la película en el disco no hay buffers que descuadren la sincronización.
    Los enlaces pasan por el worker para que el navegador la GUARDE en vez de
    abrirla: el bucket público no manda Content-Disposition. */
-const R2_PUB = /^https:\/\/pub-[a-z0-9]+\.r2\.dev\//;
-const DESCARGA_API = 'https://cine.studio-iris2026.workers.dev/descargar';
 function nombreDescarga(key) {
   const p = key.split('/').filter(Boolean);
   const base = p[p.length - 1];
   return p.length > 1 ? p[1] + '-' + base : base;
 }
+// La misma clave del bucket, pero por la ruta que la manda como adjunto.
 function urlDescarga(url) {
   const u = absCat(url);
-  if (!R2_PUB.test(u)) return u;
-  const key = decodeURIComponent(u.replace(R2_PUB, ''));
-  return DESCARGA_API + '?key=' + encodeURIComponent(key) + '&n=' + encodeURIComponent(nombreDescarga(key));
+  if (u.indexOf(CINE_API + '/media?') !== 0) return u;
+  let key = '';
+  try { key = new URL(u).searchParams.get('key') || ''; } catch (e) { return u; }
+  if (!key) return u;
+  return conPase(CINE_API + '/descargar?key=' + encodeURIComponent(key)
+    + '&n=' + encodeURIComponent(nombreDescarga(key)));
 }
 function fmtTam(b) {
   if (!b) return '';
@@ -1295,7 +1358,7 @@ function pintaBiblioteca(bib) {
     const th = document.createElement('div'); th.className = 'lib-thumb';
     if (t.poster) {
       const img = document.createElement('img'); img.loading = 'lazy'; img.alt = '';
-      img.src = absCat(t.poster); th.appendChild(img);
+      img.src = conPase(absCat(t.poster)); th.appendChild(img);
     } else {
       const ini = document.createElement('span'); ini.className = 'ini';
       ini.textContent = (t.titulo || '?').slice(0, 2).toUpperCase(); th.appendChild(ini);
@@ -1319,12 +1382,12 @@ function pintaBiblioteca(bib) {
 }
 // El catálogo vive en R2 y lo sirve el worker (lo edita el backoffice). El
 // biblioteca.json del repo queda de respaldo por si el worker no responde.
-const CATALOGO_API = 'https://cine.studio-iris2026.workers.dev/catalogo';
-fetch(CATALOGO_API, { cache: 'no-store' })
-  .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-  .catch(() => fetch('biblioteca.json', { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }))
-  .then((b) => { bibData = b; pintaBiblioteca(b); aplicaCatalogoActual(); })
-  .catch(() => pintaBiblioteca(null));
+function cargaCatalogo() {
+  return fetch(conPase(CINE_API + '/catalogo'), { cache: 'no-store' })
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then((b) => { bibData = b; pintaBiblioteca(b); aplicaCatalogoActual(); })
+    .catch(() => pintaBiblioteca(null));
+}
 
 /* ============================ Watch Party ============================ */
 let sala = null;        // { code, host, name, ws, ok, everOk, n, status, msgs, lock, navLock }
@@ -1635,22 +1698,50 @@ $('#p-chatin').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.p
 
 /* ============================ Arranque ============================ */
 const qs = new URLSearchParams(location.search);
-if (qs.get('v')) {
-  cargarURL(qs.get('v'), { remoto: true });
-  $('#in-url').value = qs.get('v');
+
+function arranca() {
+  $('#pase').classList.add('hidden');
+  cargaCatalogo();
+  if (qs.get('v')) {
+    cargarURL(qs.get('v'), { remoto: true });
+    $('#in-url').value = qs.get('v');
+  }
+  if (qs.get('sala')) {
+    $('#p-codein').value = qs.get('sala').toUpperCase();
+    panelAbre(true);
+    $('#p-name').value = localStorage.__navPartyName || '';
+  }
+  pintaSala();
+  ccPinta();
 }
-if (qs.get('sala')) {
-  $('#p-codein').value = qs.get('sala').toUpperCase();
-  panelAbre(true);
-  const n = localStorage.__navPartyName || '';
-  $('#p-name').value = n;
-}
-pintaSala();
-ccPinta();
+const dePase = async () => {
+  const c = $('#pase-in').value.trim();
+  if (!c) return;
+  $('#pase-err').style.display = 'none';
+  $('#pase-ok').disabled = true;
+  const vale = await entrar(c);
+  $('#pase-ok').disabled = false;
+  if (vale) { $('#pase-in').value = ''; arranca(); }
+  else { $('#pase-err').style.display = ''; $('#pase-in').select(); }
+};
+$('#pase-ok').addEventListener('click', dePase);
+$('#pase-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') dePase(); });
+
+(async () => {
+  // El pase puede venir de Naviris, de una visita anterior o del enlace. Si
+  // viene en el enlace se borra de la URL en cuanto se usa.
+  const guardado = window.__navCinePase || localStorage.cinePase || qs.get('pase') || '';
+  if (qs.get('pase')) {
+    qs.delete('pase');
+    try { history.replaceState(null, '', location.pathname + (qs.toString() ? '?' + qs : '')); } catch (e) { /* nada */ }
+  }
+  if (await entrar(guardado)) arranca();
+  else { $('#pase').classList.remove('hidden'); $('#pase-in').focus(); }
+})();
 
 // Gancho de consola para pruebas: window.CINE.sala() / cargar(url) / video
 window.CINE = {
-  sala: () => sala, cargar: cargarURL, video, audio: a2, enviar: send,
+  sala: () => sala, cargar: cargarURL, video, audio: a2, enviar: send, entrar, arranca,
   audios: () => audios, eligeAudio, eligeSub, tamSub: ponTamSub, estSub: ponEstSub,
   descarga: () => abreDescarga(entradaDe(curV))
 };
