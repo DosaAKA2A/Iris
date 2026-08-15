@@ -1,4 +1,6 @@
-/* Cine IRIS — API del catálogo y de subidas al bucket R2 "cine".
+/* MOOVIN — API del catálogo y de subidas al bucket R2 "cine".
+   (El bucket, el worker y la ruta /cine conservan ese nombre a propósito:
+   son identificadores, y renombrarlos rompería los enlaces ya compartidos.)
    ---------------------------------------------------------------------------
    La biblioteca es PRIVADA: el bucket no tiene URL pública (se apagó con
    `wrangler r2 bucket dev-url disable cine`) y todo lo sirve este worker, que
