@@ -1347,7 +1347,9 @@ function audioPlay() {
   if (!audioExt) return;
   const d = video.currentTime - a2.currentTime;
   if (!isFinite(d) || Math.abs(d) > 0.5) ponTiempoAudio();
-  a2.play().catch(() => { if (!video.paused) $('#tapveil').classList.remove('hidden'); });
+  // Mismo criterio que el vídeo: un fallo del audio paralelo por interrupción
+  // no significa que haga falta un gesto del usuario.
+  a2.play().catch((err) => { if (err && err.name === 'NotAllowedError' && !video.paused) velo(true); });
 }
 function eligeAudio(label) {
   audioSel = label;
@@ -1565,11 +1567,24 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'm' || e.key === 'M') $('#c-mute').click();
 });
 
+/* El velo solo debe salir cuando el navegador EXIGE un gesto para arrancar, y
+   eso es únicamente NotAllowedError.
+   Antes se mostraba ante cualquier rechazo de play(), y al encadenar capítulo
+   siempre llega uno: al cambiar el src se aborta el play anterior con
+   AbortError ("interrupted by a new load request"). El capítulo nuevo arrancaba
+   igual, así que salía el cartel de "Reanudar la reproducción" ENCIMA de un
+   vídeo que ya estaba corriendo, y había que quitarlo a mano en cada episodio. */
+function velo(ver) { $('#tapveil').classList.toggle('hidden', !ver); }
 function playSafe() {
-  video.play().catch(() => { $('#tapveil').classList.remove('hidden'); });
+  video.play().catch((err) => {
+    if (err && err.name === 'NotAllowedError' && video.paused) velo(true);
+  });
 }
+// Red de seguridad: si el vídeo llega a sonar, el velo sobra, venga de donde
+// venga. Así el cartel no puede quedarse colgado sobre algo que ya se ve.
+video.addEventListener('playing', () => velo(false));
 $('#tap-btn').addEventListener('click', () => {
-  $('#tapveil').classList.add('hidden');
+  velo(false);
   video.play().catch(() => {});
   audioPlay();
 });
