@@ -721,6 +721,27 @@ async function entrar(codigo) {
     return true;
   } catch (e) { return false; }
 }
+/* Entrada automática desde Naviris. La app inyecta su clave en
+   window.__navMoovinApp y el worker la cambia por el mismo token con caducidad
+   que da el pase. No se guarda nada en localStorage: la clave la pone Naviris
+   en cada carga, así que si algún día se rota, basta con actualizar la app.
+   En un navegador normal __navMoovinApp no existe y esto no hace nada. */
+async function entrarConApp() {
+  const clave = window.__navMoovinApp;
+  if (!clave) return false;
+  try {
+    const r = await fetch(MOOVIN_API + '/entrar-app', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clave: String(clave) })
+    });
+    if (!r.ok) return false;
+    const j = await r.json();
+    if (!j.token) return false;
+    pase = { token: j.token, exp: j.exp || 0 };
+    return true;
+  } catch (e) { return false; }
+}
+
 /* Añade el token a lo que sirve el worker. Lo demás (blobs del disco, rutas
    del propio sitio) se queda como está. Ojo: la identidad de la película que
    viaja por la sala NO lleva token, solo la URL con la que se pide el archivo. */
@@ -728,10 +749,15 @@ function conPase(u) {
   if (!u || !pase.token || String(u).indexOf(MOOVIN_API) !== 0) return u;
   return u + (u.indexOf('?') === -1 ? '?' : '&') + 't=' + encodeURIComponent(pase.token);
 }
-// El token dura un día; se renueva sin molestar cuando le queda poco.
+// El token dura un día; se renueva sin molestar cuando le queda poco. Ojo: en
+// Naviris se puede haber entrado con la clave de la app y SIN pase guardado, así
+// que si no hay pase se renueva por la misma vía por la que se entró; si no, a
+// las 24 h se caería la sesión en mitad de una película.
 setInterval(() => {
   const quedan = pase.exp - Math.floor(Date.now() / 1000);
-  if (pase.token && quedan < 3600) entrar(localStorage.moovinPase);
+  if (!pase.token || quedan >= 3600) return;
+  if (localStorage.moovinPase) entrar(localStorage.moovinPase);
+  else entrarConApp();
 }, 15 * 60 * 1000);
 
 /* ============================ Película ============================ */
@@ -1763,8 +1789,13 @@ $('#pase-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') dePase
     qs.delete('pase');
     try { history.replaceState(null, '', location.pathname + (qs.toString() ? '?' + qs : '')); } catch (e) { /* nada */ }
   }
-  if (await entrar(guardado)) arranca();
-  else { $('#pase').classList.remove('hidden'); $('#pase-in').focus(); }
+  if (await entrar(guardado)) { arranca(); return; }
+  // Naviris trae su propia clave: entra sin que nadie escriba nada, aunque en
+  // este equipo no se haya usado nunca el pase. Se prueba DESPUÉS del pase para
+  // que un pase válido siga mandando, y si falla se cae a la pantalla de
+  // siempre. En cualquier otro navegador esta rama no existe.
+  if (await entrarConApp()) { arranca(); return; }
+  $('#pase').classList.remove('hidden'); $('#pase-in').focus();
 })();
 
 // Gancho de consola para pruebas: window.MOOVIN.sala() / cargar(url) / video

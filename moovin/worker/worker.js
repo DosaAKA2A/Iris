@@ -96,6 +96,27 @@ export default {
       return json(await nuevoToken(env));
     }
 
+    /* Entrar desde Naviris sin escribir nada: la app trae una clave propia y a
+       cambio recibe el MISMO token con caducidad que da el pase.
+
+       Esto NO es tan fuerte como el pase y conviene tenerlo claro: la clave
+       viaja dentro del instalador de Naviris, que se descarga en abierto, y un
+       .asar se abre con cualquier descompresor. O sea que quien se lo proponga
+       puede sacarla. Sirve para que no entre quien tropiece con la URL, no
+       para resistir a alguien decidido. Se aceptó a sabiendas (biblioteca
+       personal, grupo pequeño).
+       Por eso es una credencial APARTE del pase: si algún día hay que rotarla,
+       se cambia NAVIRIS_KEY y se publica una versión nueva de Naviris, sin
+       tocar el pase de quien entra por navegador. */
+    if (url.pathname === '/entrar-app' && req.method === 'POST') {
+      const esperada = (env.NAVIRIS_KEY || '').trim();
+      if (!esperada) return json({ error: 'no configurado' }, 401);
+      let clave = '';
+      try { clave = String((await req.json()).clave || '').trim(); } catch (e) { /* cuerpo raro */ }
+      if (!igual(clave, esperada)) return json({ error: 'clave incorrecta' }, 401);
+      return json(await nuevoToken(env));
+    }
+
     /* ---- de aquí en adelante hace falta el pase (o ser administración) ---- */
     const pasa = admin || await tokenOk(env, url.searchParams.get('t') || bearer);
     const sinPase = () => json({ error: 'hace falta el pase' }, 401);
