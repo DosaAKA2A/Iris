@@ -174,8 +174,12 @@ button.tag:hover{opacity:.7}
 .se-volver:hover{border-color:var(--muted); color:var(--text)}
 .se-volver svg{width:14px; height:14px}
 .se-cab{display:flex; gap:22px; align-items:flex-start}
+/* width y min-width explícitos aparte del flex: en un flex item reemplazado,
+   min-width:auto vale el ancho natural de la imagen (aquí 680 px) y se come
+   la base del flex. */
 .se-poster{
-  flex:0 0 128px; aspect-ratio:2/3; border-radius:10px; object-fit:cover;
+  flex:0 0 128px; width:128px; min-width:0; height:auto;
+  aspect-ratio:2/3; border-radius:10px; object-fit:cover;
   border:1px solid var(--line); background:#141416;
 }
 .se-meta h2{font-size:22px; font-weight:700; letter-spacing:-.015em}
@@ -184,6 +188,8 @@ button.tag:hover{opacity:.7}
   margin-top:11px; font-family:var(--mono); font-size:10px; letter-spacing:.18em;
   text-transform:uppercase; color:var(--dim);
 }
+.se-seguir{margin-top:16px; width:auto; min-width:220px; display:inline-flex; align-items:center; gap:9px; justify-content:center}
+.se-seguir svg{width:15px; height:15px}
 .se-eps{margin-top:26px; display:flex; flex-direction:column; gap:8px}
 .se-ep{
   display:flex; gap:14px; align-items:center; text-align:left; padding:9px;
@@ -217,11 +223,14 @@ button.tag:hover{opacity:.7}
 .se-ep-dl svg{width:15px; height:15px}
 
 /* ---------- Acciones flotantes sobre el video (saltar intro, siguiente) ---------- */
+/* Por encima de la línea de subtítulos, no a su altura: si no, un subtítulo
+   largo y el botón se pisan. Sube con ellos cuando aparece la barra. */
 #acciones{
-  position:absolute; right:20px; bottom:84px; z-index:4;
+  position:absolute; right:20px; bottom:calc(6% + 62px); z-index:4;
   display:flex; flex-direction:column; align-items:flex-end; gap:9px;
-  pointer-events:none;
+  pointer-events:none; transition:bottom .2s;
 }
+#stage.controls #acciones{bottom:152px}
 #acciones button{
   pointer-events:auto; display:inline-flex; align-items:center; gap:8px;
   padding:9px 15px; border-radius:10px; cursor:pointer;
@@ -601,6 +610,7 @@ button.tag:hover{opacity:.7}
               <h2 id="se-tit"></h2>
               <div class="se-sub" id="se-nota"></div>
               <div class="se-cifra" id="se-cifra"></div>
+              <button class="cta se-seguir" id="se-seguir"></button>
             </div>
           </div>
           <div class="se-eps" id="se-eps"></div>
@@ -965,6 +975,12 @@ function rangoIntro() {
   const op = ent && ent.saltos && ent.saltos.op;
   return (op && op.length === 2 && op[1] > op[0]) ? op : null;
 }
+/* El siguiente capítulo va con la barra de controles: aparece al mover el
+   ratón o al pausar, y se va con ella. Fijo en pantalla toda la reproducción
+   estorba y se cruza con los subtítulos.
+   La única excepción es la cuenta atrás del final, que es momentánea y hay
+   que poder cancelarla. */
+function tocaSiguiente() { return stage.classList.contains('controls'); }
 function vaAlSiguiente() {
   const sig = siguienteEp();
   if (!sig) return;
@@ -977,12 +993,14 @@ let firmaAcciones = '';
 function pintaAcciones() {
   const intro0 = rangoIntro(), t0 = video.currentTime;
   const sig0 = siguienteEp();
+  // La cuenta atrás del final manda: ahí el botón sale siempre.
+  const verSig = !!sig0 && (!!acciones.dataset.cuenta || tocaSiguiente());
   // timeupdate salta varias veces por segundo: se repinta solo si cambia algo,
   // que si no se pierden el hover y los clics a medias.
   const firma = [
     video.src ? 1 : 0,
     intro0 && t0 >= intro0[0] && t0 < intro0[1] - 2 ? 1 : 0,
-    sig0 ? (sig0.url || '') : '',
+    verSig ? (sig0.url || '') : '',
     acciones.dataset.cuenta || ''
   ].join('|');
   if (firma === firmaAcciones) return;
@@ -1000,7 +1018,7 @@ function pintaAcciones() {
     b.addEventListener('click', () => { video.currentTime = intro[1]; pintaAcciones(); });
     acciones.appendChild(b);
   }
-  const sig = siguienteEp();
+  const sig = verSig ? sig0 : null;
   if (sig) {
     const b = document.createElement('button');
     if (acciones.dataset.cuenta) b.classList.add('red');
@@ -1518,8 +1536,11 @@ video.addEventListener('dblclick', () => $('#c-fs').click());
 let barT = 0;
 function muestraBarra() {
   stage.classList.add('controls');
+  pintaAcciones();   // el botón de siguiente capítulo acompaña a la barra
   clearTimeout(barT);
-  barT = setTimeout(() => { if (!video.paused) stage.classList.remove('controls'); }, 2600);
+  barT = setTimeout(() => {
+    if (!video.paused) { stage.classList.remove('controls'); pintaAcciones(); }
+  }, 2600);
 }
 stage.addEventListener('mousemove', muestraBarra);
 video.addEventListener('pause', () => { stage.classList.add('controls'); pintaPlay(); });
@@ -1742,8 +1763,30 @@ function abreSerie(t) {
   $('#se-nota').textContent = t.nota || '';
   const eps = t.episodios || [];
   $('#se-cifra').textContent = eps.length + (eps.length === 1 ? ' capítulo' : ' capítulos');
+  pintaSeguir(t);
   pintaEpisodios();
   $('#loader').scrollTop = 0;
+}
+/* Por dónde iba: el primero a medias, o si no el primero sin empezar. Así el
+   botón grande hace lo que se espera sin tener que buscar en la lista. */
+function porDondeIba(t) {
+  const prog = progreso();
+  const eps = t.episodios || [];
+  const medias = eps.find((e) => { const p = prog[absCat(e.url || '')]; return p && p.p > 0.01 && p.p < 0.95; });
+  if (medias) return { ep: medias, seguir: true };
+  const nuevo = eps.find((e) => !prog[absCat(e.url || '')]);
+  return nuevo ? { ep: nuevo, seguir: false } : null;
+}
+function pintaSeguir(t) {
+  const b = $('#se-seguir');
+  const d = porDondeIba(t);
+  if (!d) { b.classList.add('oculto'); return; }
+  b.classList.remove('oculto');
+  b.innerHTML = IC.play;
+  b.appendChild(document.createTextNode(
+    (d.seguir ? 'Seguir con ' : 'Ver ') + 'el capítulo ' +
+    (/^\d+$/.test(String(d.ep.n)) ? Number(d.ep.n) : d.ep.n)));
+  b.onclick = () => reproduceEp(d.ep);
 }
 function cierraSerie() {
   serieAbierta = null;
