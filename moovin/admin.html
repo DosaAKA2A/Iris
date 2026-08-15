@@ -218,7 +218,7 @@ h1{font-size:20px; font-weight:700; letter-spacing:-.01em}
 <script>
 (() => {
 'use strict';
-const W = 'https://cine.studio-iris2026.workers.dev';
+const W = 'https://moovin.studio-iris2026.workers.dev';
 // El bucket ya no es publico: los archivos se piden al worker, que exige pase.
 const MEDIA = W + '/media?key=';
 const urlDe = (key) => MEDIA + encodeURIComponent(key);
@@ -229,7 +229,15 @@ const claveDe = (u) => {
 const PARTE = 48 * 1024 * 1024;   // 48 MB por parte (el worker admite ~100)
 
 const $ = (s) => document.querySelector(s);
-let TOK = localStorage.cineAdminTok || '';
+/* La clave de administración se guardaba con el nombre anterior del sitio:
+   se pasa una vez a la nueva para no tener que volver a escribirla. */
+try {
+  if (localStorage.cineAdminTok) {
+    if (!localStorage.moovinAdminTok) localStorage.moovinAdminTok = localStorage.cineAdminTok;
+    localStorage.removeItem('cineAdminTok');
+  }
+} catch (e) { /* sin localStorage no hay nada que migrar */ }
+let TOK = localStorage.moovinAdminTok || '';
 let catalogo = { titulos: [] };
 let paseTok = '';
 // Token de un dia para que las miniaturas del bucket se puedan ver aqui.
@@ -260,7 +268,7 @@ async function entrar(clave) {
   TOK = clave.trim();
   const ok = await fetch(W + '/api/check', { headers: H() }).then((r) => r.ok).catch(() => false);
   if (!ok) { TOK = ''; $('#g-err').classList.remove('hidden'); return; }
-  localStorage.cineAdminTok = TOK;
+  localStorage.moovinAdminTok = TOK;
   paseTok = await fetch(W + '/api/pase', { headers: H() })
     .then((r) => r.json()).then((j) => j.token || '').catch(() => '');
   $('#gate').classList.add('hidden');
@@ -281,21 +289,21 @@ async function guardaCatalogo() {
     method: 'PUT', headers: { ...H(), 'Content-Type': 'application/json' },
     body: JSON.stringify(catalogo, null, 2)
   });
-  if (r.status === 401) { localStorage.cineAdminTok = ''; location.reload(); return false; }
+  if (r.status === 401) { localStorage.moovinAdminTok = ''; location.reload(); return false; }
   if (!r.ok) { toast('No se pudo guardar el catálogo'); return false; }
   return true;
 }
 function pintaLista() {
   const el = $('#lista'); el.innerHTML = '';
   $('#p-resumen').textContent = catalogo.titulos.length
-    ? catalogo.titulos.length + ' título' + (catalogo.titulos.length === 1 ? '' : 's') + ' publicados en iris.it.com/cine'
+    ? catalogo.titulos.length + ' título' + (catalogo.titulos.length === 1 ? '' : 's') + ' publicados en iris.it.com/moovin'
     : 'La biblioteca está vacía: agrega el primer título.';
   catalogo.titulos.forEach((t, idx) => {
     const fila = document.createElement('div'); fila.className = 'fila';
     const mini = document.createElement('div'); mini.className = 'mini';
     if (t.poster) {
       const im = document.createElement('img'); im.alt = '';
-      im.src = conPase(new URL(t.poster, 'https://iris.it.com/cine/').href);
+      im.src = conPase(new URL(t.poster, 'https://iris.it.com/moovin/').href);
       mini.appendChild(im);
     }
     else mini.textContent = (t.titulo || '?').slice(0, 2).toUpperCase();

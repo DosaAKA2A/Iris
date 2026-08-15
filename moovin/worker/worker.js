@@ -9,12 +9,12 @@
 
    Público:
      GET  /health                  -> ok
-     POST /entrar {pase}           -> {token, exp}; el pase es el secret CINE_PASE
+     POST /entrar {pase}           -> {token, exp}; el pase es el secret MOOVIN_PASE
    Con pase (?t=<token> o Authorization: Bearer <token>):
      GET /catalogo                 -> biblioteca.json guardado en el bucket
      GET /media?key=               -> el objeto para reproducir (con rangos)
      GET /descargar?key=&n=        -> el mismo objeto como adjunto
-   Con token de administración (Authorization: Bearer <CINE_TOKEN>):
+   Con token de administración (Authorization: Bearer <MOOVIN_TOKEN>):
      GET  /api/check               -> comprueba el token
      PUT  /api/catalogo            -> reemplaza biblioteca.json (valida JSON)
      PUT  /api/objeto?key=...      -> sube un objeto pequeño (póster, subs)
@@ -27,14 +27,14 @@
    Las películas se suben por partes porque cada request a un Worker admite
    ~100 MB de cuerpo; el backoffice trocea el archivo y las une R2.
 
-   El token del pase va firmado (HMAC-SHA256 con CINE_TOKEN de clave) y lleva
+   El token del pase va firmado (HMAC-SHA256 con MOOVIN_TOKEN de clave) y lleva
    dentro su caducidad, así que no hace falta guardar nada: el worker lo
    verifica solo. Dura un día, que da de sobra para ver la película y para
    descargarla, y un enlace que se escape deja de servir al caducar.
 
    Desplegar:  npx wrangler deploy      (desde cine/worker/)
-   Secretos:   npx wrangler secret put CINE_TOKEN   (administración)
-               npx wrangler secret put CINE_PASE    (pase de la biblioteca)
+   Secretos:   npx wrangler secret put MOOVIN_TOKEN   (administración)
+               npx wrangler secret put MOOVIN_PASE    (pase de la biblioteca)
 */
 const TTL_PASE = 24 * 3600;
 
@@ -51,7 +51,7 @@ function igual(a, b) {
 }
 async function firma(env, texto) {
   const clave = await crypto.subtle.importKey(
-    'raw', new TextEncoder().encode((env.CINE_TOKEN || '').trim()),
+    'raw', new TextEncoder().encode((env.MOOVIN_TOKEN || '').trim()),
     { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
   );
   return b64url(await crypto.subtle.sign('HMAC', clave, new TextEncoder().encode(texto)));
@@ -86,13 +86,13 @@ export default {
 
     /* trim(): al poner un secret por stdin en Windows se cuela un \r final. */
     const bearer = (req.headers.get('Authorization') || '').trim().replace(/^Bearer\s+/i, '');
-    const admin = igual(bearer, (env.CINE_TOKEN || '').trim());
+    const admin = igual(bearer, (env.MOOVIN_TOKEN || '').trim());
 
     /* Entrar con el pase de la biblioteca -> token firmado con caducidad. */
     if (url.pathname === '/entrar' && req.method === 'POST') {
       let pase = '';
       try { pase = String((await req.json()).pase || '').trim(); } catch (e) { /* cuerpo raro */ }
-      if (!igual(pase, (env.CINE_PASE || '').trim())) return json({ error: 'pase incorrecto' }, 401);
+      if (!igual(pase, (env.MOOVIN_PASE || '').trim())) return json({ error: 'pase incorrecto' }, 401);
       return json(await nuevoToken(env));
     }
 
@@ -102,7 +102,7 @@ export default {
 
     if (url.pathname === '/catalogo' && req.method === 'GET') {
       if (!pasa) return sinPase();
-      const obj = await env.CINE.get('biblioteca.json');
+      const obj = await env.MOOVIN.get('biblioteca.json');
       if (!obj) return json({ titulos: [] });
       return new Response(obj.body, {
         headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
@@ -124,7 +124,7 @@ export default {
       }
       const rango = req.headers.get('range');
       let obj;
-      try { obj = await env.CINE.get(key, { range: req.headers }); }
+      try { obj = await env.MOOVIN.get(key, { range: req.headers }); }
       catch (e) { return json({ error: 'rango invalido' }, 416); }
       if (!obj) return json({ error: 'no existe' }, 404);
       const h = new Headers(cors);
@@ -165,7 +165,7 @@ export default {
       let parsed;
       try { parsed = JSON.parse(body); } catch (e) { return json({ error: 'JSON invalido' }, 400); }
       if (!parsed || !Array.isArray(parsed.titulos)) return json({ error: 'falta titulos[]' }, 400);
-      await env.CINE.put('biblioteca.json', body, {
+      await env.MOOVIN.put('biblioteca.json', body, {
         httpMetadata: { contentType: 'application/json' }
       });
       return json({ ok: true, n: parsed.titulos.length });
@@ -175,13 +175,13 @@ export default {
       const key = url.searchParams.get('key') || '';
       if (!key || key === 'biblioteca.json' || key.indexOf('..') !== -1) return json({ error: 'key invalida' }, 400);
       if (req.method === 'PUT') {
-        await env.CINE.put(key, req.body, {
+        await env.MOOVIN.put(key, req.body, {
           httpMetadata: { contentType: req.headers.get('Content-Type') || 'application/octet-stream' }
         });
         return json({ ok: true, key });
       }
       if (req.method === 'DELETE') {
-        await env.CINE.delete(key);
+        await env.MOOVIN.delete(key);
         return json({ ok: true });
       }
       return json({ error: 'metodo' }, 405);
@@ -190,7 +190,7 @@ export default {
     if (url.pathname === '/api/multipart/create' && req.method === 'POST') {
       const { key, contentType } = await req.json();
       if (!key || key === 'biblioteca.json') return json({ error: 'key invalida' }, 400);
-      const up = await env.CINE.createMultipartUpload(key, {
+      const up = await env.MOOVIN.createMultipartUpload(key, {
         httpMetadata: { contentType: contentType || 'video/mp4' }
       });
       return json({ uploadId: up.uploadId });
@@ -201,7 +201,7 @@ export default {
       const uploadId = url.searchParams.get('uploadId');
       const part = parseInt(url.searchParams.get('part'), 10);
       if (!key || !uploadId || !(part >= 1)) return json({ error: 'parametros' }, 400);
-      const up = env.CINE.resumeMultipartUpload(key, uploadId);
+      const up = env.MOOVIN.resumeMultipartUpload(key, uploadId);
       try {
         const p = await up.uploadPart(part, req.body);
         return json({ etag: p.etag, part });
@@ -212,7 +212,7 @@ export default {
 
     if (url.pathname === '/api/multipart/complete' && req.method === 'POST') {
       const { key, uploadId, parts } = await req.json();
-      const up = env.CINE.resumeMultipartUpload(key, uploadId);
+      const up = env.MOOVIN.resumeMultipartUpload(key, uploadId);
       try {
         await up.complete((parts || []).map((p) => ({ partNumber: p.part, etag: p.etag })));
         return json({ ok: true, key });
@@ -223,7 +223,7 @@ export default {
 
     if (url.pathname === '/api/multipart/abort' && req.method === 'POST') {
       const { key, uploadId } = await req.json();
-      try { await env.CINE.resumeMultipartUpload(key, uploadId).abort(); } catch (e) { /* ya no existe */ }
+      try { await env.MOOVIN.resumeMultipartUpload(key, uploadId).abort(); } catch (e) { /* ya no existe */ }
       return json({ ok: true });
     }
 

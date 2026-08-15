@@ -653,7 +653,28 @@ button.tag:hover{opacity:.7}
 'use strict';
 
 const SERVER = localStorage.__navPartyServer || 'wss://naviris-party.studio-iris2026.workers.dev';
-const CINE_API = 'https://cine.studio-iris2026.workers.dev';
+const MOOVIN_API = 'https://moovin.studio-iris2026.workers.dev';
+
+/* Las preferencias y el pase se guardaban con el nombre anterior del sitio.
+   Se pasan una sola vez al nombre nuevo y se borran las viejas, para que a
+   nadie le toque volver a escribir el pase ni recolocar los subtítulos. */
+(function migraClaves() {
+  var pares = [
+    ['cinePase', 'moovinPase'], ['cineAudio', 'moovinAudio'],
+    ['cineSubs', 'moovinSubs'], ['cineSubTam', 'moovinSubTam'],
+    ['cineSubEst', 'moovinSubEst'], ['cineVol', 'moovinVol']
+  ];
+  try {
+    for (var i = 0; i < pares.length; i++) {
+      var viejo = pares[i][0], nuevo = pares[i][1], v = localStorage.getItem(viejo);
+      if (v !== null) {
+        if (localStorage.getItem(nuevo) === null) localStorage.setItem(nuevo, v);
+        localStorage.removeItem(viejo);
+      }
+    }
+  } catch (e) { /* sin localStorage no hay nada que migrar */ }
+})();
+
 const DRIFT = 1.5;     // segundos de desvío tolerado antes de re-seek
 const ECHO_MS = 900;   // ventana ignorando eventos locales tras aplicar un remoto
 
@@ -681,14 +702,14 @@ function toast(text) {
    La biblioteca es privada: el bucket ya no tiene URL pública y el worker no
    suelta ni el catálogo ni un solo archivo sin un token firmado. El token sale
    del pase, dura un día y se pide en cada carga; el pase se queda guardado
-   aquí. Naviris lo pone solo (window.__navCinePase desde su preload), así que
+   aquí. Naviris lo pone solo (window.__navMoovinPase desde su preload), así que
    allí esta pantalla no llega a verse. */
 let pase = { token: '', exp: 0 };
 
 async function entrar(codigo) {
   if (!codigo) return false;
   try {
-    const r = await fetch(CINE_API + '/entrar', {
+    const r = await fetch(MOOVIN_API + '/entrar', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pase: String(codigo).trim() })
     });
@@ -696,7 +717,7 @@ async function entrar(codigo) {
     const j = await r.json();
     if (!j.token) return false;
     pase = { token: j.token, exp: j.exp || 0 };
-    localStorage.cinePase = String(codigo).trim();
+    localStorage.moovinPase = String(codigo).trim();
     return true;
   } catch (e) { return false; }
 }
@@ -704,13 +725,13 @@ async function entrar(codigo) {
    del propio sitio) se queda como está. Ojo: la identidad de la película que
    viaja por la sala NO lleva token, solo la URL con la que se pide el archivo. */
 function conPase(u) {
-  if (!u || !pase.token || String(u).indexOf(CINE_API) !== 0) return u;
+  if (!u || !pase.token || String(u).indexOf(MOOVIN_API) !== 0) return u;
   return u + (u.indexOf('?') === -1 ? '?' : '&') + 't=' + encodeURIComponent(pase.token);
 }
 // El token dura un día; se renueva sin molestar cuando le queda poco.
 setInterval(() => {
   const quedan = pase.exp - Math.floor(Date.now() / 1000);
-  if (pase.token && quedan < 3600) entrar(localStorage.cinePase);
+  if (pase.token && quedan < 3600) entrar(localStorage.moovinPase);
 }, 15 * 60 * 1000);
 
 /* ============================ Película ============================ */
@@ -859,7 +880,7 @@ async function addTrackURL(label, url) {
   // Siempre fetch -> blob: un <track> con URL de otro origen (p. ej. el bucket
   // R2) exige CORS en el elemento <video>; el blob es del propio origen y
   // funciona con cualquier fuente de video. Además convierte .srt al vuelo.
-  const activar = (localStorage.cineSubs || '') === label;
+  const activar = (localStorage.moovinSubs || '') === label;
   try {
     const text = await fetch(url).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); });
     addTrack(label, URL.createObjectURL(new Blob([aVtt(text)], { type: 'text/vtt' })), activar);
@@ -870,7 +891,7 @@ function addTrackFile(label, file, activar) {
     const rd = new FileReader();
     rd.onload = () => {
       addTrack(label, URL.createObjectURL(new Blob([aVtt(rd.result)], { type: 'text/vtt' })),
-        activar !== undefined ? activar : (localStorage.cineSubs || '') === label);
+        activar !== undefined ? activar : (localStorage.moovinSubs || '') === label);
       listo();
     };
     rd.onerror = () => listo();
@@ -893,7 +914,7 @@ async function ponSubs(cat, locales) {
 function cargarSubs(file) {
   const nombre = sinExt(file.name);
   addTrackFile(nombre, file, true).then(() => {
-    localStorage.cineSubs = nombre;
+    localStorage.moovinSubs = nombre;
     toast('Subtítulos cargados: ' + file.name);
   });
 }
@@ -906,7 +927,7 @@ function pistaSel() {
 }
 function eligeSub(label) {
   subSel = label;
-  localStorage.cineSubs = label === null ? '' : label;
+  localStorage.moovinSubs = label === null ? '' : label;
   pintaCues(); ccPinta();
 }
 /* Los .srt vienen partidos para pantallas estrechas (aquí hay 54 diálogos de
@@ -963,16 +984,16 @@ const TAM_SUBS = [['s', 'Pequeño'], ['m', 'Mediano'], ['l', 'Grande'], ['xl', '
 const EST_SUBS = [['caja', 'Recuadro'], ['sombra', 'Sombra'], ['borde', 'Bordes']];
 function ponTamSub(t) {
   if (!TAM_SUBS.some((x) => x[0] === t)) t = 'm';
-  localStorage.cineSubTam = t;
+  localStorage.moovinSubTam = t;
   TAM_SUBS.forEach((x) => $('#subs').classList.toggle('cue-' + x[0], x[0] === t));
 }
 function ponEstSub(e) {
   if (!EST_SUBS.some((x) => x[0] === e)) e = 'caja';
-  localStorage.cineSubEst = e;
+  localStorage.moovinSubEst = e;
   EST_SUBS.forEach((x) => $('#subs').classList.toggle('est-' + x[0], x[0] === e));
 }
-ponTamSub(localStorage.cineSubTam || 'm');
-ponEstSub(localStorage.cineSubEst || 'caja');
+ponTamSub(localStorage.moovinSubTam || 'm');
+ponEstSub(localStorage.moovinSubEst || 'caja');
 
 /* ============================ Pistas de audio ============================
    Un <video> solo suena la pista incrustada en su archivo, así que los demás
@@ -999,7 +1020,7 @@ function ponAudios(cat, locales) {
   });
   if (!audios.length) audios.push({ label: 'Original', url: '' });
   loc.filter((l) => !l.usado).forEach((l) => audios.push({ label: l.label, url: l.url, local: true }));
-  const guardado = localStorage.cineAudio || '';
+  const guardado = localStorage.moovinAudio || '';
   audioSel = audios.some((a) => a.label === guardado) ? guardado : audios[0].label;
   aplicaAudio();
 }
@@ -1049,7 +1070,7 @@ function audioPlay() {
 }
 function eligeAudio(label) {
   audioSel = label;
-  localStorage.cineAudio = label;
+  localStorage.moovinAudio = label;
   aplicaAudio();
   toast('Audio: ' + label);
 }
@@ -1122,10 +1143,10 @@ seek.addEventListener('change', () => {
 });
 vol.addEventListener('input', () => {
   userVol = vol.value / 100; userMute = false;
-  localStorage.cineVol = vol.value;
+  localStorage.moovinVol = vol.value;
   aplicaVolumen();
 });
-if (localStorage.cineVol) userVol = Math.max(0, Math.min(1, localStorage.cineVol / 100));
+if (localStorage.moovinVol) userVol = Math.max(0, Math.min(1, localStorage.moovinVol / 100));
 $('#c-mute').addEventListener('click', () => { userMute = !userMute; aplicaVolumen(); });
 aplicaVolumen();
 $('#c-play').addEventListener('click', () => { if (video.src) { video.paused ? playSafe() : video.pause(); } });
@@ -1170,9 +1191,9 @@ function ccMuestra() {
   menuItem(ccMenu, 'Sin subtítulos', subSel === null, () => eligeSub(null));
   menuItem(ccMenu, 'Cargar archivo…', false, () => $('#in-subs').click());
   // Filas de muestras: no cierran el menú, así se compara sobre la escena.
-  chips('Tamaño', 'cc-tam', TAM_SUBS, localStorage.cineSubTam || 'm', ponTamSub,
+  chips('Tamaño', 'cc-tam', TAM_SUBS, localStorage.moovinSubTam || 'm', ponTamSub,
     () => document.createTextNode('A'));
-  chips('Estilo', 'cc-est', EST_SUBS, localStorage.cineSubEst || 'caja', ponEstSub, (id) => {
+  chips('Estilo', 'cc-est', EST_SUBS, localStorage.moovinSubEst || 'caja', ponEstSub, (id) => {
     const s = document.createElement('span');
     s.className = 'm-' + id; s.textContent = 'Aa';
     return s;
@@ -1293,11 +1314,11 @@ function nombreDescarga(key) {
 // La misma clave del bucket, pero por la ruta que la manda como adjunto.
 function urlDescarga(url) {
   const u = absCat(url);
-  if (u.indexOf(CINE_API + '/media?') !== 0) return u;
+  if (u.indexOf(MOOVIN_API + '/media?') !== 0) return u;
   let key = '';
   try { key = new URL(u).searchParams.get('key') || ''; } catch (e) { return u; }
   if (!key) return u;
-  return conPase(CINE_API + '/descargar?key=' + encodeURIComponent(key)
+  return conPase(MOOVIN_API + '/descargar?key=' + encodeURIComponent(key)
     + '&n=' + encodeURIComponent(nombreDescarga(key)));
 }
 function fmtTam(b) {
@@ -1390,7 +1411,7 @@ function pintaBiblioteca(bib) {
 // El catálogo vive en R2 y lo sirve el worker (lo edita el backoffice). El
 // biblioteca.json del repo queda de respaldo por si el worker no responde.
 function cargaCatalogo() {
-  return fetch(conPase(CINE_API + '/catalogo'), { cache: 'no-store' })
+  return fetch(conPase(MOOVIN_API + '/catalogo'), { cache: 'no-store' })
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then((b) => { bibData = b; pintaBiblioteca(b); aplicaCatalogoActual(); })
     .catch(() => pintaBiblioteca(null));
@@ -1737,7 +1758,7 @@ $('#pase-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') dePase
 (async () => {
   // El pase puede venir de Naviris, de una visita anterior o del enlace. Si
   // viene en el enlace se borra de la URL en cuanto se usa.
-  const guardado = window.__navCinePase || localStorage.cinePase || qs.get('pase') || '';
+  const guardado = window.__navMoovinPase || localStorage.moovinPase || qs.get('pase') || '';
   if (qs.get('pase')) {
     qs.delete('pase');
     try { history.replaceState(null, '', location.pathname + (qs.toString() ? '?' + qs : '')); } catch (e) { /* nada */ }
@@ -1746,8 +1767,8 @@ $('#pase-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') dePase
   else { $('#pase').classList.remove('hidden'); $('#pase-in').focus(); }
 })();
 
-// Gancho de consola para pruebas: window.CINE.sala() / cargar(url) / video
-window.CINE = {
+// Gancho de consola para pruebas: window.MOOVIN.sala() / cargar(url) / video
+window.MOOVIN = {
   sala: () => sala, cargar: cargarURL, video, audio: a2, enviar: send, entrar, arranca,
   audios: () => audios, eligeAudio, eligeSub, tamSub: ponTamSub, estSub: ponEstSub,
   descarga: () => abreDescarga(entradaDe(curV))
