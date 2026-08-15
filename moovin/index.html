@@ -152,6 +152,92 @@ button.tag:hover{opacity:.7}
 .lib-card:hover .lib-dl,.lib-dl:focus-visible{opacity:1}
 .lib-dl:hover{color:var(--text)}
 .lib-dl svg{width:14px; height:14px}
+/* Marca de serie sobre la miniatura: una serie no se reproduce al tocarla,
+   abre su lista de capítulos, y conviene que se note antes de hacer clic. */
+.lib-eps{
+  position:absolute; right:7px; bottom:7px; padding:2px 7px; border-radius:6px;
+  background:rgba(0,0,0,.72); font-family:var(--mono); font-size:10.5px;
+  color:var(--text); display:flex; align-items:center; gap:5px;
+}
+.lib-eps svg{width:11px; height:11px}
+
+/* ---------- Serie: cabecera y lista de capítulos ---------- */
+#serie{display:none}
+#serie.on{display:block}
+.oculto{display:none !important}
+.se-volver{
+  display:inline-flex; align-items:center; gap:7px; margin-bottom:20px; padding:6px 12px 6px 9px;
+  border:1px solid var(--line); border-radius:999px; background:transparent;
+  color:var(--muted); font-size:12px; font-weight:500; cursor:pointer;
+  transition:border-color .12s,color .12s;
+}
+.se-volver:hover{border-color:var(--muted); color:var(--text)}
+.se-volver svg{width:14px; height:14px}
+.se-cab{display:flex; gap:22px; align-items:flex-start}
+.se-poster{
+  flex:0 0 128px; aspect-ratio:2/3; border-radius:10px; object-fit:cover;
+  border:1px solid var(--line); background:#141416;
+}
+.se-meta h2{font-size:22px; font-weight:700; letter-spacing:-.015em}
+.se-meta .se-sub{margin-top:7px; font-size:12.5px; color:var(--muted); line-height:1.6; max-width:520px}
+.se-meta .se-cifra{
+  margin-top:11px; font-family:var(--mono); font-size:10px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--dim);
+}
+.se-eps{margin-top:26px; display:flex; flex-direction:column; gap:8px}
+.se-ep{
+  display:flex; gap:14px; align-items:center; text-align:left; padding:9px;
+  border:1px solid var(--line); border-radius:12px; background:var(--bg);
+  cursor:pointer; transition:border-color .15s,background .15s;
+}
+.se-ep:hover{border-color:var(--muted); background:rgba(255,255,255,.04)}
+.se-ep.actual{border-color:var(--red)}
+.se-ep-mini{
+  position:relative; flex:0 0 152px; aspect-ratio:16/9; border-radius:8px;
+  overflow:hidden; background:#141416;
+}
+.se-ep-mini img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+.se-ep-mini .dur{
+  position:absolute; right:5px; bottom:5px; padding:1px 6px; border-radius:5px;
+  background:rgba(0,0,0,.76); font-family:var(--mono); font-size:10px;
+}
+.se-ep-prog{position:absolute; left:0; right:0; bottom:0; height:3px; background:rgba(255,255,255,.2)}
+.se-ep-prog i{display:block; height:100%; background:var(--red)}
+.se-ep-txt{flex:1 1 auto; min-width:0}
+.se-ep-n{font-family:var(--mono); font-size:10px; letter-spacing:.18em; color:var(--dim); text-transform:uppercase}
+.se-ep-tit{margin-top:3px; font-size:13px; font-weight:700; line-height:1.35}
+.se-ep-nota{margin-top:4px; font-size:11.5px; color:var(--muted); line-height:1.5}
+.se-ep-dl{
+  flex:0 0 auto; width:30px; height:30px; padding:0; display:flex;
+  align-items:center; justify-content:center; border-radius:8px;
+  border:1px solid transparent; background:transparent; color:var(--dim);
+  transition:color .12s,border-color .12s;
+}
+.se-ep-dl:hover{color:var(--text); border-color:var(--line-2)}
+.se-ep-dl svg{width:15px; height:15px}
+
+/* ---------- Acciones flotantes sobre el video (saltar intro, siguiente) ---------- */
+#acciones{
+  position:absolute; right:20px; bottom:84px; z-index:4;
+  display:flex; flex-direction:column; align-items:flex-end; gap:9px;
+  pointer-events:none;
+}
+#acciones button{
+  pointer-events:auto; display:inline-flex; align-items:center; gap:8px;
+  padding:9px 15px; border-radius:10px; cursor:pointer;
+  border:1px solid var(--line-2); background:rgba(14,14,16,.92);
+  backdrop-filter:blur(8px); color:var(--text);
+  font-size:12.5px; font-weight:700; letter-spacing:-.005em;
+  transition:border-color .12s,background .12s;
+}
+#acciones button:hover{border-color:var(--muted); background:rgba(24,24,27,.96)}
+#acciones button.red{background:var(--red); border-color:var(--red)}
+#acciones button.red:hover{background:#e5533d; border-color:#e5533d}
+#acciones button svg{width:15px; height:15px}
+#acciones .sig-nota{
+  max-width:260px; font-size:11.5px; font-weight:400; color:var(--muted);
+  line-height:1.45; text-align:right;
+}
 
 /* ---------- Hoja de descarga ---------- */
 /* Para el Watch Party conviene tener la copia en el disco: así nadie se
@@ -487,16 +573,40 @@ button.tag:hover{opacity:.7}
     <audio id="a2" preload="auto"></audio>
     <div id="subs"></div>
 
+    <!-- Saltar intro y siguiente capítulo. Solo aparecen cuando toca: la
+         intro sale del capítulo OP del Bluray y el siguiente, de la posición
+         del episodio dentro de su serie. -->
+    <div id="acciones"></div>
+
     <!-- Biblioteca (velo de inicio y de cambio de película) -->
     <div id="loader" class="veil">
       <div class="lib">
         <button id="loader-close" title="Cerrar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18L18 6M6 6L18 18"/></svg>
         </button>
-        <h1>MOOVIN</h1>
-        <div class="sub">La biblioteca del estudio. Elige un título y, si están en una sala de Watch Party, se abre solo en la pantalla de todos.</div>
+        <h1 id="lib-h1">MOOVIN</h1>
+        <div class="sub" id="lib-sub">La biblioteca del estudio. Elige un título y, si están en una sala de Watch Party, se abre solo en la pantalla de todos.</div>
         <div id="lib-grid"></div>
-        <div class="lib-otra">
+
+        <!-- Vista de una serie: sustituye a la rejilla sin salir del velo, para
+             no perder el reproductor ni la sala que ya estén en marcha. -->
+        <div id="serie">
+          <button class="se-volver" id="se-volver">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+            Biblioteca
+          </button>
+          <div class="se-cab">
+            <img class="se-poster" id="se-poster" alt="" />
+            <div class="se-meta">
+              <h2 id="se-tit"></h2>
+              <div class="se-sub" id="se-nota"></div>
+              <div class="se-cifra" id="se-cifra"></div>
+            </div>
+          </div>
+          <div class="se-eps" id="se-eps"></div>
+        </div>
+
+        <div class="lib-otra" id="lib-otra">
           <div class="lbl">Otra fuente</div>
           <div class="fieldrow">
             <input id="in-url" class="in" type="url" placeholder="Enlace directo del video (https://…/pelicula.mp4)" />
@@ -812,14 +922,19 @@ function cargarURL(url, opts) {
   limpiaSubs();
   // Si la URL está en la biblioteca, se toman su nombre y sus pistas (también
   // cuando la manda la sala y no un clic en la tarjeta).
-  const ent = entradaDe(curV);
-  ponNombre(opts.nombre || (ent && ent.titulo) || (url ? tituloDe(url) : 'Película'));
+  const ubi = ubicaDe(curV);
+  const ent = ubi ? ubi.ent : null;
+  ponNombre(opts.nombre || nombreDe(ubi) || (url ? tituloDe(url) : 'Película'));
   ponAudios(ent ? ent.audios : null, opts.audios);
   ponSubs(ent ? ent.subs : null, opts.subs);
+  // Reanudar: el <video> aún no sabe su duración, así que se espera al metadata.
+  reanudarEn = opts.desde > 0 ? opts.desde : 0;
   $('#loader').classList.add('hidden');
   $('#dl').classList.add('hidden');
   actualizarShare();
   pintaPeli();
+  pintaAcciones();
+  if (serieAbierta) pintaEpisodios();
   if (!opts.remoto && sala && (sala.host || !sala.navLock)) {
     send({ t: 'ev', kind: 'nav', url: shareUrl(), at: Date.now() });
     logAct(sala.name, 'cambió la película de la sala');
@@ -829,6 +944,123 @@ function cargarURL(url, opts) {
     logSys('Descárgala desde el panel y ábrela con "Usar mi copia": se ve sin cortes');
   }
 }
+/* ---------- Saltar intro y siguiente capítulo ----------
+   Los dos botones viven sobre el video y solo salen cuando aplican. Los
+   tiempos de la intro salen de los capítulos del Bluray (OP), que el
+   conversor guarda en el catálogo; el siguiente capítulo, de la posición del
+   episodio dentro de su serie. */
+let reanudarEn = 0;
+let autoSig = null;          // temporizador del paso automático al terminar
+const acciones = $('#acciones');
+
+function siguienteEp() {
+  const u = ubicaDe(curV);
+  if (!u || !u.serie) return null;
+  const eps = u.serie.episodios || [];
+  const sig = eps[u.idx + 1];
+  return (sig && sig.url) ? sig : null;
+}
+function rangoIntro() {
+  const ent = entradaDe(curV);
+  const op = ent && ent.saltos && ent.saltos.op;
+  return (op && op.length === 2 && op[1] > op[0]) ? op : null;
+}
+function vaAlSiguiente() {
+  const sig = siguienteEp();
+  if (!sig) return;
+  paraAuto();
+  reproduceEp(sig);
+}
+function paraAuto() { if (autoSig) { clearTimeout(autoSig); autoSig = null; } acciones.dataset.cuenta = ''; }
+
+let firmaAcciones = '';
+function pintaAcciones() {
+  const intro0 = rangoIntro(), t0 = video.currentTime;
+  const sig0 = siguienteEp();
+  // timeupdate salta varias veces por segundo: se repinta solo si cambia algo,
+  // que si no se pierden el hover y los clics a medias.
+  const firma = [
+    video.src ? 1 : 0,
+    intro0 && t0 >= intro0[0] && t0 < intro0[1] - 2 ? 1 : 0,
+    sig0 ? (sig0.url || '') : '',
+    acciones.dataset.cuenta || ''
+  ].join('|');
+  if (firma === firmaAcciones) return;
+  firmaAcciones = firma;
+
+  acciones.innerHTML = '';
+  if (!video.src) return;
+  const intro = intro0;
+  const t = t0;
+  // La intro solo se ofrece mientras dura y con margen para que dé tiempo.
+  if (intro && t >= intro[0] && t < intro[1] - 2) {
+    const b = document.createElement('button');
+    b.innerHTML = IC.saltar;
+    b.appendChild(document.createTextNode('Saltar intro'));
+    b.addEventListener('click', () => { video.currentTime = intro[1]; pintaAcciones(); });
+    acciones.appendChild(b);
+  }
+  const sig = siguienteEp();
+  if (sig) {
+    const b = document.createElement('button');
+    if (acciones.dataset.cuenta) b.classList.add('red');
+    b.innerHTML = IC.siguiente;
+    b.appendChild(document.createTextNode(
+      acciones.dataset.cuenta ? 'Siguiente en ' + acciones.dataset.cuenta : 'Siguiente capítulo'));
+    b.addEventListener('click', vaAlSiguiente);
+    acciones.appendChild(b);
+    if (acciones.dataset.cuenta) {
+      const n = document.createElement('div'); n.className = 'sig-nota';
+      n.textContent = etiquetaEp(sig) + ' — ' + (sig.titulo || '');
+      acciones.appendChild(n);
+    }
+  }
+}
+
+video.addEventListener('loadedmetadata', () => {
+  if (reanudarEn > 0 && video.duration && reanudarEn < video.duration - 10) {
+    mute = Date.now() + ECHO_MS;
+    video.currentTime = reanudarEn;
+  }
+  reanudarEn = 0;
+  pintaAcciones();
+});
+let ultimoGuardado = 0;
+video.addEventListener('timeupdate', () => {
+  const ahora = Date.now();
+  if (curV && video.duration && ahora - ultimoGuardado > 5000) {
+    ultimoGuardado = ahora;
+    guardaProgreso(curV, video.currentTime, video.duration);
+  }
+  pintaAcciones();
+});
+video.addEventListener('pause', () => {
+  if (curV && video.duration) guardaProgreso(curV, video.currentTime, video.duration);
+});
+video.addEventListener('seeked', pintaAcciones);
+/* Al terminar se pasa solo al siguiente, con margen para cancelarlo.
+   En una sala solo lo hace el anfitrión: si lo hiciera todo el mundo, cada
+   quien mandaría su propio cambio de capítulo y se pisarían. Los invitados
+   llegan igual, siguiendo el cambio del anfitrión. */
+video.addEventListener('ended', () => {
+  paraAuto();
+  const sig = siguienteEp();
+  if (!sig) { pintaAcciones(); return; }
+  if (sala && !sala.host) { pintaAcciones(); return; }
+  let quedan = 8;
+  const paso = () => {
+    if (!siguienteEp()) { paraAuto(); pintaAcciones(); return; }
+    acciones.dataset.cuenta = quedan + ' s';
+    pintaAcciones();
+    if (quedan <= 0) { vaAlSiguiente(); return; }
+    quedan--;
+    autoSig = setTimeout(paso, 1000);
+  };
+  paso();
+});
+video.addEventListener('play', paraAuto);
+video.addEventListener('seeking', paraAuto);
+
 /* Archivos del disco: el video y, si vienen, sus pistas de audio y de
    subtítulos. Si ya había un título del catálogo puesto, la identidad de la
    sala se conserva: la copia local sigue sincronizada con los demás. */
@@ -1133,7 +1365,10 @@ const IC = {
   open: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/></svg>',
   fs: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>',
   audio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.62a48.47 48.47 0 0 1 6-.37m0 0c1.12 0 2.23.04 3.33.11M9 5.25V3m3.33 2.36C11.18 10.66 7.69 15.08 3 17.5m9.33-12.14c.9.06 1.79.15 2.67.26m-4.59 8.5a18.02 18.02 0 0 1-3.83-5.8"/></svg>',
-  descarga: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>'
+  descarga: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>',
+  capitulos: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>',
+  siguiente: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.25l9 6.75-9 6.75V5.25ZM18.75 5.25v13.5"/></svg>',
+  saltar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.25 12 12l-9 6.75V5.25ZM12.75 5.25 21.75 12l-9 6.75V5.25Z"/></svg>'
 };
 $('#c-play').innerHTML = IC.play;
 $('#c-audio').innerHTML = IC.audio;
@@ -1267,6 +1502,10 @@ document.addEventListener('click', (e) => {
 /* Volver a la biblioteca, desde la marca del encabezado o desde los controles.
    La X para cerrarla solo sale si hay algo a lo que volver. */
 function abreBiblioteca() {
+  // Si lo que suena es un capítulo, se entra directo a su lista: es lo que se
+  // busca al abrir la biblioteca a media serie.
+  const u = ubicaDe(curV);
+  if (u && u.serie) { abreSerie(u.serie); } else if (serieAbierta) { pintaEpisodios(); }
   $('#loader').classList.remove('hidden');
   $('#loader-close').style.display = video.src ? 'flex' : 'none';
 }
@@ -1335,7 +1574,10 @@ $('#loader-close').addEventListener('click', () => $('#loader').classList.add('h
 function nombreDescarga(key) {
   const p = key.split('/').filter(Boolean);
   const base = p[p.length - 1];
-  return p.length > 1 ? p[1] + '-' + base : base;
+  // Se cuelga del nombre todo lo que hay entre la carpeta raíz y el archivo:
+  // con series (series/steins-gate/e01/video.mp4) quedarse solo con el primer
+  // tramo daría el mismo nombre a los 25 capítulos.
+  return p.length > 1 ? p.slice(1, -1).join('-') + '-' + base : base;
 }
 // La misma clave del bucket, pero por la ruta que la manda como adjunto.
 function urlDescarga(url) {
@@ -1355,7 +1597,7 @@ function fmtTam(b) {
 }
 function abreDescarga(ent) {
   if (!ent) { toast('Esta película no está en la biblioteca'); return; }
-  $('#dl-tit').textContent = 'Descargar ' + (ent.titulo || 'la película');
+  $('#dl-tit').textContent = 'Descargar ' + (nombreDe(ubicaDe(absCat(ent.url || ''))) || ent.titulo || 'la película');
   const lista = $('#dl-list');
   lista.innerHTML = '';
   const fila = (titulo, detalle, url, tam) => {
@@ -1383,19 +1625,44 @@ $('#dl').addEventListener('click', (e) => { if (e.target.id === 'dl') $('#dl').c
    cualquier URL directa (p. ej. R2). */
 let bibData = null;
 const absCat = (u) => { try { return new URL(u, location.href).href; } catch (e) { return u; } };
-function entradaDe(url) {
-  if (!bibData || !url) return null;
-  return (bibData.titulos || []).find((t) => absCat(t.url) === url) || null;
+
+/* Un título del catálogo puede ser una película suelta o una serie con
+   `episodios[]`. Todo lo demás (reproductor, descargas, sala) sigue hablando
+   de UNA url, así que aquí se aplana: cada capítulo entra en el índice con su
+   propia url y de paso se recuerda a qué serie pertenece y en qué posición,
+   que es lo único que hace falta para el "siguiente capítulo". */
+let indice = new Map();   // url absoluta -> { ent, serie, idx }
+function reindexa(bib) {
+  indice = new Map();
+  ((bib && bib.titulos) || []).forEach((t) => {
+    if (t.tipo === 'serie') {
+      (t.episodios || []).forEach((e, i) => {
+        if (e && e.url) indice.set(absCat(e.url), { ent: e, serie: t, idx: i });
+      });
+    } else if (t.url) {
+      indice.set(absCat(t.url), { ent: t, serie: null, idx: -1 });
+    }
+  });
 }
+function ubicaDe(url) { return (url && indice.get(url)) || null; }
+function entradaDe(url) { const u = ubicaDe(url); return u ? u.ent : null; }
+// Nombre para el reproductor y la sala: un capítulo sin su serie no se entiende.
+function nombreDe(u) {
+  if (!u) return '';
+  if (!u.serie) return u.ent.titulo || '';
+  return u.serie.titulo + ' · ' + etiquetaEp(u.ent) + ' — ' + (u.ent.titulo || '');
+}
+const etiquetaEp = (e) => (/^\d+$/.test(String(e.n || '')) ? 'E' + e.n : String(e.n || ''));
 // La película pudo llegar antes que el catálogo (?v= o latido de la sala):
 // al llegar este, se completan nombre y pistas.
 function aplicaCatalogoActual() {
-  const ent = entradaDe(curV);
+  const u = ubicaDe(curV);
   pintaPeli();
-  if (!ent) return;
-  ponNombre(ent.titulo);
-  if (audios.length < 2) ponAudios(ent.audios, null);
-  if (!video.querySelector('track')) ponSubs(ent.subs, null);
+  pintaAcciones();
+  if (!u) return;
+  ponNombre(nombreDe(u));
+  if (audios.length < 2) ponAudios(u.ent.audios, null);
+  if (!video.querySelector('track')) ponSubs(u.ent.subs, null);
 }
 function pintaBiblioteca(bib) {
   const grid = $('#lib-grid');
@@ -1417,30 +1684,134 @@ function pintaBiblioteca(bib) {
       const ini = document.createElement('span'); ini.className = 'ini';
       ini.textContent = (t.titulo || '?').slice(0, 2).toUpperCase(); th.appendChild(ini);
     }
-    if (t.dur) { const d = document.createElement('span'); d.className = 'lib-dur'; d.textContent = t.dur; th.appendChild(d); }
-    const dl = document.createElement('span');
-    dl.className = 'lib-dl'; dl.title = 'Descargar para verla sin cortes';
-    dl.setAttribute('role', 'button'); dl.tabIndex = 0;
-    dl.innerHTML = IC.descarga;
-    dl.addEventListener('click', (e) => { e.stopPropagation(); abreDescarga(t); });
-    th.appendChild(dl);
+    const esSerie = t.tipo === 'serie';
+    if (esSerie) {
+      // Una serie no tiene duración propia; lo útil es cuántos capítulos trae.
+      const n = (t.episodios || []).length;
+      const e = document.createElement('span'); e.className = 'lib-eps';
+      e.innerHTML = IC.capitulos;
+      e.appendChild(document.createTextNode(n + (n === 1 ? ' capítulo' : ' capítulos')));
+      th.appendChild(e);
+    } else {
+      if (t.dur) { const d = document.createElement('span'); d.className = 'lib-dur'; d.textContent = t.dur; th.appendChild(d); }
+      const dl = document.createElement('span');
+      dl.className = 'lib-dl'; dl.title = 'Descargar para verla sin cortes';
+      dl.setAttribute('role', 'button'); dl.tabIndex = 0;
+      dl.innerHTML = IC.descarga;
+      dl.addEventListener('click', (ev) => { ev.stopPropagation(); abreDescarga(t); });
+      th.appendChild(dl);
+    }
     card.appendChild(th);
     const info = document.createElement('div'); info.className = 'lib-info';
     const tit = document.createElement('div'); tit.className = 'lib-tit'; tit.textContent = t.titulo || 'Sin título';
     info.appendChild(tit);
     if (t.nota) { const no = document.createElement('div'); no.className = 'lib-nota'; no.textContent = t.nota; info.appendChild(no); }
     card.appendChild(info);
-    card.addEventListener('click', () => { cargarURL(absCat(t.url), { nombre: t.titulo }); playSafe(); });
+    card.addEventListener('click', () => {
+      if (esSerie) { abreSerie(t); return; }
+      cargarURL(absCat(t.url), { nombre: t.titulo }); playSafe();
+    });
     grid.appendChild(card);
   });
 }
+
+/* ---------- Vista de serie ----------
+   Sustituye a la rejilla dentro del mismo velo. El progreso de cada capítulo
+   se guarda en este equipo (no viaja a la sala: cada quien va por donde va). */
+const VISTO = 'moovinVisto';
+function progreso() { try { return JSON.parse(localStorage[VISTO] || '{}'); } catch (e) { return {}; } }
+function guardaProgreso(url, seg, total) {
+  if (!url || !total || total < 60) return;
+  const p = progreso();
+  // Casi al final cuenta como visto entero; así no queda una barra al 97 %.
+  p[url] = (seg / total > 0.95) ? { p: 1, t: Date.now() } : { p: seg / total, s: seg, t: Date.now() };
+  try { localStorage[VISTO] = JSON.stringify(p); } catch (e) { /* cuota llena */ }
+}
+let serieAbierta = null;
+function abreSerie(t) {
+  serieAbierta = t;
+  $('#lib-h1').classList.add('oculto');
+  $('#lib-sub').classList.add('oculto');
+  $('#lib-grid').classList.add('oculto');
+  $('#lib-otra').classList.add('oculto');
+  $('#serie').classList.add('on');
+  const poster = $('#se-poster');
+  if (t.poster) { poster.src = conPase(absCat(t.poster)); poster.classList.remove('oculto'); }
+  else poster.classList.add('oculto');
+  $('#se-tit').textContent = t.titulo || '';
+  $('#se-nota').textContent = t.nota || '';
+  const eps = t.episodios || [];
+  $('#se-cifra').textContent = eps.length + (eps.length === 1 ? ' capítulo' : ' capítulos');
+  pintaEpisodios();
+  $('#loader').scrollTop = 0;
+}
+function cierraSerie() {
+  serieAbierta = null;
+  $('#serie').classList.remove('on');
+  $('#lib-h1').classList.remove('oculto');
+  $('#lib-sub').classList.remove('oculto');
+  $('#lib-grid').classList.remove('oculto');
+  $('#lib-otra').classList.remove('oculto');
+}
+function pintaEpisodios() {
+  const t = serieAbierta; if (!t) return;
+  const cont = $('#se-eps'); cont.innerHTML = '';
+  const prog = progreso();
+  (t.episodios || []).forEach((e) => {
+    const url = absCat(e.url || '');
+    const fila = document.createElement('button');
+    fila.className = 'se-ep' + (url && url === curV ? ' actual' : '');
+
+    const mini = document.createElement('div'); mini.className = 'se-ep-mini';
+    if (e.miniatura) {
+      const img = document.createElement('img'); img.loading = 'lazy'; img.alt = '';
+      img.src = conPase(absCat(e.miniatura)); mini.appendChild(img);
+    }
+    if (e.dur) { const d = document.createElement('span'); d.className = 'dur'; d.textContent = e.dur; mini.appendChild(d); }
+    const pr = prog[url];
+    if (pr && pr.p > 0.01) {
+      const b = document.createElement('div'); b.className = 'se-ep-prog';
+      const i = document.createElement('i'); i.style.width = Math.min(100, pr.p * 100) + '%';
+      b.appendChild(i); mini.appendChild(b);
+    }
+    fila.appendChild(mini);
+
+    const txt = document.createElement('div'); txt.className = 'se-ep-txt';
+    const n = document.createElement('div'); n.className = 'se-ep-n';
+    n.textContent = /^\d+$/.test(String(e.n)) ? 'Capítulo ' + Number(e.n) : String(e.n || '');
+    txt.appendChild(n);
+    const ti = document.createElement('div'); ti.className = 'se-ep-tit'; ti.textContent = e.titulo || '';
+    txt.appendChild(ti);
+    if (e.nota) { const no = document.createElement('div'); no.className = 'se-ep-nota'; no.textContent = e.nota; txt.appendChild(no); }
+    fila.appendChild(txt);
+
+    const dl = document.createElement('span');
+    dl.className = 'se-ep-dl'; dl.title = 'Descargar este capítulo';
+    dl.setAttribute('role', 'button'); dl.tabIndex = 0;
+    dl.innerHTML = IC.descarga;
+    dl.addEventListener('click', (ev) => { ev.stopPropagation(); abreDescarga(e); });
+    fila.appendChild(dl);
+
+    fila.addEventListener('click', () => reproduceEp(e));
+    cont.appendChild(fila);
+  });
+}
+function reproduceEp(e) {
+  const url = absCat(e.url || ''); if (!url) return;
+  // Si ya se vio a medias, se reanuda donde se quedó (salvo si estaba acabado).
+  const pr = progreso()[url];
+  const desde = (pr && pr.p < 0.95 && pr.s > 30) ? pr.s : 0;
+  cargarURL(url, { nombre: nombreDe(ubicaDe(url)), desde });
+  playSafe();
+}
+$('#se-volver').addEventListener('click', cierraSerie);
 // El catálogo vive en R2 y lo sirve el worker (lo edita el backoffice). El
 // biblioteca.json del repo queda de respaldo por si el worker no responde.
 function cargaCatalogo() {
   return fetch(conPase(MOOVIN_API + '/catalogo'), { cache: 'no-store' })
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then((b) => { bibData = b; pintaBiblioteca(b); aplicaCatalogoActual(); })
-    .catch(() => pintaBiblioteca(null));
+    .then((b) => { bibData = b; reindexa(b); pintaBiblioteca(b); aplicaCatalogoActual(); })
+    .catch(() => { reindexa(null); pintaBiblioteca(null); });
 }
 
 /* ============================ Watch Party ============================ */
@@ -1536,7 +1907,7 @@ function pintaPeli() {
   const hay = !!(sala && ent);
   box.classList.toggle('hidden', !hay);
   if (!hay) return;
-  $('#p-peli-t').textContent = ent.titulo || 'Película de la sala';
+  $('#p-peli-t').textContent = nombreDe(ubicaDe(curV)) || 'Película de la sala';
   $('#p-peli-d').textContent = esLocal
     ? 'Suena tu copia del disco, sincronizada con la sala.'
     : 'La estás viendo por internet. Descárgala y no habrá cortes.';
@@ -1601,10 +1972,15 @@ function applyRemote(m) {
   if (!sala) return;
   const who = m.from || 'Alguien';
   if (m.kind === 'nav') {
-    if (sala.navLock && !sala.host) return;   // sala cerrada: manda el anfitrión
+    // Sala cerrada: solo se sigue al anfitrión. `m.host` lo marca el servidor
+    // al reenviar; sin ese dato el guard miraba `sala.host` y un invitado
+    // descartaba TODOS los cambios, incluido el del anfitrión, así que nunca
+    // le seguía al capítulo siguiente.
+    if (sala.navLock && !m.host && !sala.host) return;
     const v = vDe(m.url); if (!v || v === curV) return;
     logAct(who, 'cambió la película de la sala');
     cargarURL(v, { remoto: true });
+    playSafe();
     return;
   }
   narrate(m.kind, who,

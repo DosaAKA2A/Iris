@@ -312,11 +312,20 @@ function pintaLista() {
     const tt = document.createElement('div'); tt.className = 't'; tt.textContent = t.titulo || 'Sin título'; datos.appendChild(tt);
     if (t.nota) { const nn = document.createElement('div'); nn.className = 'n'; nn.textContent = t.nota; datos.appendChild(nn); }
     const meta = document.createElement('div'); meta.className = 'meta';
-    const enR2 = !!claveDe(t.url);
-    meta.innerHTML = (t.dur ? t.dur + ' · ' : '') +
-      (enR2 ? '<span class="tagr2">almacén R2</span>' : '<span class="tagext">fuente externa</span>') +
-      ((t.audios && t.audios.length > 1) ? ' · ' + t.audios.length + ' audios' : '') +
-      ((t.subs && t.subs.length) ? ' · ' + t.subs.length + ' pista' + (t.subs.length === 1 ? '' : 's') : '');
+    if (t.tipo === 'serie') {
+      // Una serie no tiene video propio: lo que cuenta son sus capítulos, y
+      // sus pistas viven en cada uno.
+      const eps = t.episodios || [];
+      const enR2 = eps.some((e) => !!claveDe(e.url));
+      meta.innerHTML = eps.length + ' capítulo' + (eps.length === 1 ? '' : 's') + ' · ' +
+        (enR2 ? '<span class="tagr2">almacén R2</span>' : '<span class="tagext">fuente externa</span>');
+    } else {
+      const enR2 = !!claveDe(t.url);
+      meta.innerHTML = (t.dur ? t.dur + ' · ' : '') +
+        (enR2 ? '<span class="tagr2">almacén R2</span>' : '<span class="tagext">fuente externa</span>') +
+        ((t.audios && t.audios.length > 1) ? ' · ' + t.audios.length + ' audios' : '') +
+        ((t.subs && t.subs.length) ? ' · ' + t.subs.length + ' pista' + (t.subs.length === 1 ? '' : 's') : '');
+    }
     datos.appendChild(meta);
     fila.appendChild(datos);
     const acc = document.createElement('div'); acc.className = 'acc';
@@ -341,12 +350,17 @@ async function editar(idx) {
 }
 async function borrar(idx) {
   const t = catalogo.titulos[idx];
-  if (!confirm('Borrar "' + (t.titulo || 'Sin título') + '" de la biblioteca?' +
-    (!!claveDe(t.url) ? ' También se borran sus archivos del almacén.' : ''))) return;
-  // Archivos alojados en el bucket: se borran también.
+  // Una serie guarda sus archivos dentro de cada capítulo, no en la raíz.
+  const partes = t.tipo === 'serie' ? (t.episodios || []) : [t];
   const claves = [];
-  [t.url, t.poster].forEach((u) => { const k = claveDe(u); if (k) claves.push(k); });
-  (t.subs || []).concat(t.audios || []).forEach((s) => { const k = claveDe(s.url); if (k) claves.push(k); });
+  const suma = (u) => { const k = claveDe(u); if (k) claves.push(k); };
+  suma(t.poster);
+  partes.forEach((p) => {
+    [p.url, p.poster, p.miniatura].forEach(suma);
+    (p.subs || []).concat(p.audios || []).forEach((s) => suma(s.url));
+  });
+  if (!confirm('Borrar "' + (t.titulo || 'Sin título') + '" de la biblioteca?' +
+    (claves.length ? ' También se borran sus ' + claves.length + ' archivos del almacén.' : ''))) return;
   for (const k of claves) {
     await fetch(W + '/api/objeto?key=' + encodeURIComponent(k), { method: 'DELETE', headers: H() }).catch(() => {});
   }
