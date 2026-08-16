@@ -144,7 +144,14 @@ button.tag:hover{opacity:.7}
 }
 .lib-info{padding:10px 12px 12px}
 .lib-tit{font-size:13px; font-weight:700; line-height:1.35}
-.lib-nota{margin-top:3px; font-size:11.5px; color:var(--muted); line-height:1.5}
+/* Tope de dos líneas. Una nota larga estiraba su tarjeta y, como la fila de
+   la rejilla se iguala a la más alta, descuadraba toda la fila. El texto
+   entero sigue disponible en el title y en la ficha de la serie. */
+.lib-nota{
+  margin-top:3px; font-size:11.5px; color:var(--muted); line-height:1.5;
+  display:-webkit-box; -webkit-box-orient:vertical;
+  -webkit-line-clamp:2; line-clamp:2; overflow:hidden;
+}
 .lib-otra{margin-top:30px; border-top:1px solid var(--line); padding-top:8px; max-width:640px}
 .lib-vacia{grid-column:1/-1; color:var(--dim); font-size:12.5px; padding:18px 0; text-align:center}
 .lib-pie{
@@ -1846,7 +1853,11 @@ function tarjetaDe(t) {
   const info = document.createElement('div'); info.className = 'lib-info';
   const tit = document.createElement('div'); tit.className = 'lib-tit'; tit.textContent = t.titulo || 'Sin título';
   info.appendChild(tit);
-  if (t.nota) { const no = document.createElement('div'); no.className = 'lib-nota'; no.textContent = t.nota; info.appendChild(no); }
+  if (t.nota) {
+    const no = document.createElement('div'); no.className = 'lib-nota';
+    no.textContent = t.nota; no.title = t.nota;   // el recorte no debe ocultar nada
+    info.appendChild(no);
+  }
   card.appendChild(info);
   card.addEventListener('click', () => {
     if (esSerie) { abreSerie(t); return; }
