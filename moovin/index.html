@@ -191,13 +191,23 @@ button.tag:hover{opacity:.7}
 .se-seguir{margin-top:16px; width:auto; min-width:220px; display:inline-flex; align-items:center; gap:9px; justify-content:center}
 .se-seguir svg{width:15px; height:15px}
 .se-eps{margin-top:26px; display:flex; flex-direction:column; gap:8px}
-/* Separador entre los capítulos y las películas de la misma saga. */
-.se-grupo{
-  margin-top:30px; padding-bottom:9px; border-bottom:1px solid var(--line);
+/* Secciones de una saga: la serie y cada película. Al cambiar de sección
+   cambia la portada entera, no solo la lista de abajo. */
+.se-tabs{
+  display:flex; gap:4px; flex-wrap:wrap; margin:16px 0 0;
+  border-bottom:1px solid var(--line);
+}
+.se-tabs.oculto{display:none}
+.se-tab{
+  appearance:none; background:none; border:0; cursor:pointer;
+  padding:9px 13px; margin-bottom:-1px; border-bottom:2px solid transparent;
   font-family:var(--mono); font-size:10px; letter-spacing:.18em;
   text-transform:uppercase; color:var(--dim);
+  transition:color .15s, border-color .15s;
 }
-.se-grupo + .se-eps{margin-top:14px}
+.se-tab:hover{color:var(--fg)}
+.se-tab.on{color:var(--fg); border-bottom-color:var(--red)}
+.se-tabs + .se-cab{margin-top:22px}
 .se-ep{
   display:flex; gap:14px; align-items:center; text-align:left; padding:9px;
   border:1px solid var(--line); border-radius:12px; background:var(--bg);
@@ -611,6 +621,9 @@ button.tag:hover{opacity:.7}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
             Biblioteca
           </button>
+          <!-- Secciones de la saga: la serie y sus películas. Solo aparece si
+               la serie trae `peliculas[]`. -->
+          <div class="se-tabs oculto" id="se-tabs"></div>
           <div class="se-cab">
             <img class="se-poster" id="se-poster" alt="" />
             <div class="se-meta">
@@ -621,10 +634,6 @@ button.tag:hover{opacity:.7}
             </div>
           </div>
           <div class="se-eps" id="se-eps"></div>
-          <!-- Películas de la misma saga: van dentro de la serie, no como un
-               título suelto en la biblioteca. -->
-          <div class="se-grupo oculto" id="se-pelis-cab">Películas</div>
-          <div class="se-eps oculto" id="se-pelis"></div>
         </div>
 
         <div class="lib-otra" id="lib-otra">
@@ -960,7 +969,7 @@ function cargarURL(url, opts) {
   actualizarShare();
   pintaPeli();
   pintaAcciones();
-  if (serieAbierta) { pintaEpisodios(); pintaPeliculas(); }
+  if (serieAbierta) pintaSeccion();
   if (!opts.remoto && sala && (sala.host || !sala.navLock)) {
     send({ t: 'ev', kind: 'nav', url: shareUrl(), at: Date.now() });
     logAct(sala.name, 'cambió la película de la sala');
@@ -1542,7 +1551,7 @@ function abreBiblioteca() {
   // Si lo que suena es un capítulo, se entra directo a su lista: es lo que se
   // busca al abrir la biblioteca a media serie.
   const u = ubicaDe(curV);
-  if (u && u.serie) { abreSerie(u.serie); } else if (serieAbierta) { pintaEpisodios(); pintaPeliculas(); }
+  if (u && u.serie) { abreSerie(u.serie, seccionDeUrl(u)); } else if (serieAbierta) { pintaSeccion(); }
   $('#loader').classList.remove('hidden');
   $('#loader-close').style.display = video.src ? 'flex' : 'none';
 }
@@ -1791,26 +1800,73 @@ function guardaProgreso(url, seg, total) {
   try { localStorage[VISTO] = JSON.stringify(p); } catch (e) { /* cuota llena */ }
 }
 let serieAbierta = null;
-function abreSerie(t) {
+let seccion = 0;   // 0 = la serie; 1..n = serieAbierta.peliculas[seccion-1]
+
+/* Una saga se ve como varias secciones: la serie y cada película. La sección 0
+   siempre existe, así que una serie sin películas se comporta como antes. */
+function seccionesDe(t) {
+  return [{ tipo: 'serie', ent: t, tab: 'Serie' }].concat(
+    (t.peliculas || []).map((p, i) => ({
+      tipo: 'peli', ent: p, tab: p.etiqueta || ('Película ' + (i + 1))
+    })));
+}
+// Al abrir la biblioteca con algo sonando se entra por su propia sección.
+function seccionDeUrl(u) {
+  if (!u || !u.serie || !u.peli) return 0;
+  const i = (u.serie.peliculas || []).indexOf(u.ent);
+  return i >= 0 ? i + 1 : 0;
+}
+function abreSerie(t, sec) {
   serieAbierta = t;
+  const secs = seccionesDe(t);
+  seccion = (sec > 0 && sec < secs.length) ? sec : 0;
   $('#lib-h1').classList.add('oculto');
   $('#lib-sub').classList.add('oculto');
   $('#lib-grid').classList.add('oculto');
   $('#lib-otra').classList.add('oculto');
   $('#serie').classList.add('on');
-  const poster = $('#se-poster');
-  if (t.poster) { poster.src = conPase(absCat(t.poster)); poster.classList.remove('oculto'); }
-  else poster.classList.add('oculto');
-  $('#se-tit').textContent = t.titulo || '';
-  $('#se-nota').textContent = t.nota || '';
-  const eps = t.episodios || [];
-  const pel = t.peliculas || [];
-  $('#se-cifra').textContent = eps.length + (eps.length === 1 ? ' capítulo' : ' capítulos')
-    + (pel.length ? ' · ' + pel.length + (pel.length === 1 ? ' película' : ' películas') : '');
-  pintaSeguir(t);
-  pintaEpisodios();
-  pintaPeliculas();
+  pintaTabs();
+  pintaSeccion();
   $('#loader').scrollTop = 0;
+}
+function pintaTabs() {
+  const t = serieAbierta; if (!t) return;
+  const cont = $('#se-tabs'); cont.innerHTML = '';
+  const secs = seccionesDe(t);
+  // Con una sola sección no hay nada que elegir: no se enseña el selector.
+  cont.classList.toggle('oculto', secs.length < 2);
+  if (secs.length < 2) return;
+  secs.forEach((s, i) => {
+    const b = document.createElement('button');
+    b.className = 'se-tab' + (i === seccion ? ' on' : '');
+    b.textContent = s.tab;
+    b.addEventListener('click', () => {
+      if (i === seccion) return;
+      seccion = i; pintaTabs(); pintaSeccion(); $('#loader').scrollTop = 0;
+    });
+    cont.appendChild(b);
+  });
+}
+/* Cambiar de sección cambia la portada entera: póster, título, descripción,
+   cifra, botón grande y lista. */
+function pintaSeccion() {
+  const t = serieAbierta; if (!t) return;
+  const s = seccionesDe(t)[seccion] || seccionesDe(t)[0];
+  const ent = s.ent;
+  const poster = $('#se-poster');
+  if (ent.poster) { poster.src = conPase(absCat(ent.poster)); poster.classList.remove('oculto'); }
+  else poster.classList.add('oculto');
+  $('#se-tit').textContent = ent.titulo || '';
+  $('#se-nota').textContent = ent.nota || '';
+  if (s.tipo === 'peli') {
+    $('#se-cifra').textContent = s.tab + (ent.dur ? ' · ' + ent.dur : '');
+  } else {
+    const eps = t.episodios || [], pel = t.peliculas || [];
+    $('#se-cifra').textContent = eps.length + (eps.length === 1 ? ' capítulo' : ' capítulos')
+      + (pel.length ? ' · ' + pel.length + (pel.length === 1 ? ' película' : ' películas') : '');
+  }
+  pintaSeguir();
+  pintaLista();
 }
 /* Por dónde iba: el primero a medias, o si no el primero sin empezar. Así el
    botón grande hace lo que se espera sin tener que buscar en la lista. */
@@ -1822,8 +1878,19 @@ function porDondeIba(t) {
   const nuevo = eps.find((e) => !prog[absCat(e.url || '')]);
   return nuevo ? { ep: nuevo, seguir: false } : null;
 }
-function pintaSeguir(t) {
+function pintaSeguir() {
+  const t = serieAbierta; if (!t) return;
   const b = $('#se-seguir');
+  const s = seccionesDe(t)[seccion] || seccionesDe(t)[0];
+  if (s.tipo === 'peli') {
+    const pr = progreso()[absCat(s.ent.url || '')];
+    b.classList.remove('oculto');
+    b.innerHTML = IC.play;
+    b.appendChild(document.createTextNode(
+      (pr && pr.p > 0.01 && pr.p < 0.95) ? 'Seguir la película' : 'Ver la película'));
+    b.onclick = () => reproduceEp(s.ent);
+    return;
+  }
   const d = porDondeIba(t);
   if (!d) { b.classList.add('oculto'); return; }
   b.classList.remove('oculto');
@@ -1884,23 +1951,20 @@ function filaLista(e, etiqueta, tituloDl) {
   fila.addEventListener('click', () => reproduceEp(e));
   return fila;
 }
-function pintaEpisodios() {
+function pintaLista() {
   const t = serieAbierta; if (!t) return;
   const cont = $('#se-eps'); cont.innerHTML = '';
+  const s = seccionesDe(t)[seccion] || seccionesDe(t)[0];
+  if (s.tipo === 'peli') {
+    // La película se lista como una fila más: así conserva la miniatura, la
+    // barra de lo ya visto y el botón de descarga que tienen los capítulos.
+    cont.appendChild(filaLista(s.ent, s.tab, 'Descargar esta película'));
+    return;
+  }
   (t.episodios || []).forEach((e) => {
     const etq = /^\d+$/.test(String(e.n)) ? 'Capítulo ' + Number(e.n) : String(e.n || '');
     cont.appendChild(filaLista(e, etq, 'Descargar este capítulo'));
   });
-}
-function pintaPeliculas() {
-  const t = serieAbierta; if (!t) return;
-  const cont = $('#se-pelis'), cab = $('#se-pelis-cab');
-  cont.innerHTML = '';
-  const pel = t.peliculas || [];
-  cont.classList.toggle('oculto', !pel.length);
-  cab.classList.toggle('oculto', !pel.length);
-  // `etiqueta` deja poner "Película 1", "OVA" o lo que toque desde el catálogo.
-  pel.forEach((p) => cont.appendChild(filaLista(p, p.etiqueta || 'Película', 'Descargar esta película')));
 }
 function reproduceEp(e) {
   const url = absCat(e.url || ''); if (!url) return;
