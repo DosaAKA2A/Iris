@@ -191,6 +191,13 @@ button.tag:hover{opacity:.7}
 .se-seguir{margin-top:16px; width:auto; min-width:220px; display:inline-flex; align-items:center; gap:9px; justify-content:center}
 .se-seguir svg{width:15px; height:15px}
 .se-eps{margin-top:26px; display:flex; flex-direction:column; gap:8px}
+/* Separador entre los capítulos y las películas de la misma saga. */
+.se-grupo{
+  margin-top:30px; padding-bottom:9px; border-bottom:1px solid var(--line);
+  font-family:var(--mono); font-size:10px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--dim);
+}
+.se-grupo + .se-eps{margin-top:14px}
 .se-ep{
   display:flex; gap:14px; align-items:center; text-align:left; padding:9px;
   border:1px solid var(--line); border-radius:12px; background:var(--bg);
@@ -614,6 +621,10 @@ button.tag:hover{opacity:.7}
             </div>
           </div>
           <div class="se-eps" id="se-eps"></div>
+          <!-- Películas de la misma saga: van dentro de la serie, no como un
+               título suelto en la biblioteca. -->
+          <div class="se-grupo oculto" id="se-pelis-cab">Películas</div>
+          <div class="se-eps oculto" id="se-pelis"></div>
         </div>
 
         <div class="lib-otra" id="lib-otra">
@@ -949,7 +960,7 @@ function cargarURL(url, opts) {
   actualizarShare();
   pintaPeli();
   pintaAcciones();
-  if (serieAbierta) pintaEpisodios();
+  if (serieAbierta) { pintaEpisodios(); pintaPeliculas(); }
   if (!opts.remoto && sala && (sala.host || !sala.navLock)) {
     send({ t: 'ev', kind: 'nav', url: shareUrl(), at: Date.now() });
     logAct(sala.name, 'cambió la película de la sala');
@@ -970,7 +981,8 @@ const acciones = $('#acciones');
 
 function siguienteEp() {
   const u = ubicaDe(curV);
-  if (!u || !u.serie) return null;
+  // Sin u.peli, una película (idx -1) encadenaría al capítulo 1 de su serie.
+  if (!u || !u.serie || u.peli) return null;
   const eps = u.serie.episodios || [];
   const sig = eps[u.idx + 1];
   return (sig && sig.url) ? sig : null;
@@ -1530,7 +1542,7 @@ function abreBiblioteca() {
   // Si lo que suena es un capítulo, se entra directo a su lista: es lo que se
   // busca al abrir la biblioteca a media serie.
   const u = ubicaDe(curV);
-  if (u && u.serie) { abreSerie(u.serie); } else if (serieAbierta) { pintaEpisodios(); }
+  if (u && u.serie) { abreSerie(u.serie); } else if (serieAbierta) { pintaEpisodios(); pintaPeliculas(); }
   $('#loader').classList.remove('hidden');
   $('#loader-close').style.display = video.src ? 'flex' : 'none';
 }
@@ -1672,16 +1684,21 @@ const absCat = (u) => { try { return new URL(u, location.href).href; } catch (e)
    de UNA url, así que aquí se aplana: cada capítulo entra en el índice con su
    propia url y de paso se recuerda a qué serie pertenece y en qué posición,
    que es lo único que hace falta para el "siguiente capítulo". */
-let indice = new Map();   // url absoluta -> { ent, serie, idx }
+let indice = new Map();   // url absoluta -> { ent, serie, idx, peli }
 function reindexa(bib) {
   indice = new Map();
   ((bib && bib.titulos) || []).forEach((t) => {
     if (t.tipo === 'serie') {
       (t.episodios || []).forEach((e, i) => {
-        if (e && e.url) indice.set(absCat(e.url), { ent: e, serie: t, idx: i });
+        if (e && e.url) indice.set(absCat(e.url), { ent: e, serie: t, idx: i, peli: false });
+      });
+      // Las películas de la saga pertenecen a la serie pero NO a la cadena de
+      // capítulos: se marcan para que "siguiente capítulo" no salte desde ellas.
+      (t.peliculas || []).forEach((p) => {
+        if (p && p.url) indice.set(absCat(p.url), { ent: p, serie: t, idx: -1, peli: true });
       });
     } else if (t.url) {
-      indice.set(absCat(t.url), { ent: t, serie: null, idx: -1 });
+      indice.set(absCat(t.url), { ent: t, serie: null, idx: -1, peli: true });
     }
   });
 }
@@ -1691,6 +1708,8 @@ function entradaDe(url) { const u = ubicaDe(url); return u ? u.ent : null; }
 function nombreDe(u) {
   if (!u) return '';
   if (!u.serie) return u.ent.titulo || '';
+  // Una película de la saga ya tiene título propio: no lleva número de capítulo.
+  if (u.peli) return u.serie.titulo + ' · ' + (u.ent.titulo || '');
   return u.serie.titulo + ' · ' + etiquetaEp(u.ent) + ' — ' + (u.ent.titulo || '');
 }
 const etiquetaEp = (e) => (/^\d+$/.test(String(e.n || '')) ? 'E' + e.n : String(e.n || ''));
@@ -1729,9 +1748,12 @@ function pintaBiblioteca(bib) {
     if (esSerie) {
       // Una serie no tiene duración propia; lo útil es cuántos capítulos trae.
       const n = (t.episodios || []).length;
+      const np = (t.peliculas || []).length;
       const e = document.createElement('span'); e.className = 'lib-eps';
       e.innerHTML = IC.capitulos;
-      e.appendChild(document.createTextNode(n + (n === 1 ? ' capítulo' : ' capítulos')));
+      e.appendChild(document.createTextNode(
+        n + (n === 1 ? ' capítulo' : ' capítulos')
+        + (np ? ' · ' + np + (np === 1 ? ' película' : ' películas') : '')));
       th.appendChild(e);
     } else {
       if (t.dur) { const d = document.createElement('span'); d.className = 'lib-dur'; d.textContent = t.dur; th.appendChild(d); }
@@ -1782,9 +1804,12 @@ function abreSerie(t) {
   $('#se-tit').textContent = t.titulo || '';
   $('#se-nota').textContent = t.nota || '';
   const eps = t.episodios || [];
-  $('#se-cifra').textContent = eps.length + (eps.length === 1 ? ' capítulo' : ' capítulos');
+  const pel = t.peliculas || [];
+  $('#se-cifra').textContent = eps.length + (eps.length === 1 ? ' capítulo' : ' capítulos')
+    + (pel.length ? ' · ' + pel.length + (pel.length === 1 ? ' película' : ' películas') : '');
   pintaSeguir(t);
   pintaEpisodios();
+  pintaPeliculas();
   $('#loader').scrollTop = 0;
 }
 /* Por dónde iba: el primero a medias, o si no el primero sin empezar. Así el
@@ -1816,48 +1841,66 @@ function cierraSerie() {
   $('#lib-grid').classList.remove('oculto');
   $('#lib-otra').classList.remove('oculto');
 }
+/* Una fila de la lista. Sirve igual para un capítulo que para una película de
+   la saga: solo cambian la etiqueta de arriba y de dónde sale la imagen (un
+   capítulo trae `miniatura`, una película trae `poster`). */
+function filaLista(e, etiqueta, tituloDl) {
+  const prog = progreso();
+  const url = absCat(e.url || '');
+  const fila = document.createElement('button');
+  fila.className = 'se-ep' + (url && url === curV ? ' actual' : '');
+
+  const mini = document.createElement('div'); mini.className = 'se-ep-mini';
+  const img0 = e.miniatura || e.poster;
+  if (img0) {
+    const img = document.createElement('img'); img.loading = 'lazy'; img.alt = '';
+    img.src = conPase(absCat(img0)); mini.appendChild(img);
+  }
+  if (e.dur) { const d = document.createElement('span'); d.className = 'dur'; d.textContent = e.dur; mini.appendChild(d); }
+  const pr = prog[url];
+  if (pr && pr.p > 0.01) {
+    const b = document.createElement('div'); b.className = 'se-ep-prog';
+    const i = document.createElement('i'); i.style.width = Math.min(100, pr.p * 100) + '%';
+    b.appendChild(i); mini.appendChild(b);
+  }
+  fila.appendChild(mini);
+
+  const txt = document.createElement('div'); txt.className = 'se-ep-txt';
+  const n = document.createElement('div'); n.className = 'se-ep-n';
+  n.textContent = etiqueta;
+  txt.appendChild(n);
+  const ti = document.createElement('div'); ti.className = 'se-ep-tit'; ti.textContent = e.titulo || '';
+  txt.appendChild(ti);
+  if (e.nota) { const no = document.createElement('div'); no.className = 'se-ep-nota'; no.textContent = e.nota; txt.appendChild(no); }
+  fila.appendChild(txt);
+
+  const dl = document.createElement('span');
+  dl.className = 'se-ep-dl'; dl.title = tituloDl;
+  dl.setAttribute('role', 'button'); dl.tabIndex = 0;
+  dl.innerHTML = IC.descarga;
+  dl.addEventListener('click', (ev) => { ev.stopPropagation(); abreDescarga(e); });
+  fila.appendChild(dl);
+
+  fila.addEventListener('click', () => reproduceEp(e));
+  return fila;
+}
 function pintaEpisodios() {
   const t = serieAbierta; if (!t) return;
   const cont = $('#se-eps'); cont.innerHTML = '';
-  const prog = progreso();
   (t.episodios || []).forEach((e) => {
-    const url = absCat(e.url || '');
-    const fila = document.createElement('button');
-    fila.className = 'se-ep' + (url && url === curV ? ' actual' : '');
-
-    const mini = document.createElement('div'); mini.className = 'se-ep-mini';
-    if (e.miniatura) {
-      const img = document.createElement('img'); img.loading = 'lazy'; img.alt = '';
-      img.src = conPase(absCat(e.miniatura)); mini.appendChild(img);
-    }
-    if (e.dur) { const d = document.createElement('span'); d.className = 'dur'; d.textContent = e.dur; mini.appendChild(d); }
-    const pr = prog[url];
-    if (pr && pr.p > 0.01) {
-      const b = document.createElement('div'); b.className = 'se-ep-prog';
-      const i = document.createElement('i'); i.style.width = Math.min(100, pr.p * 100) + '%';
-      b.appendChild(i); mini.appendChild(b);
-    }
-    fila.appendChild(mini);
-
-    const txt = document.createElement('div'); txt.className = 'se-ep-txt';
-    const n = document.createElement('div'); n.className = 'se-ep-n';
-    n.textContent = /^\d+$/.test(String(e.n)) ? 'Capítulo ' + Number(e.n) : String(e.n || '');
-    txt.appendChild(n);
-    const ti = document.createElement('div'); ti.className = 'se-ep-tit'; ti.textContent = e.titulo || '';
-    txt.appendChild(ti);
-    if (e.nota) { const no = document.createElement('div'); no.className = 'se-ep-nota'; no.textContent = e.nota; txt.appendChild(no); }
-    fila.appendChild(txt);
-
-    const dl = document.createElement('span');
-    dl.className = 'se-ep-dl'; dl.title = 'Descargar este capítulo';
-    dl.setAttribute('role', 'button'); dl.tabIndex = 0;
-    dl.innerHTML = IC.descarga;
-    dl.addEventListener('click', (ev) => { ev.stopPropagation(); abreDescarga(e); });
-    fila.appendChild(dl);
-
-    fila.addEventListener('click', () => reproduceEp(e));
-    cont.appendChild(fila);
+    const etq = /^\d+$/.test(String(e.n)) ? 'Capítulo ' + Number(e.n) : String(e.n || '');
+    cont.appendChild(filaLista(e, etq, 'Descargar este capítulo'));
   });
+}
+function pintaPeliculas() {
+  const t = serieAbierta; if (!t) return;
+  const cont = $('#se-pelis'), cab = $('#se-pelis-cab');
+  cont.innerHTML = '';
+  const pel = t.peliculas || [];
+  cont.classList.toggle('oculto', !pel.length);
+  cab.classList.toggle('oculto', !pel.length);
+  // `etiqueta` deja poner "Película 1", "OVA" o lo que toque desde el catálogo.
+  pel.forEach((p) => cont.appendChild(filaLista(p, p.etiqueta || 'Película', 'Descargar esta película')));
 }
 function reproduceEp(e) {
   const url = absCat(e.url || ''); if (!url) return;
