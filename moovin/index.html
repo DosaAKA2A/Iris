@@ -200,6 +200,7 @@ button.tag:hover{opacity:.7}
 .se-tabs.oculto{display:none}
 .se-tab{
   appearance:none; background:none; border:0; cursor:pointer;
+  display:inline-flex; align-items:center; gap:8px;
   padding:9px 13px; margin-bottom:-1px; border-bottom:2px solid transparent;
   font-family:var(--mono); font-size:10px; letter-spacing:.18em;
   text-transform:uppercase; color:var(--dim);
@@ -207,6 +208,14 @@ button.tag:hover{opacity:.7}
 }
 .se-tab:hover{color:var(--fg)}
 .se-tab.on{color:var(--fg); border-bottom-color:var(--red)}
+/* El ordinal: la saga se lee de izquierda a derecha y el número lo confirma. */
+.se-tab-n{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:17px; height:17px; border-radius:50%; flex:0 0 auto;
+  border:1px solid var(--line); letter-spacing:0; font-size:9px;
+  transition:border-color .15s, background .15s, color .15s;
+}
+.se-tab.on .se-tab-n{border-color:var(--red); background:var(--red); color:#fff}
 .se-tabs + .se-cab{margin-top:22px}
 .se-ep{
   display:flex; gap:14px; align-items:center; text-align:left; padding:9px;
@@ -1802,10 +1811,11 @@ function guardaProgreso(url, seg, total) {
 let serieAbierta = null;
 let seccion = 0;   // 0 = la serie; 1..n = serieAbierta.peliculas[seccion-1]
 
-/* Una saga se ve como varias secciones: la serie y cada película. La sección 0
-   siempre existe, así que una serie sin películas se comporta como antes. */
+/* Una saga se ve como varias secciones EN ORDEN DE VISIONADO: la temporada y
+   luego sus películas, tal como vengan en el catálogo. La sección 0 siempre
+   existe, así que una serie sin películas se comporta igual que antes. */
 function seccionesDe(t) {
-  return [{ tipo: 'serie', ent: t, tab: 'Serie' }].concat(
+  return [{ tipo: 'serie', ent: t, tab: t.etiqueta || 'Serie' }].concat(
     (t.peliculas || []).map((p, i) => ({
       tipo: 'peli', ent: p, tab: p.etiqueta || ('Película ' + (i + 1))
     })));
@@ -1839,7 +1849,12 @@ function pintaTabs() {
   secs.forEach((s, i) => {
     const b = document.createElement('button');
     b.className = 'se-tab' + (i === seccion ? ' on' : '');
-    b.textContent = s.tab;
+    // El número es la posición en la saga: es lo que deja claro que la película
+    // va DESPUÉS de la temporada, y no como algo suelto al margen.
+    const num = document.createElement('span');
+    num.className = 'se-tab-n'; num.textContent = i + 1;
+    b.appendChild(num);
+    b.appendChild(document.createTextNode(s.tab));
     b.addEventListener('click', () => {
       if (i === seccion) return;
       seccion = i; pintaTabs(); pintaSeccion(); $('#loader').scrollTop = 0;
@@ -1859,7 +1874,8 @@ function pintaSeccion() {
   $('#se-tit').textContent = ent.titulo || '';
   $('#se-nota').textContent = ent.nota || '';
   if (s.tipo === 'peli') {
-    $('#se-cifra').textContent = s.tab + (ent.dur ? ' · ' + ent.dur : '');
+    // La pestaña ya dice qué lugar ocupa; aquí se dice qué es.
+    $('#se-cifra').textContent = 'Película' + (ent.dur ? ' · ' + ent.dur : '');
   } else {
     const eps = t.episodios || [], pel = t.peliculas || [];
     $('#se-cifra').textContent = eps.length + (eps.length === 1 ? ' capítulo' : ' capítulos')
