@@ -40,8 +40,12 @@ svg{display:block}
   font-family:var(--mono); font-size:11px; font-weight:700;
   letter-spacing:.22em; color:var(--red);
 }
+#top .tag .marca-ico{width:15px; height:15px; flex:0 0 auto}
 /* La marca es el camino de vuelta a la biblioteca. */
-button.tag{padding:6px 2px; transition:opacity .12s}
+button.tag{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 2px; transition:opacity .12s;
+}
 button.tag:hover{opacity:.7}
 #top .right{margin-left:auto; display:flex; align-items:center; gap:10px}
 #btn-party{
@@ -108,16 +112,11 @@ button.tag:hover{opacity:.7}
 .lib h1{font-size:24px; font-weight:700; letter-spacing:-.015em}
 .lib .sub{margin-top:8px; font-size:13.5px; color:var(--muted); line-height:1.65; max-width:560px}
 #lib-grid{margin-top:26px}
-/* La biblioteca va en bloques (películas / anime) y cada bloque lleva su
-   propia rejilla, para que el rótulo ocupe la fila entera sin depender de
-   grid-column en un hijo suelto. */
-.lib-bloque + .lib-bloque{margin-top:32px}
-.lib-rotulo{
-  display:flex; align-items:center; gap:12px; margin-bottom:14px;
-  font-family:var(--mono); font-size:10px; letter-spacing:.18em;
-  text-transform:uppercase; color:var(--dim);
-}
-.lib-rotulo::after{content:""; flex:1; height:1px; background:var(--line)}
+/* Las secciones (películas / anime) van en una barra horizontal y comparten
+   una sola rejilla, con el mismo aspecto que las secciones de una saga. Una
+   debajo de otra no valía: cada título nuevo empujaba el anime más al fondo
+   de la página, y con la biblioteca creciendo eso solo empeora. */
+.lib-tabs{margin:0 0 20px}
 .lib-rejilla{
   display:grid; gap:16px;
   grid-template-columns:repeat(auto-fill,minmax(158px,1fr));
@@ -204,12 +203,13 @@ button.tag:hover{opacity:.7}
 .se-eps{margin-top:26px; display:flex; flex-direction:column; gap:8px}
 /* Secciones de una saga: la serie y cada película. Al cambiar de sección
    cambia la portada entera, no solo la lista de abajo. */
-.se-tabs{
-  display:flex; gap:4px; flex-wrap:wrap; margin:16px 0 0;
+.se-tabs,.lib-tabs{
+  display:flex; gap:4px; flex-wrap:wrap;
   border-bottom:1px solid var(--line);
 }
+.se-tabs{margin:16px 0 0}
 .se-tabs.oculto{display:none}
-.se-tab{
+.se-tab,.lib-tab{
   appearance:none; background:none; border:0; cursor:pointer;
   display:inline-flex; align-items:center; gap:8px;
   padding:9px 13px; margin-bottom:-1px; border-bottom:2px solid transparent;
@@ -217,8 +217,8 @@ button.tag:hover{opacity:.7}
   text-transform:uppercase; color:var(--dim);
   transition:color .15s, border-color .15s;
 }
-.se-tab:hover{color:var(--fg)}
-.se-tab.on{color:var(--fg); border-bottom-color:var(--red)}
+.se-tab:hover,.lib-tab:hover{color:var(--text)}
+.se-tab.on,.lib-tab.on{color:var(--text); border-bottom-color:var(--red)}
 /* El ordinal: la saga se lee de izquierda a derecha y el número lo confirma. */
 .se-tab-n{
   display:inline-flex; align-items:center; justify-content:center;
@@ -600,7 +600,14 @@ button.tag:hover{opacity:.7}
     </svg>
   </a>
   <span class="sep"></span>
-  <button class="tag" id="marca" title="Volver a la biblioteca">MOOVIN</button>
+  <!-- El icono es el mismo trazado del favicon (assets/moovin-favicon.svg), en
+       currentColor para que siga al rojo de la marca. -->
+  <button class="tag" id="marca" title="Volver a la biblioteca">
+    <svg class="marca-ico" viewBox="0 0 876.27 874.82" fill="currentColor" aria-hidden="true">
+      <path d="M1.08,582.41L0,302.19C-.65,131.46,130.07-1.65,303,.02l306.38,2.95c152.34,1.47,267.72,141.24,266.88,290.55l-1.72,307.39c-.86,154.14-136.95,274.21-288.33,273.92l-299.69-.58C128.09,873.93,1.69,742.98,1.08,582.41ZM670.98,820.63c85.92-7.81,145.77-71.41,151.41-157.79,5.07-77.74-16.57-152.57-53.84-222.68-82.97-156.09-213.93-281-375.71-352.86-56.61-25.15-115.91-37.9-176.04-34.9C124.83,56.97,57.47,124.72,53.55,217.62c-11.51,273.02,343.75,627.9,617.43,603.01Z"/>
+    </svg>
+    MOOVIN
+  </button>
   <div class="right">
     <button id="btn-party" title="Abrir Watch Party">
       <span class="dot"></span>
@@ -1763,6 +1770,8 @@ const GRUPOS = [
   { clave: 'anime', rotulo: 'Anime' }
 ];
 const grupoDe = (t) => (t && t.grupo === 'anime' ? 'anime' : 'pelicula');
+const LIBSEC = 'moovinSeccion';
+let libSec = (() => { try { return localStorage[LIBSEC] || ''; } catch (e) { return ''; } })();
 
 function pintaBiblioteca(bib) {
   const grid = $('#lib-grid');
@@ -1774,21 +1783,31 @@ function pintaBiblioteca(bib) {
     grid.appendChild(p);
     return;
   }
-  GRUPOS.forEach((g) => {
-    const suyos = tt.filter((t) => grupoDe(t) === g.clave);
-    // Un bloque vacío no se anuncia: mientras solo haya películas, la
-    // biblioteca se ve como una rejilla normal y sin rótulos de más.
-    if (!suyos.length) return;
-    const bloque = document.createElement('section'); bloque.className = 'lib-bloque';
-    if (GRUPOS.some((o) => o.clave !== g.clave && tt.some((t) => grupoDe(t) === o.clave))) {
-      const rot = document.createElement('div'); rot.className = 'lib-rotulo';
-      rot.textContent = g.rotulo; bloque.appendChild(rot);
-    }
-    const rejilla = document.createElement('div'); rejilla.className = 'lib-rejilla';
-    suyos.forEach((t) => rejilla.appendChild(tarjetaDe(t)));
-    bloque.appendChild(rejilla);
-    grid.appendChild(bloque);
-  });
+  // Solo se ofrecen las secciones que tienen algo. Si queda una sola, no se
+  // pinta la barra: con la biblioteca de una sola clase, unas pestañas que no
+  // llevan a ningún sitio sobran.
+  const conTitulos = GRUPOS.filter((g) => tt.some((t) => grupoDe(t) === g.clave));
+  if (!conTitulos.some((g) => g.clave === libSec)) libSec = conTitulos[0].clave;
+  if (conTitulos.length > 1) {
+    const tabs = document.createElement('div'); tabs.className = 'lib-tabs';
+    conTitulos.forEach((g) => {
+      const b = document.createElement('button');
+      b.className = 'lib-tab' + (g.clave === libSec ? ' on' : '');
+      b.textContent = g.rotulo;
+      b.addEventListener('click', () => {
+        if (g.clave === libSec) return;
+        libSec = g.clave;
+        try { localStorage[LIBSEC] = libSec; } catch (e) { /* cuota llena */ }
+        pintaBiblioteca(bib);
+        $('#loader').scrollTop = 0;
+      });
+      tabs.appendChild(b);
+    });
+    grid.appendChild(tabs);
+  }
+  const rejilla = document.createElement('div'); rejilla.className = 'lib-rejilla';
+  tt.filter((t) => grupoDe(t) === libSec).forEach((t) => rejilla.appendChild(tarjetaDe(t)));
+  grid.appendChild(rejilla);
 }
 function tarjetaDe(t) {
   const card = document.createElement('button'); card.className = 'lib-card';
