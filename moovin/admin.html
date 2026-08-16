@@ -316,8 +316,10 @@ function pintaLista() {
       // Una serie no tiene video propio: lo que cuenta son sus capítulos, y
       // sus pistas viven en cada uno.
       const eps = t.episodios || [];
-      const enR2 = eps.some((e) => !!claveDe(e.url));
-      meta.innerHTML = eps.length + ' capítulo' + (eps.length === 1 ? '' : 's') + ' · ' +
+      const pel = t.peliculas || [];
+      const enR2 = eps.concat(pel).some((e) => !!claveDe(e.url));
+      meta.innerHTML = eps.length + ' capítulo' + (eps.length === 1 ? '' : 's') +
+        (pel.length ? ' · ' + pel.length + ' película' + (pel.length === 1 ? '' : 's') : '') + ' · ' +
         (enR2 ? '<span class="tagr2">almacén R2</span>' : '<span class="tagext">fuente externa</span>');
     } else {
       const enR2 = !!claveDe(t.url);
@@ -350,8 +352,12 @@ async function editar(idx) {
 }
 async function borrar(idx) {
   const t = catalogo.titulos[idx];
-  // Una serie guarda sus archivos dentro de cada capítulo, no en la raíz.
-  const partes = t.tipo === 'serie' ? (t.episodios || []) : [t];
+  // Una serie guarda sus archivos dentro de cada capítulo, no en la raíz. Las
+  // películas de la saga cuelgan de la misma serie: si no se incluyen aquí, al
+  // borrarla sus archivos quedarían huérfanos en el bucket ocupando sitio.
+  const partes = t.tipo === 'serie'
+    ? (t.episodios || []).concat(t.peliculas || [])
+    : [t];
   const claves = [];
   const suma = (u) => { const k = claveDe(u); if (k) claves.push(k); };
   suma(t.poster);
