@@ -107,9 +107,20 @@ button.tag:hover{opacity:.7}
 }
 .lib h1{font-size:24px; font-weight:700; letter-spacing:-.015em}
 .lib .sub{margin-top:8px; font-size:13.5px; color:var(--muted); line-height:1.65; max-width:560px}
-#lib-grid{
-  margin-top:26px; display:grid; gap:16px;
-  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+#lib-grid{margin-top:26px}
+/* La biblioteca va en bloques (películas / anime) y cada bloque lleva su
+   propia rejilla, para que el rótulo ocupe la fila entera sin depender de
+   grid-column en un hijo suelto. */
+.lib-bloque + .lib-bloque{margin-top:32px}
+.lib-rotulo{
+  display:flex; align-items:center; gap:12px; margin-bottom:14px;
+  font-family:var(--mono); font-size:10px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--dim);
+}
+.lib-rotulo::after{content:""; flex:1; height:1px; background:var(--line)}
+.lib-rejilla{
+  display:grid; gap:16px;
+  grid-template-columns:repeat(auto-fill,minmax(158px,1fr));
 }
 .lib-card{
   display:flex; flex-direction:column; text-align:left;
@@ -119,7 +130,7 @@ button.tag:hover{opacity:.7}
 }
 .lib-card:hover{border-color:var(--muted); transform:translateY(-2px)}
 .lib-thumb{
-  position:relative; aspect-ratio:16/9; background:#141416;
+  position:relative; aspect-ratio:2/3; background:#141416;
   display:flex; align-items:center; justify-content:center;
 }
 .lib-thumb img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
@@ -1742,6 +1753,17 @@ function aplicaCatalogoActual() {
   if (audios.length < 2) ponAudios(u.ent.audios, null);
   if (!video.querySelector('track')) ponSubs(u.ent.subs, null);
 }
+/* Los bloques de la biblioteca. `grupo` es del título y NO tiene que ver con
+   `tipo:'serie'`: aquí se separa por lo que se ve (imagen real o animación),
+   así que una serie de anime y una película de anime caen en el mismo sitio.
+   Sin `grupo` se da por hecho que es película: es lo que traen las altas
+   antiguas y lo más probable en una nueva. */
+const GRUPOS = [
+  { clave: 'pelicula', rotulo: 'Películas' },
+  { clave: 'anime', rotulo: 'Anime' }
+];
+const grupoDe = (t) => (t && t.grupo === 'anime' ? 'anime' : 'pelicula');
+
 function pintaBiblioteca(bib) {
   const grid = $('#lib-grid');
   grid.innerHTML = '';
@@ -1752,51 +1774,66 @@ function pintaBiblioteca(bib) {
     grid.appendChild(p);
     return;
   }
-  tt.forEach((t) => {
-    const card = document.createElement('button'); card.className = 'lib-card';
-    const th = document.createElement('div'); th.className = 'lib-thumb';
-    // La rejilla es 16:9 y la ficha 2:3: una carátula oficial vertical puesta
-    // aquí saldría recortada a una franja. Si hay `miniatura` apaisada, se usa.
-    const img0 = t.miniatura || t.poster;
-    if (img0) {
-      const img = document.createElement('img'); img.loading = 'lazy'; img.alt = '';
-      img.src = conPase(absCat(img0)); th.appendChild(img);
-    } else {
-      const ini = document.createElement('span'); ini.className = 'ini';
-      ini.textContent = (t.titulo || '?').slice(0, 2).toUpperCase(); th.appendChild(ini);
+  GRUPOS.forEach((g) => {
+    const suyos = tt.filter((t) => grupoDe(t) === g.clave);
+    // Un bloque vacío no se anuncia: mientras solo haya películas, la
+    // biblioteca se ve como una rejilla normal y sin rótulos de más.
+    if (!suyos.length) return;
+    const bloque = document.createElement('section'); bloque.className = 'lib-bloque';
+    if (GRUPOS.some((o) => o.clave !== g.clave && tt.some((t) => grupoDe(t) === o.clave))) {
+      const rot = document.createElement('div'); rot.className = 'lib-rotulo';
+      rot.textContent = g.rotulo; bloque.appendChild(rot);
     }
-    const esSerie = t.tipo === 'serie';
-    if (esSerie) {
-      // Una serie no tiene duración propia; lo útil es cuántos capítulos trae.
-      const n = (t.episodios || []).length;
-      const np = (t.peliculas || []).length;
-      const e = document.createElement('span'); e.className = 'lib-eps';
-      e.innerHTML = IC.capitulos;
-      e.appendChild(document.createTextNode(
-        n + (n === 1 ? ' capítulo' : ' capítulos')
-        + (np ? ' · ' + np + (np === 1 ? ' película' : ' películas') : '')));
-      th.appendChild(e);
-    } else {
-      if (t.dur) { const d = document.createElement('span'); d.className = 'lib-dur'; d.textContent = t.dur; th.appendChild(d); }
-      const dl = document.createElement('span');
-      dl.className = 'lib-dl'; dl.title = 'Descargar para verla sin cortes';
-      dl.setAttribute('role', 'button'); dl.tabIndex = 0;
-      dl.innerHTML = IC.descarga;
-      dl.addEventListener('click', (ev) => { ev.stopPropagation(); abreDescarga(t); });
-      th.appendChild(dl);
-    }
-    card.appendChild(th);
-    const info = document.createElement('div'); info.className = 'lib-info';
-    const tit = document.createElement('div'); tit.className = 'lib-tit'; tit.textContent = t.titulo || 'Sin título';
-    info.appendChild(tit);
-    if (t.nota) { const no = document.createElement('div'); no.className = 'lib-nota'; no.textContent = t.nota; info.appendChild(no); }
-    card.appendChild(info);
-    card.addEventListener('click', () => {
-      if (esSerie) { abreSerie(t); return; }
-      cargarURL(absCat(t.url), { nombre: t.titulo }); playSafe();
-    });
-    grid.appendChild(card);
+    const rejilla = document.createElement('div'); rejilla.className = 'lib-rejilla';
+    suyos.forEach((t) => rejilla.appendChild(tarjetaDe(t)));
+    bloque.appendChild(rejilla);
+    grid.appendChild(bloque);
   });
+}
+function tarjetaDe(t) {
+  const card = document.createElement('button'); card.className = 'lib-card';
+  const th = document.createElement('div'); th.className = 'lib-thumb';
+  // La rejilla es 2:3, igual que la ficha de serie: manda la carátula
+  // vertical y `miniatura` (apaisada) solo cubre a quien no tenga portada.
+  const img0 = t.poster || t.miniatura;
+  if (img0) {
+    const img = document.createElement('img'); img.loading = 'lazy'; img.alt = '';
+    img.src = conPase(absCat(img0)); th.appendChild(img);
+  } else {
+    const ini = document.createElement('span'); ini.className = 'ini';
+    ini.textContent = (t.titulo || '?').slice(0, 2).toUpperCase(); th.appendChild(ini);
+  }
+  const esSerie = t.tipo === 'serie';
+  if (esSerie) {
+    // Una serie no tiene duración propia; lo útil es cuántos capítulos trae.
+    const n = (t.episodios || []).length;
+    const np = (t.peliculas || []).length;
+    const e = document.createElement('span'); e.className = 'lib-eps';
+    e.innerHTML = IC.capitulos;
+    e.appendChild(document.createTextNode(
+      n + (n === 1 ? ' capítulo' : ' capítulos')
+      + (np ? ' · ' + np + (np === 1 ? ' película' : ' películas') : '')));
+    th.appendChild(e);
+  } else {
+    if (t.dur) { const d = document.createElement('span'); d.className = 'lib-dur'; d.textContent = t.dur; th.appendChild(d); }
+    const dl = document.createElement('span');
+    dl.className = 'lib-dl'; dl.title = 'Descargar para verla sin cortes';
+    dl.setAttribute('role', 'button'); dl.tabIndex = 0;
+    dl.innerHTML = IC.descarga;
+    dl.addEventListener('click', (ev) => { ev.stopPropagation(); abreDescarga(t); });
+    th.appendChild(dl);
+  }
+  card.appendChild(th);
+  const info = document.createElement('div'); info.className = 'lib-info';
+  const tit = document.createElement('div'); tit.className = 'lib-tit'; tit.textContent = t.titulo || 'Sin título';
+  info.appendChild(tit);
+  if (t.nota) { const no = document.createElement('div'); no.className = 'lib-nota'; no.textContent = t.nota; info.appendChild(no); }
+  card.appendChild(info);
+  card.addEventListener('click', () => {
+    if (esSerie) { abreSerie(t); return; }
+    cargarURL(absCat(t.url), { nombre: t.titulo }); playSafe();
+  });
+  return card;
 }
 
 /* ---------- Vista de serie ----------

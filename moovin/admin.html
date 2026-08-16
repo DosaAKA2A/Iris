@@ -167,6 +167,14 @@ h1{font-size:20px; font-weight:700; letter-spacing:-.01em}
       <div class="lbl">Nota (opcional)</div>
       <input id="f-nota" class="in" maxlength="140" placeholder="Descripción corta" />
 
+      <!-- Bloque de la biblioteca. Separa por lo que se ve, no por formato:
+           una película de anime va con las series de anime. -->
+      <div class="lbl">Bloque</div>
+      <select id="f-grupo" class="in">
+        <option value="pelicula">Películas</option>
+        <option value="anime">Anime</option>
+      </select>
+
       <div class="lbl">Video</div>
       <div class="row">
         <button id="f-vid-btn" class="filebtn">Elegir archivo de video (se sube al almacén)</button>
@@ -346,8 +354,13 @@ async function editar(idx) {
   if (nuevo === null) return;
   const nota = prompt('Nota:', t.nota || '');
   if (nota === null) return;
+  const grupo = prompt('Bloque (peliculas / anime):', t.grupo === 'anime' ? 'anime' : 'peliculas');
+  if (grupo === null) return;
   t.titulo = nuevo.trim() || t.titulo;
   t.nota = nota.trim();
+  // Solo se guarda cuando es anime; sin el campo, la biblioteca lo pone con
+  // las películas. delete y no `= undefined`: así no queda la clave suelta.
+  if (/^anime$/i.test(grupo.trim())) t.grupo = 'anime'; else delete t.grupo;
   if (await guardaCatalogo()) { toast('Guardado'); pintaLista(); }
 }
 async function borrar(idx) {
@@ -392,7 +405,7 @@ $('#f-audio-add').addEventListener('click', () => filaAudio());
 function limpiaForm() {
   vidFile = null; vidDur = 0; posterBlob = null; posterPct = 0.35;
   $('#f-titulo').value = ''; $('#f-nota').value = ''; $('#f-vid-url').value = '';
-  $('#f-vid-file').value = ''; $('#f-audio-main').value = '';
+  $('#f-vid-file').value = ''; $('#f-audio-main').value = ''; $('#f-grupo').value = 'pelicula';
   $('#f-vid-info').classList.add('hidden');
   $('#f-poster-zona').classList.add('hidden');
   $('#f-subs').innerHTML = ''; filaSub();
@@ -510,6 +523,9 @@ $('#f-guardar').addEventListener('click', async () => {
 
   try {
     const entrada = { titulo, url: urlExt || '', nota: nota || undefined };
+    // Solo se escribe cuando NO es película: la biblioteca da eso por hecho y
+    // así las fichas antiguas siguen valiendo sin tocarlas.
+    if ($('#f-grupo').value === 'anime') entrada.grupo = 'anime';
     if (vidDur) entrada.dur = fmtT(vidDur);
 
     if (vidFile) {
