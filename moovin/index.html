@@ -1755,9 +1755,12 @@ function pintaBiblioteca(bib) {
   tt.forEach((t) => {
     const card = document.createElement('button'); card.className = 'lib-card';
     const th = document.createElement('div'); th.className = 'lib-thumb';
-    if (t.poster) {
+    // La rejilla es 16:9 y la ficha 2:3: una carátula oficial vertical puesta
+    // aquí saldría recortada a una franja. Si hay `miniatura` apaisada, se usa.
+    const img0 = t.miniatura || t.poster;
+    if (img0) {
       const img = document.createElement('img'); img.loading = 'lazy'; img.alt = '';
-      img.src = conPase(absCat(t.poster)); th.appendChild(img);
+      img.src = conPase(absCat(img0)); th.appendChild(img);
     } else {
       const ini = document.createElement('span'); ini.className = 'ini';
       ini.textContent = (t.titulo || '?').slice(0, 2).toUpperCase(); th.appendChild(ini);
