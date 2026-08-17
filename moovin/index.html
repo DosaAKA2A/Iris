@@ -215,7 +215,10 @@ button.tag:hover{opacity:.7}
   margin-top:11px; font-family:var(--mono); font-size:10px; letter-spacing:.18em;
   text-transform:uppercase; color:var(--dim);
 }
-.se-seguir{margin-top:16px; width:auto; min-width:220px; display:inline-flex; align-items:center; gap:9px; justify-content:center}
+/* button.se-seguir, no .se-seguir a secas: comparte elemento con .cta, que
+   trae width:100% y va después en el archivo; sin más especificidad el botón
+   llenaría su columna y cambiaría de ancho con el texto de la ficha. */
+button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:center; gap:9px; justify-content:center}
 .se-seguir svg{width:15px; height:15px}
 .se-eps{margin-top:26px; display:flex; flex-direction:column; gap:8px}
 /* Secciones de una saga: la serie y cada película. Al cambiar de sección
@@ -2021,27 +2024,25 @@ function porDondeIba(t) {
   const nuevo = eps.find((e) => !prog[absCat(e.url || '')]);
   return nuevo ? { ep: nuevo, seguir: false } : null;
 }
+/* El botón grande dice siempre "Empezar" y mide siempre lo mismo: antes armaba
+   el texto con el número ("Ver el capítulo 3", "Seguir la película"...) y al
+   cambiar de sección o de estado cambiaba de ancho. La acción sigue siendo la
+   de siempre: reanuda el capítulo a medias, o si no arranca el primero sin ver
+   (o la película). */
 function pintaSeguir() {
   const t = serieAbierta; if (!t) return;
   const b = $('#se-seguir');
   const s = seccionesDe(t)[seccion] || seccionesDe(t)[0];
-  if (s.tipo === 'peli') {
-    const pr = progreso()[absCat(s.ent.url || '')];
+  const arranca = (ent) => {
     b.classList.remove('oculto');
     b.innerHTML = IC.play;
-    b.appendChild(document.createTextNode(
-      (pr && pr.p > 0.01 && pr.p < 0.95) ? 'Seguir la película' : 'Ver la película'));
-    b.onclick = () => reproduceEp(s.ent);
-    return;
-  }
+    b.appendChild(document.createTextNode('Empezar'));
+    b.onclick = () => reproduceEp(ent);
+  };
+  if (s.tipo === 'peli') { arranca(s.ent); return; }
   const d = porDondeIba(s.ent);
   if (!d) { b.classList.add('oculto'); return; }
-  b.classList.remove('oculto');
-  b.innerHTML = IC.play;
-  b.appendChild(document.createTextNode(
-    (d.seguir ? 'Seguir con ' : 'Ver ') + 'el capítulo ' +
-    (/^\d+$/.test(String(d.ep.n)) ? Number(d.ep.n) : d.ep.n)));
-  b.onclick = () => reproduceEp(d.ep);
+  arranca(d.ep);
 }
 function cierraSerie() {
   serieAbierta = null;
