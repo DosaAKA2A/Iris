@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Eduardo Enrico — Perfil</title>
-<link rel="icon" href="../assets/iris-favicon.svg" type="image/svg+xml">
+<!-- El favicon oficial viene en blanco y desaparece en pestañas claras: aquí va en azul, embebido -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 876.27 874.82'%3E%3Cpath fill='%231d4ed8' d='M1.08,582.41L0,302.19C-.65,131.46,130.07-1.65,303,.02l306.38,2.95c152.34,1.47,267.72,141.24,266.88,290.55l-1.72,307.39c-.86,154.14-136.95,274.21-288.33,273.92l-299.69-.58C128.09,873.93,1.69,742.98,1.08,582.41ZM670.98,820.63c85.92-7.81,145.77-71.41,151.41-157.79,5.07-77.74-16.57-152.57-53.84-222.68-82.97-156.09-213.93-281-375.71-352.86-56.61-25.15-115.91-37.9-176.04-34.9C124.83,56.97,57.47,124.72,53.55,217.62c-11.51,273.02,343.75,627.9,617.43,603.01Z'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -73,9 +74,11 @@
   .nav-logo-iris {
     display: flex;
     align-items: center;
+    gap: 9px;
     color: var(--blue);
   }
   .nav-logo-iris svg { height: 16px; width: auto; display: block; }
+  .nav-logo-iris .iso { height: 19px; }
 
   .nav-tag {
     font-size: 10px;
@@ -277,6 +280,12 @@
     color: var(--muted);
     letter-spacing: .04em;
   }
+  .cv-edu-note {
+    font-size: 12px;
+    color: var(--soft);
+    line-height: 1.55;
+    margin-top: 5px;
+  }
 
   /* ── HABILIDADES ── */
   .cv-skill-group { margin-bottom: 28px; }
@@ -421,6 +430,9 @@
     Volver
   </a>
   <a class="nav-logo-iris" href="../index.html" aria-label="IRIS">
+    <svg class="iso" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 876.27 874.82" fill="currentColor">
+      <path d="M1.08,582.41L0,302.19C-.65,131.46,130.07-1.65,303,.02l306.38,2.95c152.34,1.47,267.72,141.24,266.88,290.55l-1.72,307.39c-.86,154.14-136.95,274.21-288.33,273.92l-299.69-.58C128.09,873.93,1.69,742.98,1.08,582.41ZM670.98,820.63c85.92-7.81,145.77-71.41,151.41-157.79,5.07-77.74-16.57-152.57-53.84-222.68-82.97-156.09-213.93-281-375.71-352.86-56.61-25.15-115.91-37.9-176.04-34.9C124.83,56.97,57.47,124.72,53.55,217.62c-11.51,273.02,343.75,627.9,617.43,603.01Z"/>
+    </svg>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1705.36 523.43" fill="currentColor">
       <path d="M87.79.43h0c48.46,0,87.79,39.34,87.79,87.79v435.12H0V88.22C0,39.77,39.34.43,87.79.43Z"/>
       <path d="M1705.36,355.5c0,46.36-18.79,88.32-49.16,118.7-30.38,30.37-72.35,49.16-118.7,49.16h-215.23v.07h-301.59c-41.02,0-74.26-33.25-74.26-74.26h0c0-41.02,33.25-74.26,74.26-74.26h301.59s0,.3,0,.3h187.26c10.91,0,20.14-8.64,20.24-19.54.05-5.54-2.17-10.54-5.78-14.16-3.57-3.57-8.5-5.78-13.96-5.78h-266.02c-92.9,0-169.81-76.01-169.12-168.9.34-45.78,19.03-87.2,49.1-117.26,30.33-30.34,72.24-49.1,118.53-49.1h314.78c3.07,0,6.11.09,9.13.28,95.04,5.78,89.98,147.79-5.24,147.79h-290.69c-10.61,0-19.64,8.25-20.02,18.85-.4,11.12,8.5,20.26,19.55,20.26h267.47c92.71,0,167.86,75.16,167.86,167.86Z"/>
@@ -435,7 +447,7 @@
 <!-- HERO HEADER -->
 <div class="cv-hero">
   <div class="cv-hero-eyebrow">Perfil profesional · Madrid, España</div>
-  <h1 class="cv-hero-name">Eduardo<br>Enric<span class="s">o</span></h1>
+  <h1 class="cv-hero-name">Eduardo<br>Enrico</h1>
   <div class="cv-avail-badge">
     <span class="cv-avail-dot"></span>
     Disponibilidad inmediata
@@ -471,6 +483,14 @@
 
   <!-- COLUMNA PRINCIPAL -->
   <main class="cv-main">
+
+    <!-- PERFIL -->
+    <div class="cv-section" style="animation-delay:.1s">
+      <div class="cv-section-label">Perfil</div>
+      <p class="cv-job-desc" style="margin-bottom:0">
+        Perfil híbrido creativo-técnico: vengo del diseño, gestiono e-commerce de punta a punta y construyo mis propias herramientas cuando el proceso lo pide. Me muevo con la misma soltura entre una campaña, un panel de métricas y el código de la tienda, y eso me permite cerrar el ciclo completo: atraer tráfico, medirlo y convertirlo.
+      </p>
+    </div>
 
     <!-- EXPERIENCIA -->
     <div class="cv-section" style="animation-delay:.15s">
@@ -521,12 +541,22 @@
       <div class="cv-section-label">Proyectos</div>
 
       <div class="cv-project">
-        <div class="cv-project-title">Naviris — navegador web</div>
+        <div class="cv-project-title">Naviris — Navegador web</div>
         <p class="cv-project-desc">Navegador propio de Iris Studio construido sobre Electron, con sistema de addons, cuenta de usuario y actualizaciones automáticas. Diseño de interfaz y web del producto en <a href="https://naviris.site" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">naviris.site</a>.</p>
         <div class="cv-tags">
           <span class="cv-tag">Electron</span>
           <span class="cv-tag">JavaScript</span>
           <span class="cv-tag">Diseño UI</span>
+        </div>
+      </div>
+
+      <div class="cv-project">
+        <div class="cv-project-title">Ederus — Tienda online</div>
+        <p class="cv-project-desc">Tienda de microtransacciones montada desde cero para una comunidad de juego online: catálogo de productos digitales, guía de compra para el usuario e integración con la pasarela de pago Tebex. Diseño, desarrollo y despliegue completos, más la definición de la economía de productos y precios de la tienda.</p>
+        <div class="cv-tags">
+          <span class="cv-tag">E-commerce</span>
+          <span class="cv-tag">Tebex</span>
+          <span class="cv-tag">Diseño web</span>
         </div>
       </div>
 
@@ -556,15 +586,16 @@
       <div class="cv-section-label">Formación</div>
 
       <div class="cv-edu">
-        <div class="cv-edu-degree">Postgrado en Comercio Digital</div>
+        <div class="cv-edu-degree">Máster en Comercio Digital</div>
         <div class="cv-edu-school">Universidad Peruana de Ciencias Aplicadas — UPC</div>
         <div class="cv-edu-period">Enero 2025 — Actualidad</div>
       </div>
 
       <div class="cv-edu">
-        <div class="cv-edu-degree">Máster en Diseño Gráfico</div>
+        <div class="cv-edu-degree">Diseño Gráfico</div>
         <div class="cv-edu-school">Cibertec</div>
         <div class="cv-edu-period">Abril 2016 — Diciembre 2023</div>
+        <div class="cv-edu-note">Ingreso por Desarrollo de Videojuegos, convalidado después a Diseño Gráfico: base en programación y motores de juego además del perfil visual.</div>
       </div>
     </div>
 
