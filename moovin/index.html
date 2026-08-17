@@ -749,7 +749,8 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
           Ajustes y no vuelve a aparecer esta pantalla.
         </div>
         <div class="fieldrow" style="margin-top:16px">
-          <input id="pase-in" class="in code" maxlength="24" placeholder="Pase" autocomplete="off" />
+          <input id="pase-in" class="in code" maxlength="24" placeholder="Pase" autocomplete="off"
+                 autocapitalize="characters" autocorrect="off" spellcheck="false" />
           <button id="pase-ok" class="btn red">Entrar</button>
         </div>
         <div id="pase-err" class="hint" style="margin-top:10px; color:var(--err); display:none">
@@ -910,20 +911,53 @@ function toast(text) {
    allí esta pantalla no llega a verse. */
 let pase = { token: '', exp: 0 };
 
+/* El último intento no llegó a preguntarle al worker (sin red, worker caído).
+   Se distingue de "el pase está mal" porque el aviso que ve quien entra tiene
+   que ser otro: en un televisor los dos casos se veían iguales y no había forma
+   de saber si el pase estaba mal escrito o si era la conexión. */
+let paseSinRed = false;
+
+/* Los teclados de televisor y de móvil escriben el guion tipográfico (–), meten
+   espacios sueltos o pasan todo a minúscula sin avisar. El worker compara letra
+   a letra, así que se normaliza aquí antes de mandarlo. */
+function limpiaPase(s) {
+  return String(s || '')
+    .replace(/[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-')  // guiones tipográficos -> guion normal
+    .replace(/\s+/g, '')                     // espacios, incluido el no separable
+    .trim();
+}
+
 async function entrar(codigo) {
-  if (!codigo) return false;
-  try {
-    const r = await fetch(MOOVIN_API + '/entrar', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pase: String(codigo).trim() })
-    });
-    if (!r.ok) return false;
-    const j = await r.json();
-    if (!j.token) return false;
-    pase = { token: j.token, exp: j.exp || 0 };
-    localStorage.moovinPase = String(codigo).trim();
-    return true;
-  } catch (e) { return false; }
+  paseSinRed = false;
+  const limpio = limpiaPase(codigo);
+  if (!limpio) return false;
+  // Se prueba tal cual y, si el worker lo rechaza, en mayúsculas: hay teclados
+  // que escriben en minúscula por su cuenta.
+  const mayus = limpio.toUpperCase();
+  const intentos = limpio === mayus ? [limpio] : [limpio, mayus];
+  for (const intento of intentos) {
+    let r;
+    try {
+      r = await fetch(MOOVIN_API + '/entrar', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pase: intento })
+      });
+    } catch (e) { paseSinRed = true; return false; }
+    if (r.ok) {
+      let j = null;
+      try { j = await r.json(); } catch (e) { paseSinRed = true; return false; }
+      if (!j || !j.token) return false;
+      pase = { token: j.token, exp: j.exp || 0 };
+      // En algunos televisores localStorage existe pero escribir revienta. Eso
+      // no puede tumbar una entrada que el worker ya dio por buena.
+      try { localStorage.moovinPase = intento; } catch (e) { /* sin guardar */ }
+      return true;
+    }
+    // 401 es "pase incorrecto"; cualquier otra cosa es un problema del servicio
+    // y no tiene sentido seguir probando variantes.
+    if (r.status !== 401) { paseSinRed = true; return false; }
+  }
+  return false;
 }
 /* Entrada automática desde Naviris. La app inyecta su clave en
    window.__navMoovinApp y el worker la cambia por el mismo token con caducidad
@@ -2465,8 +2499,14 @@ const dePase = async () => {
   $('#pase-ok').disabled = true;
   const vale = await entrar(c);
   $('#pase-ok').disabled = false;
-  if (vale) { $('#pase-in').value = ''; arranca(); }
-  else { $('#pase-err').style.display = ''; $('#pase-in').select(); }
+  if (vale) { $('#pase-in').value = ''; arranca(); return; }
+  // Sin esta distinción, un televisor sin conexión decía "pase incorrecto" y se
+  // perdía el tiempo reescribiendo un pase que estaba bien.
+  $('#pase-err').textContent = paseSinRed
+    ? 'No se pudo conectar con la biblioteca. Revisa la conexión e inténtalo otra vez.'
+    : 'Ese pase no vale.';
+  $('#pase-err').style.display = '';
+  $('#pase-in').select();
 };
 $('#pase-ok').addEventListener('click', dePase);
 $('#pase-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') dePase(); });
