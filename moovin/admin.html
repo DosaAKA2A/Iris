@@ -30,14 +30,19 @@ header{
   display:flex; align-items:center; gap:14px; height:52px; padding:0 18px;
   border-bottom:1px solid var(--line);
 }
-header .logo{display:inline-flex; color:var(--text)}
+/* El símbolo y el logotipo son la misma marca, IRIS, y van juntos. */
+header .logo{
+  display:inline-flex; align-items:center; gap:8px;
+  color:var(--text); transition:opacity .12s;
+}
+header .logo:hover{opacity:.7}
 header .logo svg{height:15px; width:auto}
+header .logo .marca-ico{width:15px; height:15px; flex:0 0 auto}
 header .sep{width:1px; height:18px; background:var(--line-2)}
 header .tag{
   display:inline-flex; align-items:center; gap:8px;
   font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.22em; color:var(--red);
 }
-header .tag .marca-ico{width:15px; height:15px; flex:0 0 auto}
 header .right{margin-left:auto; font-size:12.5px}
 header .right a{color:var(--muted); text-decoration:none}
 header .right a:hover{color:var(--text)}
@@ -125,6 +130,11 @@ h1{font-size:20px; font-weight:700; letter-spacing:-.01em}
 
 <header>
   <a class="logo" href="/" aria-label="IRIS Studio">
+    <!-- El símbolo es el mismo trazado que assets/iris-favicon.svg: es la marca
+         de IRIS, así que acompaña al logotipo de IRIS y no al del producto. -->
+    <svg class="marca-ico" viewBox="0 0 876.27 874.82" fill="currentColor" aria-hidden="true">
+      <path d="M1.08,582.41L0,302.19C-.65,131.46,130.07-1.65,303,.02l306.38,2.95c152.34,1.47,267.72,141.24,266.88,290.55l-1.72,307.39c-.86,154.14-136.95,274.21-288.33,273.92l-299.69-.58C128.09,873.93,1.69,742.98,1.08,582.41ZM670.98,820.63c85.92-7.81,145.77-71.41,151.41-157.79,5.07-77.74-16.57-152.57-53.84-222.68-82.97-156.09-213.93-281-375.71-352.86-56.61-25.15-115.91-37.9-176.04-34.9C124.83,56.97,57.47,124.72,53.55,217.62c-11.51,273.02,343.75,627.9,617.43,603.01Z"/>
+    </svg>
     <svg viewBox="0 0 1705.36 523.43" fill="currentColor" aria-hidden="true">
       <path d="M87.79.43h0c48.46,0,87.79,39.34,87.79,87.79v435.12H0V88.22C0,39.77,39.34.43,87.79.43Z"/>
       <path d="M1705.36,355.5c0,46.36-18.79,88.32-49.16,118.7-30.38,30.37-72.35,49.16-118.7,49.16h-215.23v.07h-301.59c-41.02,0-74.26-33.25-74.26-74.26h0c0-41.02,33.25-74.26,74.26-74.26h301.59s0,.3,0,.3h187.26c10.91,0,20.14-8.64,20.24-19.54.05-5.54-2.17-10.54-5.78-14.16-3.57-3.57-8.5-5.78-13.96-5.78h-266.02c-92.9,0-169.81-76.01-169.12-168.9.34-45.78,19.03-87.2,49.1-117.26,30.33-30.34,72.24-49.1,118.53-49.1h314.78c3.07,0,6.11.09,9.13.28,95.04,5.78,89.98,147.79-5.24,147.79h-290.69c-10.61,0-19.64,8.25-20.02,18.85-.4,11.12,8.5,20.26,19.55,20.26h267.47c92.71,0,167.86,75.16,167.86,167.86Z"/>
@@ -134,13 +144,7 @@ h1{font-size:20px; font-weight:700; letter-spacing:-.01em}
     </svg>
   </a>
   <span class="sep"></span>
-  <!-- Mismo trazado que assets/moovin-favicon.svg, en currentColor. -->
-  <span class="tag">
-    <svg class="marca-ico" viewBox="0 0 876.27 874.82" fill="currentColor" aria-hidden="true">
-      <path d="M1.08,582.41L0,302.19C-.65,131.46,130.07-1.65,303,.02l306.38,2.95c152.34,1.47,267.72,141.24,266.88,290.55l-1.72,307.39c-.86,154.14-136.95,274.21-288.33,273.92l-299.69-.58C128.09,873.93,1.69,742.98,1.08,582.41ZM670.98,820.63c85.92-7.81,145.77-71.41,151.41-157.79,5.07-77.74-16.57-152.57-53.84-222.68-82.97-156.09-213.93-281-375.71-352.86-56.61-25.15-115.91-37.9-176.04-34.9C124.83,56.97,57.47,124.72,53.55,217.62c-11.51,273.02,343.75,627.9,617.43,603.01Z"/>
-    </svg>
-    MOOVIN · BACKOFFICE
-  </span>
+  <span class="tag">MOOVIN · BACKOFFICE</span>
   <div class="right"><a href="./">Ver MOOVIN</a></div>
 </header>
 
