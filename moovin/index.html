@@ -1030,7 +1030,9 @@ function siguienteEp() {
   const u = ubicaDe(curV);
   // Sin u.peli, una película (idx -1) encadenaría al capítulo 1 de su serie.
   if (!u || !u.serie || u.peli) return null;
-  const eps = u.serie.episodios || [];
+  // La lista de SU temporada: el último capítulo de una no encadena con la
+  // siguiente, igual que no encadena con las películas de la saga.
+  const eps = u.lista || u.serie.episodios || [];
   const sig = eps[u.idx + 1];
   return (sig && sig.url) ? sig : null;
 }
@@ -1736,18 +1738,33 @@ function reindexa(bib) {
   indice = new Map();
   ((bib && bib.titulos) || []).forEach((t) => {
     if (t.tipo === 'serie') {
-      (t.episodios || []).forEach((e, i) => {
-        if (e && e.url) indice.set(absCat(e.url), { ent: e, serie: t, idx: i, peli: false });
+      /* Una serie trae sus capítulos sueltos en `episodios` o repartidos en
+         `temporadas[]`. Se indexan igual, pero se guarda la LISTA a la que
+         pertenece cada capítulo: es lo único que necesita "siguiente capítulo"
+         para encadenar dentro de su temporada y no saltar a la siguiente. */
+      listasDe(t).forEach((l) => {
+        l.eps.forEach((e, i) => {
+          if (e && e.url) {
+            indice.set(absCat(e.url), { ent: e, serie: t, temporada: l.temp, lista: l.eps, idx: i, peli: false });
+          }
+        });
       });
       // Las películas de la saga pertenecen a la serie pero NO a la cadena de
       // capítulos: se marcan para que "siguiente capítulo" no salte desde ellas.
       (t.peliculas || []).forEach((p) => {
-        if (p && p.url) indice.set(absCat(p.url), { ent: p, serie: t, idx: -1, peli: true });
+        if (p && p.url) indice.set(absCat(p.url), { ent: p, serie: t, temporada: null, lista: null, idx: -1, peli: true });
       });
     } else if (t.url) {
-      indice.set(absCat(t.url), { ent: t, serie: null, idx: -1, peli: true });
+      indice.set(absCat(t.url), { ent: t, serie: null, temporada: null, lista: null, idx: -1, peli: true });
     }
   });
+}
+/* Las tandas de capítulos de una serie. Sin `temporadas[]` hay una sola, la de
+   la propia serie, y todo se comporta como antes de que existieran. */
+function listasDe(t) {
+  return (t.temporadas && t.temporadas.length)
+    ? t.temporadas.map((s) => ({ temp: s, eps: s.episodios || [] }))
+    : [{ temp: null, eps: t.episodios || [] }];
 }
 function ubicaDe(url) { return (url && indice.get(url)) || null; }
 function entradaDe(url) { const u = ubicaDe(url); return u ? u.ent : null; }
@@ -1757,7 +1774,10 @@ function nombreDe(u) {
   if (!u.serie) return u.ent.titulo || '';
   // Una película de la saga ya tiene título propio: no lleva número de capítulo.
   if (u.peli) return u.serie.titulo + ' · ' + (u.ent.titulo || '');
-  return u.serie.titulo + ' · ' + etiquetaEp(u.ent) + ' — ' + (u.ent.titulo || '');
+  // Con temporadas manda el nombre de la temporada: "Bakemonogatari · E1"
+  // dice más que "Monogatari Series · E1", que se repetiría en todas.
+  const casa = (u.temporada && u.temporada.titulo) || u.serie.titulo;
+  return casa + ' · ' + etiquetaEp(u.ent) + ' — ' + (u.ent.titulo || '');
 }
 const etiquetaEp = (e) => (/^\d+$/.test(String(e.n || '')) ? 'E' + e.n : String(e.n || ''));
 // La película pudo llegar antes que el catálogo (?v= o latido de la sala):
@@ -1836,12 +1856,17 @@ function tarjetaDe(t) {
   const esSerie = t.tipo === 'serie';
   if (esSerie) {
     // Una serie no tiene duración propia; lo útil es cuántos capítulos trae.
-    const n = (t.episodios || []).length;
+    // Con temporadas se suman todas: en la rejilla interesa el tamaño de la
+    // saga entera, y el reparto ya se ve al abrirla.
+    const listas = listasDe(t);
+    const n = listas.reduce((a, l) => a + l.eps.length, 0);
+    const nt = (t.temporadas || []).length;
     const np = (t.peliculas || []).length;
     const e = document.createElement('span'); e.className = 'lib-eps';
     e.innerHTML = IC.capitulos;
     e.appendChild(document.createTextNode(
-      n + (n === 1 ? ' capítulo' : ' capítulos')
+      (nt > 1 ? nt + ' temporadas · ' : '')
+      + n + (n === 1 ? ' capítulo' : ' capítulos')
       + (np ? ' · ' + np + (np === 1 ? ' película' : ' películas') : '')));
     th.appendChild(e);
   } else {
@@ -1885,20 +1910,26 @@ function guardaProgreso(url, seg, total) {
 let serieAbierta = null;
 let seccion = 0;   // 0 = la serie; 1..n = serieAbierta.peliculas[seccion-1]
 
-/* Una saga se ve como varias secciones EN ORDEN DE VISIONADO: la temporada y
-   luego sus películas, tal como vengan en el catálogo. La sección 0 siempre
-   existe, así que una serie sin películas se comporta igual que antes. */
+/* Una saga se ve como varias secciones EN ORDEN DE VISIONADO: primero sus
+   temporadas y luego sus películas, tal como vengan en el catálogo. Sin
+   `temporadas[]` ni `peliculas[]` queda una sola sección y todo se comporta
+   igual que antes de que existieran. */
 function seccionesDe(t) {
-  return [{ tipo: 'serie', ent: t, tab: t.etiqueta || 'Serie' }].concat(
-    (t.peliculas || []).map((p, i) => ({
+  const temps = (t.temporadas || []).map((s, i) => ({
+    tipo: 'serie', ent: s, tab: s.etiqueta || s.titulo || ('Temporada ' + (i + 1))
+  }));
+  return (temps.length ? temps : [{ tipo: 'serie', ent: t, tab: t.etiqueta || 'Serie' }])
+    .concat((t.peliculas || []).map((p, i) => ({
       tipo: 'peli', ent: p, tab: p.etiqueta || ('Película ' + (i + 1))
     })));
 }
-// Al abrir la biblioteca con algo sonando se entra por su propia sección.
+// Al abrir la biblioteca con algo sonando se entra por su propia sección: la
+// temporada del capítulo, o la película si es una película.
 function seccionDeUrl(u) {
-  if (!u || !u.serie || !u.peli) return 0;
-  const i = (u.serie.peliculas || []).indexOf(u.ent);
-  return i >= 0 ? i + 1 : 0;
+  if (!u || !u.serie) return 0;
+  const secs = seccionesDe(u.serie);
+  const i = secs.findIndex((s) => s.ent === (u.peli ? u.ent : (u.temporada || u.serie)));
+  return i > 0 ? i : 0;
 }
 function abreSerie(t, sec) {
   serieAbierta = t;
@@ -1940,7 +1971,11 @@ function pintaTabs() {
    cifra, botón grande y lista. */
 function pintaSeccion() {
   const t = serieAbierta; if (!t) return;
-  const s = seccionesDe(t)[seccion] || seccionesDe(t)[0];
+  // El ÍNDICE, no el objeto: seccionesDe() construye secciones nuevas en cada
+  // llamada, así que comparar los objetos entre sí no casa nunca.
+  const secs = seccionesDe(t);
+  const i = (seccion >= 0 && seccion < secs.length) ? seccion : 0;
+  const s = secs[i];
   const ent = s.ent;
   const poster = $('#se-poster');
   if (ent.poster) { poster.src = conPase(absCat(ent.poster)); poster.classList.remove('oculto'); }
@@ -1951,9 +1986,12 @@ function pintaSeccion() {
     // La pestaña ya dice qué lugar ocupa; aquí se dice qué es.
     $('#se-cifra').textContent = 'Película' + (ent.dur ? ' · ' + ent.dur : '');
   } else {
-    const eps = t.episodios || [], pel = t.peliculas || [];
+    // Los capítulos son los de ESTA sección (la temporada abierta), no los de
+    // toda la saga. Las películas sí se cuentan una sola vez, en la primera.
+    const eps = ent.episodios || [], pel = t.peliculas || [];
+    const primera = i === 0;
     $('#se-cifra').textContent = eps.length + (eps.length === 1 ? ' capítulo' : ' capítulos')
-      + (pel.length ? ' · ' + pel.length + (pel.length === 1 ? ' película' : ' películas') : '');
+      + (primera && pel.length ? ' · ' + pel.length + (pel.length === 1 ? ' película' : ' películas') : '');
   }
   pintaSeguir();
   pintaLista();
@@ -1962,7 +2000,7 @@ function pintaSeccion() {
    botón grande hace lo que se espera sin tener que buscar en la lista. */
 function porDondeIba(t) {
   const prog = progreso();
-  const eps = t.episodios || [];
+  const eps = t.episodios || [];   // `t` es la sección abierta, no la saga entera
   const medias = eps.find((e) => { const p = prog[absCat(e.url || '')]; return p && p.p > 0.01 && p.p < 0.95; });
   if (medias) return { ep: medias, seguir: true };
   const nuevo = eps.find((e) => !prog[absCat(e.url || '')]);
@@ -1981,7 +2019,7 @@ function pintaSeguir() {
     b.onclick = () => reproduceEp(s.ent);
     return;
   }
-  const d = porDondeIba(t);
+  const d = porDondeIba(s.ent);
   if (!d) { b.classList.add('oculto'); return; }
   b.classList.remove('oculto');
   b.innerHTML = IC.play;
@@ -2051,7 +2089,7 @@ function pintaLista() {
     cont.appendChild(filaLista(s.ent, s.tab, 'Descargar esta película'));
     return;
   }
-  (t.episodios || []).forEach((e) => {
+  (s.ent.episodios || []).forEach((e) => {
     const etq = /^\d+$/.test(String(e.n)) ? 'Capítulo ' + Number(e.n) : String(e.n || '');
     cont.appendChild(filaLista(e, etq, 'Descargar este capítulo'));
   });
@@ -2438,7 +2476,13 @@ $('#pase-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') dePase
 window.MOOVIN = {
   sala: () => sala, cargar: cargarURL, video, audio: a2, enviar: send, entrar, arranca,
   audios: () => audios, eligeAudio, eligeSub, tamSub: ponTamSub, estSub: ponEstSub,
-  descarga: () => abreDescarga(entradaDe(curV))
+  descarga: () => abreDescarga(entradaDe(curV)),
+  // Para probar la biblioteca sin depender de lo que haya publicado: `pon`
+  // mete un catálogo de mentira y repinta, igual que si lo hubiera traído el
+  // worker. El resto son las piezas que deciden secciones y encadenado.
+  catalogo: () => bibData,
+  pon: (b) => { bibData = b; reindexa(b); pintaBiblioteca(b); },
+  abreSerie, secciones: seccionesDe, siguiente: siguienteEp, ubica: ubicaDe
 };
 })();
 </script>

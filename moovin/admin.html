@@ -248,6 +248,14 @@ const claveDe = (u) => {
   if (!u || String(u).indexOf(MEDIA) !== 0) return null;
   try { return new URL(u).searchParams.get('key') || null; } catch (e) { return null; }
 };
+/* Todos los capítulos de una serie, vengan sueltos en `episodios` o repartidos
+   en `temporadas[]`. Contar y borrar tienen que mirar los dos sitios: si aquí
+   se olvidan las temporadas, al borrar la serie sus archivos se quedan en el
+   bucket sin que nadie los reclame. */
+const capitulosDe = (t) => (t.temporadas && t.temporadas.length)
+  ? t.temporadas.reduce((a, s) => a.concat(s.episodios || []), [])
+  : (t.episodios || []);
+
 const PARTE = 48 * 1024 * 1024;   // 48 MB por parte (el worker admite ~100)
 
 const $ = (s) => document.querySelector(s);
@@ -337,10 +345,12 @@ function pintaLista() {
     if (t.tipo === 'serie') {
       // Una serie no tiene video propio: lo que cuenta son sus capítulos, y
       // sus pistas viven en cada uno.
-      const eps = t.episodios || [];
+      const eps = capitulosDe(t);
       const pel = t.peliculas || [];
+      const nt = (t.temporadas || []).length;
       const enR2 = eps.concat(pel).some((e) => !!claveDe(e.url));
-      meta.innerHTML = eps.length + ' capítulo' + (eps.length === 1 ? '' : 's') +
+      meta.innerHTML = (nt > 1 ? nt + ' temporadas · ' : '') +
+        eps.length + ' capítulo' + (eps.length === 1 ? '' : 's') +
         (pel.length ? ' · ' + pel.length + ' película' + (pel.length === 1 ? '' : 's') : '') + ' · ' +
         (enR2 ? '<span class="tagr2">almacén R2</span>' : '<span class="tagext">fuente externa</span>');
     } else {
@@ -380,14 +390,17 @@ async function editar(idx) {
 async function borrar(idx) {
   const t = catalogo.titulos[idx];
   // Una serie guarda sus archivos dentro de cada capítulo, no en la raíz. Las
-  // películas de la saga cuelgan de la misma serie: si no se incluyen aquí, al
-  // borrarla sus archivos quedarían huérfanos en el bucket ocupando sitio.
+  // películas de la saga y los capítulos de cada temporada cuelgan de la misma
+  // serie: si no se incluyen aquí, al borrarla sus archivos quedarían
+  // huérfanos en el bucket ocupando sitio.
   const partes = t.tipo === 'serie'
-    ? (t.episodios || []).concat(t.peliculas || [])
+    ? capitulosDe(t).concat(t.peliculas || [])
     : [t];
   const claves = [];
   const suma = (u) => { const k = claveDe(u); if (k) claves.push(k); };
   suma(t.poster);
+  suma(t.miniatura);
+  (t.temporadas || []).forEach((s) => { suma(s.poster); suma(s.miniatura); });
   partes.forEach((p) => {
     [p.url, p.poster, p.miniatura].forEach(suma);
     (p.subs || []).concat(p.audios || []).forEach((s) => suma(s.url));
