@@ -177,10 +177,14 @@ button.tag:hover{opacity:.7}
 .lib-dl svg{width:14px; height:14px}
 /* Marca de serie sobre la miniatura: una serie no se reproduce al tocarla,
    abre su lista de capítulos, y conviene que se note antes de hacer clic. */
+/* La chapa va ENCIMA de la carátula, así que se queda en una línea pase lo que
+   pase: si el texto crece, esto se parte en dos y el recuadro sube tapando la
+   ilustración en vez de estorbar solo en la esquina. */
 .lib-eps{
   position:absolute; right:7px; bottom:7px; padding:2px 7px; border-radius:6px;
   background:rgba(0,0,0,.72); font-family:var(--mono); font-size:10.5px;
   color:var(--text); display:flex; align-items:center; gap:5px;
+  white-space:nowrap; max-width:calc(100% - 14px); overflow:hidden;
 }
 .lib-eps svg{width:11px; height:11px}
 
@@ -1855,19 +1859,16 @@ function tarjetaDe(t) {
   }
   const esSerie = t.tipo === 'serie';
   if (esSerie) {
-    // Una serie no tiene duración propia; lo útil es cuántos capítulos trae.
-    // Con temporadas se suman todas: en la rejilla interesa el tamaño de la
-    // saga entera, y el reparto ya se ve al abrirla.
-    const listas = listasDe(t);
-    const n = listas.reduce((a, l) => a + l.eps.length, 0);
-    const nt = (t.temporadas || []).length;
-    const np = (t.peliculas || []).length;
+    /* Una serie no tiene duración propia; lo útil es cuántos capítulos trae, y
+       con temporadas se suman todas. La chapa dice SOLO eso: es una etiqueta
+       encima de la portada y cada palabra de más se come la ilustración. Antes
+       llevaba también las temporadas y las películas, y con eso se partía en
+       dos líneas y tapaba un tercio de la carátula. El reparto por temporadas
+       y las películas ya se ven enteros al abrir la ficha. */
+    const n = listasDe(t).reduce((a, l) => a + l.eps.length, 0);
     const e = document.createElement('span'); e.className = 'lib-eps';
     e.innerHTML = IC.capitulos;
-    e.appendChild(document.createTextNode(
-      (nt > 1 ? nt + ' temporadas · ' : '')
-      + n + (n === 1 ? ' capítulo' : ' capítulos')
-      + (np ? ' · ' + np + (np === 1 ? ' película' : ' películas') : '')));
+    e.appendChild(document.createTextNode(n + (n === 1 ? ' capítulo' : ' capítulos')));
     th.appendChild(e);
   } else {
     if (t.dur) { const d = document.createElement('span'); d.className = 'lib-dur'; d.textContent = t.dur; th.appendChild(d); }
