@@ -234,12 +234,22 @@ button.tag:hover{opacity:.7}
   text-transform:uppercase; color:var(--dim);
   transition:color .15s, border-color .15s;
 }
-/* Las pestañas de temporada se reparten la fila a partes iguales, así todas
-   miden lo mismo aunque el nombre sea más largo o más corto. Solo estas; las
-   de la biblioteca (Películas/Anime) siguen ajustándose a su texto. */
-.se-tab{flex:1 1 0; min-width:0; justify-content:center; white-space:nowrap}
-.se-tab:hover,.lib-tab:hover{color:var(--text)}
-.se-tab.on,.lib-tab.on{color:var(--text); border-bottom-color:var(--red)}
+/* Las pestañas de temporada se reparten la fila a partes iguales Y se dibujan
+   como recuadros: sin el recuadro, como son texto de largo distinto, se leen
+   como de tamaños distintos aunque el hueco clicable sea idéntico. Con el
+   borde se ve que todas miden lo mismo. Solo estas; las de la biblioteca
+   (Películas/Anime) siguen siendo pestañas de texto subrayadas. */
+.se-tab{
+  flex:1 1 0; min-width:0; justify-content:center; white-space:nowrap;
+  border:1px solid var(--line-2); border-radius:8px; margin-bottom:0;
+  background:var(--panel); color:var(--muted); overflow:hidden;
+  transition:color .15s, border-color .15s, background .15s;
+}
+.se-tabs{border-bottom:0; gap:8px}
+.lib-tab:hover{color:var(--text)}
+.lib-tab.on{color:var(--text); border-bottom-color:var(--red)}
+.se-tab:hover{color:var(--text); background:#141416; border-color:#2a2a2e}
+.se-tab.on{color:var(--text); background:rgba(220,64,42,.16); border-color:var(--red)}
 /* El ordinal: la saga se lee de izquierda a derecha y el número lo confirma. */
 .se-tab-n{
   display:inline-flex; align-items:center; justify-content:center;
