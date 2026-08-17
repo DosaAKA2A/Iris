@@ -12,19 +12,20 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --black:  #080808;
-    --white:  #f5f5f5;
-    --grey:   #888;
-    --red:    #dc402a;
-    --border: rgba(255,255,255,0.07);
-    --muted:  rgba(255,255,255,0.35);
+    --bg:     #ffffff;
+    --ink:    #2b2b2b;
+    --body:   rgba(20,20,20,0.72);
+    --soft:   rgba(20,20,20,0.55);
+    --blue:   #1d4ed8;
+    --border: rgba(0,0,0,0.09);
+    --muted:  rgba(0,0,0,0.42);
   }
 
-  html { scroll-behavior: smooth; background: #000; }
+  html { scroll-behavior: smooth; background: #f4f5f7; }
 
   body {
-    background: var(--black);
-    color: var(--white);
+    background: var(--bg);
+    color: var(--ink);
     font-family: 'Inter', system-ui, sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
@@ -34,7 +35,7 @@
     max-width: 1920px;
     width: 100%;
     margin: 0 auto;
-    background: var(--black);
+    background: var(--bg);
     min-height: 100vh;
   }
 
@@ -49,7 +50,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 16px 28px;
-    background: rgba(8,8,8,0.85);
+    background: rgba(255,255,255,0.85);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border);
@@ -66,7 +67,7 @@
     font-family: 'Inter', sans-serif;
     transition: color .2s;
   }
-  .nav-back:hover { color: var(--white); }
+  .nav-back:hover { color: var(--ink); }
   .nav-back svg { width: 14px; height: 14px; }
 
   .nav-logo {
@@ -74,10 +75,10 @@
     font-size: 18px;
     font-weight: 700;
     letter-spacing: -.02em;
-    color: var(--white);
+    color: var(--ink);
     text-decoration: none;
   }
-  .nav-logo .s { color: var(--red); }
+  .nav-logo .s { color: var(--blue); }
 
   .nav-tag {
     font-size: 10px;
@@ -110,10 +111,10 @@
     font-weight: 700;
     line-height: .9;
     letter-spacing: -.03em;
-    color: var(--white);
+    color: var(--ink);
     margin-bottom: 32px;
   }
-  .cv-hero-name .s { color: var(--red); }
+  .cv-hero-name .s { color: var(--blue); }
 
   .cv-hero-meta {
     display: flex;
@@ -123,11 +124,11 @@
   }
 
   .cv-hero-role {
-    font-size: clamp(14px, 1.5vw, 18px);
-    color: rgba(255,255,255,0.6);
-    font-weight: 300;
-    line-height: 1.5;
-    max-width: 420px;
+    font-size: clamp(15px, 1.5vw, 18px);
+    color: var(--body);
+    font-weight: 400;
+    line-height: 1.55;
+    max-width: 460px;
   }
 
   .cv-hero-contacts {
@@ -141,13 +142,13 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 12px;
-    color: var(--muted);
+    font-size: 13px;
+    color: var(--soft);
     letter-spacing: .03em;
     text-decoration: none;
     transition: color .2s;
   }
-  .cv-contact-item:hover { color: var(--white); }
+  .cv-contact-item:hover { color: var(--blue); }
   .cv-contact-item svg { width: 13px; height: 13px; flex-shrink: 0; }
 
   /* ── LAYOUT ── */
@@ -178,10 +179,11 @@
   .cv-section:last-child { border-bottom: none; }
 
   .cv-section-label {
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: .2em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--blue);
+    font-weight: 600;
     font-family: 'Inter', sans-serif;
     margin-bottom: 32px;
     display: flex;
@@ -208,14 +210,14 @@
   }
 
   .cv-job-title {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
-    color: var(--white);
+    color: var(--ink);
     letter-spacing: -.01em;
   }
 
   .cv-job-period {
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: .06em;
     color: var(--muted);
     white-space: nowrap;
@@ -226,13 +228,14 @@
     font-size: 11px;
     letter-spacing: .06em;
     text-transform: uppercase;
-    color: var(--red);
+    color: var(--blue);
+    font-weight: 600;
     margin-bottom: 12px;
   }
 
   .cv-job-desc {
-    font-size: 13px;
-    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+    color: var(--body);
     line-height: 1.7;
     margin-bottom: 14px;
   }
@@ -244,11 +247,12 @@
   }
 
   .cv-tag {
-    font-size: 9px;
-    letter-spacing: .1em;
+    font-size: 10px;
+    letter-spacing: .08em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.4);
+    color: var(--soft);
     border: 1px solid var(--border);
+    background: rgba(0,0,0,0.02);
     padding: 4px 10px;
     border-radius: 100px;
   }
@@ -258,25 +262,38 @@
   .cv-edu:last-child { margin-bottom: 0; }
 
   .cv-edu-degree {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
-    color: var(--white);
+    color: var(--ink);
     margin-bottom: 4px;
   }
   .cv-edu-school {
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: .06em;
-    color: var(--red);
+    color: var(--blue);
+    font-weight: 600;
     margin-bottom: 4px;
   }
   .cv-edu-period {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--muted);
     letter-spacing: .04em;
   }
 
   /* ── HABILIDADES ── */
+  .cv-skill-group { margin-bottom: 28px; }
+  .cv-skill-group:last-child { margin-bottom: 0; }
+
+  .cv-skill-group-title {
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
   .cv-skills-grid {
     display: flex;
     flex-direction: column;
@@ -287,10 +304,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 0;
+    padding: 11px 0;
     border-bottom: 1px solid var(--border);
-    font-size: 12px;
-    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    color: var(--body);
     letter-spacing: .02em;
   }
   .cv-skill-item:last-child { border-bottom: none; }
@@ -298,7 +315,7 @@
   .cv-skill-dot {
     width: 4px; height: 4px;
     border-radius: 50%;
-    background: var(--red);
+    background: var(--blue);
     flex-shrink: 0;
   }
 
@@ -309,12 +326,12 @@
     align-items: center;
     padding: 12px 0;
     border-bottom: 1px solid var(--border);
-    font-size: 12px;
+    font-size: 13px;
   }
   .cv-lang:last-child { border-bottom: none; }
-  .cv-lang-name { color: rgba(255,255,255,0.6); }
+  .cv-lang-name { color: var(--body); }
   .cv-lang-level {
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: .1em;
     text-transform: uppercase;
     color: var(--muted);
@@ -327,9 +344,9 @@
     gap: 7px;
     padding: 6px 14px;
     border-radius: 100px;
-    border: 1px solid rgba(63,185,80,0.4);
-    background: rgba(63,185,80,0.1);
-    color: #3fb950;
+    border: 1px solid rgba(22,134,58,0.35);
+    background: rgba(22,134,58,0.07);
+    color: #16863a;
     font-size: 11px;
     font-weight: 500;
     letter-spacing: .06em;
@@ -339,7 +356,7 @@
   .cv-avail-dot {
     width: 6px; height: 6px;
     border-radius: 50%;
-    background: #3fb950;
+    background: #16863a;
     animation: pulse 2s ease-in-out infinite;
     flex-shrink: 0;
   }
@@ -358,7 +375,7 @@
   }
   .cv-avail-item:last-child { border-bottom: none; }
   .cv-avail-label { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-  .cv-avail-value { font-size: 12px; color: rgba(255,255,255,0.6); }
+  .cv-avail-value { font-size: 13px; color: var(--body); }
 
   /* ── PROYECTOS ── */
   .cv-project {
@@ -367,14 +384,14 @@
   }
   .cv-project:last-child { border-bottom: none; }
   .cv-project-title {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
-    color: var(--white);
+    color: var(--ink);
     margin-bottom: 6px;
   }
   .cv-project-desc {
-    font-size: 12px;
-    color: rgba(255,255,255,0.45);
+    font-size: 13px;
+    color: var(--body);
     line-height: 1.65;
     margin-bottom: 10px;
   }
@@ -406,8 +423,8 @@
     </svg>
     Volver
   </a>
-  <a class="nav-logo-center nav-logo-pill" href="../index.html" style="display:flex;align-items:center;gap:9px;padding:10px 20px 10px 14px;border-radius:100px;background:rgba(12,12,12,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.12);text-decoration:none;transition:border-color .2s;">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.98 19.98" style="width:24px;height:24px;background:#dc402a;border-radius:6px;padding:2px;flex-shrink:0;">
+  <a class="nav-logo-center nav-logo-pill" href="../index.html" style="display:flex;align-items:center;gap:9px;padding:10px 20px 10px 14px;border-radius:100px;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(0,0,0,0.12);text-decoration:none;transition:border-color .2s;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.98 19.98" style="width:24px;height:24px;background:#1d4ed8;border-radius:6px;padding:2px;flex-shrink:0;">
       <g fill="#f5f5f5">
         <path d="M9.54,6.21c0,.99-.35,1.83-1.05,2.53s-1.54,1.05-2.53,1.05-1.83-.35-2.53-1.05-1.05-1.54-1.05-2.53.35-1.83,1.05-2.53,1.54-1.05,2.53-1.05h1.01v-.53h2.56v4.1ZM7.5,5.95c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.13-.91.38-.38.55-.38.91.12.65.38.9.55.38.91.38.65-.12.9-.38.38-.55.38-.9Z"/>
         <path d="M17.4,5.95c0,1.06-.38,1.96-1.12,2.71s-1.65,1.12-2.71,1.12-1.97-.38-2.72-1.12-1.12-1.65-1.12-2.71.38-1.96,1.13-2.72,1.66-1.13,2.72-1.13,1.96.38,2.71,1.12,1.12,1.66,1.12,2.72ZM14.84,5.95c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.13-.91.38-.38.55-.38.91.12.65.38.9.55.38.91.38.65-.12.9-.38.38-.55.38-.9Z"/>
@@ -415,7 +432,7 @@
         <path d="M17.61,17.79h-2.56v-3.63c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.12-.9.38-.38.55-.38.91v3.63h-2.56v-3.63c0-1.06.38-1.97,1.12-2.72s1.65-1.12,2.71-1.12,1.96.38,2.71,1.12,1.12,1.66,1.12,2.72v3.63ZM14.3,17.27c0,.14-.05.27-.16.37s-.23.15-.38.15-.27-.05-.37-.15-.16-.22-.16-.37.05-.27.16-.37.23-.16.37-.16.27.05.38.16.16.23.16.37Z"/>
       </g>
     </svg>
-    <span style="font-family:'Clash Display',sans-serif;font-size:14px;font-weight:700;letter-spacing:.12em;color:#f5f5f5;text-transform:uppercase;">DOSA</span>
+    <span style="font-family:'Clash Display',sans-serif;font-size:14px;font-weight:700;letter-spacing:.12em;color:#2b2b2b;text-transform:uppercase;">DOSA</span>
   </a>
   <span class="nav-tag">Perfil</span>
 </nav>
@@ -430,8 +447,8 @@
   </div>
   <div class="cv-hero-meta">
     <p class="cv-hero-role">
-      Diseñador digital y gestor de e-commerce con perfil híbrido creativo-técnico.<br>
-      Especializado en identidad visual, interfaces y automatización de procesos digitales.
+      Especialista en e-commerce y marketing digital con perfil híbrido creativo-técnico.<br>
+      Gestión de tiendas online, campañas de visibilidad y venta en Meta y Google, medición de conversiones y automatización de procesos digitales.
     </p>
     <div class="cv-hero-contacts">
       <a class="cv-contact-item" href="mailto:hatred.aka2a@gmail.com">
@@ -466,16 +483,18 @@
           <span class="cv-job-period">Nov 2024 — Abr 2026</span>
         </div>
         <div class="cv-job-company">Corlima</div>
-        <p class="cv-job-desc">Responsable de la gestión integral del ecosistema digital: administración del e-commerce en PrestaShop, planificación y ejecución de campañas publicitarias en Meta Ads, y desarrollo de contenido gráfico y audiovisual para plataformas digitales. Construcción de herramientas internas de automatización para gestión de catálogo y generación de fichas técnicas.</p>
+        <p class="cv-job-desc">Responsable de la gestión integral del ecosistema digital: administración del e-commerce en PrestaShop, planificación y ejecución de campañas en Meta Ads y Google Ads, e implementación de la medición de conversiones (GA4, Google Tag Manager y píxel de Meta) para optimizar las campañas hacia la compra. Construcción y mantenimiento del feed de catálogo de productos para Meta (extracción con SQL, transformación a CSV y carga), automatización de procesos de catálogo y generación de fichas técnicas, y desarrollo de contenido gráfico y audiovisual para plataformas digitales.</p>
         <div class="cv-tags">
           <span class="cv-tag">PrestaShop</span>
           <span class="cv-tag">Meta Ads</span>
+          <span class="cv-tag">Google Ads</span>
+          <span class="cv-tag">GA4</span>
+          <span class="cv-tag">Google Tag Manager</span>
+          <span class="cv-tag">Feeds de catálogo</span>
+          <span class="cv-tag">SQL</span>
           <span class="cv-tag">E-commerce</span>
           <span class="cv-tag">Adobe Photoshop</span>
           <span class="cv-tag">Adobe Illustrator</span>
-          <span class="cv-tag">Diseño web</span>
-          <span class="cv-tag">Shopify</span>
-          <span class="cv-tag">Campañas publicitarias</span>
         </div>
       </div>
 
@@ -517,12 +536,13 @@
 
       <div class="cv-project">
         <div class="cv-project-title">Contenido & Campañas Corlima</div>
-        <p class="cv-project-desc">Producción de contenido para Instagram, Facebook y WhatsApp con modelo de doble variante (aspiracional + urgencia). Prompts de fotografía de producto en Adobe Firefly para vidrio y cristalería con efectos de transparencia y refracción realista.</p>
+        <p class="cv-project-desc">Producción de contenido para Instagram, Facebook y WhatsApp con modelo de doble variante (aspiracional + urgencia). Prompts de fotografía de producto en Adobe Firefly para vidrio y cristalería con efectos de transparencia y refracción realista. Planificación de calendario de campañas estacionales (catálogo, remarketing y visibilidad de marca).</p>
         <div class="cv-tags">
           <span class="cv-tag">Meta Ads</span>
           <span class="cv-tag">Adobe Firefly</span>
           <span class="cv-tag">Copywriting</span>
           <span class="cv-tag">Social Media</span>
+          <span class="cv-tag">Planificación de campañas</span>
         </div>
       </div>
 
@@ -540,12 +560,13 @@
 
       <div class="cv-project">
         <div class="cv-project-title">DOSA Tools</div>
-        <p class="cv-project-desc">Suite de herramientas web bajo marca propia. Incluye Scale Corlima (reescalado de imágenes para e-commerce), Firma Corlima, Carga Masiva para PrestaShop, y una sección de Filtros con efectos Dreamy Blur y CRT Machine sobre imágenes. Desarrollado en HTML/CSS/JS vanilla y desplegado en GitHub Pages.</p>
+        <p class="cv-project-desc">Suite de herramientas web bajo marca propia para automatizar tareas repetitivas de e-commerce. Incluye Scale Corlima (reescalado de imágenes para tienda online), Firma Corlima, Carga Masiva para PrestaShop, y una sección de Filtros con efectos Dreamy Blur y CRT Machine sobre imágenes. Desarrollado en HTML/CSS/JS vanilla y desplegado en GitHub Pages.</p>
         <div class="cv-tags">
           <span class="cv-tag">JavaScript</span>
           <span class="cv-tag">Canvas API</span>
           <span class="cv-tag">HTML/CSS</span>
           <span class="cv-tag">GitHub Pages</span>
+          <span class="cv-tag">Automatización</span>
         </div>
       </div>
     </div>
@@ -575,19 +596,47 @@
     <!-- HABILIDADES -->
     <div class="cv-section" style="animation-delay:.2s">
       <div class="cv-section-label">Habilidades</div>
-      <div class="cv-skills-grid">
-        <div class="cv-skill-item"><span>Adobe Illustrator</span><div class="cv-skill-dot"></div></div>
-        <div class="cv-skill-item"><span>Adobe Photoshop</span><div class="cv-skill-dot"></div></div>
-        <div class="cv-skill-item"><span>Adobe Premiere Pro</span><div class="cv-skill-dot"></div></div>
-        <div class="cv-skill-item"><span>Adobe Firefly</span><div class="cv-skill-dot"></div></div>
-        <div class="cv-skill-item"><span>Autodesk Maya</span><div class="cv-skill-dot"></div></div>
-        <div class="cv-skill-item"><span>PrestaShop</span><div class="cv-skill-dot"></div></div>
-        <div class="cv-skill-item"><span>Shopify</span><div class="cv-skill-dot"></div></div>
-        <div class="cv-skill-item"><span>VTEX</span><div class="cv-skill-dot"></div></div>
-        <div class="cv-skill-item"><span>Facebook / Meta Ads</span><div class="cv-skill-dot"></div></div>
-        <div class="cv-skill-item"><span>HTML / CSS / JS</span><div class="cv-skill-dot"></div></div>
-        <div class="cv-skill-item"><span>Diseño UI / UX</span><div class="cv-skill-dot"></div></div>
-        <div class="cv-skill-item"><span>Canvas API</span><div class="cv-skill-dot"></div></div>
+
+      <div class="cv-skill-group">
+        <div class="cv-skill-group-title">E-commerce</div>
+        <div class="cv-skills-grid">
+          <div class="cv-skill-item"><span>PrestaShop</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>Shopify</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>VTEX</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>Feeds de producto (Meta Catálogo)</span><div class="cv-skill-dot"></div></div>
+        </div>
+      </div>
+
+      <div class="cv-skill-group">
+        <div class="cv-skill-group-title">Marketing digital</div>
+        <div class="cv-skills-grid">
+          <div class="cv-skill-item"><span>Meta Ads (campañas y catálogo)</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>Google Ads</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>GA4 / Google Tag Manager</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>Píxel y medición de conversiones</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>Copywriting / Social Media</span><div class="cv-skill-dot"></div></div>
+        </div>
+      </div>
+
+      <div class="cv-skill-group">
+        <div class="cv-skill-group-title">Desarrollo y automatización</div>
+        <div class="cv-skills-grid">
+          <div class="cv-skill-item"><span>HTML / CSS / JavaScript</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>SQL (catálogos y reportes)</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>Automatización de procesos</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>Cloudflare (Pages / Workers)</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>Git / GitHub Pages</span><div class="cv-skill-dot"></div></div>
+        </div>
+      </div>
+
+      <div class="cv-skill-group">
+        <div class="cv-skill-group-title">Diseño</div>
+        <div class="cv-skills-grid">
+          <div class="cv-skill-item"><span>Adobe Illustrator / Photoshop</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>Adobe Premiere Pro</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>Adobe Firefly (IA generativa)</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>Diseño UI / UX</span><div class="cv-skill-dot"></div></div>
+        </div>
       </div>
     </div>
 
