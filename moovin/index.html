@@ -234,6 +234,10 @@ button.tag:hover{opacity:.7}
   text-transform:uppercase; color:var(--dim);
   transition:color .15s, border-color .15s;
 }
+/* Las pestañas de temporada se reparten la fila a partes iguales, así todas
+   miden lo mismo aunque el nombre sea más largo o más corto. Solo estas; las
+   de la biblioteca (Películas/Anime) siguen ajustándose a su texto. */
+.se-tab{flex:1 1 0; min-width:0; justify-content:center; white-space:nowrap}
 .se-tab:hover,.lib-tab:hover{color:var(--text)}
 .se-tab.on,.lib-tab.on{color:var(--text); border-bottom-color:var(--red)}
 /* El ordinal: la saga se lee de izquierda a derecha y el número lo confirma. */
