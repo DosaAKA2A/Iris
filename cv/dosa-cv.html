@@ -7,7 +7,7 @@
 <link rel="icon" href="../assets/iris-favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Clash+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -70,15 +70,12 @@
   .nav-back:hover { color: var(--ink); }
   .nav-back svg { width: 14px; height: 14px; }
 
-  .nav-logo {
-    font-family: 'Clash Display', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: -.02em;
-    color: var(--ink);
-    text-decoration: none;
+  .nav-logo-iris {
+    display: flex;
+    align-items: center;
+    color: var(--blue);
   }
-  .nav-logo .s { color: var(--blue); }
+  .nav-logo-iris svg { height: 16px; width: auto; display: block; }
 
   .nav-tag {
     font-size: 10px;
@@ -106,11 +103,11 @@
   }
 
   .cv-hero-name {
-    font-family: 'Clash Display', sans-serif;
-    font-size: clamp(56px, 8vw, 120px);
-    font-weight: 700;
-    line-height: .9;
-    letter-spacing: -.03em;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(48px, 7vw, 96px);
+    font-weight: 800;
+    line-height: .95;
+    letter-spacing: -.045em;
     color: var(--ink);
     margin-bottom: 32px;
   }
@@ -423,16 +420,14 @@
     </svg>
     Volver
   </a>
-  <a class="nav-logo-center nav-logo-pill" href="../index.html" style="display:flex;align-items:center;gap:9px;padding:10px 20px 10px 14px;border-radius:100px;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(0,0,0,0.12);text-decoration:none;transition:border-color .2s;">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.98 19.98" style="width:24px;height:24px;background:#1d4ed8;border-radius:6px;padding:2px;flex-shrink:0;">
-      <g fill="#f5f5f5">
-        <path d="M9.54,6.21c0,.99-.35,1.83-1.05,2.53s-1.54,1.05-2.53,1.05-1.83-.35-2.53-1.05-1.05-1.54-1.05-2.53.35-1.83,1.05-2.53,1.54-1.05,2.53-1.05h1.01v-.53h2.56v4.1ZM7.5,5.95c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.13-.91.38-.38.55-.38.91.12.65.38.9.55.38.91.38.65-.12.9-.38.38-.55.38-.9Z"/>
-        <path d="M17.4,5.95c0,1.06-.38,1.96-1.12,2.71s-1.65,1.12-2.71,1.12-1.97-.38-2.72-1.12-1.12-1.65-1.12-2.71.38-1.96,1.13-2.72,1.66-1.13,2.72-1.13,1.96.38,2.71,1.12,1.12,1.66,1.12,2.72ZM14.84,5.95c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.13-.91.38-.38.55-.38.91.12.65.38.9.55.38.91.38.65-.12.9-.38.38-.55.38-.9Z"/>
-        <path d="M9.96,12.76h-1.17c-.36,0-.66.12-.91.38s-.38.55-.38.9c0,1.06-.38,1.96-1.12,2.71s-1.66,1.12-2.72,1.12h-1.17v-2.55h1.17c.36,0,.66-.12.91-.38s.38-.55.38-.9c0-1.06.38-1.96,1.12-2.71s1.66-1.12,2.72-1.12h1.17v2.56Z"/>
-        <path d="M17.61,17.79h-2.56v-3.63c0-.36-.12-.66-.38-.91s-.55-.38-.9-.38-.65.12-.9.38-.38.55-.38.91v3.63h-2.56v-3.63c0-1.06.38-1.97,1.12-2.72s1.65-1.12,2.71-1.12,1.96.38,2.71,1.12,1.12,1.66,1.12,2.72v3.63ZM14.3,17.27c0,.14-.05.27-.16.37s-.23.15-.38.15-.27-.05-.37-.15-.16-.22-.16-.37.05-.27.16-.37.23-.16.37-.16.27.05.38.16.16.23.16.37Z"/>
-      </g>
+  <a class="nav-logo-iris" href="../index.html" aria-label="IRIS">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1705.36 523.43" fill="currentColor">
+      <path d="M87.79.43h0c48.46,0,87.79,39.34,87.79,87.79v435.12H0V88.22C0,39.77,39.34.43,87.79.43Z"/>
+      <path d="M1705.36,355.5c0,46.36-18.79,88.32-49.16,118.7-30.38,30.37-72.35,49.16-118.7,49.16h-215.23v.07h-301.59c-41.02,0-74.26-33.25-74.26-74.26h0c0-41.02,33.25-74.26,74.26-74.26h301.59s0,.3,0,.3h187.26c10.91,0,20.14-8.64,20.24-19.54.05-5.54-2.17-10.54-5.78-14.16-3.57-3.57-8.5-5.78-13.96-5.78h-266.02c-92.9,0-169.81-76.01-169.12-168.9.34-45.78,19.03-87.2,49.1-117.26,30.33-30.34,72.24-49.1,118.53-49.1h314.78c3.07,0,6.11.09,9.13.28,95.04,5.78,89.98,147.79-5.24,147.79h-290.69c-10.61,0-19.64,8.25-20.02,18.85-.4,11.12,8.5,20.26,19.55,20.26h267.47c92.71,0,167.86,75.16,167.86,167.86Z"/>
+      <path d="M956.74.43h0c48.46,0,87.79,39.34,87.79,87.79v435.12h-175.59V88.22c0-48.46,39.34-87.79,87.79-87.79Z"/>
+      <path d="M661.69,375.2h27.42c81.77,0,148.16,66.39,148.16,148.16h-175.59v-148.16h0Z"/>
+      <path d="M688.74,0H207.25v187.46h-45.19c-41.02,0-74.27,33.25-74.27,74.27h0c0,41.02,33.25,74.27,74.27,74.27h45.19v187.36h175.59v-187.36h305.9c82.04,0,148.54-66.5,148.54-148.54v-38.92C837.28,66.5,770.78,0,688.74,0ZM655.99,181.76c-3.53,3.52-8.4,5.7-13.77,5.7h-259.38v-38.92h258.89c10.75,0,19.85,8.51,19.96,19.26.05,5.46-2.14,10.4-5.7,13.96Z"/>
     </svg>
-    <span style="font-family:'Clash Display',sans-serif;font-size:14px;font-weight:700;letter-spacing:.12em;color:#2b2b2b;text-transform:uppercase;">DOSA</span>
   </a>
   <span class="nav-tag">Perfil</span>
 </nav>
@@ -447,10 +442,14 @@
   </div>
   <div class="cv-hero-meta">
     <p class="cv-hero-role">
-      Especialista en e-commerce y marketing digital con perfil híbrido creativo-técnico.<br>
-      Gestión de tiendas online, campañas de visibilidad y venta en Meta y Google, medición de conversiones y automatización de procesos digitales.
+      Especialista en e-commerce y marketing digital.<br>
+      Tiendas online, campañas en Meta y Google, y automatización de procesos.
     </p>
     <div class="cv-hero-contacts">
+      <a class="cv-contact-item" href="https://iris.it.com" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 12h17M12 3.5c2.5 2.3 3.8 5.2 3.8 8.5s-1.3 6.2-3.8 8.5c-2.5-2.3-3.8-5.2-3.8-8.5s1.3-6.2 3.8-8.5z" stroke="currentColor" stroke-width="1.5"/></svg>
+        iris.it.com
+      </a>
       <a class="cv-contact-item" href="mailto:hatred.aka2a@gmail.com">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 7l9 6 9-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         hatred.aka2a@gmail.com
@@ -483,18 +482,13 @@
           <span class="cv-job-period">Nov 2024 — Abr 2026</span>
         </div>
         <div class="cv-job-company">Corlima</div>
-        <p class="cv-job-desc">Responsable de la gestión integral del ecosistema digital: administración del e-commerce en PrestaShop, planificación y ejecución de campañas en Meta Ads y Google Ads, e implementación de la medición de conversiones (GA4, Google Tag Manager y píxel de Meta) para optimizar las campañas hacia la compra. Construcción y mantenimiento del feed de catálogo de productos para Meta (extracción con SQL, transformación a CSV y carga), automatización de procesos de catálogo y generación de fichas técnicas, y desarrollo de contenido gráfico y audiovisual para plataformas digitales.</p>
+        <p class="cv-job-desc">Gestión integral del e-commerce en PrestaShop: campañas en Meta Ads y Google Ads, medición de conversiones (GA4, Tag Manager y píxel) optimizada a compra, feed de catálogo para Meta con SQL y automatización de procesos de catálogo y contenido.</p>
         <div class="cv-tags">
           <span class="cv-tag">PrestaShop</span>
           <span class="cv-tag">Meta Ads</span>
           <span class="cv-tag">Google Ads</span>
-          <span class="cv-tag">GA4</span>
-          <span class="cv-tag">Google Tag Manager</span>
-          <span class="cv-tag">Feeds de catálogo</span>
+          <span class="cv-tag">GA4 / GTM</span>
           <span class="cv-tag">SQL</span>
-          <span class="cv-tag">E-commerce</span>
-          <span class="cv-tag">Adobe Photoshop</span>
-          <span class="cv-tag">Adobe Illustrator</span>
         </div>
       </div>
 
@@ -504,14 +498,11 @@
           <span class="cv-job-period">Oct 2019 — Jul 2021</span>
         </div>
         <div class="cv-job-company">Ventus · Importación y exportación</div>
-        <p class="cv-job-desc">Diseño publicitario y gráfico para campañas comerciales. Desarrollo de materiales visuales en Adobe Illustrator y Photoshop. Edición de imagen y apoyo en diseño web con enfoque en comunicación visual atractiva y funcional.</p>
+        <p class="cv-job-desc">Diseño publicitario para campañas comerciales en Illustrator y Photoshop, edición de imagen y apoyo en diseño web.</p>
         <div class="cv-tags">
           <span class="cv-tag">Adobe Illustrator</span>
           <span class="cv-tag">Adobe Photoshop</span>
-          <span class="cv-tag">Diseño gráfico</span>
-          <span class="cv-tag">Campañas publicitarias</span>
           <span class="cv-tag">Diseño web</span>
-          <span class="cv-tag">Autodesk Maya</span>
         </div>
       </div>
 
@@ -521,12 +512,7 @@
           <span class="cv-job-period">Jun 2017 — May 2018</span>
         </div>
         <div class="cv-job-company">Tiendas por Departamento Ripley · Retail</div>
-        <p class="cv-job-desc">Atención al público, capacitación en técnicas de venta y promoción de productos en sala.</p>
-        <div class="cv-tags">
-          <span class="cv-tag">Atención al cliente</span>
-          <span class="cv-tag">Ventas</span>
-          <span class="cv-tag">Retail</span>
-        </div>
+        <p class="cv-job-desc">Atención al público, técnicas de venta y promoción de productos en sala.</p>
       </div>
     </div>
 
@@ -535,38 +521,32 @@
       <div class="cv-section-label">Proyectos</div>
 
       <div class="cv-project">
-        <div class="cv-project-title">Contenido & Campañas Corlima</div>
-        <p class="cv-project-desc">Producción de contenido para Instagram, Facebook y WhatsApp con modelo de doble variante (aspiracional + urgencia). Prompts de fotografía de producto en Adobe Firefly para vidrio y cristalería con efectos de transparencia y refracción realista. Planificación de calendario de campañas estacionales (catálogo, remarketing y visibilidad de marca).</p>
+        <div class="cv-project-title">Naviris — navegador web</div>
+        <p class="cv-project-desc">Navegador propio de Iris Studio construido sobre Electron, con sistema de addons, cuenta de usuario y actualizaciones automáticas. Diseño de interfaz y web del producto en <a href="https://naviris.site" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">naviris.site</a>.</p>
         <div class="cv-tags">
-          <span class="cv-tag">Meta Ads</span>
-          <span class="cv-tag">Adobe Firefly</span>
-          <span class="cv-tag">Copywriting</span>
-          <span class="cv-tag">Social Media</span>
-          <span class="cv-tag">Planificación de campañas</span>
+          <span class="cv-tag">Electron</span>
+          <span class="cv-tag">JavaScript</span>
+          <span class="cv-tag">Diseño UI</span>
         </div>
       </div>
 
       <div class="cv-project">
-        <div class="cv-project-title">Proyecto Aurora — Iris Studio</div>
-        <p class="cv-project-desc">Servidor de videojuegos desarrollado de forma colaborativa por el equipo de Iris Studio, colectivo creativo del que formo parte. Mi rol se centró en el crecimiento y la retención de la comunidad: definición de estrategia de paid media, gestión de campañas orientadas a captación, dinamización activa en redes sociales y diseño de mecánicas de engagement que impulsaron la participación continua de los usuarios.</p>
+        <div class="cv-project-title">Contenido & Campañas Corlima</div>
+        <p class="cv-project-desc">Contenido para Instagram, Facebook y WhatsApp con doble variante (aspiracional + urgencia) y calendario de campañas estacionales de catálogo, remarketing y visibilidad de marca.</p>
         <div class="cv-tags">
-          <span class="cv-tag">Paid Media</span>
-          <span class="cv-tag">Community Management</span>
-          <span class="cv-tag">Redes Sociales</span>
-          <span class="cv-tag">Engagement</span>
-          <span class="cv-tag">Iris Studio</span>
+          <span class="cv-tag">Meta Ads</span>
+          <span class="cv-tag">Social Media</span>
+          <span class="cv-tag">Copywriting</span>
         </div>
       </div>
 
       <div class="cv-project">
         <div class="cv-project-title">DOSA Tools</div>
-        <p class="cv-project-desc">Suite de herramientas web bajo marca propia para automatizar tareas repetitivas de e-commerce. Incluye Scale Corlima (reescalado de imágenes para tienda online), Firma Corlima, Carga Masiva para PrestaShop, y una sección de Filtros con efectos Dreamy Blur y CRT Machine sobre imágenes. Desarrollado en HTML/CSS/JS vanilla y desplegado en GitHub Pages.</p>
+        <p class="cv-project-desc">Suite web propia que automatiza tareas repetitivas de e-commerce: reescalado de imágenes, firma y carga masiva para PrestaShop. Más proyectos en <a href="https://iris.it.com" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">iris.it.com</a>.</p>
         <div class="cv-tags">
           <span class="cv-tag">JavaScript</span>
-          <span class="cv-tag">Canvas API</span>
-          <span class="cv-tag">HTML/CSS</span>
-          <span class="cv-tag">GitHub Pages</span>
           <span class="cv-tag">Automatización</span>
+          <span class="cv-tag">GitHub Pages</span>
         </div>
       </div>
     </div>
@@ -598,22 +578,12 @@
       <div class="cv-section-label">Habilidades</div>
 
       <div class="cv-skill-group">
-        <div class="cv-skill-group-title">E-commerce</div>
+        <div class="cv-skill-group-title">E-commerce y marketing</div>
         <div class="cv-skills-grid">
-          <div class="cv-skill-item"><span>PrestaShop</span><div class="cv-skill-dot"></div></div>
-          <div class="cv-skill-item"><span>Shopify</span><div class="cv-skill-dot"></div></div>
-          <div class="cv-skill-item"><span>VTEX</span><div class="cv-skill-dot"></div></div>
-          <div class="cv-skill-item"><span>Feeds de producto (Meta Catálogo)</span><div class="cv-skill-dot"></div></div>
-        </div>
-      </div>
-
-      <div class="cv-skill-group">
-        <div class="cv-skill-group-title">Marketing digital</div>
-        <div class="cv-skills-grid">
-          <div class="cv-skill-item"><span>Meta Ads (campañas y catálogo)</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>PrestaShop / Shopify</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>Meta Ads</span><div class="cv-skill-dot"></div></div>
           <div class="cv-skill-item"><span>Google Ads</span><div class="cv-skill-dot"></div></div>
           <div class="cv-skill-item"><span>GA4 / Google Tag Manager</span><div class="cv-skill-dot"></div></div>
-          <div class="cv-skill-item"><span>Píxel y medición de conversiones</span><div class="cv-skill-dot"></div></div>
           <div class="cv-skill-item"><span>Copywriting / Social Media</span><div class="cv-skill-dot"></div></div>
         </div>
       </div>
@@ -622,9 +592,8 @@
         <div class="cv-skill-group-title">Desarrollo y automatización</div>
         <div class="cv-skills-grid">
           <div class="cv-skill-item"><span>HTML / CSS / JavaScript</span><div class="cv-skill-dot"></div></div>
-          <div class="cv-skill-item"><span>SQL (catálogos y reportes)</span><div class="cv-skill-dot"></div></div>
+          <div class="cv-skill-item"><span>SQL</span><div class="cv-skill-dot"></div></div>
           <div class="cv-skill-item"><span>Automatización de procesos</span><div class="cv-skill-dot"></div></div>
-          <div class="cv-skill-item"><span>Cloudflare (Pages / Workers)</span><div class="cv-skill-dot"></div></div>
           <div class="cv-skill-item"><span>Git / GitHub Pages</span><div class="cv-skill-dot"></div></div>
         </div>
       </div>
@@ -634,7 +603,6 @@
         <div class="cv-skills-grid">
           <div class="cv-skill-item"><span>Adobe Illustrator / Photoshop</span><div class="cv-skill-dot"></div></div>
           <div class="cv-skill-item"><span>Adobe Premiere Pro</span><div class="cv-skill-dot"></div></div>
-          <div class="cv-skill-item"><span>Adobe Firefly (IA generativa)</span><div class="cv-skill-dot"></div></div>
           <div class="cv-skill-item"><span>Diseño UI / UX</span><div class="cv-skill-dot"></div></div>
         </div>
       </div>
