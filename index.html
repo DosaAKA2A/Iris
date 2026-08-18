@@ -146,8 +146,9 @@
     .hq-fondo .hq-velo{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.34) 0%,rgba(0,0,0,0) 38%,rgba(0,0,0,.58) 100%)}
     .hq-hoja,.hq-video{min-width:0;position:relative;z-index:1}
     .hq-hoja{position:relative;color:#fff;border-radius:var(--r-hoja);display:flex;flex-direction:column;padding:22px clamp(16px,2.6vw,38px) 24px;overflow:hidden}
+    .hq-hoja>*{position:relative;z-index:2}
+    /* despues de la regla de hijos, para ganarle por orden */
     .hq-hoja-bg{position:absolute;inset:0;z-index:0;background:var(--grafito);border-radius:var(--r-hoja)}
-    .hq-hoja>:not(.hq-hoja-bg){position:relative;z-index:2}
 
     /* Barra de arriba: la de siempre, pero dentro de la lámina */
     .heroq .hz-top{position:static;padding:0;gap:16px}
