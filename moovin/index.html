@@ -262,6 +262,54 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 }
 .se-tab.on .se-tab-n{border-color:var(--red); background:var(--red); color:#fff}
 .se-tabs + .se-cab{margin-top:22px}
+/* Pasadas CUATRO secciones las pestañas dejan de caber en una fila y el texto
+   se recortaba a media palabra (Monogatari ya va por siete temporadas). A
+   partir de ahí el selector se dibuja como un desplegable, que ocupa lo mismo
+   con siete que con veinte y siempre enseña entera la sección en la que estás.
+   Con pocas secciones siguen siendo pestañas: se ven todas de un vistazo. */
+.se-tabs.desplegable{display:block; gap:0; border-bottom:0; max-width:420px}
+.se-pick{position:relative}
+.se-pick-btn{
+  width:100%; display:flex; align-items:center; gap:10px; text-align:left;
+  padding:11px 13px; border:1px solid var(--line-2); border-radius:10px;
+  background:var(--panel); color:var(--text);
+  transition:border-color .15s, background .15s;
+}
+.se-pick-btn:hover{border-color:#2a2a2e; background:#141416}
+.se-pick.abierto .se-pick-btn{border-color:var(--red)}
+.se-pick-nom{
+  flex:1; min-width:0; font-size:13.5px; font-weight:600;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.se-pick-cnt{
+  flex:0 0 auto; font-family:var(--mono); font-size:9.5px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--dim);
+}
+.se-pick-fl{flex:0 0 auto; width:12px; height:12px; color:var(--muted); transition:transform .15s}
+.se-pick.abierto .se-pick-fl{transform:rotate(180deg)}
+.se-pick-menu{
+  position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:5;
+  max-height:min(58vh,340px); overflow:auto; overscroll-behavior:contain;
+  background:var(--surface); border:1px solid var(--line-2); border-radius:10px;
+  padding:5px; display:flex; flex-direction:column; gap:2px;
+}
+.se-pick-menu.oculto{display:none}
+.se-pick-menu::-webkit-scrollbar{width:8px}
+.se-pick-menu::-webkit-scrollbar-thumb{background:var(--line-2); border-radius:99px}
+.se-pick-op{
+  display:flex; align-items:center; gap:10px; text-align:left;
+  padding:9px 10px; border-radius:7px; color:var(--muted);
+  transition:color .12s, background .12s;
+}
+.se-pick-op:hover{background:rgba(255,255,255,.07); color:var(--text)}
+.se-pick-op.on{background:rgba(220,64,42,.14); color:var(--text)}
+.se-pick-op-nom{flex:1; min-width:0; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.se-pick-op.on .se-pick-op-nom{font-weight:600}
+.se-pick-op .se-tab-n,.se-pick-btn .se-tab-n{
+  width:19px; height:19px; flex:0 0 auto;
+  font-family:var(--mono); font-size:9.5px;
+}
+.se-pick-op.on .se-tab-n,.se-pick-btn .se-tab-n{border-color:var(--red); background:var(--red); color:#fff}
 .se-ep{
   display:flex; gap:14px; align-items:center; text-align:left; padding:9px;
   border:1px solid var(--line); border-radius:12px; background:var(--bg);
@@ -1996,13 +2044,27 @@ function abreSerie(t, sec) {
   pintaSeccion();
   $('#loader').scrollTop = 0;
 }
+// A partir de aquí el selector deja de ser pestañas y pasa a desplegable.
+const TABS_MAX = 4;
+// Lo que hay dentro de cada sección, que es lo que ayuda a elegir.
+function cuentaDe(s) {
+  if (s.tipo === 'peli') return 'Película';
+  const n = (s.ent.episodios || []).length;
+  return n === 1 ? '1 capítulo' : n + ' capítulos';
+}
+function eligeSeccion(i) {
+  if (i === seccion) return;
+  seccion = i; pintaTabs(); pintaSeccion(); $('#loader').scrollTop = 0;
+}
 function pintaTabs() {
   const t = serieAbierta; if (!t) return;
   const cont = $('#se-tabs'); cont.innerHTML = '';
   const secs = seccionesDe(t);
   // Con una sola sección no hay nada que elegir: no se enseña el selector.
   cont.classList.toggle('oculto', secs.length < 2);
+  cont.classList.toggle('desplegable', secs.length > TABS_MAX);
   if (secs.length < 2) return;
+  if (secs.length > TABS_MAX) { pintaDesplegable(cont, secs); return; }
   secs.forEach((s, i) => {
     const b = document.createElement('button');
     b.className = 'se-tab' + (i === seccion ? ' on' : '');
@@ -2012,13 +2074,88 @@ function pintaTabs() {
     num.className = 'se-tab-n'; num.textContent = i + 1;
     b.appendChild(num);
     b.appendChild(document.createTextNode(s.tab));
-    b.addEventListener('click', () => {
-      if (i === seccion) return;
-      seccion = i; pintaTabs(); pintaSeccion(); $('#loader').scrollTop = 0;
-    });
+    b.addEventListener('click', () => eligeSeccion(i));
     cont.appendChild(b);
   });
 }
+/* El desplegable de secciones. Enseña siempre la sección actual entera y con
+   lo que tiene dentro; la lista se abre encima del contenido y se cierra al
+   elegir, al pulsar fuera o con Escape. */
+function pintaDesplegable(cont, secs) {
+  const s = secs[seccion] || secs[0];
+  const caja = document.createElement('div');
+  caja.className = 'se-pick';
+  const btn = document.createElement('button');
+  btn.className = 'se-pick-btn';
+  btn.setAttribute('aria-haspopup', 'listbox');
+  btn.setAttribute('aria-expanded', 'false');
+  const num = document.createElement('span');
+  num.className = 'se-tab-n'; num.textContent = (seccion + 1);
+  const nom = document.createElement('span');
+  nom.className = 'se-pick-nom'; nom.textContent = s.tab;
+  const cnt = document.createElement('span');
+  cnt.className = 'se-pick-cnt'; cnt.textContent = cuentaDe(s);
+  const fl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  fl.setAttribute('class', 'se-pick-fl'); fl.setAttribute('viewBox', '0 0 24 24');
+  fl.setAttribute('fill', 'none'); fl.setAttribute('stroke', 'currentColor');
+  fl.setAttribute('stroke-width', '2.4'); fl.setAttribute('stroke-linecap', 'round');
+  fl.setAttribute('stroke-linejoin', 'round');
+  const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  p.setAttribute('d', 'M5 9l7 7 7-7'); fl.appendChild(p);
+  btn.append(num, nom, cnt, fl);
+
+  const menu = document.createElement('div');
+  menu.className = 'se-pick-menu oculto';
+  menu.setAttribute('role', 'listbox');
+  secs.forEach((sx, i) => {
+    const op = document.createElement('button');
+    op.className = 'se-pick-op' + (i === seccion ? ' on' : '');
+    op.setAttribute('role', 'option');
+    op.setAttribute('aria-selected', i === seccion ? 'true' : 'false');
+    const n = document.createElement('span');
+    n.className = 'se-tab-n'; n.textContent = i + 1;
+    const t2 = document.createElement('span');
+    t2.className = 'se-pick-op-nom'; t2.textContent = sx.tab;
+    const c2 = document.createElement('span');
+    c2.className = 'se-pick-cnt'; c2.textContent = cuentaDe(sx);
+    op.append(n, t2, c2);
+    op.addEventListener('click', () => { cierra(); eligeSeccion(i); });
+    menu.appendChild(op);
+  });
+
+  const cierra = () => {
+    menu.classList.add('oculto');
+    caja.classList.remove('abierto');
+    btn.setAttribute('aria-expanded', 'false');
+  };
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const abrir = menu.classList.contains('oculto');
+    menu.classList.toggle('oculto', !abrir);
+    caja.classList.toggle('abierto', abrir);
+    btn.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+    // La sección actual puede quedar fuera de la parte visible de la lista.
+    if (abrir) {
+      const act = menu.querySelector('.se-pick-op.on');
+      if (act) act.scrollIntoView({ block: 'nearest' });
+    }
+  });
+  caja.append(btn, menu);
+  cont.appendChild(caja);
+}
+function cierraDesplegables() {
+  document.querySelectorAll('.se-pick.abierto').forEach((c) => {
+    c.classList.remove('abierto');
+    c.querySelector('.se-pick-menu').classList.add('oculto');
+    c.querySelector('.se-pick-btn').setAttribute('aria-expanded', 'false');
+  });
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.se-pick')) cierraDesplegables();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') cierraDesplegables();
+});
 /* Cambiar de sección cambia la portada entera: póster, título, descripción,
    cifra, botón grande y lista. */
 function pintaSeccion() {
