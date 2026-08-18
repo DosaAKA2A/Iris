@@ -128,6 +128,91 @@
       text-transform:uppercase;padding:5px 10px;border-radius:999px;color:#fff;
       background:rgba(5,5,5,.4);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25)}
     .case__badge svg{width:10px;height:10px}
+
+    /* ===================== HERO 2026-08-18 (maqueta Quantum) =====================
+       Solo afecta al hero: todo cuelga de .heroq y usa clases hq-. Dos piezas —
+       lámina de texto a la izquierda, vídeo a la derecha— con las medidas
+       tomadas de la plantilla de referencia (766/455, marco 10, radio 30).
+       El mordisco de la esquina es el fondo de la página comiéndose la lámina;
+       sus dos esquinas convexas se dibujan con discos transparentes. */
+    .heroq{
+      --marco:10px; --r-hoja:30px; --r-caja:20px;
+      --grafito:#17171a; --hq-linea:rgba(255,255,255,.14);
+      position:relative; min-height:calc(100svh - var(--marco)*2); margin:var(--marco);
+      display:grid; grid-template-columns:766fr 455fr; gap:var(--marco);
+    }
+    .hq-hoja,.hq-video{min-width:0}
+    .hq-hoja{position:relative;background:var(--grafito);color:#fff;border-radius:var(--r-hoja);display:flex;flex-direction:column;padding:22px clamp(16px,2.6vw,38px) 24px;overflow:hidden}
+    .hq-hoja>*{position:relative;z-index:2}
+
+    /* Barra de arriba: la de siempre, pero dentro de la lámina */
+    .heroq .hz-top{position:static;padding:0;gap:16px}
+    .heroq .hz-time{display:none}
+
+    .hq-cuerpo{flex:1;display:flex;flex-direction:column;justify-content:center;padding:30px clamp(6px,3vw,46px);max-width:780px}
+    .hq-ficha{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-bottom:18px;color:#cfcfcf}
+    .hq-pin{width:10px;height:10px;border:2px solid currentColor;border-radius:3px;display:inline-block;flex:none}
+    .hq-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;display:inline-block;flex:none}
+    .hq-titulo{font-size:clamp(34px,4.4vw,60px);line-height:1.02;letter-spacing:-.035em;font-weight:700;max-width:14ch}
+    .hq-sub{margin-top:22px;max-width:46ch;color:#d6d6d6;font-weight:400;font-size:clamp(15px,1.15vw,17.5px)}
+    .hq-ctas{display:flex;flex-wrap:wrap;align-items:center;gap:22px;margin-top:34px}
+    .hq-pill{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:16px 28px;background:var(--invert-bg);color:var(--invert-text);font-family:var(--font-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;transition:transform .15s ease,background .25s ease,color .25s ease}
+    .hq-pill:hover{transform:translateY(-1px);background:var(--accent);color:var(--accent-ink)}
+
+    .hq-cinta{display:flex;gap:10px 26px;overflow:hidden;white-space:nowrap;color:#cfcfcf;margin:auto 0 80px;padding:10px 0 2px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+    .hq-cinta span{display:inline-flex;align-items:center;gap:10px}
+    .hq-cinta i{width:4px;height:4px;border-radius:50%;background:var(--accent);flex:none}
+
+    /* Mordisco + pastilla de valoración */
+    .hq-muesca{position:absolute;right:0;bottom:0;z-index:3;height:84px;background:var(--bg);border-top-left-radius:30px;display:flex;align-items:flex-end;justify-content:flex-end;padding:14px}
+    .hq-muesca::before{content:"";position:absolute;right:100%;bottom:0;width:30px;height:30px;background:radial-gradient(circle 30px at 0 0,transparent 0 29.5px,var(--bg) 30px)}
+    .hq-muesca::after{content:"";position:absolute;right:0;bottom:100%;width:30px;height:30px;background:radial-gradient(circle 30px at 0 0,transparent 0 29.5px,var(--bg) 30px)}
+    .hq-nota{display:flex;align-items:center;gap:14px;height:56px;padding:0 24px 0 11px;border-radius:999px;background:var(--grafito);border:1px solid var(--hq-linea)}
+    .hq-nota b{font-size:16px}
+    .hq-nota .hq-nota-txt{color:#bdbdbd}
+    .hq-avatares{display:flex;align-items:center}
+    .hq-avatares img{width:30px;height:30px;border-radius:50%;border:2px solid var(--grafito);margin-left:-9px;object-fit:cover}
+    .hq-avatares img:first-child{margin-left:0}
+
+    /* Pieza del vídeo */
+    .hq-video{position:relative;border-radius:var(--r-hoja);overflow:hidden;background:#000;min-height:320px}
+    .hq-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+    .hq-velo{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.34) 0%,rgba(0,0,0,0) 38%,rgba(0,0,0,.58) 100%)}
+    .heroq .hz-cta{position:absolute;z-index:2;top:14px;right:14px}
+
+    /* Cartilla del CV: cristal, para que el vídeo se vea por detrás */
+    .hq-cv{position:absolute;z-index:2;right:14px;bottom:14px;width:min(330px,calc(100% - 28px));background:rgba(255,255,255,.06);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16);border-radius:var(--r-caja);overflow:hidden}
+    .hq-cv-foto{position:relative;aspect-ratio:4/3;display:grid;place-items:center;border-bottom:1px solid rgba(255,255,255,.16)}
+    .hq-cv-tag{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+    .hq-cv-disp{position:absolute;left:12px;top:12px;display:flex;align-items:center;gap:8px;white-space:nowrap;color:#e3e3e3;background:rgba(5,5,5,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--hq-linea);border-radius:999px;padding:7px 13px}
+    .hq-cv-disp i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);flex:none}
+    .hq-cv-datos{padding:16px}
+    .hq-cv-nombre{font-size:16px;font-weight:700}
+    .hq-cv-rol{color:var(--muted);font-size:13.5px;margin-top:3px}
+    .hq-cv-precio{color:var(--muted);font-size:13.5px;margin-top:10px}
+    .hq-cv-precio b{color:var(--text);font-weight:600}
+    .hq-cv-btn{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;background:var(--invert-bg);color:var(--invert-text);border-radius:14px;padding:13px 16px;font-weight:700;font-size:14px;transition:background .25s ease,color .25s ease}
+    .hq-cv-btn:hover{background:var(--accent);color:var(--accent-ink)}
+
+    @media (max-width:1080px){
+      .heroq{grid-template-columns:1fr}
+      .hq-hoja{min-height:78svh}
+      .hq-video{min-height:56svh}
+      .hq-cv{width:min(300px,calc(100% - 28px))}
+    }
+    @media (max-width:760px){
+      .heroq{--marco:8px;--r-hoja:22px}
+      .hq-cinta{display:none}
+      .hq-cuerpo{padding:20px 4px}
+      .hq-titulo{max-width:none}
+      .hq-muesca{height:68px;padding:10px;border-top-left-radius:24px}
+      .hq-muesca::before,.hq-muesca::after{width:24px;height:24px;background:radial-gradient(circle 24px at 0 0,transparent 0 23.5px,var(--bg) 24px)}
+      .hq-nota{height:48px;padding:0 18px 0 9px;gap:11px}
+      .hq-nota .hq-nota-txt{display:none}
+      .hq-cv{left:14px;width:auto}
+    }
+    @media (prefers-reduced-motion:reduce){ .hq-video video{display:none} }
+
   </style>
 </head>
 <body>
@@ -175,86 +260,77 @@
   <div id="smooth-content">
 
   <!-- ===================== HERO ===================== -->
-  <section class="hero" id="inicio">
-    <!-- Top bar (portada de iris.it.com): botón MENU, wordmark, hora y CTA -->
-    <header class="hz-top">
-      <div class="hz-top-left">
-        <button class="hz-menu-btn" id="hnMenuBtn" onclick="toggleHnMenu()" aria-expanded="false" aria-controls="hnOverlay" aria-label="Abrir menú">
-          <span class="hz-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-          <span class="hn-menu-label" data-open="MENU" data-close="CERRAR">MENU</span>
-        </button>
-        <span class="hz-top-sep" aria-hidden="true"></span>
-        <a class="hz-wordmark hz-wordmark--logo" href="#inicio"><img src="./assets/iris-logo.svg" alt="IRIS" /></a>
+  <!-- ===================== HERO (maqueta Quantum, 2026-08-18) =====================
+       Dos piezas: lámina de texto a la izquierda y el vídeo a la derecha. -->
+  <section class="heroq" id="inicio">
+    <div class="hq-hoja">
+      <!-- Top bar de siempre (MENU + logo), ahora dentro de la lámina -->
+      <header class="hz-top">
+        <div class="hz-top-left">
+          <button class="hz-menu-btn" id="hnMenuBtn" onclick="toggleHnMenu()" aria-expanded="false" aria-controls="hnOverlay" aria-label="Abrir menú">
+            <span class="hz-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <span class="hn-menu-label" data-open="MENU" data-close="CERRAR">MENU</span>
+          </button>
+          <span class="hz-top-sep" aria-hidden="true"></span>
+          <a class="hz-wordmark hz-wordmark--logo" href="#inicio"><img src="./assets/iris-logo.svg" alt="IRIS" /></a>
+        </div>
+        <div class="hz-time" aria-hidden="true"><b id="hzTimeVal">--:--</b>&ensp;HORA&nbsp;LOCAL</div>
+      </header>
+
+      <div class="hq-cuerpo">
+        <p class="hq-ficha label"><span class="hq-pin" aria-hidden="true"></span><span class="hq-dot" aria-hidden="true"></span> (IRIS — 01)&ensp;Estudio de diseño &amp; automatización — Madrid</p>
+        <h1 class="hq-titulo">La web que hace crecer tu marca.</h1>
+        <p class="hq-sub">Diseño y desarrollo a medida, de la primera idea al lanzamiento. Trato directo con quien diseña y programa tu web.</p>
+        <div class="hq-ctas">
+          <a class="hq-pill" href="#contacto">Empezar proyecto <span aria-hidden="true">→</span></a>
+        </div>
       </div>
-      <div class="hz-time" aria-hidden="true"><b id="hzTimeVal">--:--</b>&ensp;HORA&nbsp;LOCAL</div>
+
+      <div class="hq-cinta label" aria-hidden="true">
+        <span><i></i> Webs que convierten</span>
+        <span><i></i> Automatización real</span>
+        <span><i></i> Entregas por fases</span>
+        <span><i></i> Respuesta en menos de 24 h</span>
+      </div>
+
+      <!-- Mordisco: el fondo de la página se come la esquina y deja sitio a la pastilla -->
+      <div class="hq-muesca">
+        <div class="hq-nota">
+          <span class="hq-avatares" aria-hidden="true">
+            <img src="./assets/avatar-1.jpg" alt="" width="30" height="30" loading="lazy" decoding="async">
+            <img src="./assets/avatar-2.jpg" alt="" width="30" height="30" loading="lazy" decoding="async">
+            <img src="./assets/avatar-3.jpg" alt="" width="30" height="30" loading="lazy" decoding="async">
+          </span>
+          <b><span data-count="4.9" data-decimals="1">4.9</span>/5</b>
+          <span class="label hq-nota-txt">+<span data-count="20">20</span> proyectos entregados</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hq-video">
+      <!-- Seda líquida negra, bucle de 10 s. Sin <source> webm: el navegador lo
+           prefiere al mp4 y el vídeo nuevo no llegaría a verse. -->
+      <video autoplay loop muted playsinline preload="auto" poster="./assets/hero-poster.jpg">
+        <source src="./assets/hero.mp4" type="video/mp4" />
+      </video>
+      <div class="hq-velo" aria-hidden="true"></div>
+
       <a class="hz-cta" href="#contacto">
         <span class="hz-cta-logo" aria-hidden="true"><img src="./assets/iris-favicon.svg" alt="" /></span>
         <span class="hz-cta-txt">EMPEZAR&nbsp;PROYECTO&ensp;<em>/IRIS</em></span>
         <span class="hz-cta-arrow" aria-hidden="true">→</span>
       </a>
-    </header>
 
-    <!-- Fondo: vídeo full-bleed (mudo, loop). El gradiente queda de fallback. -->
-    <div class="hero__bg" aria-hidden="true"></div>
-    <!-- Seda líquida negra, bucle ping-pong de 10 s (ComfyUI/Wan + ESRGAN).
-         El webm del hero anterior YA NO se lista: el navegador lo prefiere al mp4
-         y el vídeo nuevo no llegaría a verse. Sigue en assets por si se recupera. -->
-    <video class="hero__video" autoplay loop muted playsinline preload="auto" poster="assets/hero-poster.jpg">
-      <source src="assets/hero.mp4" type="video/mp4" />
-    </video>
-    <div class="hero__scrim" aria-hidden="true"></div>
-
-    <div class="hero__inner">
-      <!-- Wordmark + tagline -->
-      <div class="hero__head">
-        <span class="hero__eyebrow label">© Estudio de diseño &amp; automatización — Madrid</span>
-        <h1 class="hero__wordmark hero__wordmark--logo"><img src="./assets/iris-logo.svg" alt="IRIS" /></h1>
-        <p class="hero__tagline">
-          La web que hace crecer tu marca.
-          <span class="muted">Diseño y desarrollo a medida, de la primera idea al lanzamiento.</span>
-        </p>
-      </div>
-
-      <!-- Fila inferior de conversión -->
-      <div class="hero__foot">
-        <!-- Izquierda: prueba social + propuesta de valor -->
-        <div class="hero__foot-left">
-          <div class="rating">
-            <div class="rating__avatars" aria-hidden="true">
-              <img src="./assets/avatar-1.jpg" alt="" width="30" height="30" loading="lazy" decoding="async">
-              <img src="./assets/avatar-2.jpg" alt="" width="30" height="30" loading="lazy" decoding="async">
-              <img src="./assets/avatar-3.jpg" alt="" width="30" height="30" loading="lazy" decoding="async">
-              <img src="./assets/avatar-4.jpg" alt="" width="30" height="30" loading="lazy" decoding="async">
-              <img src="./assets/avatar-5.jpg" alt="" width="30" height="30" loading="lazy" decoding="async">
-            </div>
-            <p class="rating__meta">
-              <b><span data-count="4.9" data-decimals="1">4.9</span>/5</b> ·
-              <span>+<span data-count="20">20</span> proyectos entregados</span>
-            </p>
-          </div>
-
-          <p class="hero__pitch">
-            <b>Trato directo con quien diseña y programa tu web, sin intermediarios.</b>
-            Presupuesto cerrado, entregas por fases y respuesta en menos de 24&nbsp;h.
-            Lo que acordamos es lo que pagas.
-          </p>
+      <div class="hq-cv">
+        <div class="hq-cv-foto">
+          <span class="hq-cv-tag">Foto 4:3 → /assets</span>
+          <p class="hq-cv-disp label"><i></i> Disponible para proyectos</p>
         </div>
-
-        <!-- Derecha: card de DOSA -->
-        <div class="cta-card">
-          <div class="cta-card__media">
-            <span class="ph-tag">Foto 4:3 → /assets</span>
-            <span class="cta-card__slots"><i class="dot"></i> Disponible para proyectos</span>
-          </div>
-          <div class="cta-card__body">
-            <p class="cta-card__name">Eduardo Enrico</p>
-            <p class="cta-card__role">Diseño, marketing y dirección creativa</p>
-            <p class="cta-card__price">Proyectos <b>a medida</b></p>
-            <a class="cta-btn" href="https://iris.it.com/cv/" target="_blank" rel="noopener">
-              Ver mi CV
-              <span class="cta-btn__arrow">↗</span>
-            </a>
-          </div>
+        <div class="hq-cv-datos">
+          <p class="hq-cv-nombre">Eduardo Enrico</p>
+          <p class="hq-cv-rol">Diseño, marketing y dirección creativa</p>
+          <p class="hq-cv-precio">Proyectos <b>a medida</b></p>
+          <a class="hq-cv-btn" href="https://iris.it.com/cv/" target="_blank" rel="noopener">Ver mi CV <span aria-hidden="true">↗</span></a>
         </div>
       </div>
     </div>
