@@ -72,14 +72,23 @@ button.tag:hover{opacity:.7}
   flex:1; min-width:0; position:relative; background:#000;
   display:flex; align-items:center; justify-content:center;
 }
-#v{width:100%; height:100%; object-fit:contain; background:#000}
+/* position+z-index a propósito: en pantalla completa Chrome puede pintar el
+   vídeo en una capa de hardware por encima de la página, y entonces todo lo
+   que va encima sin capa propia (los subtítulos) desaparece. Metiendo el vídeo
+   en el orden de apilamiento normal, y dando capa propia a lo que va encima
+   (ver #subs y #acciones), la superposición vuelve a respetarse. */
+#v{width:100%; height:100%; object-fit:contain; background:#000; position:relative; z-index:0}
 /* Subtítulos. Se pintan en una capa propia y no con ::cue del navegador: así
    el tamaño lo elige la persona y, sobre todo, suben cuando aparece la barra
    de controles en vez de quedar tapados por ella. */
+/* `translateZ(0)` no es decoración: fuerza capa propia. La barra de controles
+   ya tenía la suya de regalo (anima `opacity`), y por eso en pantalla completa
+   se veía la barra pero NO los subtítulos. */
 #subs{
   position:absolute; left:0; right:0; bottom:6%; z-index:3;
   display:flex; flex-direction:column; align-items:center; gap:5px;
   padding:0 6%; pointer-events:none; transition:bottom .2s;
+  transform:translateZ(0); will-change:transform;
 }
 #stage.controls #subs{bottom:96px}
 #subs .cue{
@@ -354,6 +363,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   position:absolute; right:20px; bottom:calc(6% + 62px); z-index:4;
   display:flex; flex-direction:column; align-items:flex-end; gap:9px;
   pointer-events:none; transition:bottom .2s;
+  transform:translateZ(0); will-change:transform;
 }
 #stage.controls #acciones{bottom:152px}
 #acciones button{
