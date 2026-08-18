@@ -221,15 +221,13 @@ button.tag:hover{opacity:.7}
 button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:center; gap:9px; justify-content:center}
 .se-seguir svg{width:15px; height:15px}
 .se-eps{margin-top:26px; display:flex; flex-direction:column; gap:8px}
-/* Secciones de una saga: la serie y cada película. Al cambiar de sección
-   cambia la portada entera, no solo la lista de abajo. */
-.se-tabs,.lib-tabs{
+/* Las pestañas de la biblioteca (Películas / Anime). Las secciones de una saga
+   ya NO son pestañas: son la rejilla de tarjetas de más abajo. */
+.lib-tabs{
   display:flex; gap:4px; flex-wrap:wrap;
   border-bottom:1px solid var(--line);
 }
-.se-tabs{margin:16px 0 0}
-.se-tabs.oculto{display:none}
-.se-tab,.lib-tab{
+.lib-tab{
   appearance:none; background:none; border:0; cursor:pointer;
   display:inline-flex; align-items:center; gap:8px;
   padding:9px 13px; margin-bottom:-1px; border-bottom:2px solid transparent;
@@ -237,79 +235,87 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   text-transform:uppercase; color:var(--dim);
   transition:color .15s, border-color .15s;
 }
-/* Las pestañas de temporada se reparten la fila a partes iguales Y se dibujan
-   como recuadros: sin el recuadro, como son texto de largo distinto, se leen
-   como de tamaños distintos aunque el hueco clicable sea idéntico. Con el
-   borde se ve que todas miden lo mismo. Solo estas; las de la biblioteca
-   (Películas/Anime) siguen siendo pestañas de texto subrayadas. */
-.se-tab{
-  flex:1 1 0; min-width:0; justify-content:center; white-space:nowrap;
-  border:1px solid var(--line-2); border-radius:8px; margin-bottom:0;
-  background:var(--panel); color:var(--muted); overflow:hidden;
-  transition:color .15s, border-color .15s, background .15s;
-}
-.se-tabs{border-bottom:0; gap:8px}
 .lib-tab:hover{color:var(--text)}
 .lib-tab.on{color:var(--text); border-bottom-color:var(--red)}
-.se-tab:hover{color:var(--text); background:#141416; border-color:#2a2a2e}
-.se-tab.on{color:var(--text); background:rgba(220,64,42,.16); border-color:var(--red)}
-/* El ordinal: la saga se lee de izquierda a derecha y el número lo confirma. */
-.se-tab-n{
+/* Secciones de una saga: cada temporada y el bloque de películas, como
+   TARJETAS con su carátula. Antes eran pestañas de texto que se repartían la
+   fila; con siete temporadas los nombres ya no cabían y se recortaban, y aun
+   cabiendo todas se leían igual (siete veces "...monogatari"). La carátula
+   distingue de un vistazo y la rejilla crece hacia abajo sin romper nada. */
+.se-tabs{margin:16px 0 0}
+.se-tabs.oculto{display:none}
+.se-cards{
+  display:grid; gap:12px;
+  grid-template-columns:repeat(auto-fill,minmax(104px,1fr));
+}
+.se-card{
+  appearance:none; border:0; background:none; cursor:pointer; padding:0;
+  display:flex; flex-direction:column; gap:8px; text-align:left; min-width:0;
+}
+.se-card-art{
+  position:relative; width:100%; aspect-ratio:2/3; border-radius:10px;
+  overflow:hidden; background:#141416; border:1px solid var(--line);
+  transition:border-color .15s, transform .15s;
+}
+.se-card-art img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+.se-card:hover .se-card-art{border-color:var(--muted); transform:translateY(-2px)}
+.se-card.on .se-card-art{border-color:var(--red); box-shadow:0 0 0 1px var(--red)}
+/* El ordinal va sobre la carátula: la saga se lee en orden y el número lo
+   confirma sin gastar una línea de texto. */
+.se-card-n{
+  position:absolute; left:6px; top:6px; z-index:1;
   display:inline-flex; align-items:center; justify-content:center;
-  width:17px; height:17px; border-radius:50%; flex:0 0 auto;
-  border:1px solid var(--line); letter-spacing:0; font-size:9px;
-  transition:border-color .15s, background .15s, color .15s;
+  min-width:19px; height:19px; padding:0 5px; border-radius:999px;
+  background:rgba(0,0,0,.72); border:1px solid var(--line-2);
+  font-family:var(--mono); font-size:9.5px; color:var(--text);
 }
-.se-tab.on .se-tab-n{border-color:var(--red); background:var(--red); color:#fff}
-.se-tabs + .se-cab{margin-top:22px}
-/* Pasadas CUATRO secciones las pestañas dejan de caber en una fila y el texto
-   se recortaba a media palabra (Monogatari ya va por siete temporadas). A
-   partir de ahí el selector se dibuja como un desplegable, que ocupa lo mismo
-   con siete que con veinte y siempre enseña entera la sección en la que estás.
-   Con pocas secciones siguen siendo pestañas: se ven todas de un vistazo. */
-.se-tabs.desplegable{display:block; gap:0; border-bottom:0; max-width:420px}
-.se-pick{position:relative}
-.se-pick-btn{
-  width:100%; display:flex; align-items:center; gap:10px; text-align:left;
-  padding:11px 13px; border:1px solid var(--line-2); border-radius:10px;
-  background:var(--panel); color:var(--text);
-  transition:border-color .15s, background .15s;
+.se-card.on .se-card-n{background:var(--red); border-color:var(--red); color:#fff}
+.se-card-nom{
+  font-size:12px; font-weight:600; color:var(--muted); line-height:1.35;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
 }
-.se-pick-btn:hover{border-color:#2a2a2e; background:#141416}
-.se-pick.abierto .se-pick-btn{border-color:var(--red)}
-.se-pick-nom{
-  flex:1; min-width:0; font-size:13.5px; font-weight:600;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.se-pick-cnt{
-  flex:0 0 auto; font-family:var(--mono); font-size:9.5px; letter-spacing:.16em;
+.se-card.on .se-card-nom{color:var(--text)}
+.se-card-cnt{
+  margin-top:3px; font-family:var(--mono); font-size:9px; letter-spacing:.14em;
   text-transform:uppercase; color:var(--dim);
 }
-.se-pick-fl{flex:0 0 auto; width:12px; height:12px; color:var(--muted); transition:transform .15s}
-.se-pick.abierto .se-pick-fl{transform:rotate(180deg)}
-.se-pick-menu{
-  position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:5;
-  max-height:min(58vh,340px); overflow:auto; overscroll-behavior:contain;
-  background:var(--surface); border:1px solid var(--line-2); border-radius:10px;
-  padding:5px; display:flex; flex-direction:column; gap:2px;
+.se-tabs + .se-cab{margin-top:26px}
+/* Las películas de una saga van todas en la MISMA sección y se enseñan como
+   carátulas, no como filas: son tres carteles distintos y se eligen mirando. */
+/* Anchura tope: sin ella, tres películas en una pantalla ancha salen a 370 px
+   por cartel y la sección se lee como un escaparate desproporcionado. */
+.se-films{
+  display:grid; gap:16px; justify-content:start;
+  grid-template-columns:repeat(auto-fill,minmax(168px,208px));
 }
-.se-pick-menu.oculto{display:none}
-.se-pick-menu::-webkit-scrollbar{width:8px}
-.se-pick-menu::-webkit-scrollbar-thumb{background:var(--line-2); border-radius:99px}
-.se-pick-op{
-  display:flex; align-items:center; gap:10px; text-align:left;
-  padding:9px 10px; border-radius:7px; color:var(--muted);
-  transition:color .12s, background .12s;
+.se-film{
+  appearance:none; border:0; background:none; cursor:pointer; padding:0;
+  display:flex; flex-direction:column; gap:10px; text-align:left; min-width:0;
 }
-.se-pick-op:hover{background:rgba(255,255,255,.07); color:var(--text)}
-.se-pick-op.on{background:rgba(220,64,42,.14); color:var(--text)}
-.se-pick-op-nom{flex:1; min-width:0; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.se-pick-op.on .se-pick-op-nom{font-weight:600}
-.se-pick-op .se-tab-n,.se-pick-btn .se-tab-n{
-  width:19px; height:19px; flex:0 0 auto;
-  font-family:var(--mono); font-size:9.5px;
+.se-film-art{
+  position:relative; width:100%; aspect-ratio:2/3; border-radius:12px;
+  overflow:hidden; background:#141416; border:1px solid var(--line);
+  transition:border-color .15s, transform .15s;
 }
-.se-pick-op.on .se-tab-n,.se-pick-btn .se-tab-n{border-color:var(--red); background:var(--red); color:#fff}
+.se-film-art img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+.se-film:hover .se-film-art{border-color:var(--muted); transform:translateY(-2px)}
+.se-film.actual .se-film-art{border-color:var(--red)}
+.se-film-dur{
+  position:absolute; right:6px; bottom:6px; padding:1px 6px; border-radius:5px;
+  background:rgba(0,0,0,.76); font-family:var(--mono); font-size:10px;
+}
+.se-film-etq{
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--dim);
+}
+.se-film-tit{margin-top:4px; font-size:13.5px; font-weight:600; line-height:1.35}
+.se-film-dl{
+  margin-top:8px; display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--dim); transition:color .12s;
+}
+.se-film-dl:hover{color:var(--text)}
+.se-film-dl svg{width:12px; height:12px}
 .se-ep{
   display:flex; gap:14px; align-items:center; text-align:left; padding:9px;
   border:1px solid var(--line); border-radius:12px; background:var(--bg);
@@ -2018,17 +2024,27 @@ function seccionesDe(t) {
   const temps = (t.temporadas || []).map((s, i) => ({
     tipo: 'serie', ent: s, tab: s.etiqueta || s.titulo || ('Temporada ' + (i + 1))
   }));
-  return (temps.length ? temps : [{ tipo: 'serie', ent: t, tab: t.etiqueta || 'Serie' }])
-    .concat((t.peliculas || []).map((p, i) => ({
-      tipo: 'peli', ent: p, tab: p.etiqueta || ('Película ' + (i + 1))
-    })));
+  const base = temps.length ? temps : [{ tipo: 'serie', ent: t, tab: t.etiqueta || 'Serie' }];
+  /* TODAS las películas de la saga van en UNA sola sección, no en una por
+     película: son tres carteles de la misma historia (Kizumonogatari) y
+     partirlos en tres pestañas llenaba el selector de entradas casi iguales.
+     Dentro de la sección se enseñan como carátulas. El nombre sale de
+     `grupoPeliculas` de la saga, o de la etiqueta si hay una sola. */
+  const pel = t.peliculas || [];
+  if (!pel.length) return base;
+  const tab = pel.length === 1
+    ? (pel[0].etiqueta || 'Película')
+    : (t.grupoPeliculas || 'Películas');
+  return base.concat([{ tipo: 'pelis', ent: pel[0], ents: pel, tab }]);
 }
 // Al abrir la biblioteca con algo sonando se entra por su propia sección: la
 // temporada del capítulo, o la película si es una película.
 function seccionDeUrl(u) {
   if (!u || !u.serie) return 0;
   const secs = seccionesDe(u.serie);
-  const i = secs.findIndex((s) => s.ent === (u.peli ? u.ent : (u.temporada || u.serie)));
+  const i = u.peli
+    ? secs.findIndex((s) => s.ents && s.ents.indexOf(u.ent) >= 0)
+    : secs.findIndex((s) => s.ent === (u.temporada || u.serie));
   return i > 0 ? i : 0;
 }
 function abreSerie(t, sec) {
@@ -2044,11 +2060,12 @@ function abreSerie(t, sec) {
   pintaSeccion();
   $('#loader').scrollTop = 0;
 }
-// A partir de aquí el selector deja de ser pestañas y pasa a desplegable.
-const TABS_MAX = 4;
 // Lo que hay dentro de cada sección, que es lo que ayuda a elegir.
 function cuentaDe(s) {
-  if (s.tipo === 'peli') return 'Película';
+  if (s.tipo === 'pelis') {
+    const n = (s.ents || []).length;
+    return n === 1 ? 'Película' : n + ' películas';
+  }
   const n = (s.ent.episodios || []).length;
   return n === 1 ? '1 capítulo' : n + ' capítulos';
 }
@@ -2056,106 +2073,49 @@ function eligeSeccion(i) {
   if (i === seccion) return;
   seccion = i; pintaTabs(); pintaSeccion(); $('#loader').scrollTop = 0;
 }
+/* El selector de secciones: una tarjeta por temporada (más la de películas),
+   con su carátula. La marcada en rojo es la abierta. */
 function pintaTabs() {
   const t = serieAbierta; if (!t) return;
   const cont = $('#se-tabs'); cont.innerHTML = '';
   const secs = seccionesDe(t);
   // Con una sola sección no hay nada que elegir: no se enseña el selector.
   cont.classList.toggle('oculto', secs.length < 2);
-  cont.classList.toggle('desplegable', secs.length > TABS_MAX);
   if (secs.length < 2) return;
-  if (secs.length > TABS_MAX) { pintaDesplegable(cont, secs); return; }
+  const rejilla = document.createElement('div');
+  rejilla.className = 'se-cards';
   secs.forEach((s, i) => {
     const b = document.createElement('button');
-    b.className = 'se-tab' + (i === seccion ? ' on' : '');
-    // El número es la posición en la saga: es lo que deja claro que la película
-    // va DESPUÉS de la temporada, y no como algo suelto al margen.
+    b.className = 'se-card' + (i === seccion ? ' on' : '');
+    b.title = s.tab;
+
+    const art = document.createElement('div'); art.className = 'se-card-art';
+    // El ordinal es la posición en la saga: deja claro que las películas van
+    // DESPUÉS de las temporadas, y no como algo suelto al margen.
     const num = document.createElement('span');
-    num.className = 'se-tab-n'; num.textContent = i + 1;
-    b.appendChild(num);
-    b.appendChild(document.createTextNode(s.tab));
-    b.addEventListener('click', () => eligeSeccion(i));
-    cont.appendChild(b);
-  });
-}
-/* El desplegable de secciones. Enseña siempre la sección actual entera y con
-   lo que tiene dentro; la lista se abre encima del contenido y se cierra al
-   elegir, al pulsar fuera o con Escape. */
-function pintaDesplegable(cont, secs) {
-  const s = secs[seccion] || secs[0];
-  const caja = document.createElement('div');
-  caja.className = 'se-pick';
-  const btn = document.createElement('button');
-  btn.className = 'se-pick-btn';
-  btn.setAttribute('aria-haspopup', 'listbox');
-  btn.setAttribute('aria-expanded', 'false');
-  const num = document.createElement('span');
-  num.className = 'se-tab-n'; num.textContent = (seccion + 1);
-  const nom = document.createElement('span');
-  nom.className = 'se-pick-nom'; nom.textContent = s.tab;
-  const cnt = document.createElement('span');
-  cnt.className = 'se-pick-cnt'; cnt.textContent = cuentaDe(s);
-  const fl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  fl.setAttribute('class', 'se-pick-fl'); fl.setAttribute('viewBox', '0 0 24 24');
-  fl.setAttribute('fill', 'none'); fl.setAttribute('stroke', 'currentColor');
-  fl.setAttribute('stroke-width', '2.4'); fl.setAttribute('stroke-linecap', 'round');
-  fl.setAttribute('stroke-linejoin', 'round');
-  const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  p.setAttribute('d', 'M5 9l7 7 7-7'); fl.appendChild(p);
-  btn.append(num, nom, cnt, fl);
-
-  const menu = document.createElement('div');
-  menu.className = 'se-pick-menu oculto';
-  menu.setAttribute('role', 'listbox');
-  secs.forEach((sx, i) => {
-    const op = document.createElement('button');
-    op.className = 'se-pick-op' + (i === seccion ? ' on' : '');
-    op.setAttribute('role', 'option');
-    op.setAttribute('aria-selected', i === seccion ? 'true' : 'false');
-    const n = document.createElement('span');
-    n.className = 'se-tab-n'; n.textContent = i + 1;
-    const t2 = document.createElement('span');
-    t2.className = 'se-pick-op-nom'; t2.textContent = sx.tab;
-    const c2 = document.createElement('span');
-    c2.className = 'se-pick-cnt'; c2.textContent = cuentaDe(sx);
-    op.append(n, t2, c2);
-    op.addEventListener('click', () => { cierra(); eligeSeccion(i); });
-    menu.appendChild(op);
-  });
-
-  const cierra = () => {
-    menu.classList.add('oculto');
-    caja.classList.remove('abierto');
-    btn.setAttribute('aria-expanded', 'false');
-  };
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const abrir = menu.classList.contains('oculto');
-    menu.classList.toggle('oculto', !abrir);
-    caja.classList.toggle('abierto', abrir);
-    btn.setAttribute('aria-expanded', abrir ? 'true' : 'false');
-    // La sección actual puede quedar fuera de la parte visible de la lista.
-    if (abrir) {
-      const act = menu.querySelector('.se-pick-op.on');
-      if (act) act.scrollIntoView({ block: 'nearest' });
+    num.className = 'se-card-n'; num.textContent = i + 1;
+    art.appendChild(num);
+    const src = s.ent.poster || t.poster;
+    if (src) {
+      const img = document.createElement('img');
+      img.loading = 'lazy'; img.alt = ''; img.src = conPase(absCat(src));
+      art.appendChild(img);
     }
+    b.appendChild(art);
+
+    const txt = document.createElement('div');
+    const nom = document.createElement('div');
+    nom.className = 'se-card-nom'; nom.textContent = s.tab;
+    const cnt = document.createElement('div');
+    cnt.className = 'se-card-cnt'; cnt.textContent = cuentaDe(s);
+    txt.append(nom, cnt);
+    b.appendChild(txt);
+
+    b.addEventListener('click', () => eligeSeccion(i));
+    rejilla.appendChild(b);
   });
-  caja.append(btn, menu);
-  cont.appendChild(caja);
+  cont.appendChild(rejilla);
 }
-function cierraDesplegables() {
-  document.querySelectorAll('.se-pick.abierto').forEach((c) => {
-    c.classList.remove('abierto');
-    c.querySelector('.se-pick-menu').classList.add('oculto');
-    c.querySelector('.se-pick-btn').setAttribute('aria-expanded', 'false');
-  });
-}
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.se-pick')) cierraDesplegables();
-});
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') cierraDesplegables();
-});
 /* Cambiar de sección cambia la portada entera: póster, título, descripción,
    cifra, botón grande y lista. */
 function pintaSeccion() {
@@ -2167,14 +2127,21 @@ function pintaSeccion() {
   const s = secs[i];
   const ent = s.ent;
   const poster = $('#se-poster');
-  if (ent.poster) { poster.src = conPase(absCat(ent.poster)); poster.classList.remove('oculto'); }
+  /* La carátula grande solo sale cuando NO hay selector: con la rejilla de
+     tarjetas arriba, la de la sección abierta ya está ahí marcada en rojo y
+     repetirla debajo era la misma imagen dos veces en la misma pantalla. */
+  const arte = secs.length > 1 ? '' : ent.poster;
+  if (arte) { poster.src = conPase(absCat(arte)); poster.classList.remove('oculto'); }
   else poster.classList.add('oculto');
-  $('#se-tit').textContent = ent.titulo || '';
-  $('#se-nota').textContent = ent.nota || '';
-  if (s.tipo === 'peli') {
-    // La pestaña ya dice qué lugar ocupa; aquí se dice qué es.
-    $('#se-cifra').textContent = 'Película' + (ent.dur ? ' · ' + ent.dur : '');
+  if (s.tipo === 'pelis') {
+    $('#se-tit').textContent = s.ents.length > 1 ? s.tab : (ent.titulo || '');
+    $('#se-nota').textContent = (s.ents.length > 1 ? (t.notaPeliculas || '') : (ent.nota || ''));
+    $('#se-cifra').textContent = s.ents.length > 1
+      ? cuentaDe(s)
+      : 'Película' + (ent.dur ? ' · ' + ent.dur : '');
   } else {
+    $('#se-tit').textContent = ent.titulo || '';
+    $('#se-nota').textContent = ent.nota || '';
     // Los capítulos son los de ESTA sección (la temporada abierta), no los de
     // toda la saga. Las películas sí se cuentan una sola vez, en la primera.
     const eps = ent.episodios || [], pel = t.peliculas || [];
@@ -2210,7 +2177,14 @@ function pintaSeguir() {
     b.appendChild(document.createTextNode('Empezar'));
     b.onclick = () => reproduceEp(ent);
   };
-  if (s.tipo === 'peli') { arranca(s.ent); return; }
+  // En la sección de películas: la que esté a medias, o si no la primera sin ver.
+  if (s.tipo === 'pelis') {
+    const prog = progreso();
+    const medias = s.ents.find((p) => { const x = prog[absCat(p.url || '')]; return x && x.p > 0.01 && x.p < 0.95; });
+    const nueva = s.ents.find((p) => !prog[absCat(p.url || '')]);
+    arranca(medias || nueva || s.ents[0]);
+    return;
+  }
   const d = porDondeIba(s.ent);
   if (!d) { b.classList.add('oculto'); return; }
   arranca(d.ep);
@@ -2266,16 +2240,58 @@ function filaLista(e, etiqueta, tituloDl) {
   fila.addEventListener('click', () => reproduceEp(e));
   return fila;
 }
+/* Las películas de la saga NO se listan como filas: se enseñan sus carteles,
+   que es como se eligen. Cada uno lleva su duración, la barra de lo ya visto y
+   su propia descarga. */
+function pintaPeliculas(cont, s) {
+  const prog = progreso();
+  const rejilla = document.createElement('div');
+  rejilla.className = 'se-films';
+  s.ents.forEach((p, i) => {
+    const url = absCat(p.url || '');
+    const b = document.createElement('button');
+    b.className = 'se-film' + (url && url === curV ? ' actual' : '');
+
+    const art = document.createElement('div'); art.className = 'se-film-art';
+    if (p.poster || p.miniatura) {
+      const img = document.createElement('img');
+      img.loading = 'lazy'; img.alt = ''; img.src = conPase(absCat(p.poster || p.miniatura));
+      art.appendChild(img);
+    }
+    if (p.dur) { const d = document.createElement('span'); d.className = 'se-film-dur'; d.textContent = p.dur; art.appendChild(d); }
+    const pr = prog[url];
+    if (pr && pr.p > 0.01) {
+      const barra = document.createElement('div'); barra.className = 'se-ep-prog';
+      const j = document.createElement('i'); j.style.width = Math.min(100, pr.p * 100) + '%';
+      barra.appendChild(j); art.appendChild(barra);
+    }
+    b.appendChild(art);
+
+    const txt = document.createElement('div');
+    const etq = document.createElement('div');
+    etq.className = 'se-film-etq'; etq.textContent = p.etiqueta || ('Película ' + (i + 1));
+    const tit = document.createElement('div');
+    tit.className = 'se-film-tit'; tit.textContent = p.titulo || '';
+    txt.append(etq, tit);
+    const dl = document.createElement('span');
+    dl.className = 'se-film-dl'; dl.title = 'Descargar esta película';
+    dl.setAttribute('role', 'button'); dl.tabIndex = 0;
+    dl.innerHTML = IC.descarga;
+    dl.appendChild(document.createTextNode('Descargar'));
+    dl.addEventListener('click', (ev) => { ev.stopPropagation(); abreDescarga(p); });
+    txt.appendChild(dl);
+    b.appendChild(txt);
+
+    b.addEventListener('click', () => reproduceEp(p));
+    rejilla.appendChild(b);
+  });
+  cont.appendChild(rejilla);
+}
 function pintaLista() {
   const t = serieAbierta; if (!t) return;
   const cont = $('#se-eps'); cont.innerHTML = '';
   const s = seccionesDe(t)[seccion] || seccionesDe(t)[0];
-  if (s.tipo === 'peli') {
-    // La película se lista como una fila más: así conserva la miniatura, la
-    // barra de lo ya visto y el botón de descarga que tienen los capítulos.
-    cont.appendChild(filaLista(s.ent, s.tab, 'Descargar esta película'));
-    return;
-  }
+  if (s.tipo === 'pelis') { pintaPeliculas(cont, s); return; }
   (s.ent.episodios || []).forEach((e) => {
     const etq = /^\d+$/.test(String(e.n)) ? 'Capítulo ' + Number(e.n) : String(e.n || '');
     cont.appendChild(filaLista(e, etq, 'Descargar este capítulo'));
