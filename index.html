@@ -163,14 +163,14 @@
     .hq-pill:hover{background:var(--accent);color:var(--accent-ink)}
 
         .hq-cinta{overflow:hidden;white-space:nowrap;color:#9a9a9a;font-size:10.5px;letter-spacing:.09em;margin:auto 0 100px;padding:10px 0 2px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
-    .hq-cinta-tira{display:inline-flex;gap:30px;padding-right:30px;animation:hq-marquesina 36s linear infinite;will-change:transform}
+    .hq-cinta-tira{display:inline-flex;gap:30px;padding-right:30px;animation:hq-marquesina 90s linear infinite;will-change:transform}
     @keyframes hq-marquesina{to{transform:translateX(-50%)}}
-    .hq-cinta span{display:inline-flex;align-items:center;gap:10px}
+    .hq-cinta span{display:inline-flex;align-items:center;gap:10px;flex:none}
     .hq-cinta i{width:4px;height:4px;border-radius:50%;background:var(--accent);flex:none}
 
     /* Mordisco + pastilla de valoracion. La mascara vive en la capa de
        fondo: si recortara la lamina entera se llevaria tambien la pastilla. */
-    .hq-hoja{--nw:359px;--nh:84px} /* hueco: pastilla + 14px de aire por lado */
+    .hq-hoja{--nw:374px;--nh:84px} /* hueco: pastilla + 14px de aire por lado */
     .hq-hoja-bg{
       -webkit-mask-image:linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),radial-gradient(circle 30px at 0 0,#fff 0 29.5px,transparent 30px),radial-gradient(circle 30px at 0 0,#fff 0 29.5px,transparent 30px),radial-gradient(circle 30px at 100% 100%,transparent 0 29.5px,#fff 30px);
       -webkit-mask-size:calc(100% - var(--nw) - 30px) 100%,30px calc(100% - 30px),100% calc(100% - var(--nh) - 30px),calc(100% - 30px) 30px,30px 30px,30px 30px,30px 30px;
@@ -309,7 +309,7 @@
         </div>
       </div>
 
-      <div class="hq-cinta label" aria-hidden="true"><div class="hq-cinta-tira"><span><i></i> Webs que convierten</span><span><i></i> Automatización real</span><span><i></i> Entregas por fases</span><span><i></i> Respuesta en menos de 24 h</span><span><i></i> Webs que convierten</span><span><i></i> Automatización real</span><span><i></i> Entregas por fases</span><span><i></i> Respuesta en menos de 24 h</span></div></div>
+      <div class="hq-cinta label" aria-hidden="true"><div class="hq-cinta-tira"><span><i></i> Webs que convierten</span><span><i></i> Automatización real</span><span><i></i> Entregas por fases</span><span><i></i> Respuesta en menos de 24 h</span><span><i></i> Webs que convierten</span><span><i></i> Automatización real</span><span><i></i> Entregas por fases</span><span><i></i> Respuesta en menos de 24 h</span><span><i></i> Webs que convierten</span><span><i></i> Automatización real</span><span><i></i> Entregas por fases</span><span><i></i> Respuesta en menos de 24 h</span><span><i></i> Webs que convierten</span><span><i></i> Automatización real</span><span><i></i> Entregas por fases</span><span><i></i> Respuesta en menos de 24 h</span><span><i></i> Webs que convierten</span><span><i></i> Automatización real</span><span><i></i> Entregas por fases</span><span><i></i> Respuesta en menos de 24 h</span><span><i></i> Webs que convierten</span><span><i></i> Automatización real</span><span><i></i> Entregas por fases</span><span><i></i> Respuesta en menos de 24 h</span></div></div>
 
       <!-- Mordisco: el fondo de la página se come la esquina y deja sitio a la pastilla -->
       <div class="hq-muesca">
