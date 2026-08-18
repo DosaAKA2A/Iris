@@ -27,6 +27,12 @@
     @media (min-width:861px){
       .hero__tagline{max-width:clamp(360px,38vw,560px);text-wrap:balance;margin-top:calc(var(--space-3) * .75)}
     }
+    /* Cartillas del menu: en reposo van en acero, y al pasar el raton se
+       encienden con su color original. El grado se hace aqui, no en el
+       archivo, para que quede color que encender. */
+    .hn-feature-media{filter:grayscale(88%) contrast(1.06) brightness(.82)}
+    .hn-feature:hover .hn-feature-media{filter:grayscale(0%) contrast(1) brightness(1)}
+
     /* Media real en el swap de proyectos (img/video sobre el gradiente fallback) */
     .swap__asset{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:block}
     /* Imagen real en las cartillas de casos (sobre el placeholder rayado) */
@@ -260,7 +266,7 @@
         </div>
       </div>
       <div class="hn-panel-right">
-        <a class="hn-feature" href="https://iris.it.com/spacio/spacio2.html" target="_blank" rel="noopener"><img class="hn-feature-media" src="./assets/spacio-swap.jpg" alt="" style="object-fit:cover" loading="lazy" decoding="async"><span>SPACIO²</span></a>
+        <a class="hn-feature" href="https://iris.it.com/spacio/spacio2.html" target="_blank" rel="noopener"><img class="hn-feature-media" src="./assets/spacio-card.jpg" alt="" style="object-fit:cover" loading="lazy" decoding="async"><span>SPACIO²</span></a>
         <a class="hn-feature" href="https://iris.it.com/portafolio/" target="_blank" rel="noopener"><img class="hn-feature-media" src="./assets/naviris-case.webp" alt="" style="object-fit:cover" loading="lazy" decoding="async"><span>PORTAFOLIO</span></a>
       </div>
     </div>
