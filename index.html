@@ -34,7 +34,12 @@
     .hn-feature:hover .hn-feature-media{filter:grayscale(0%) contrast(1) brightness(1)}
 
     /* Media real en el swap de proyectos (img/video sobre el gradiente fallback) */
-    .swap__asset{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:block}
+    .swap__asset{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:block;
+      /* En reposo, acero desaturado; al pasar el raton la foto se enciende
+         con su color original. El grado va aqui, no en el archivo. */
+      filter:grayscale(88%) contrast(1.06) brightness(.9);
+      transition:filter .7s ease}
+    .swap__media:hover .swap__asset{filter:none}
     /* Imagen real en las cartillas de casos (sobre el placeholder rayado) */
     .case__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
     /* Swap de proyectos: imágenes sin borde ni esquinas redondeadas, y más grandes */
@@ -378,7 +383,7 @@
         <div class="swap__media">
           <div class="swap__frame">
             <div class="swap__track">
-              <div class="swap__img" data-index="0"><img class="swap__asset" src="./assets/spacio-swap.jpg" alt="SPACIO² — diseño web editorial de una nave de carga autónoma" loading="lazy" decoding="async" width="1500" height="1200"></div>
+              <div class="swap__img" data-index="0"><img class="swap__asset" src="./assets/spacio-swap.jpg" alt="SPACIO² — diseño web editorial de una nave de carga autónoma" loading="lazy" decoding="async" width="1800" height="1200"></div>
               <div class="swap__img" data-index="1"><img class="swap__asset" src="./assets/fisio-swap.jpg" alt="FISIO — rediseño web y rebranding de clínica de fisioterapia" loading="lazy" decoding="async" width="1500" height="1200"></div>
               <div class="swap__img" data-index="2"><img class="swap__asset" src="./assets/ederus-swap.jpg" alt="EDERUS — sitio oficial del servidor ederus.com" loading="lazy" decoding="async" width="1500" height="1200"></div>
               <div class="swap__img ph" data-index="3"><span class="ph__tag">WAVA · imagen → /assets</span></div>
