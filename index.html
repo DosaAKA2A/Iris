@@ -196,19 +196,13 @@
 
     <!-- Fondo: vídeo full-bleed (mudo, loop). El gradiente queda de fallback. -->
     <div class="hero__bg" aria-hidden="true"></div>
+    <!-- Seda líquida negra, bucle ping-pong de 10 s (ComfyUI/Wan + ESRGAN).
+         El webm del hero anterior YA NO se lista: el navegador lo prefiere al mp4
+         y el vídeo nuevo no llegaría a verse. Sigue en assets por si se recupera. -->
     <video class="hero__video" autoplay loop muted playsinline preload="auto" poster="assets/hero-poster.jpg">
-      <source src="assets/hero.webm" type="video/webm" />
       <source src="assets/hero.mp4" type="video/mp4" />
     </video>
     <div class="hero__scrim" aria-hidden="true"></div>
-    <!--
-      TODO recurso Iris — sustituir el .hero__bg por vídeo full-bleed:
-      <video class="hero__video" autoplay loop muted playsinline
-             poster="/assets/hero-poster.jpg">
-        <source src="/assets/hero.mp4" type="video/mp4" />
-      </video>
-      Formato: mp4 H.264, mudo, en loop, cover a pantalla (fuente 16:9).
-    -->
 
     <div class="hero__inner">
       <!-- Wordmark + tagline -->
