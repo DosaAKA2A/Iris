@@ -148,7 +148,7 @@
     .hq-hoja{position:relative;color:#fff;border-radius:var(--r-hoja);display:flex;flex-direction:column;padding:clamp(20px,2.6vw,38px) clamp(20px,2.6vw,38px) 24px;overflow:hidden}
     .hq-hoja>*{position:relative;z-index:2}
     /* despues de la regla de hijos, para ganarle por orden */
-    .hq-hoja-bg{position:absolute;inset:0;z-index:0;background:var(--grafito);border-radius:var(--r-hoja)}
+    .hq-hoja-bg{position:absolute;inset:0;z-index:0;background:rgba(255,255,255,.06);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16);border-radius:var(--r-hoja)}
 
     /* Barra de arriba: la de siempre, pero dentro de la lámina */
     .heroq .hz-top{position:static;padding:0;gap:16px}
@@ -182,11 +182,11 @@
       mask-repeat:no-repeat;
     }
     .hq-muesca{position:absolute;right:0;bottom:0;z-index:3;height:var(--nh);display:flex;align-items:flex-end;justify-content:flex-end;padding:14px}
-    .hq-nota{display:flex;align-items:center;gap:14px;height:56px;padding:0 24px 0 11px;border-radius:999px;background:var(--grafito);border:1px solid var(--hq-linea)}
+    .hq-nota{display:flex;align-items:center;gap:14px;height:56px;padding:0 24px 0 11px;border-radius:999px;background:rgba(255,255,255,.06);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16)}
     .hq-nota b{font-size:16px}
     .hq-nota .hq-nota-txt{color:#bdbdbd}
     .hq-avatares{display:flex;align-items:center}
-    .hq-avatares img{width:30px;height:30px;border-radius:50%;border:2px solid var(--grafito);margin-left:-9px;object-fit:cover}
+    .hq-avatares img{width:30px;height:30px;border-radius:50%;border:2px solid rgba(20,20,22,.9);margin-left:-9px;object-fit:cover}
     .hq-avatares img:first-child{margin-left:0}
 
     /* Pieza del vídeo */
