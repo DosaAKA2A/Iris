@@ -141,9 +141,13 @@
       position:relative; min-height:calc(100svh - var(--marco)*2); margin:var(--marco);
       display:grid; grid-template-columns:766fr 455fr; gap:var(--marco);
     }
-    .hq-hoja,.hq-video{min-width:0}
-    .hq-hoja{position:relative;background:var(--grafito);color:#fff;border-radius:var(--r-hoja);display:flex;flex-direction:column;padding:22px clamp(16px,2.6vw,38px) 24px;overflow:hidden}
-    .hq-hoja>*{position:relative;z-index:2}
+    .hq-fondo{position:absolute;inset:0;z-index:0;border-radius:var(--r-hoja);overflow:hidden;background:#000}
+    .hq-fondo video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .hq-fondo .hq-velo{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.34) 0%,rgba(0,0,0,0) 38%,rgba(0,0,0,.58) 100%)}
+    .hq-hoja,.hq-video{min-width:0;position:relative;z-index:1}
+    .hq-hoja{position:relative;color:#fff;border-radius:var(--r-hoja);display:flex;flex-direction:column;padding:22px clamp(16px,2.6vw,38px) 24px;overflow:hidden}
+    .hq-hoja-bg{position:absolute;inset:0;z-index:0;background:var(--grafito);border-radius:var(--r-hoja)}
+    .hq-hoja>:not(.hq-hoja-bg){position:relative;z-index:2}
 
     /* Barra de arriba: la de siempre, pero dentro de la lámina */
     .heroq .hz-top{position:static;padding:0;gap:16px}
@@ -163,9 +167,21 @@
     .hq-cinta span{display:inline-flex;align-items:center;gap:10px}
     .hq-cinta i{width:4px;height:4px;border-radius:50%;background:var(--accent);flex:none}
 
-    /* Mordisco + pastilla de valoración */
-    .hq-muesca{position:absolute;right:14px;bottom:14px;z-index:3}
-    .hq-nota{display:flex;align-items:center;gap:14px;height:56px;padding:0 24px 0 11px;border-radius:999px;background:rgba(255,255,255,.06);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16)}
+    /* Mordisco + pastilla de valoracion. La mascara vive en la capa de
+       fondo: si recortara la lamina entera se llevaria tambien la pastilla. */
+    .hq-hoja{--nw:359px;--nh:84px} /* hueco: pastilla + 14px de aire por lado */
+    .hq-hoja-bg{
+      -webkit-mask-image:linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),radial-gradient(circle 30px at 0 0,#fff 0 29.5px,transparent 30px),radial-gradient(circle 30px at 0 0,#fff 0 29.5px,transparent 30px),radial-gradient(circle 30px at 100% 100%,transparent 0 29.5px,#fff 30px);
+      -webkit-mask-size:calc(100% - var(--nw) - 30px) 100%,30px calc(100% - 30px),100% calc(100% - var(--nh) - 30px),calc(100% - 30px) 30px,30px 30px,30px 30px,30px 30px;
+      -webkit-mask-position:left 0 top 0,right var(--nw) top 0,left 0 top 0,left 0 bottom var(--nh),right var(--nw) bottom 0,right 0 bottom var(--nh),right calc(var(--nw) - 30px) bottom calc(var(--nh) - 30px);
+      -webkit-mask-repeat:no-repeat;
+      mask-image:linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),radial-gradient(circle 30px at 0 0,#fff 0 29.5px,transparent 30px),radial-gradient(circle 30px at 0 0,#fff 0 29.5px,transparent 30px),radial-gradient(circle 30px at 100% 100%,transparent 0 29.5px,#fff 30px);
+      mask-size:calc(100% - var(--nw) - 30px) 100%,30px calc(100% - 30px),100% calc(100% - var(--nh) - 30px),calc(100% - 30px) 30px,30px 30px,30px 30px,30px 30px;
+      mask-position:left 0 top 0,right var(--nw) top 0,left 0 top 0,left 0 bottom var(--nh),right var(--nw) bottom 0,right 0 bottom var(--nh),right calc(var(--nw) - 30px) bottom calc(var(--nh) - 30px);
+      mask-repeat:no-repeat;
+    }
+    .hq-muesca{position:absolute;right:0;bottom:0;z-index:3;height:var(--nh);display:flex;align-items:flex-end;justify-content:flex-end;padding:14px}
+    .hq-nota{display:flex;align-items:center;gap:14px;height:56px;padding:0 24px 0 11px;border-radius:999px;background:var(--grafito);border:1px solid var(--hq-linea)}
     .hq-nota b{font-size:16px}
     .hq-nota .hq-nota-txt{color:#bdbdbd}
     .hq-avatares{display:flex;align-items:center}
@@ -173,9 +189,7 @@
     .hq-avatares img:first-child{margin-left:0}
 
     /* Pieza del vídeo */
-    .hq-video{position:relative;border-radius:var(--r-hoja);overflow:hidden;background:#000;min-height:320px}
-    .hq-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
-    .hq-velo{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.34) 0%,rgba(0,0,0,0) 38%,rgba(0,0,0,.58) 100%)}
+    .hq-video{position:relative;min-height:320px}
     .heroq .hz-cta{position:absolute;z-index:2;top:14px;right:14px}
 
     /* Cartilla del CV: cristal, para que el vídeo se vea por detrás */
@@ -203,12 +217,13 @@
       .hq-cinta{display:none}
       .hq-cuerpo{padding:20px 4px}
       .hq-titulo{max-width:none}
-      .hq-muesca{right:10px;bottom:10px}
+      .hq-hoja,.hq-hoja-bg{--nw:196px;--nh:68px}
+      .hq-muesca{padding:10px}
       .hq-nota{height:48px;padding:0 18px 0 9px;gap:11px}
       .hq-nota .hq-nota-txt{display:none}
       .hq-cv{left:14px;width:auto}
     }
-    @media (prefers-reduced-motion:reduce){ .hq-video video{display:none} }
+    @media (prefers-reduced-motion:reduce){ .hq-fondo video{display:none} }
 
   </style>
 </head>
@@ -260,7 +275,17 @@
   <!-- ===================== HERO (maqueta Quantum, 2026-08-18) =====================
        Dos piezas: lámina de texto a la izquierda y el vídeo a la derecha. -->
   <section class="heroq" id="inicio">
+    <!-- El video de seda llena TODO el fondo del hero: se ve por el mordisco
+         y por la junta entre las dos piezas. -->
+    <div class="hq-fondo" aria-hidden="true">
+      <video autoplay loop muted playsinline preload="auto" poster="./assets/hero-poster.jpg">
+        <source src="./assets/hero.mp4" type="video/mp4" />
+      </video>
+      <div class="hq-velo"></div>
+    </div>
+
     <div class="hq-hoja">
+      <div class="hq-hoja-bg" aria-hidden="true"></div>
       <!-- Top bar de siempre (MENU + logo), ahora dentro de la lámina -->
       <header class="hz-top">
         <div class="hz-top-left">
@@ -305,13 +330,6 @@
     </div>
 
     <div class="hq-video">
-      <!-- Seda líquida negra, bucle de 10 s. Sin <source> webm: el navegador lo
-           prefiere al mp4 y el vídeo nuevo no llegaría a verse. -->
-      <video autoplay loop muted playsinline preload="auto" poster="./assets/hero-poster.jpg">
-        <source src="./assets/hero.mp4" type="video/mp4" />
-      </video>
-      <div class="hq-velo" aria-hidden="true"></div>
-
       <a class="hz-cta" href="#contacto">
         <span class="hz-cta-logo" aria-hidden="true"><img src="./assets/iris-favicon.svg" alt="" /></span>
         <span class="hz-cta-txt">EMPEZAR&nbsp;PROYECTO&ensp;<em>/IRIS</em></span>
