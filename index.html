@@ -140,37 +140,6 @@
       background:rgba(5,5,5,.4);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25)}
     .case__badge svg{width:10px;height:10px}
 
-    /* ===================== HOVERS (2026-08-19) =====================
-       Tres gestos medidos en himon.framer.website y rehechos con CSS propio:
-       1) el subrayado se dibuja de izquierda a derecha en los enlaces de texto;
-       2) el aro del boton principal cambia de punta (ya estaba en el hero);
-       3) los botones pastilla ganan un punto y se ensanchan para hacerle sitio. */
-
-    /* 1 - Subrayado que se dibuja */
-    .swap__link,.footer__links a,.footer__nav a,.hn-ov-links a{position:relative}
-    .swap__link::after,.footer__links a::after,.footer__nav a::after,.hn-ov-links a::after{
-      content:"";position:absolute;left:0;right:0;bottom:-3px;height:1px;background:currentColor;
-      transform:scaleX(0);transform-origin:left center;
-      transition:transform .45s cubic-bezier(.65,0,.35,1)}
-    .swap__link:hover::after,.footer__links a:hover::after,.footer__nav a:hover::after,.hn-ov-links a:hover::after{transform:scaleX(1)}
-    /* el subrayado del menu grande cuelga un poco mas abajo */
-    .hn-ov-links a::after{bottom:-5px}
-
-    /* 3 - Pastilla que se ensancha y saca un punto */
-    .plan__btn,.contact-form__btn{position:relative;
-      transition:padding-right .45s cubic-bezier(.65,0,.35,1),background .3s ease,color .3s ease,border-color .3s ease}
-    .plan__btn::before,.contact-form__btn::before{
-      content:"";position:absolute;right:16px;top:50%;width:6px;height:6px;border-radius:50%;background:currentColor;
-      transform:translateY(-50%) scale(0);opacity:0;
-      transition:transform .45s cubic-bezier(.65,0,.35,1),opacity .3s ease}
-    .plan__btn:hover,.contact-form__btn:hover{padding-right:38px}
-    .plan__btn:hover::before,.contact-form__btn:hover::before{transform:translateY(-50%) scale(1);opacity:1}
-
-    @media (prefers-reduced-motion:reduce){
-      .swap__link::after,.footer__links a::after,.footer__nav a::after,.hn-ov-links a::after,
-      .plan__btn::before,.contact-form__btn::before{transition:none}
-    }
-
     /* El menu desplegable y los modales de proyecto miden mas que la ventana
        en movil y provocaban scroll lateral en toda la pagina. clip no crea
        contenedor de scroll, asi que el sticky de proyectos sigue funcionando. */
