@@ -133,10 +133,8 @@
     .case__media--corlima{position:relative;display:grid;place-items:center;overflow:hidden;background:#0d0d10}
     /* velo para que el isotipo y la etiqueta se lean sobre la foto */
     .case__media--corlima::after{content:"";position:absolute;inset:0;z-index:1;
-      background:linear-gradient(180deg,rgba(8,8,14,.55) 0%,rgba(8,8,14,.12) 42%,rgba(8,8,14,.62) 100%)}
+      background:linear-gradient(180deg,rgba(8,8,14,.42) 0%,rgba(8,8,14,.06) 38%,rgba(8,8,14,.34) 100%)}
     .case__media--corlima .case__badge,.case__media--corlima .case__plus{z-index:3}
-    .case__iso{position:relative;z-index:2;width:26%;max-width:104px;line-height:0;filter:drop-shadow(0 8px 26px rgba(0,0,0,.55))}
-    .case__iso svg{display:block;width:100%;height:auto}
     .case__badge{position:absolute;top:12px;left:12px;z-index:4;display:inline-flex;align-items:center;gap:6px;
       font-family:var(--font-mono,ui-monospace,monospace);font-size:10px;font-weight:600;letter-spacing:.14em;
       text-transform:uppercase;padding:5px 10px;border-radius:999px;color:#fff;
@@ -494,9 +492,8 @@
 
         <article class="case case--b">
           <a class="case__media case__media--corlima" href="#" data-corlima role="button" aria-label="Abrir Corlima Tools (acceso privado)">
-            <img class="case__img" src="./assets/corlima-case.webp" alt="Cristalería del catálogo de Corlima" width="1600" height="1200" loading="lazy" decoding="async">
+            <img class="case__img" src="./assets/corlima-case.webp?v=2" alt="Cristalería del catálogo de Corlima" width="1600" height="1200" loading="lazy" decoding="async">
             <span class="case__badge label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Privado</span>
-            <span class="case__iso" aria-hidden="true"><svg viewBox="0 0 876.27 874.82" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M1.08,582.41L0,302.19C-.65,131.46,130.07-1.65,303,.02l306.38,2.95c152.34,1.47,267.72,141.24,266.88,290.55l-1.72,307.39c-.86,154.14-136.95,274.21-288.33,273.92l-299.69-.58C128.09,873.93,1.69,742.98,1.08,582.41ZM670.98,820.63c85.92-7.81,145.77-71.41,151.41-157.79,5.07-77.74-16.57-152.57-53.84-222.68-82.97-156.09-213.93-281-375.71-352.86-56.61-25.15-115.91-37.9-176.04-34.9C124.83,56.97,57.47,124.72,53.55,217.62c-11.51,273.02,343.75,627.9,617.43,603.01Z"/></svg></span>
             <span class="case__plus" aria-hidden="true">+</span>
           </a>
           <div class="case__meta">
