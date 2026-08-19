@@ -84,14 +84,19 @@ button.tag:hover{opacity:.7}
 /* `translateZ(0)` no es decoración: fuerza capa propia. La barra de controles
    ya tenía la suya de regalo (anima `opacity`), y por eso en pantalla completa
    se veía la barra pero NO los subtítulos. */
-#subs{
-  position:absolute; left:0; right:0; bottom:6%; z-index:3;
+/* Dos capas: la de abajo es la de siempre y la de arriba recoge los cues que
+   el subtítulo marca como superiores. Se usan cuando hablan dos personajes a
+   la vez, o cuando el de abajo taparía algo escrito en la imagen. */
+#subs,#subs-arriba{
+  position:absolute; left:0; right:0; z-index:3;
   display:flex; flex-direction:column; align-items:center; gap:5px;
   padding:0 6%; pointer-events:none; transition:bottom .2s;
   transform:translateZ(0); will-change:transform;
 }
+#subs{bottom:6%}
+#subs-arriba{top:6%}
 #stage.controls #subs{bottom:96px}
-#subs .cue{
+#subs .cue,#subs-arriba .cue{
   max-width:min(100%,58ch); padding:2px 12px; border-radius:4px;
   color:#fff; text-align:center;
   line-height:1.34; font-weight:500; text-wrap:balance;
@@ -99,18 +104,18 @@ button.tag:hover{opacity:.7}
 }
 /* Tres acabados, como en cualquier plataforma: recuadro, sombra o contorno.
    Las medidas van en em para que acompañen al tamaño elegido. */
-#subs.est-caja .cue{background:rgba(0,0,0,.72)}
-#subs.est-sombra .cue{text-shadow:0 .07em .14em rgba(0,0,0,.98),0 0 .35em rgba(0,0,0,.85)}
-#subs.est-borde .cue{
+#subs.est-caja .cue,#subs-arriba.est-caja .cue{background:rgba(0,0,0,.72)}
+#subs.est-sombra .cue,#subs-arriba.est-sombra .cue{text-shadow:0 .07em .14em rgba(0,0,0,.98),0 0 .35em rgba(0,0,0,.85)}
+#subs.est-borde .cue,#subs-arriba.est-borde .cue{
   text-shadow:
     -.055em -.055em 0 #000, .055em -.055em 0 #000,
     -.055em .055em 0 #000, .055em .055em 0 #000,
     0 -.075em 0 #000, 0 .075em 0 #000, -.075em 0 0 #000, .075em 0 0 #000;
 }
-#subs.cue-s{--cue:clamp(15px,2.6vh,30px)}
-#subs.cue-m{--cue:clamp(19px,3.5vh,42px)}
-#subs.cue-l{--cue:clamp(23px,4.5vh,54px)}
-#subs.cue-xl{--cue:clamp(28px,5.7vh,70px)}
+#subs.cue-s,#subs-arriba.cue-s{--cue:clamp(15px,2.6vh,30px)}
+#subs.cue-m,#subs-arriba.cue-m{--cue:clamp(19px,3.5vh,42px)}
+#subs.cue-l,#subs-arriba.cue-l{--cue:clamp(23px,4.5vh,54px)}
+#subs.cue-xl,#subs-arriba.cue-xl{--cue:clamp(28px,5.7vh,70px)}
 
 /* ---------- Velos sobre el video ---------- */
 .veil{
@@ -721,6 +726,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
          mantiene pegados al video (ver sincroAudio). -->
     <audio id="a2" preload="auto"></audio>
     <div id="subs"></div>
+    <div id="subs-arriba"></div>
 
     <!-- Saltar intro y siguiente capítulo. Solo aparecen cuando toca: la
          intro sale del capítulo OP del Bluray y el siguiente, de la posición
@@ -1422,17 +1428,30 @@ function reflow(frag) {
   });
   return salida;
 }
+/* Un cue va arriba si el subtítulo lo pidió con `line`. Los .ass lo marcan con
+   \an8 y el conversor lo pasa a `line:5%`. Sin `line` el valor es 'auto' y
+   entonces va abajo, que es lo de siempre. */
+function vaArriba(cue) {
+  const l = cue.line;
+  if (l === 'auto' || l == null) return false;
+  const n = Number(l);
+  if (Number.isNaN(n)) return false;
+  // Con snapToLines `line` cuenta renglones (negativo = contando desde abajo);
+  // sin él, es un porcentaje de alto.
+  return cue.snapToLines ? (n >= 0 && n <= 3) : n <= 30;
+}
 function pintaCues() {
-  const capa = $('#subs');
-  capa.textContent = '';
+  const abajo = $('#subs'), arriba = $('#subs-arriba');
+  abajo.textContent = ''; arriba.textContent = '';
   const tt = pistaSel();
   if (!tt || !tt.activeCues) return;
   for (let i = 0; i < tt.activeCues.length; i++) {
+    const cue = tt.activeCues[i];
     const caja = document.createElement('div');
     caja.className = 'cue';
     // getCueAsHTML respeta las cursivas del subtítulo y no mete HTML ajeno.
-    caja.appendChild(reflow(tt.activeCues[i].getCueAsHTML()));
-    capa.appendChild(caja);
+    caja.appendChild(reflow(cue.getCueAsHTML()));
+    (vaArriba(cue) ? arriba : abajo).appendChild(caja);
   }
 }
 function ccPinta() {
@@ -1446,12 +1465,14 @@ const EST_SUBS = [['caja', 'Recuadro'], ['sombra', 'Sombra'], ['borde', 'Bordes'
 function ponTamSub(t) {
   if (!TAM_SUBS.some((x) => x[0] === t)) t = 'm';
   localStorage.moovinSubTam = t;
-  TAM_SUBS.forEach((x) => $('#subs').classList.toggle('cue-' + x[0], x[0] === t));
+  ['#subs', '#subs-arriba'].forEach((sel) =>
+    TAM_SUBS.forEach((x) => $(sel).classList.toggle('cue-' + x[0], x[0] === t)));
 }
 function ponEstSub(e) {
   if (!EST_SUBS.some((x) => x[0] === e)) e = 'caja';
   localStorage.moovinSubEst = e;
-  EST_SUBS.forEach((x) => $('#subs').classList.toggle('est-' + x[0], x[0] === e));
+  ['#subs', '#subs-arriba'].forEach((sel) =>
+    EST_SUBS.forEach((x) => $(sel).classList.toggle('est-' + x[0], x[0] === e)));
 }
 ponTamSub(localStorage.moovinSubTam || 'm');
 ponEstSub(localStorage.moovinSubEst || 'caja');
