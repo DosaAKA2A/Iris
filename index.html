@@ -140,6 +140,11 @@
       background:rgba(5,5,5,.4);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25)}
     .case__badge svg{width:10px;height:10px}
 
+    /* El menu desplegable y los modales de proyecto miden mas que la ventana
+       en movil y provocaban scroll lateral en toda la pagina. clip no crea
+       contenedor de scroll, asi que el sticky de proyectos sigue funcionando. */
+    html{overflow-x:clip}
+
     /* ===================== HERO 2026-08-18 (maqueta Quantum) =====================
        Solo afecta al hero: todo cuelga de .heroq y usa clases hq-. Dos piezas —
        lámina de texto a la izquierda, vídeo a la derecha— con las medidas
@@ -150,25 +155,26 @@
       --marco:10px; --r-hoja:30px; --r-caja:20px;
       --grafito:#17171a; --hq-linea:rgba(255,255,255,.14);
       position:relative; min-height:calc(100svh - var(--marco)*2); margin:var(--marco);
-      display:grid; grid-template-columns:minmax(420px,34%) 1fr; gap:var(--marco);
+      display:grid; grid-template-columns:1fr; gap:var(--marco);
     }
     .hq-fondo{position:absolute;inset:0;z-index:0;border-radius:var(--r-hoja);overflow:hidden;background:#000}
     .hq-fondo video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-    .hq-fondo .hq-velo{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.34) 0%,rgba(0,0,0,0) 38%,rgba(0,0,0,.58) 100%)}
+    .hq-fondo .hq-velo{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.74) 0%,rgba(0,0,0,.38) 44%,rgba(0,0,0,.08) 68%,rgba(0,0,0,.5) 100%),linear-gradient(180deg,rgba(0,0,0,.3) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,.45) 100%)}
     .hq-hoja,.hq-video{min-width:0;position:relative;z-index:1}
-    .hq-hoja{position:relative;color:#fff;border-radius:var(--r-hoja);display:flex;flex-direction:column;padding:clamp(20px,2.6vw,38px) clamp(20px,2.6vw,38px) 24px;overflow:hidden}
+    .hq-hoja{position:relative;color:#fff;display:flex;flex-direction:column;padding:clamp(20px,2.6vw,38px) clamp(20px,2.6vw,38px) 24px;overflow:visible}
     .hq-hoja>*{position:relative;z-index:2}
     /* despues de la regla de hijos, para ganarle por orden */
-    .hq-hoja-bg{position:absolute;inset:0;z-index:0;background:rgba(255,255,255,.06);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16);border-radius:var(--r-hoja)}
+    /* sin panel: el texto va directo sobre el video */
+    .hq-hoja-bg{display:none}
 
     /* Barra de arriba: la de siempre, pero dentro de la lámina */
     .heroq .hz-top{position:static;padding:0;gap:16px}
     .heroq .hz-time{display:none}
 
-    .hq-cuerpo{flex:1;display:flex;flex-direction:column;justify-content:center;padding:30px clamp(6px,2vw,26px);width:100%}
-    .hq-bloque{width:100%;margin-inline:auto;text-align:left}
+    .hq-cuerpo{flex:1;display:flex;flex-direction:column;justify-content:center;padding:30px 0;width:100%}
+    .hq-bloque{width:min(100%,620px);margin-inline:0;margin-left:clamp(10px,4vw,80px);text-align:left}
     .hq-ficha{margin-bottom:22px;color:#cfcfcf;font-size:11.5px;letter-spacing:.1em}
-    .hq-titulo{font-size:clamp(30px,2.6vw,44px);line-height:1;letter-spacing:-.04em;font-weight:700;text-wrap:balance}
+    .hq-titulo{font-size:clamp(36px,4.4vw,60px);line-height:1;letter-spacing:-.04em;font-weight:700;text-wrap:balance}
     .hq-sub{margin-top:22px;color:#c9c9c9;font-weight:400;font-size:clamp(15px,1.15vw,17px);line-height:1.6}
     .hq-ctas{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:36px}
     .hq-pill{display:inline-flex;align-items:center;gap:12px;border-radius:999px;padding:18px 30px;background:#0a0a0a;color:#fff;font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;transition:background .25s ease,color .25s ease}
@@ -188,7 +194,7 @@
       mask-position:left 0 top 0,right var(--nw) top 0,left 0 top 0,left 0 bottom var(--nh),right var(--nw) bottom 0,right 0 bottom var(--nh),right calc(var(--nw) - 30px) bottom calc(var(--nh) - 30px);
       mask-repeat:no-repeat;
     }
-    .hq-muesca{position:absolute;right:0;bottom:0;z-index:3;height:var(--nh);display:flex;align-items:flex-end;justify-content:flex-end;padding:14px}
+    .hq-muesca{position:absolute;left:0;bottom:0;z-index:3;height:var(--nh);display:flex;align-items:flex-end;padding:14px}
     .hq-nota{display:flex;align-items:center;gap:14px;height:56px;padding:0 24px 0 11px;border-radius:999px;background:rgba(255,255,255,.06);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16)}
     .hq-nota b{font-size:16px}
     .hq-nota .hq-nota-txt{color:#bdbdbd}
@@ -197,7 +203,8 @@
     .hq-avatares img:first-child{margin-left:0}
 
     /* Pieza del vídeo */
-    .hq-video{position:relative;min-height:320px}
+    .hq-video{position:absolute;inset:0;pointer-events:none}
+    .hq-video>*{pointer-events:auto}
     .heroq .hz-cta{position:absolute;z-index:2;top:14px;right:14px}
 
     /* Cartilla del CV: cristal, para que el vídeo se vea por detrás */
@@ -215,21 +222,22 @@
     .hq-cv-btn:hover{background:var(--accent);color:var(--accent-ink)}
 
     @media (max-width:1080px){
-      .heroq{grid-template-columns:1fr}
-      .hq-hoja{min-height:78svh}
-      .hq-video{min-height:56svh}
+      .hq-bloque{margin-left:clamp(10px,3vw,40px)}
       .hq-cv{width:min(300px,calc(100% - 28px))}
     }
+    /* En pantallas estrechas la cartilla deja de flotar: el texto arriba, la
+       cartilla abajo, y la pastilla de valoracion se retira para no chocar. */
     @media (max-width:760px){
-      .heroq{--marco:8px;--r-hoja:22px}
-      .hq-cinta{display:none}
-      .hq-cuerpo{padding:20px 4px}
-      .hq-titulo{max-width:none}
-      .hq-hoja,.hq-hoja-bg{--nw:196px;--nh:68px}
-      .hq-muesca{padding:10px}
-      .hq-nota{height:48px;padding:0 18px 0 9px;gap:11px}
-      .hq-nota .hq-nota-txt{display:none}
-      .hq-cv{left:14px;width:auto}
+      .heroq{--marco:8px;--r-hoja:22px;grid-template-rows:auto auto;align-content:start}
+      .hq-cuerpo{flex:none;justify-content:flex-start;padding:64px 0 24px}
+      .hq-bloque{margin-left:8px;margin-right:8px}
+      .hq-titulo{max-width:none;font-size:clamp(30px,8vw,40px)}
+      .hq-video{position:relative;inset:auto;padding:0 8px 8px}
+      .hq-cv{position:relative;right:auto;bottom:auto;width:100%}
+      .hq-cv-foto{aspect-ratio:16/9}
+      /* el CTA de la barra repite al boton del hero: en movil sobra */
+      .heroq .hz-cta{display:none}
+      .hq-muesca{display:none}
     }
     @media (prefers-reduced-motion:reduce){ .hq-fondo video{display:none} }
 
