@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8" /><title>Naviris — cartilla</title>
+<style>
+/* ================================================================
+   CARTILLA de Naviris — TROQUELADO (2026-08-21).
+   La interfaz se ve DENTRO de la marca. 1760x1320, la medida que
+   declaran index.html y site/index.html de Iris.
+   La pantalla es una captura REAL de la app tomada por CDP.
+   ================================================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1760px;height:1320px;overflow:hidden;background:#08090b}
+body{font-family:"Inter Var","Segoe UI",system-ui,sans-serif}
+.escena{position:relative;width:1760px;height:1320px;overflow:hidden}
+/* la captura, en diagonal y cubriendo de sobra */
+.cap{position:absolute;left:-18%;top:-22%;width:136%;height:150%;transform:rotate(-14deg);
+  background-image:url("file:///C:/Users/Dosa/AppData/Local/Temp/claude/C--WINDOWS-system32/b9c0db84-b770-4544-b6f8-9af1bc40e070/scratchpad/naviris-alta.jpg");background-size:cover;background-position:center}
+/* la tapa deja el fondo como textura, no como protagonista */
+.tapa{position:absolute;inset:0;background:rgba(7,8,10,.84)}
+.vin{position:absolute;inset:0;background:radial-gradient(80% 72% at 50% 44%,transparent 34%,rgba(5,6,8,.72) 100%)}
+/* el troquel */
+.hueco{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);width:660px;height:660px}
+.dentro{position:absolute;inset:0;
+  background-image:url("file:///C:/Users/Dosa/AppData/Local/Temp/claude/C--WINDOWS-system32/b9c0db84-b770-4544-b6f8-9af1bc40e070/scratchpad/naviris-alta.jpg");background-size:2050px auto;background-position:50% 33%;
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20876.27%20874.83%22%3E%3Cpath%20fill%3D%22%23000%22%20fill-rule%3D%22evenodd%22%20d%3D%22M1.08%2C582.41L0%2C302.19C-.65%2C131.46%2C130.07-1.65%2C303%2C.02l306.38%2C2.95c152.34%2C1.47%2C267.72%2C141.24%2C266.88%2C290.55l-1.72%2C307.39c-.86%2C154.14-136.95%2C274.21-288.33%2C273.92l-299.69-.58C128.09%2C873.93%2C1.69%2C742.98%2C1.08%2C582.41ZM670.98%2C820.63c85.92-7.81%2C145.77-71.41%2C151.41-157.79%2C5.07-77.74-16.57-152.57-53.84-222.68-82.97-156.09-213.93-281-375.71-352.86-56.61-25.15-115.91-37.9-176.04-34.9C124.83%2C56.97%2C57.47%2C124.72%2C53.55%2C217.62c-11.51%2C273.02%2C343.75%2C627.9%2C617.43%2C603.01Z%22%2F%3E%3C%2Fsvg%3E");mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20876.27%20874.83%22%3E%3Cpath%20fill%3D%22%23000%22%20fill-rule%3D%22evenodd%22%20d%3D%22M1.08%2C582.41L0%2C302.19C-.65%2C131.46%2C130.07-1.65%2C303%2C.02l306.38%2C2.95c152.34%2C1.47%2C267.72%2C141.24%2C266.88%2C290.55l-1.72%2C307.39c-.86%2C154.14-136.95%2C274.21-288.33%2C273.92l-299.69-.58C128.09%2C873.93%2C1.69%2C742.98%2C1.08%2C582.41ZM670.98%2C820.63c85.92-7.81%2C145.77-71.41%2C151.41-157.79%2C5.07-77.74-16.57-152.57-53.84-222.68-82.97-156.09-213.93-281-375.71-352.86-56.61-25.15-115.91-37.9-176.04-34.9C124.83%2C56.97%2C57.47%2C124.72%2C53.55%2C217.62c-11.51%2C273.02%2C343.75%2C627.9%2C617.43%2C603.01Z%22%2F%3E%3C%2Fsvg%3E");
+  -webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-position:center;mask-position:center;
+  filter:brightness(1.16) contrast(1.04)}
+.filo{position:absolute;inset:0;fill:none;stroke:rgba(255,255,255,.24);stroke-width:6}
+.wm{position:absolute;left:50%;bottom:172px;transform:translateX(-50%);
+  font-size:25px;font-weight:600;letter-spacing:19px;color:rgba(255,255,255,.86);padding-left:19px}
+.grano{position:absolute;inset:0;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)'/%3E%3C/svg%3E")}
+</style></head>
+<body><div class="escena">
+  <div class="cap"></div>
+  <div class="tapa"></div>
+  <div class="vin"></div>
+  <div class="hueco">
+    <div class="dentro"></div>
+    <svg class="filo" viewBox="0 0 876.27 874.83"><path fill-rule="evenodd" d="M1.08,582.41L0,302.19C-.65,131.46,130.07-1.65,303,.02l306.38,2.95c152.34,1.47,267.72,141.24,266.88,290.55l-1.72,307.39c-.86,154.14-136.95,274.21-288.33,273.92l-299.69-.58C128.09,873.93,1.69,742.98,1.08,582.41ZM670.98,820.63c85.92-7.81,145.77-71.41,151.41-157.79,5.07-77.74-16.57-152.57-53.84-222.68-82.97-156.09-213.93-281-375.71-352.86-56.61-25.15-115.91-37.9-176.04-34.9C124.83,56.97,57.47,124.72,53.55,217.62c-11.51,273.02,343.75,627.9,617.43,603.01Z"/></svg>
+  </div>
+  <div class="wm">NAVIRIS</div>
+  <div class="grano"></div>
+</div></body></html>
