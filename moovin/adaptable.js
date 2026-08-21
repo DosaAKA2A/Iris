@@ -118,6 +118,15 @@ function zonaActiva() {
 
 const ENFOCABLES = 'button,input:not([type=hidden]),select,textarea,a[href],[tabindex]:not([tabindex="-1"])';
 
+/* Un elemento vale como sitio donde tener el foco si de verdad se ve. Cuando
+   se cierra un panel, lo que tenia dentro conserva el foco pero pasa a medir
+   cero: eso es un foco huerfano y hay que recogerlo. */
+function usable(el) {
+  if (!el || el === document.body) return true;
+  const r = el.getBoundingClientRect();
+  return r.width >= 2 && r.height >= 2;
+}
+
 function candidatos() {
   const zonas = zonaActiva();
   const fuera = [];
@@ -168,10 +177,28 @@ function puntuacion(ra, rb, dir) {
   return Math.max(0, avance) + desvio * (alineado ? 0.35 : 3);
 }
 
+/* Barras horizontales de las que el movimiento lateral NO debe salir.
+   La cabecera es el caso que lo hizo evidente: el boton de Watch Party esta en
+   el extremo derecho y la biblioteca empieza justo debajo, asi que al ir a la
+   derecha desde la marca siempre ganaba la segunda tarjeta de la rejilla, que
+   estaba a 50 px, frente al boton, que estaba a 2800. Resultado: al boton no se
+   llegaba nunca. Dentro de una barra, izquierda y derecha recorren la barra; la
+   salida es arriba o abajo. */
+const CARRILES = '#top, .lib-tabs, .bar-row';
+
 function mueve(dir) {
-  const lista = candidatos();
+  let lista = candidatos();
   if (!lista.length) return false;
   const actual = document.activeElement;
+  if (dir === 'izq' || dir === 'der') {
+    const carril = actual && actual.closest ? actual.closest(CARRILES) : null;
+    if (carril) {
+      const dentro = lista.filter((el) => carril.contains(el));
+      // Solo se acota si queda a donde ir; si no, se deja salir para no
+      // encerrar el foco en una barra de un solo boton.
+      if (dentro.length > 1) lista = dentro;
+    }
+  }
 
   // Sin foco util todavia (recien abierta una capa), se entra por lo primero.
   if (!actual || actual === document.body || !lista.includes(actual)) {
@@ -364,11 +391,29 @@ document.addEventListener('keydown', (e) => {
    que es como index.html abre y cierra sus paneles. */
 if (raiz.getAttribute('data-entrada') === 'mando' || TV) {
   const observa = new MutationObserver(() => {
-    if (raiz.getAttribute('data-entrada') !== 'mando') return;
     const act = document.activeElement;
     const lista = candidatos();
     if (!lista.length) return;
-    if (!act || act === document.body || !lista.includes(act)) enfoca(lista[0]);
+    if (act && act !== document.body && lista.includes(act)) return;
+
+    // Un foco que se ha quedado dentro de un panel ya cerrado se recoloca
+    // SIEMPRE, se este manejando con mando o con raton: es la forma clasica de
+    // que un televisor parezca colgado, porque las flechas siguen yendo a un
+    // sitio que ya no se ve. Lo que si depende del mando es entrar solo en una
+    // capa recien abierta, que con raton seria un anillo que nadie pidio.
+    const huerfano = !!(act && act !== document.body && usable(act) !== true);
+    if (!huerfano && raiz.getAttribute('data-entrada') !== 'mando') return;
+
+    // Se cerro la ultima capa: lo que manda ahora es la pelicula. El foco se
+    // SUELTA en vez de mandarlo al primer boton que haya, que era la marca de
+    // la cabecera: dejar el foco ahi al arrancar un capitulo significa que un
+    // OK sin querer te devuelve a la biblioteca. Sin foco, OK es pausar y la
+    // flecha de abajo entra en la barra, que es lo que se espera.
+    if (!hayCapa()) {
+      if (act && act.blur) act.blur();
+      return;
+    }
+    enfoca(lista[0]);
   });
   ['#loader', '#pase', '#dl', '#party', '#tapveil'].forEach((s) => {
     const el = $(s);
@@ -381,6 +426,19 @@ if (raiz.getAttribute('data-entrada') === 'mando' || TV) {
 }
 
 /* ======================= Parches de cada plataforma ======================= */
+
+/* En la cabecera, la marca IRIS es un enlace a la portada del estudio. En un
+   navegador eso esta bien: se vuelve con el boton de atras. Dentro de la
+   aplicacion del televisor NO hay boton de atras ni barra de direcciones, asi
+   que quien llegue ahi con el mando (dos flechas desde la biblioteca) se queda
+   encerrado en la web del estudio sin forma de volver a MOOVIN salvo cerrar la
+   aplicacion entera.
+   La marca se queda a la vista, que es la identidad, pero deja de ser un
+   enlace: sin href tampoco entra ya en el recorrido del foco. */
+if (TV) {
+  const logo = document.querySelector('#top .logo');
+  if (logo) { logo.removeAttribute('href'); logo.style.cursor = 'default'; }
+}
 
 /* iOS no deja poner en pantalla completa a un div: solo al propio video, y con
    un metodo suyo. Sin esto, el boton de pantalla completa no hace nada en un

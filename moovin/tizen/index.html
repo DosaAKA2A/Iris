@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>MOOVIN</title>
+<style>
+  /* Lo unico que se ve de este archivo es el rato que tarda en bajar la
+     interfaz. A partir de ahi, lo que hay en pantalla es MOOVIN. */
+  html,body{height:100%;margin:0;background:#0a0a0a;color:#f5f5f5;
+    font-family:system-ui,-apple-system,sans-serif}
+  #carga{height:100%;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:22px;text-align:center;padding:0 8vw}
+  .marca{font-family:ui-monospace,monospace;font-size:26px;font-weight:700;
+    letter-spacing:.24em;color:#dc402a}
+  .estado{font-size:20px;color:rgba(245,245,245,.6);line-height:1.6}
+  .aviso{font-size:18px;color:rgba(245,245,245,.38);max-width:36em;line-height:1.7}
+</style>
+</head>
+<body>
+  <div id="carga">
+    <div class="marca">MOOVIN</div>
+    <div class="estado" id="estado">Buscando la ultima version...</div>
+    <div class="aviso" id="aviso"></div>
+  </div>
+  <script src="arranque.js"></script>
+</body>
+</html>

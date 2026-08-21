@@ -2,15 +2,19 @@
 <!--
   MOOVIN para televisores Samsung (Tizen).
 
-  La aplicacion se empaqueta con la interfaz DENTRO, no apuntando a
-  iris.it.com. Es a proposito: cuando el contenido de un widget de Tizen es
-  remoto, el sistema no garantiza que el objeto `tizen` llegue a la pagina, y
-  sin el no hay tecla de volver ni teclas de reproduccion del mando. La
-  biblioteca y los videos si vienen de la red, que es lo unico que cambia a
-  menudo; la interfaz se vuelve a empaquetar con empaquetar.ps1 cuando toque.
+  El paquete NO lleva la interfaz dentro: lleva un arranque (index.html +
+  arranque.js) que en cada apertura se descarga la ultima version de
+  iris.it.com/moovin y la monta en este mismo documento. Asi un push al
+  repositorio llega a la tele sola, sin volver a instalar nada.
 
-  El paquete lo arma ese script: copia index.html y la capa adaptable desde la
-  carpeta de al lado y reescribe las dos rutas absolutas que tiene el HTML.
+  No se apunta el widget directamente a la web porque cuando el contenido de
+  una aplicacion Tizen es remoto el sistema no garantiza que el objeto `tizen`
+  llegue a la pagina, y sin el no hay tecla de volver ni teclas de
+  reproduccion. Descargando y escribiendo en el documento local, la ventana
+  nunca navega y el objeto sobrevive.
+
+  Solo hay que reinstalar si cambia arranque.js, que es la unica pieza que se
+  queda en el paquete.
 -->
 <widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets"
         id="http://iris.it.com/moovin" version="1.0.0" viewmodes="maximized">

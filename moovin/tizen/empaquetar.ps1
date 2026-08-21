@@ -46,31 +46,19 @@ Write-Host "Tizen Studio: $raiz"
 # ------------------------------------------------------------------ el paquete
 # Se arma de cero en cada pasada: un archivo que se quedo de una version
 # anterior es la clase de fallo que solo se ve en la tele y cuesta media hora.
+#
+# Lo que entra es SOLO el arranque. La interfaz se la baja el propio arranque de
+# iris.it.com cada vez que se abre la aplicacion, que es lo que permite que un
+# push llegue a la tele sin reinstalar.
 if (Test-Path $build) { Remove-Item $build -Recurse -Force }
 New-Item -ItemType Directory -Path $build | Out-Null
-New-Item -ItemType Directory -Path (Join-Path $build 'assets') | Out-Null
 
-Copy-Item (Join-Path $aqui 'config.xml')          $build
-Copy-Item (Join-Path $aqui 'icono\icon.png')      $build
-Copy-Item (Join-Path $moovin 'adaptable.css')     $build
-Copy-Item (Join-Path $moovin 'adaptable.js')      $build
-Copy-Item (Join-Path (Split-Path -Parent $moovin) 'assets\moovin-favicon.svg') (Join-Path $build 'assets')
+Copy-Item (Join-Path $aqui 'config.xml')     $build
+Copy-Item (Join-Path $aqui 'index.html')     $build
+Copy-Item (Join-Path $aqui 'arranque.js')    $build
+Copy-Item (Join-Path $aqui 'icono\icon.png') $build
 
-# El HTML trae dos rutas que arrancan en la raiz del sitio y dentro del paquete
-# no llevan a ningun sitio: el favicon y el enlace a la portada del estudio. La
-# primera se reapunta a la copia local; la segunda, a la web, que es a donde
-# quiere ir de verdad.
-#
-# Se escribe con .NET y UTF-8 SIN BOM a proposito: Out-File mete la marca de
-# orden de bytes al principio del archivo y el motor de Tizen se encuentra tres
-# bytes raros antes del <!DOCTYPE>.
-$html = [System.IO.File]::ReadAllText((Join-Path $moovin 'index.html'), [System.Text.Encoding]::UTF8)
-$html = $html.Replace('href="/assets/moovin-favicon.svg"', 'href="assets/moovin-favicon.svg"')
-$html = $html.Replace('href="/"', 'href="https://iris.it.com/"')
-$sinBom = New-Object System.Text.UTF8Encoding($false)
-[System.IO.File]::WriteAllText((Join-Path $build 'index.html'), $html, $sinBom)
-
-Write-Host "Interfaz copiada a build\"
+Write-Host "Arranque copiado a build\ (la interfaz se descarga sola en cada apertura)"
 
 # ------------------------------------------------------------ firmar y empacar
 $argsPack = @('package', '-t', 'wgt', '--', $build)

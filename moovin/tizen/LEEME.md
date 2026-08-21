@@ -27,11 +27,17 @@ más. Si quedó en otro, se le pasa con `-TizenStudio`.
 ### 2. Modo desarrollador en la tele
 
 1. Menú **Apps**.
-2. Con el mando, teclear **12345**. Se abre un cuadro de ajustes.
+2. Teclear **12345**. Se abre un cuadro de ajustes.
 3. **Developer mode: On**.
 4. Escribir la **IP de este PC** en el campo que pide.
 5. Apagar y encender la tele. No vale con salir del menú: el modo no queda
    activo hasta que arranca de nuevo.
+
+**El One Remote no tiene teclado numérico.** Los mandos que vienen con estos
+televisores traen un botón **123**: al pulsarlo sale un teclado numérico en la
+pantalla, y con él se marca el 12345. Si el mando tampoco tiene ese botón, el
+mando virtual de la app **SmartThings** (móvil, con la tele emparejada) incluye
+teclado numérico y sirve igual.
 
 La tele y el PC tienen que estar en la misma red.
 
@@ -60,21 +66,30 @@ cd moovin\tizen
 .\empaquetar.ps1 -Ip 192.168.1.40
 ```
 
-El script copia la interfaz desde `moovin\`, arma el `.wgt`, lo firma, conecta
-con la tele y lo instala. Si solo se quiere el paquete, se llama sin `-Ip`.
+El script arma el `.wgt`, lo firma, conecta con la tele y lo instala. Si solo se
+quiere el paquete, se llama sin `-Ip`.
 
-## Actualizar después de tocar MOOVIN
+## Se actualiza sola
 
-La interfaz va **dentro** del paquete, así que un cambio en `index.html`,
-`adaptable.css` o `adaptable.js` no llega solo a la tele: hay que volver a
-ejecutar `empaquetar.ps1`. La biblioteca y los vídeos sí vienen de la red, que
-es lo que cambia a menudo, así que esto solo hace falta cuando se toca la
-interfaz.
+**Un push a `main` llega a la tele sin reinstalar nada.** El paquete no lleva la
+interfaz dentro: lleva `arranque.js`, que en cada apertura se descarga
+`iris.it.com/moovin/index.html` y lo monta en su propio documento. La siguiente
+vez que se abre la aplicación, ya es la versión nueva.
 
-Va empaquetada y no apuntando a `iris.it.com` a propósito: cuando el contenido
-de un widget de Tizen es remoto, el sistema no garantiza que el objeto `tizen`
-llegue a la página, y sin él no hay tecla de volver ni teclas de reproducción
-del mando.
+Solo hay que volver a ejecutar `empaquetar.ps1` si se toca `arranque.js` o
+`config.xml`, que son las dos únicas piezas que viven en el paquete. Tocar
+`index.html`, `adaptable.css` o `adaptable.js` **no** requiere reinstalar.
+
+Por qué se monta en vez de apuntar el widget a la web: cuando el contenido de una
+aplicación Tizen es remoto, el sistema no garantiza que el objeto `tizen` llegue
+a la página, y sin él no hay tecla de volver ni teclas de reproducción del mando.
+Descargando el HTML y escribiéndolo en el documento local, la ventana no navega
+nunca y el objeto sobrevive.
+
+**Sin conexión con el estudio**, se abre la última copia que funcionó, guardada
+en la propia tele junto con `adaptable.css` y `adaptable.js` para que no le falte
+nada. Si además no hay red, el catálogo tampoco llegará, pero la aplicación abre
+y dice por qué en vez de quedarse en negro.
 
 ---
 
