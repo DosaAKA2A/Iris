@@ -1,0 +1,213 @@
+/* ============================================================================
+   MOOVIN — capa adaptable (televisor / movil / escritorio)
+   ----------------------------------------------------------------------------
+   La interfaz de MOOVIN se diseno para raton. Este archivo NO la reescribe:
+   solo la reajusta segun donde se abra, a partir de dos atributos que pone
+   adaptable.js en el <html>:
+
+     data-plataforma = tv | movil | escritorio
+     data-entrada    = mando | tactil | raton
+
+   La plataforma decide tamanos y que sobra en cada sitio. La entrada decide
+   una sola cosa: si el foco tiene que verse. Con raton no se ve nunca; con
+   mando o teclado se ve siempre, porque es lo unico que dice donde estas.
+   ========================================================================== */
+
+/* ======================= Foco: el cursor del mando ======================= */
+/* :focus-visible no basta en televisor: el navegador de Tizen lo aplica de
+   forma irregular cuando el foco lo mueve un script, que es como se mueve
+   aqui. Por eso el anillo va sobre :focus a secas y se enciende con el
+   atributo data-entrada en vez de fiarlo a la heuristica del navegador. */
+:root[data-entrada="mando"] :focus,
+:root[data-entrada="mando"] :focus-visible{
+  outline:2px solid var(--red);
+  outline-offset:3px;
+  border-radius:8px;
+}
+/* Dentro de la rejilla el anillo se pega al borde de la propia tarjeta en vez
+   de dibujar un rectangulo por fuera que se solapa con las vecinas. */
+:root[data-entrada="mando"] .lib-card:focus{
+  border-color:var(--red);
+  transform:translateY(-2px);
+  outline-offset:2px;
+}
+:root[data-entrada="mando"] .lib-tab:focus{outline-offset:-2px}
+
+/* ============================== TELEVISOR ==============================
+   Distancia de vision de 2 a 3 metros: lo que en un monitor se lee a 13 px
+   aqui necesita rondar los 20. Y todo lo que exija escribir sobra, porque
+   con un mando de flechas un teclado en pantalla es un castigo.
+   ====================================================================== */
+:root[data-plataforma="tv"]{
+  /* Muchos televisores recortan el borde de la imagen (overscan). El margen
+     de seguridad evita que la primera fila de la rejilla y la barra de
+     controles queden a medias fuera de la pantalla. */
+  --safe-x:3vw;
+  --safe-y:2.4vh;
+}
+:root[data-plataforma="tv"] body{font-size:18px}
+
+/* ---------- Cabecera ---------- */
+:root[data-plataforma="tv"] #top{
+  height:76px; padding:0 calc(18px + var(--safe-x));
+}
+:root[data-plataforma="tv"] #top .logo svg{height:21px}
+:root[data-plataforma="tv"] #top .logo .marca-ico{width:21px; height:21px}
+:root[data-plataforma="tv"] #top .tag{font-size:15px; letter-spacing:.24em}
+:root[data-plataforma="tv"] #btn-party{font-size:16px; padding:11px 20px}
+
+/* ---------- Biblioteca ---------- */
+/* En escritorio la biblioteca es una columna de 1080 px centrada, que a esa
+   distancia se lee bien. En un televisor de 1920 esa misma columna deja media
+   pantalla en negro a cada lado: aqui se ocupa el ancho entero. */
+:root[data-plataforma="tv"] .lib{
+  width:100%;
+  max-width:none;
+  padding:calc(30px + var(--safe-y)) calc(20px + var(--safe-x)) calc(50px + var(--safe-y));
+}
+:root[data-plataforma="tv"] .lib h1{font-size:34px}
+:root[data-plataforma="tv"] .lib .sub{font-size:18px; max-width:820px}
+:root[data-plataforma="tv"] .lib-tab{font-size:14px; padding:13px 18px}
+:root[data-plataforma="tv"] .lib-rejilla{
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:26px;
+}
+:root[data-plataforma="tv"] .lib-tit{font-size:19px}
+:root[data-plataforma="tv"] .lib-nota{font-size:15px}
+:root[data-plataforma="tv"] .lib-info{padding:14px 16px 16px}
+:root[data-plataforma="tv"] .lib-dur,
+:root[data-plataforma="tv"] .lib-eps{font-size:14px; padding:4px 10px}
+:root[data-plataforma="tv"] .lib-eps svg{width:15px; height:15px}
+:root[data-plataforma="tv"] .lib-pie{font-size:15px}
+
+/* En un televisor no hay ni explorador de archivos ni forma comoda de teclear
+   una URL, asi que "Otra fuente" solo estorba: se lleva una pantalla entera
+   de recorrido con el mando para llegar a algo inservible. */
+:root[data-plataforma="tv"] .lib-otra{display:none}
+/* La descarga tampoco: el televisor no tiene donde guardar el archivo. */
+:root[data-plataforma="tv"] .lib-dl{display:none}
+
+/* ---------- Ficha de serie ---------- */
+:root[data-plataforma="tv"] .se-volver{font-size:16px; padding:10px 18px 10px 14px}
+:root[data-plataforma="tv"] .se-volver svg{width:18px; height:18px}
+:root[data-plataforma="tv"] .se-poster{flex:0 0 200px; width:200px}
+:root[data-plataforma="tv"] .se-meta h2{font-size:31px}
+:root[data-plataforma="tv"] .se-meta .se-sub{font-size:17px; max-width:760px}
+:root[data-plataforma="tv"] .se-meta .se-cifra{font-size:13px}
+:root[data-plataforma="tv"] button.se-seguir{width:300px; font-size:17px; padding:14px 20px}
+:root[data-plataforma="tv"] .se-seguir svg{width:19px; height:19px}
+
+/* ---------- Barra de reproduccion ---------- */
+:root[data-plataforma="tv"] #bar{
+  padding:56px calc(16px + var(--safe-x)) calc(16px + var(--safe-y));
+}
+:root[data-plataforma="tv"] #seek{height:26px}
+:root[data-plataforma="tv"] #seek::-webkit-slider-runnable-track{height:7px; border-radius:4px}
+:root[data-plataforma="tv"] #seek::-webkit-slider-thumb{width:22px; height:22px; margin-top:-7.5px}
+:root[data-plataforma="tv"] #seek::-moz-range-track{height:7px}
+:root[data-plataforma="tv"] #seek::-moz-range-progress{height:7px}
+:root[data-plataforma="tv"] #seek::-moz-range-thumb{width:22px; height:22px}
+:root[data-plataforma="tv"] .cbtn{width:56px; height:56px; border-radius:12px}
+:root[data-plataforma="tv"] .cbtn svg{width:28px; height:28px}
+:root[data-plataforma="tv"] #t-cur,
+:root[data-plataforma="tv"] #t-dur,
+:root[data-plataforma="tv"] .tsep{font-size:17px}
+:root[data-plataforma="tv"] #movie-name{font-size:17px}
+/* El volumen lo lleva el mando del televisor, con sus teclas y su indicador
+   en pantalla. Un segundo control aqui solo confunde. */
+:root[data-plataforma="tv"] #vol,
+:root[data-plataforma="tv"] #c-mute{display:none}
+/* Y la pantalla completa tampoco aplica: la app YA ocupa la pantalla entera. */
+:root[data-plataforma="tv"] #c-fs{display:none}
+
+/* ---------- Menus de audio y subtitulos ---------- */
+/* Los menus se anclan a la derecha contando los botones que tienen al lado.
+   En televisor esos botones son mas anchos y ademas faltan tres (volumen,
+   silencio y pantalla completa), asi que la cuenta cambia. */
+:root[data-plataforma="tv"] .menu{
+  bottom:110px; min-width:280px; padding:8px;
+}
+:root[data-plataforma="tv"] .menu-t{font-size:13px; padding:10px 14px 7px}
+:root[data-plataforma="tv"] #cc-menu{right:calc(30px + var(--safe-x))}
+:root[data-plataforma="tv"] #audio-menu{right:calc(96px + var(--safe-x))}
+
+/* ---------- Subtitulos ---------- */
+/* El tamano guardado viene de una sesion de escritorio y en un televisor se
+   queda corto. Sube el minimo; el ajuste del usuario sigue mandando encima. */
+:root[data-plataforma="tv"] #subs,
+:root[data-plataforma="tv"] #subs-arriba{font-size:max(1em,26px)}
+
+/* ---------- Pase ----------
+   Es la primera pantalla que se ve en el televisor, y encima hay que escribir
+   en ella con un teclado en pantalla: la tarjeta de 400 px que funciona en un
+   monitor aqui queda como un sello en mitad de la pared. */
+:root[data-plataforma="tv"] .pase-card{max-width:720px; padding:38px 40px}
+:root[data-plataforma="tv"] .pase-card h2{font-size:30px}
+:root[data-plataforma="tv"] .pase-card .sub{font-size:17px}
+:root[data-plataforma="tv"] #pase-in{font-size:24px; letter-spacing:.2em; padding:14px 18px}
+:root[data-plataforma="tv"] #pase-err{font-size:17px}
+:root[data-plataforma="tv"] .veil .btn,
+:root[data-plataforma="tv"] .veil .cta{font-size:17px; padding:13px 22px}
+
+/* ---------- Watch Party ---------- */
+:root[data-plataforma="tv"] #party{width:420px}
+:root[data-plataforma="tv"] #p-chat{font-size:16px}
+
+/* ================================ MOVIL ================================
+   Aqui no sobra contenido, sobra hueco: la interfaz esta pensada para un
+   ancho de escritorio y en un telefono las tarjetas quedan a dos por fila con
+   el texto apretado. Se compacta el marco y se agrandan las zonas que se
+   tocan con el dedo, que necesitan 44 px como minimo.
+   ====================================================================== */
+@media (max-width:760px){
+  /* Con la barra del navegador movil, 100% de alto deja el ultimo control por
+     debajo del borde visible. dvh mide el alto que de verdad se ve. */
+  html,body{height:100dvh}
+
+  #top{height:48px; padding:0 12px; gap:10px}
+  #top .tag{font-size:10px; letter-spacing:.18em}
+  #btn-party{padding:7px 11px; font-size:12px}
+
+  .lib{padding:22px 14px 34px}
+  .lib h1{font-size:20px}
+  .lib .sub{font-size:12.5px}
+  .lib-rejilla{grid-template-columns:repeat(auto-fill,minmax(124px,1fr)); gap:12px}
+  .lib-info{padding:8px 9px 10px}
+  .lib-tit{font-size:12px}
+  .lib-nota{font-size:10.5px}
+  .lib-pie{flex-wrap:wrap; gap:10px}
+  /* El boton de descarga aparece al pasar el raton por encima, gesto que en
+     una pantalla tactil no existe: aqui se queda siempre visible. */
+  .lib-card .lib-dl{opacity:1}
+
+  /* La ficha de serie en dos columnas deja la caratula y el texto a unos
+     130 px cada uno. Apilada, la caratula manda y el texto ocupa el ancho. */
+  .se-cab{flex-direction:column; gap:16px}
+  .se-poster{flex:0 0 auto; width:132px}
+  .se-meta h2{font-size:19px}
+  button.se-seguir{width:100%}
+
+  /* La barra de controles: menos elementos y mas grandes. El nombre de la
+     pelicula y el volumen se van, que en un telefono el volumen son los
+     botones fisicos y el nombre ya esta en la ficha. */
+  #bar{padding:30px 10px 10px}
+  .cbtn{width:44px; height:44px}
+  .cbtn svg{width:20px; height:20px}
+  #vol,#c-mute,#movie-name{display:none}
+  /* El pulgar necesita mas alto que el puntero para agarrar la barra. */
+  #seek{height:22px}
+  #seek::-webkit-slider-thumb{width:18px; height:18px; margin-top:-7px}
+  #seek::-moz-range-thumb{width:18px; height:18px}
+  .menu{bottom:64px}
+  #cc-menu,#audio-menu{right:10px; left:10px; max-width:none}
+
+  /* El panel de Watch Party a media pantalla no deja leer ni el chat ni ver
+     el video. En un telefono es una cosa o la otra. */
+  #party{width:100%; left:0}
+}
+
+/* Con el telefono tumbado el alto es lo escaso: la cabecera se retira
+   mientras se reproduce para que el video se quede con toda la pantalla. */
+@media (max-width:900px) and (orientation:landscape){
+  html[data-reproduciendo] #top{display:none}
+}

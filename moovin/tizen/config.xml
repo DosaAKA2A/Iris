@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  MOOVIN para televisores Samsung (Tizen).
+
+  La aplicacion se empaqueta con la interfaz DENTRO, no apuntando a
+  iris.it.com. Es a proposito: cuando el contenido de un widget de Tizen es
+  remoto, el sistema no garantiza que el objeto `tizen` llegue a la pagina, y
+  sin el no hay tecla de volver ni teclas de reproduccion del mando. La
+  biblioteca y los videos si vienen de la red, que es lo unico que cambia a
+  menudo; la interfaz se vuelve a empaquetar con empaquetar.ps1 cuando toque.
+
+  El paquete lo arma ese script: copia index.html y la capa adaptable desde la
+  carpeta de al lado y reescribe las dos rutas absolutas que tiene el HTML.
+-->
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets"
+        id="http://iris.it.com/moovin" version="1.0.0" viewmodes="maximized">
+
+  <tizen:application id="IRISMOOVIN.MOOVIN" package="IRISMOOVIN" required_version="6.0"/>
+
+  <name>MOOVIN</name>
+  <description>La biblioteca de cine y anime de IRIS Studio.</description>
+  <author href="https://iris.it.com" email="studio.iris2026@gmail.com">IRIS Studio</author>
+  <icon src="icon.png"/>
+  <content src="index.html"/>
+
+  <!-- La biblioteca, los videos y las fuentes vienen de fuera: sin el permiso
+       de red la aplicacion arranca y se queda en la pantalla del pase sin
+       poder preguntarle nada a nadie. -->
+  <tizen:privilege name="http://tizen.org/privilege/internet"/>
+  <!-- Y sin este, las teclas de reproduccion del mando (play, pausa, avance)
+       se las queda el sistema y no llegan nunca a la aplicacion. -->
+  <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
+
+  <tizen:profile name="tv"/>
+  <feature name="http://tizen.org/feature/screen.size.all"/>
+
+  <!-- hwkey-event enable es lo que hace que el boton Return del mando llegue
+       como una tecla (codigo 10009) en vez de cerrar la aplicacion por su
+       cuenta: es la tecla de volver que gestiona adaptable.js. -->
+  <tizen:setting screen-orientation="landscape"
+                 context-menu="disable"
+                 background-support="disable"
+                 encryption="disable"
+                 install-location="auto"
+                 hwkey-event="enable"/>
+
+  <access origin="*" subdomains="true"/>
+  <tizen:allow-navigation>iris.it.com *.workers.dev fonts.googleapis.com fonts.gstatic.com</tizen:allow-navigation>
+</widget>

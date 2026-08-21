@@ -1,0 +1,3 @@
+# Lo que produce empaquetar.ps1: se rehace en cada pasada y pesa.
+build/
+*.wgt

@@ -2,10 +2,23 @@
 <html lang="es">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- viewport-fit=cover: en un teléfono con muesca, sin esto la pantalla
+     completa deja una franja negra a los lados del vídeo. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="robots" content="noindex" />
 <title>MOOVIN — IRIS Studio</title>
 <link rel="icon" type="image/svg+xml" href="/assets/moovin-favicon.svg" />
+
+<!-- Instalable como aplicación. En Android y en el escritorio basta con el
+     manifiesto y el service worker, que registra adaptable.js; iOS no lee el
+     manifiesto y necesita sus propias etiquetas. -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#0a0a0a" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MOOVIN" />
+<link rel="apple-touch-icon" href="icono-192.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
@@ -123,6 +136,7 @@ button.tag:hover{opacity:.7}
   background:rgba(6,6,8,.86); z-index:5;
 }
 .veil.hidden{display:none}
+.pase-card{max-width:400px}
 /* La biblioteca ES la landing: capa opaca a pantalla completa con scroll */
 #loader{background:var(--bg); align-items:flex-start; overflow-y:auto}
 .lib{
@@ -689,6 +703,9 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   #party{position:fixed; right:0; top:52px; bottom:0; z-index:20; border-left:1px solid var(--line)}
 }
 </style>
+<!-- La capa adaptable va DESPUES de los estilos de arriba: reajusta lo justo
+     para televisor y para telefono, y para eso tiene que poder pisarlos. -->
+<link rel="stylesheet" href="adaptable.css" />
 </head>
 <body>
 
@@ -812,7 +829,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 
     <!-- Pase de acceso: la biblioteca es privada y el worker no sirve nada sin él -->
     <div id="pase" class="veil hidden">
-      <div class="dl-card" style="max-width:400px">
+      <div class="dl-card pase-card">
         <h2>Biblioteca privada</h2>
         <div class="sub">
           Escribe el pase para entrar. En Naviris se pone solo: guárdalo en
@@ -2726,5 +2743,8 @@ window.MOOVIN = {
 };
 })();
 </script>
+<!-- Y el script, DESPUES del de arriba: escucha las mismas teclas y necesita
+     que los controles ya esten montados para poder moverles el foco. -->
+<script src="adaptable.js"></script>
 </body>
 </html>
