@@ -136,6 +136,11 @@
    queda corto. Sube el minimo; el ajuste del usuario sigue mandando encima. */
 :root[data-plataforma="tv"] #subs,
 :root[data-plataforma="tv"] #subs-arriba{font-size:max(1em,26px)}
+/* Cuando sale la barra, los subtitulos suben para no quedar debajo. Los 96 px
+   de index.html son la altura de la barra de escritorio; la de televisor pasa
+   de 180 con los botones grandes y el margen de overscan, y el subtitulo se
+   quedaba cruzado con la barra de avance. */
+:root[data-plataforma="tv"] #stage.controls #subs{bottom:calc(190px + var(--safe-y))}
 
 /* ---------- Pase ----------
    Es la primera pantalla que se ve en el televisor, y encima hay que escribir
@@ -200,6 +205,9 @@
   #seek::-moz-range-thumb{width:18px; height:18px}
   .menu{bottom:64px}
   #cc-menu,#audio-menu{right:10px; left:10px; max-width:none}
+  /* Misma cuenta que en televisor: los botones tactiles de 44 px hacen la
+     barra mas alta que en escritorio y el subtitulo se metia dentro. */
+  #stage.controls #subs{bottom:120px}
 
   /* El panel de Watch Party a media pantalla no deja leer ni el chat ni ver
      el video. En un telefono es una cosa o la otra. */
