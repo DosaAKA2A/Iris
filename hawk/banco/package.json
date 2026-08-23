@@ -1,0 +1,15 @@
+{
+  "name": "hawk-banco",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Constructor del banco de coordenadas de HAWK a partir de la cobertura de Mapillary.",
+  "scripts": {
+    "construir": "node construir.js",
+    "resumen": "node construir.js --resumen"
+  },
+  "dependencies": {
+    "@mapbox/vector-tile": "^2.0.3",
+    "pbf": "^4.0.1"
+  }
+}
