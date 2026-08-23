@@ -58,9 +58,26 @@ salud de cada país. Techo teórico: unos 24.800 puntos en 237 países.
   las semillas en `datos/semillas.json`. Si se corta, se relanza y sigue.
 - **Tarda.** Del orden de una hora larga. Las teselas de ciudad grande son
   enormes: una sola de Lima trae 177.000 fotos y pesa lo suyo.
-- **Roza el límite diario de teselas.** Mapillary permite 50.000 al día y un
-  banco completo anda por las 25.000–35.000. Si se agota, corta y se sigue al
-  día siguiente sin perder nada.
+
+### NO BORRES `datos/semillas.json`
+
+Sembrar cuesta **unas 20.000 teselas** (1.024 de la pasada a z5 más el refuerzo)
+y el tope de Mapillary son **50.000 al día**. Sembrar dos veces en la misma
+jornada agota la cuota y deja sin teselas a la cosecha, que es lo que de verdad
+importa. Pasó el 2026-08-23: se borró la caché sin necesidad, se volvió a
+sembrar, y el barrido terminó con cero puntos.
+
+Las semillas no caducan. Si hay que rehacer países, `--pais XX` los recosecha
+reutilizando las semillas de siempre. Borrar la caché solo tiene sentido para
+refrescar la cobertura del mundo entero, y ese día no se hace nada más.
+
+### Cuando se acaba la cuota, Mapillary no dice que se acabó
+
+No contesta 429. Devuelve un **HTTP 200 con su página web en HTML** dentro. Si
+eso se toma por una tesela vacía, el barrido entero termina "bien", con código
+de salida 0 y el banco a cero, sin una sola queja. `leerTesela` mira el
+`content-type` y lanza `LimiteDeTeselas`, que no se traga nadie y para el
+trabajo en seco. Si lo ves, espera al día siguiente y relanza: no se pierde nada.
 - Las dos consultas a la API están separadas a propósito: el descubrimiento va
   siempre por teselas (baratas y masivas) y el grafo solo remata candidatos ya
   filtrados. La búsqueda por área del grafo NO sirve aquí, está limitada a

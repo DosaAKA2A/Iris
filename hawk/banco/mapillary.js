@@ -22,6 +22,21 @@ const GRAFO = 'https://graph.mapillary.com';
 let TOKEN = '';
 export function usarToken(t) { TOKEN = String(t || '').trim(); }
 
+/* Mapillary no contesta 429 cuando se agota el tope diario de teselas: devuelve
+   un HTTP 200 con la pagina web de Mapillary dentro. Si eso se toma por una
+   tesela vacia, el barrido entero termina "bien" y con cero puntos, sin una
+   sola queja. Paso por eso: dos siembras seguidas se comieron las 50.000 del
+   dia y la cosecha salio en blanco con codigo de salida 0.
+
+   Por eso esto es un error con nombre propio y para el trabajo en seco. */
+export class LimiteDeTeselas extends Error {
+  constructor(detalle) {
+    super(`Mapillary ya no sirve teselas (${detalle}). Es el tope de 50.000 al dia; `
+      + 'se reanuda mañana con "npm run construir" y no se pierde lo hecho.');
+    this.name = 'LimiteDeTeselas';
+  }
+}
+
 /* ------------------------------ rejilla ------------------------------ */
 
 export function aTesela(lon, lat, z) {
@@ -76,11 +91,23 @@ export async function leerTesela(z, x, y, capas, { tope = Infinity, filtro = nul
   const url = `${TESELAS}/${z}/${x}/${y}?access_token=${encodeURIComponent(TOKEN)}`;
   const r = await pedir(url, 'tesela');
   if (!r) return {};
+
+  /* Una tesela de verdad viene en binario. Si llega HTML o JSON no es que no
+     haya fotos: es que nos han cortado el grifo. */
+  const tipo = (r.headers.get('content-type') || '').toLowerCase();
+  if (tipo.includes('text/html') || tipo.includes('application/json')) {
+    throw new LimiteDeTeselas(`devuelve ${tipo.split(';')[0]} en vez de una tesela`);
+  }
+
   const buf = new Uint8Array(await r.arrayBuffer());
   if (!buf.length) return {};
 
   let tile;
-  try { tile = new VectorTile(new Pbf(buf)); } catch { return {}; }
+  try {
+    tile = new VectorTile(new Pbf(buf));
+  } catch (e) {
+    throw new LimiteDeTeselas(`la tesela z${z}/${x}/${y} no se descodifica: ${e.message}`);
+  }
 
   const salida = {};
   for (const nombre of capas) {
@@ -178,7 +205,12 @@ export async function enParalelo(items, tope, trabajo) {
     while (true) {
       const i = siguiente++;
       if (i >= items.length) return;
-      try { salida[i] = await trabajo(items[i], i); } catch { salida[i] = null; }
+      try {
+        salida[i] = await trabajo(items[i], i);
+      } catch (e) {
+        if (e instanceof LimiteDeTeselas) throw e;   // esto no se traga: para todo
+        salida[i] = null;
+      }
     }
   });
   await Promise.all(obreros);

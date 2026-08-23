@@ -26,8 +26,10 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { cargarPaises, indexar } from './paises.js';
-import { usarToken, aTesela, explorar, leerTesela, fotosDe, detalleFoto, enParalelo } from './mapillary.js';
+import { cargarPaises, indexar, bboxDe } from './paises.js';
+import {
+  usarToken, aTesela, explorar, leerTesela, fotosDe, detalleFoto, enParalelo, LimiteDeTeselas,
+} from './mapillary.js';
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const DATOS = path.join(AQUI, 'datos');
@@ -46,6 +48,19 @@ const POR_SECUENCIA = 2;        // máximo de fotos de un mismo recorrido
 const ANTIGUEDAD_MAX = 8;       // años: fotos más viejas se descartan
 const REMATE_POR_PAIS = 12;     // cuántas se confirman contra el grafo
 const CONCURRENCIA = 12;
+
+/* Frenos de gasto. Sin ellos, un país con poca cobertura se gasta TODAS sus
+   semillas sin llenar el cupo: puede pedir 3.000 teselas para sacar 20 puntos.
+   Con 773.000 semillas repartidas, el barrido completo se iría por encima de
+   las 100.000 teselas y reventaría el tope diario de Mapillary (50.000), o sea
+   días de calendario en vez de horas.
+
+   `LOTES_SECOS` se rinde donde no hay nada: si doce teselas seguidas no dan ni
+   un punto, y otras once tandas más tampoco, ese país está agotado. Es un
+   freno adaptativo, no castiga al que sí produce. `TESELAS_POR_PAIS` es solo
+   la red de seguridad por debajo. */
+const LOTES_SECOS = 12;
+const TESELAS_POR_PAIS = 2500;
 
 const args = process.argv.slice(2);
 const soloResumen = args.includes('--resumen');
@@ -81,7 +96,7 @@ async function main() {
 
   const dondeEsta = indexar(paises);
   const semillas = await sembrar(paises, dondeEsta);
-  await cosechar(paises, semillas, progreso);
+  await cosechar(paises, semillas, progreso, dondeEsta);
   await publicar(progreso);
 }
 
@@ -164,7 +179,7 @@ async function sembrar(paises, dondeEsta) {
   console.log(`\n\nREFUERZO - ${flojos.length} paises mal servidos, pasada a z${Z_REFUERZO}...`);
   let n = 0;
   for (const pais of flojos) {
-    const extra = await reforzar(pais);
+    const extra = await reforzar(pais, dondeEsta);
     if (extra.length) (porPais[pais.iso] ||= []).push(...extra);
     barra('paises', ++n, flojos.length, pais.nombre.slice(0, 22));
   }
@@ -175,33 +190,87 @@ async function sembrar(paises, dondeEsta) {
 }
 
 /* A z8 la capa que existe ya no es `overview` sino `sequence`: son los
-   recorridos, y nos vale su primer vertice para saber que por ahi hay fotos. */
-async function reforzar(pais) {
-  const [oe, su, es, no] = pais.bbox;
-  const a = aTesela(oe, no, Z_REFUERZO);
-  const b = aTesela(es, su, Z_REFUERZO);
-  const teselas = [];
-  for (let x = a.x; x <= b.x && teselas.length <= 900; x++) {
-    for (let y = a.y; y <= b.y && teselas.length <= 900; y++) {
-      teselas.push({ x, y });
-    }
-  }
+   recorridos, y nos vale su primer vertice para saber que por ahi hay fotos.
 
+   El recuadro de un pais se come siempre a sus vecinos —el de España abarca
+   Portugal, Marruecos y media Francia—, asi que cada punto se comprueba contra
+   el poligono antes de aceptarlo. Sin esto, un pais hereda las semillas de sus
+   vecinos y el banco miente. */
+async function reforzar(pais, dondeEsta) {
+  const teselas = teselasDeReticula(pais);
   const encontradas = [];
   await enParalelo(teselas, CONCURRENCIA, async (t) => {
     const capas = await leerTesela(Z_REFUERZO, t.x, t.y, ['sequence', 'overview'], {
       tope: SEMILLAS_POR_TESELA, repartido: true,
     });
     for (const p of [...(capas.sequence || []), ...(capas.overview || [])]) {
+      if (!perteneceA(pais, dondeEsta, p.lon, p.lat)) continue;
       encontradas.push([redondear(p.lon), redondear(p.lat)]);
     }
   });
   return encontradas;
 }
 
+/* Que teselas hay que pedir para cubrir un pais.
+
+   Un pais NO es un rectangulo. Si se usa el recuadro que engloba todas sus
+   piezas, los paises repartidos salen carisimos y casi todo lo pedido es mar:
+   el recuadro de Fiyi va de -180 a 180 porque cruza el antimeridiano, el de
+   Francia de Guadalupe a la Reunion, y el de Chile se estira hasta la isla de
+   Pascua. Medido: 901 teselas cada uno, el tope, para cuatro islas.
+
+   Se recorre pieza por pieza, cada una con su propio recuadro ajustado, y se
+   juntan sin repetir. Los paises compactos cuestan lo mismo; los repartidos,
+   una fraccion. */
+const TESELAS_REFUERZO = 900;
+
+function teselasDeReticula(pais) {
+  const vistas = new Set();
+  const teselas = [];
+
+  // Las piezas grandes primero: si hay que recortar, que caiga lo residual.
+  const piezas = pais.anillos.slice().sort((a, b) => areaBbox(b[0]) - areaBbox(a[0]));
+
+  for (const pieza of piezas) {
+    const [oe, su, es, no] = bboxDe([pieza]);
+    const a = aTesela(oe, no, Z_REFUERZO);
+    const b = aTesela(es, su, Z_REFUERZO);
+    for (let x = a.x; x <= b.x; x++) {
+      for (let y = a.y; y <= b.y; y++) {
+        const clave = `${x}/${y}`;
+        if (vistas.has(clave)) continue;
+        vistas.add(clave);
+        teselas.push({ x, y });
+        if (teselas.length >= TESELAS_REFUERZO) return teselas;
+      }
+    }
+  }
+  return teselas;
+}
+
+function areaBbox(anillo) {
+  const [oe, su, es, no] = bboxDe([[anillo]]);
+  return (es - oe) * (no - su);
+}
+
+/* Un punto es de este pais si el poligono lo dice. Cuando el poligono dice
+   "mar" no se descarta a la primera: a escala 1:50m las islas pequeñas y las
+   lineas de costa se comen metros de tierra real, y descartarlas dejaria sin
+   banco a los paises isla. En ese caso vale con que caiga en su recuadro. Lo
+   que nunca se acepta es un punto que caiga en tierra de OTRO pais. */
+const MARGEN_COSTA = 0.05;   // grados, ~5 km
+
+function perteneceA(pais, dondeEsta, lon, lat) {
+  const real = dondeEsta(lon, lat);
+  if (real) return real.iso === pais.iso;
+  const [oe, su, es, no] = pais.bbox;
+  return lon >= oe - MARGEN_COSTA && lon <= es + MARGEN_COSTA
+      && lat >= su - MARGEN_COSTA && lat <= no + MARGEN_COSTA;
+}
+
 /* -------------------------- 2. cosechar fotos -------------------------- */
 
-async function cosechar(paises, semillas, progreso) {
+async function cosechar(paises, semillas, progreso, dondeEsta) {
   const pendientes = paises.filter((p) => {
     if (soloPaises && !soloPaises.has(p.iso)) return false;
     if (!soloPaises && progreso[p.iso]) return false;   // ya hecho
@@ -212,7 +281,7 @@ async function cosechar(paises, semillas, progreso) {
 
   let n = 0;
   for (const pais of pendientes) {
-    const puntos = await cosecharPais(pais, semillas[pais.iso]);
+    const puntos = await cosecharPais(pais, semillas[pais.iso], dondeEsta);
     progreso[pais.iso] = {
       iso: pais.iso,
       nombre: pais.nombre,
@@ -227,16 +296,22 @@ async function cosechar(paises, semillas, progreso) {
   }
 }
 
-async function cosecharPais(pais, semillas) {
-  const orden = barajar(semillas.slice());
+async function cosecharPais(pais, semillas, dondeEsta) {
+  const orden = repartirPorZonas(semillas);
   const rejilla = new Map();          // espaciado minimo
   const porSecuencia = new Map();
   const elegidas = [];
   const vistas = new Set();
   const corte = Date.now() - ANTIGUEDAD_MAX * 365 * 24 * 3600 * 1000;
 
+  let secos = 0;      // lotes seguidos sin sacar ni un punto
+
   for (const lote of trocear(orden, CONCURRENCIA)) {
     if (elegidas.length >= pais.cupo) break;
+    if (secos >= LOTES_SECOS) break;              // aqui ya no hay nada que rascar
+    if (vistas.size >= TESELAS_POR_PAIS) break;   // tope duro de gasto
+
+    const antes = elegidas.length;
 
     const cosechas = await enParalelo(lote, CONCURRENCIA, async ([lon, lat]) => {
       const t = aTesela(lon, lat, Z_DETALLE);
@@ -252,6 +327,7 @@ async function cosecharPais(pais, semillas) {
         if (elegidas.length >= pais.cupo) break;
         if (!f.pano) continue;                              // solo esfericas de 360
         if (f.fecha && f.fecha < corte) continue;           // demasiado antigua
+        if (!perteneceA(pais, dondeEsta, f.lon, f.lat)) continue;  // el otro lado de la frontera
         if (f.secuencia && (porSecuencia.get(f.secuencia) || 0) >= POR_SECUENCIA) continue;
         if (!cabeEn(rejilla, f.lon, f.lat)) continue;       // separacion minima
         if (f.secuencia) porSecuencia.set(f.secuencia, (porSecuencia.get(f.secuencia) || 0) + 1);
@@ -264,8 +340,41 @@ async function cosecharPais(pais, semillas) {
         });
       }
     }
+
+    secos = elegidas.length > antes ? 0 : secos + 1;
   }
   return elegidas;
+}
+
+/* El orden en que se visitan las semillas decide el reparto del banco.
+   Barajarlas sin mas no basta: donde hay mas cobertura hay mas semillas, asi
+   que el cupo se llenaba por la zona mas fotografiada y el resto del pais no
+   llegaba a visitarse. Medido: el 56% de "España" caia en Canarias y el 48%
+   de "Perú" en la costa norte.
+
+   Aqui se agrupan las semillas por zonas de un grado (~110 km) y se sirven por
+   turnos: una de cada zona, luego la segunda de cada zona, y asi. El cupo se
+   agota recorriendo el pais entero en vez de vaciar su rincon mas rico. */
+const ZONA_GRADOS = 1;
+
+function repartirPorZonas(semillas) {
+  const zonas = new Map();
+  for (const s of semillas) {
+    const clave = `${Math.floor(s[1] / ZONA_GRADOS)},${Math.floor(s[0] / ZONA_GRADOS)}`;
+    if (!zonas.has(clave)) zonas.set(clave, []);
+    zonas.get(clave).push(s);
+  }
+
+  const listas = barajar([...zonas.values()]).map((l) => barajar(l));
+  const orden = [];
+  for (let vuelta = 0; ; vuelta++) {
+    let quedaAlguna = false;
+    for (const lista of listas) {
+      if (vuelta < lista.length) { orden.push(lista[vuelta]); quedaAlguna = true; }
+    }
+    if (!quedaAlguna) break;
+  }
+  return orden;
 }
 
 /* Rejilla de celdas de SEPARACION_KM: un punto solo entra si su celda y las
