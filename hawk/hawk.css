@@ -1,36 +1,52 @@
-/* HAWK — estilos de la portada.
+/* HAWK — hoja de estilos.
    ---------------------------------------------------------------------------
-   Lenguaje de IRIS: noche, violeta de ambiente, grano fino. Pero HAWK no es
-   QUIEBRA: aqui manda la precision, no la fiesta. De ahi Archivo en su eje
-   ancho (no la Black) y la monoespaciada como voz principal, porque en este
-   juego el contenido son coordenadas.
+   Direccion: instrumento de reconocimiento. Noche profunda, curvas de nivel de
+   fondo, paneles de cristal con filo de luz arriba, y el ambar reservado para
+   la instrumentacion: lecturas, marcas de escala y la chincheta. El violeta de
+   IRIS queda como campo, no como grito.
 
-   La retícula de la pagina es la del propio logo: cuatro cuartos, una calle en
-   cruz y una esquina en pico. Se repite en "como se juega".
+   La retícula del logo manda en la estructura: cuatro cuartos, calle en cruz y
+   una esquina en pico. Se repite en "como se juega" y en las esquinas de los
+   paneles grandes.
 
-   Rendimiento: nada de animaciones infinitas en reposo. La entrada se toca una
-   vez y se para sola. */
+   Rendimiento: nada de animaciones infinitas en reposo. Hay una entrada
+   orquestada que se toca una vez y se para; lo demas responde al raton o al
+   scroll. Con prefers-reduced-motion no se mueve nada. */
+
+/* ============================================================== fichas ==== */
 
 :root {
-  --noche: #07090e;
-  --panel: #131824;
-  --panel-2: #1b2130;
-  --linea: #2b3348;
-  --linea-viva: #3c4763;
-  --tinta: #f2f3f7;
-  --tinta-2: #cdd3e2;
-  --tenue: #8f98b0;
+  --abismo: #04060a;
+  --noche: #070a10;
+  --panel: rgba(20, 26, 38, .72);
+  --panel-solido: #141a26;
+  --panel-alto: #1c2433;
+  --linea: #28304399;
+  --linea-viva: #3b4763;
+  --filo: rgba(255, 255, 255, .07);
+
+  --tinta: #f4f6fb;
+  --tinta-2: #ccd3e3;
+  --tenue: #8b95ad;
+  --apagado: #5d6780;
+
   --violeta: #7b69ff;
-  --ambar: #f2a33c;          /* solo la chincheta: es el unico grito */
+  --violeta-claro: #9b8dff;
+  --ambar: #f2a33c;
+  --jade: #4fd18b;
+  --brasa: #ff6b5d;
 
   --f-display: 'Archivo', system-ui, sans-serif;
   --f-cuerpo: 'Inter', system-ui, sans-serif;
   --f-dato: 'Geist Mono', ui-monospace, monospace;
 
-  --ancho: 68rem;
-  --radio: 14px;
-  --radio-cuarto: 40px;      /* el redondeo de los cuartos, como en la marca */
-  --calle: 14px;             /* la calle en cruz */
+  --ancho: 74rem;
+  --radio: 16px;
+  --radio-grande: 40px;
+  --calle: 14px;
+
+  --sombra: 0 2px 6px rgba(0, 0, 0, .5), 0 18px 50px rgba(0, 0, 0, .45);
+  --sombra-alta: 0 4px 12px rgba(0, 0, 0, .55), 0 40px 90px rgba(0, 0, 0, .6);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,295 +64,474 @@ body {
   overflow-x: hidden;
 }
 
-/* Campo violeta y grano. Ambas capas estaticas: cuestan un pintado. */
-body::before {
-  content: "";
-  position: fixed; inset: 0; z-index: -2; pointer-events: none;
+/* Tres capas fijas: campo de color, curvas de nivel y grano. Las tres estan
+   quietas, asi que cuestan un pintado y se acabo. */
+.fondo { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.fondo__campo {
+  position: absolute; inset: 0;
   background:
-    radial-gradient(90% 60% at 50% -10%, rgba(123, 105, 255, .20), transparent 60%),
-    radial-gradient(70% 50% at 85% 100%, rgba(242, 163, 60, .07), transparent 65%),
-    linear-gradient(180deg, #0c111c, var(--noche) 55%);
+    radial-gradient(80% 55% at 50% -8%, rgba(123, 105, 255, .26), transparent 62%),
+    radial-gradient(60% 45% at 92% 8%, rgba(242, 163, 60, .10), transparent 60%),
+    radial-gradient(70% 50% at 4% 92%, rgba(79, 209, 139, .06), transparent 62%),
+    linear-gradient(180deg, #0b101c 0%, var(--noche) 45%, var(--abismo) 100%);
 }
-body::after {
-  content: "";
-  position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  opacity: .05;
+.fondo__curvas { position: absolute; inset: -10%; width: 120%; height: 120%; opacity: .5; }
+.fondo__curvas path { fill: none; stroke: #6f7ea8; stroke-width: .7; opacity: .16; }
+.fondo__grano {
+  position: absolute; inset: 0; opacity: .045;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 svg { display: block; }
-button { font: inherit; color: inherit; cursor: pointer; }
+button { font: inherit; color: inherit; cursor: pointer; background: none; border: 0; }
 input { font: inherit; }
 a { color: inherit; }
+img { max-width: 100%; display: block; }
 
 ::selection { background: var(--violeta); color: #fff; }
 
 * { scrollbar-width: thin; scrollbar-color: var(--linea-viva) transparent; }
-*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb { background: var(--linea-viva); border-radius: 99px; }
+*::-webkit-scrollbar-thumb:hover { background: #4d5a7d; }
 
-:focus-visible { outline: 2px solid var(--violeta); outline-offset: 3px; border-radius: 4px; }
+:focus-visible { outline: 2px solid var(--violeta-claro); outline-offset: 3px; border-radius: 6px; }
 
 .envoltura { width: 100%; max-width: var(--ancho); margin-inline: auto; padding-inline: 1.5rem; }
+.oculto {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
 
-/* ---------------------------------------------------------------- cabecera */
+/* ============================================================ cabecera ==== */
 
 .cabecera {
-  position: sticky; top: 0; z-index: 10;
-  backdrop-filter: blur(12px);
-  background: rgba(7, 9, 14, .72);
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(7, 10, 16, .78);
+  backdrop-filter: blur(16px) saturate(1.3);
   border-bottom: 1px solid var(--linea);
 }
-.cabecera__fila {
-  display: flex; align-items: center; gap: .65rem;
-  height: 60px;
-}
-.cabecera__marca { width: 24px; height: 24px; color: var(--violeta); flex: none; }
-.cabecera__marca svg { width: 100%; height: 100%; }
-.cabecera__nombre {
+.cabecera__fila { display: flex; align-items: center; gap: 1.4rem; height: 66px; }
+
+.identidad { display: flex; align-items: center; gap: .6rem; text-decoration: none; }
+.identidad__marca { width: 26px; height: 26px; color: var(--violeta); flex: none; }
+.identidad__marca svg { width: 100%; height: 100%; }
+.identidad__nombre {
   font-family: var(--f-display);
   font-variation-settings: 'wdth' 118;
-  font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: .10em;
+  font-weight: 800; font-size: 1.1rem; letter-spacing: .11em;
 }
-.cabecera__estudio {
-  margin-left: auto;
+
+.menu { display: flex; gap: .35rem; margin-left: .8rem; }
+.menu a {
+  text-decoration: none; color: var(--tenue);
+  font-size: .89rem; font-weight: 500;
+  padding: .45rem .75rem; border-radius: 9px;
+  transition: color .14s ease, background-color .14s ease;
+}
+.menu a:hover { color: var(--tinta); background: rgba(255, 255, 255, .05); }
+
+.cabecera__derecha { margin-left: auto; display: flex; align-items: center; gap: .7rem; }
+
+/* ============================================================== botones === */
+
+.pulsar {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  border: 1px solid var(--linea-viva);
+  background: linear-gradient(180deg, var(--panel-alto), var(--panel-solido));
+  border-radius: 12px;
+  padding: .78rem 1.35rem;
+  font-weight: 600; font-size: .95rem;
+  white-space: nowrap;
+  box-shadow: inset 0 1px 0 var(--filo), 0 2px 0 rgba(0, 0, 0, .45), var(--sombra);
+  transition: transform .13s ease, border-color .13s ease, box-shadow .13s ease;
+}
+.pulsar:hover:not(:disabled) {
+  transform: translateY(-1px); border-color: #55618a;
+  box-shadow: inset 0 1px 0 var(--filo), 0 3px 0 rgba(0, 0, 0, .45), var(--sombra-alta);
+}
+.pulsar:active:not(:disabled) { transform: translateY(1px); box-shadow: inset 0 1px 0 var(--filo); }
+.pulsar:disabled { opacity: .42; cursor: not-allowed; box-shadow: none; }
+
+.pulsar--principal {
+  background: linear-gradient(180deg, var(--violeta-claro), var(--violeta));
+  border-color: #a99dff; color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3), 0 2px 0 #4b3ec2,
+              0 14px 34px rgba(123, 105, 255, .34);
+}
+.pulsar--principal:hover:not(:disabled) {
+  border-color: #bcb3ff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3), 0 3px 0 #4b3ec2,
+              0 20px 46px rgba(123, 105, 255, .45);
+}
+.pulsar--chico { padding: .5rem .9rem; font-size: .86rem; border-radius: 10px; }
+.pulsar--fantasma { background: transparent; border-color: var(--linea-viva); box-shadow: none; }
+.pulsar--fantasma:hover:not(:disabled) { background: rgba(255, 255, 255, .04); }
+
+/* =============================================================== rotulos == */
+
+.rotulo {
   font-family: var(--f-dato);
-  font-size: .74rem;
-  color: var(--tenue);
-  text-decoration: none;
+  font-size: .71rem; text-transform: uppercase; letter-spacing: .2em;
+  color: var(--apagado);
+  display: inline-flex; align-items: center; gap: .6rem;
 }
-.cabecera__estudio:hover { color: var(--tinta-2); }
+.rotulo::before {
+  content: ""; width: 18px; height: 1px; background: var(--ambar); flex: none;
+}
 
-/* -------------------------------------------------------------------- hero */
+.seccion { padding: clamp(3.5rem, 9vw, 6.5rem) 0; position: relative; }
+.seccion__cabeza {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 2rem; margin-bottom: 2.4rem; flex-wrap: wrap;
+}
+.seccion__titulo {
+  font-family: var(--f-display);
+  font-variation-settings: 'wdth' 114;
+  font-weight: 800;
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  line-height: 1.08; letter-spacing: -.01em;
+  margin-top: .8rem; max-width: 20ch;
+}
+.seccion__apunte { color: var(--tenue); max-width: 38ch; font-size: .96rem; }
 
-.hero { padding: clamp(3rem, 9vw, 6rem) 0 clamp(2.5rem, 6vw, 4rem); }
+/* ================================================================ hero ==== */
+
+.hero { padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(2rem, 5vw, 3.5rem); }
 .hero__caja {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
-  gap: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: minmax(0, .82fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 3.6rem);
   align-items: center;
+}
+
+.hero__lectura {
+  font-family: var(--f-dato); font-size: .74rem; letter-spacing: .16em;
+  color: var(--ambar); margin-bottom: 1.1rem;
+  display: flex; align-items: center; gap: .6rem;
+}
+.hero__lectura .punto {
+  width: 7px; height: 7px; border-radius: 99px; background: var(--ambar);
+  box-shadow: 0 0 0 4px rgba(242, 163, 60, .16);
 }
 
 .hero__titulo {
   font-family: var(--f-display);
-  font-variation-settings: 'wdth' 122;
+  font-variation-settings: 'wdth' 123;
   font-weight: 900;
-  font-size: clamp(3.2rem, 11vw, 6.5rem);
-  line-height: .92;
-  letter-spacing: -.01em;
-  margin-bottom: 1.1rem;
+  font-size: clamp(3.4rem, 9.5vw, 6rem);
+  line-height: .9; letter-spacing: -.015em;
+  margin-bottom: 1.15rem;
 }
 .hero__lema {
-  font-size: clamp(1.05rem, 2.4vw, 1.3rem);
-  color: var(--tinta-2);
-  max-width: 30ch;
-  margin-bottom: 2rem;
+  font-size: clamp(1.02rem, 1.7vw, 1.18rem);
+  color: var(--tinta-2); max-width: 34ch; margin-bottom: 1.9rem;
 }
 .hero__lema strong { color: var(--tinta); font-weight: 600; }
 
-/* El lector: una coordenada que no sabes. Es el juego entero en una linea. */
-.lector {
-  display: inline-flex; align-items: baseline; gap: .9rem; flex-wrap: wrap;
-  font-family: var(--f-dato);
-  border: 1px solid var(--linea);
-  border-left: 2px solid var(--ambar);
-  background: var(--panel);
-  border-radius: 0 var(--radio) var(--radio) 0;
-  padding: .7rem 1.1rem;
-  margin-bottom: 2rem;
-}
-.lector__rotulo {
-  font-size: .68rem; text-transform: uppercase; letter-spacing: .16em;
-  color: var(--tenue);
-}
-.lector__cifra { font-size: 1.05rem; color: var(--ambar); letter-spacing: .04em; }
+.hero__acciones { display: flex; flex-wrap: wrap; gap: .7rem; align-items: center; }
 
-/* --------------------------------------------------------------- graticula */
-
-.graticula { position: relative; aspect-ratio: 1; width: 100%; }
-.graticula__lienzo { width: 100%; height: 100%; }
-.graticula__linea { stroke: var(--linea); stroke-width: 1; fill: none; }
-.graticula__linea--eje { stroke: var(--linea-viva); }
-.graticula__anillo { stroke: var(--linea); stroke-width: 1; fill: none; }
-
-.graticula__pin {
-  position: absolute;
-  left: 50%; top: 50%;
-  width: 27%; height: 27%;
-  margin: -13.5% 0 0 -13.5%;
-  color: var(--ambar);
-}
-.graticula__pin svg { width: 100%; height: 100%; }
-
-/* La entrada se toca una vez. Al acabar, la pagina queda quieta. */
-@media (prefers-reduced-motion: no-preference) {
-  .graticula__anillo { opacity: 0; animation: brotar .8s ease-out forwards; }
-  .graticula__anillo:nth-of-type(1) { animation-delay: .05s; }
-  .graticula__anillo:nth-of-type(2) { animation-delay: .15s; }
-  .graticula__anillo:nth-of-type(3) { animation-delay: .25s; }
-  .graticula__pin { animation: caer .7s cubic-bezier(.34, 1.4, .5, 1) .35s both; }
-}
-@keyframes brotar { to { opacity: 1; } }
-@keyframes caer {
-  from { transform: translateY(-38%) scale(.6); opacity: 0; }
-  to   { transform: none; opacity: 1; }
-}
-
-/* ------------------------------------------------------------------ pulsar */
-
-.acciones { display: flex; flex-wrap: wrap; gap: .7rem; align-items: center; }
-
-.pulsar {
-  border: 1px solid var(--linea-viva);
-  background: linear-gradient(180deg, var(--panel-2), var(--panel));
-  border-radius: 12px;
-  padding: .8rem 1.4rem;
-  font-weight: 600;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 2px 0 rgba(0, 0, 0, .4);
-  transition: transform .12s ease, border-color .12s ease;
-}
-.pulsar:hover:not(:disabled) { transform: translateY(-1px); border-color: var(--violeta); }
-.pulsar:active:not(:disabled) { transform: translateY(1px); }
-.pulsar--principal {
-  background: linear-gradient(180deg, #8878ff, var(--violeta));
-  border-color: #9b8dff;
-  color: #fff;
-}
-.pulsar:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
-
-.codigo {
-  display: flex; gap: .5rem;
-}
+.codigo { display: flex; gap: .5rem; }
 .codigo input {
-  width: 8.5rem;
-  font-family: var(--f-dato);
-  letter-spacing: .28em;
-  text-transform: uppercase;
-  background: var(--panel);
-  border: 1px solid var(--linea);
-  border-radius: 12px;
-  color: var(--tinta);
-  padding: .8rem .9rem;
+  width: 9rem;
+  font-family: var(--f-dato); font-size: .95rem;
+  letter-spacing: .3em; text-transform: uppercase;
+  background: rgba(10, 14, 22, .7);
+  border: 1px solid var(--linea-viva); border-radius: 12px;
+  color: var(--tinta); padding: .78rem .9rem;
+  transition: border-color .14s ease;
 }
-.codigo input::placeholder { color: var(--tenue); letter-spacing: .18em; }
+.codigo input:focus { border-color: var(--violeta); }
+.codigo input::placeholder { color: var(--apagado); letter-spacing: .2em; }
 
-/* Aviso de estado. Ni disculpas ni misterio: que falta y cuando. */
-.estado {
-  margin-top: 1.5rem;
-  display: flex; gap: .7rem; align-items: flex-start;
-  font-size: .88rem; color: var(--tenue);
-  max-width: 46ch;
+.aviso {
+  margin-top: 1.6rem; display: flex; gap: .75rem; align-items: flex-start;
+  font-size: .87rem; color: var(--tenue); max-width: 44ch;
 }
-.estado__punto {
+.aviso__punto {
   width: 8px; height: 8px; border-radius: 99px; background: var(--ambar);
-  flex: none; margin-top: .5rem;
+  flex: none; margin-top: .52rem;
 }
-.estado b { color: var(--tinta-2); font-weight: 600; }
+.aviso b { color: var(--tinta-2); font-weight: 600; }
 
-/* ---------------------------------------------------------------- secciones */
+/* ------------------------------------------------------------- el visor -- */
+/* Lo que se ve es la partida: panorama, brujula, cronometro y minimapa. Todo
+   dibujado, sin una sola imagen: asi la pagina se sostiene sola mientras no
+   haya fotos, y cuando las haya entran en `.visor__foto` sin tocar el resto. */
 
-.seccion { padding: clamp(3rem, 8vw, 5rem) 0; }
-.seccion__rotulo {
-  font-family: var(--f-dato);
-  font-size: .72rem; text-transform: uppercase; letter-spacing: .18em;
-  color: var(--tenue);
-  display: flex; align-items: center; gap: .8rem;
-  margin-bottom: 1.6rem;
+.visor {
+  position: relative;
+  border-radius: var(--radio-grande) var(--radio) var(--radio) var(--radio);
+  overflow: hidden;
+  border: 1px solid var(--linea-viva);
+  box-shadow: var(--sombra-alta), inset 0 1px 0 var(--filo);
+  background: #0a0e17;
+  aspect-ratio: 4 / 3;
 }
-.seccion__rotulo::after {
-  content: ""; flex: 1; height: 1px; background: var(--linea);
+.visor__foto { position: absolute; inset: 0; width: 100%; height: 100%; }
+.visor__foto img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Rejilla de latitud y longitud encima del panorama: se lee como visor. */
+.visor__malla {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, .045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .045) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: radial-gradient(70% 70% at 50% 50%, #000 40%, transparent 100%);
 }
-.seccion__titulo {
-  font-family: var(--f-display);
-  font-variation-settings: 'wdth' 115;
-  font-weight: 800;
-  font-size: clamp(1.7rem, 4.5vw, 2.5rem);
-  line-height: 1.1;
-  margin-bottom: 2.2rem;
-  max-width: 22ch;
+.visor__vineta {
+  position: absolute; inset: 0;
+  background: radial-gradient(75% 65% at 50% 45%, transparent 40%, rgba(3, 5, 9, .78) 100%);
 }
 
-/* Los cuatro cuartos: la retícula del logo, a tamaño de página. Tres esquinas
-   exteriores redondeadas y la de abajo a la derecha en pico. */
-.cuartos {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--calle);
+.hud { position: absolute; inset: 0; padding: .9rem; display: flex; flex-direction: column; }
+.hud__alto { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; }
+.hud__bajo { margin-top: auto; display: flex; align-items: flex-end; justify-content: space-between; gap: .8rem; }
+
+.chapa {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: rgba(6, 9, 15, .72);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--linea-viva);
+  border-radius: 10px;
+  padding: .4rem .7rem;
+  font-family: var(--f-dato); font-size: .72rem; letter-spacing: .08em;
+  color: var(--tinta-2);
 }
+.chapa b { color: var(--tinta); font-weight: 500; }
+.chapa--ambar { border-color: rgba(242, 163, 60, .45); color: var(--ambar); }
+
+/* Cinta de brujula: las marcas y los rumbos, como en un visor real. */
+.brujula {
+  position: absolute; left: 50%; top: .9rem; transform: translateX(-50%);
+  width: min(56%, 15rem);
+}
+.brujula svg { width: 100%; height: 26px; }
+.brujula .marca { stroke: rgba(255, 255, 255, .35); stroke-width: 1; }
+.brujula .marca--alta { stroke: var(--tinta-2); }
+.brujula .rumbo { fill: var(--tinta-2); font: 500 8px var(--f-dato, monospace); letter-spacing: .1em; }
+.brujula .aguja { fill: var(--ambar); }
+
+/* Minimapa: cerrado, con la esquina viva. Se abre al pasar el raton. */
+.minimapa {
+  width: 8.5rem; aspect-ratio: 1;
+  background: rgba(6, 9, 15, .8);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--linea-viva);
+  border-radius: 12px;
+  overflow: hidden; position: relative;
+  transition: width .28s cubic-bezier(.2, .8, .3, 1), box-shadow .28s ease;
+}
+.visor:hover .minimapa { width: 11.5rem; box-shadow: var(--sombra-alta); }
+@media (prefers-reduced-motion: reduce) { .minimapa, .visor:hover .minimapa { transition: none; } }
+
+.minimapa svg { width: 100%; height: 100%; }
+.minimapa .tierra { fill: #202b3f; stroke: #37455f; stroke-width: .6; }
+.minimapa .agua { fill: #0b111c; }
+.minimapa .pin { fill: var(--ambar); }
+
+.cronometro { flex: 1; max-width: 9rem; }
+.cronometro__pista {
+  height: 4px; border-radius: 99px; background: rgba(255, 255, 255, .12); overflow: hidden;
+}
+.cronometro__barra {
+  height: 100%; width: 64%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--ambar), #ffc978);
+}
+
+/* ========================================================== barra datos === */
+
+.datos {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--linea); border-radius: var(--radio);
+  background: var(--panel); backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+.dato { padding: 1.25rem 1.4rem; border-left: 1px solid var(--linea); }
+.dato:first-child { border-left: 0; }
+.dato__cifra {
+  font-family: var(--f-display); font-variation-settings: 'wdth' 120;
+  font-weight: 900; font-size: 1.9rem; line-height: 1; margin-bottom: .3rem;
+}
+.dato__que { font-size: .83rem; color: var(--tenue); }
+
+/* =============================================================== modos ==== */
+
+.modos { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--calle); }
+
+.modo {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  background: var(--panel); backdrop-filter: blur(14px);
+  padding: 1.5rem;
+  display: flex; flex-direction: column;
+  min-height: 15rem;
+  transition: border-color .16s ease, transform .16s ease;
+}
+.modo:hover { border-color: var(--linea-viva); transform: translateY(-2px); }
+.modo--ancho { grid-column: span 2; }
+
+/* El dibujo de cada modo vive aqui: hoy es SVG, mañana puede ser una imagen. */
+.modo__arte {
+  position: absolute; right: -1.5rem; top: -1rem;
+  width: 11rem; height: 11rem; opacity: .5;
+  color: var(--violeta); pointer-events: none;
+}
+.modo--ancho .modo__arte { width: 15rem; height: 15rem; right: 1rem; opacity: .6; }
+.modo__arte svg { width: 100%; height: 100%; }
+
+.modo__cima { display: flex; align-items: center; gap: .6rem; margin-bottom: .9rem; position: relative; }
+.modo__jugadores {
+  font-family: var(--f-dato); font-size: .68rem; letter-spacing: .12em;
+  color: var(--apagado); border: 1px solid var(--linea);
+  border-radius: 99px; padding: .18rem .55rem;
+}
+.modo__nombre {
+  font-family: var(--f-display); font-variation-settings: 'wdth' 112;
+  font-weight: 700; font-size: 1.25rem; margin-bottom: .45rem; position: relative;
+}
+.modo__que { color: var(--tenue); font-size: .93rem; position: relative; max-width: 30ch; }
+.modo__pie {
+  margin-top: auto; padding-top: 1.1rem;
+  font-family: var(--f-dato); font-size: .72rem; letter-spacing: .08em;
+  color: var(--apagado); position: relative;
+  display: flex; align-items: center; gap: .45rem;
+}
+.modo__pie .llave { color: var(--ambar); }
+
+/* =============================================================== mapas ==== */
+
+.mapas { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--calle); }
+
+.mapa {
+  border: 1px solid var(--linea); border-radius: var(--radio);
+  background: var(--panel); backdrop-filter: blur(14px);
+  overflow: hidden; text-align: left;
+  transition: border-color .16s ease, transform .16s ease;
+  display: flex; flex-direction: column;
+}
+.mapa:hover { border-color: var(--violeta); transform: translateY(-2px); }
+.mapa--destacado { grid-column: span 2; }
+
+.mapa__lamina { aspect-ratio: 16 / 9; position: relative; background: #0a1018; overflow: hidden; }
+.mapa--destacado .mapa__lamina { aspect-ratio: 16 / 7; }
+.mapa__lamina svg { width: 100%; height: 100%; }
+.mapa__lamina .tierra { fill: #1e2839; stroke: #3a4864; stroke-width: .5; }
+.mapa__lamina .foco { fill: var(--violeta); opacity: .85; }
+.mapa__brillo {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 45%, rgba(7, 10, 16, .9) 100%);
+}
+.mapa__cuerpo { padding: .9rem 1rem 1.05rem; }
+.mapa__nombre { font-weight: 600; font-size: .98rem; margin-bottom: .18rem; }
+.mapa__sitios { font-family: var(--f-dato); font-size: .74rem; color: var(--apagado); }
+
+/* ========================================================== los cuartos === */
+
+.cuartos { display: grid; grid-template-columns: 1fr 1fr; gap: var(--calle); }
 .cuarto {
-  background: var(--panel);
+  background: var(--panel); backdrop-filter: blur(14px);
   border: 1px solid var(--linea);
   padding: clamp(1.4rem, 3vw, 2rem);
 }
-.cuarto:nth-child(1) { border-radius: var(--radio-cuarto) 8px 8px 8px; }
-.cuarto:nth-child(2) { border-radius: 8px var(--radio-cuarto) 8px 8px; }
-.cuarto:nth-child(3) { border-radius: 8px 8px 8px var(--radio-cuarto); }
-.cuarto:nth-child(4) { border-radius: 8px; }          /* la del pico */
+.cuarto:nth-child(1) { border-radius: var(--radio-grande) 10px 10px 10px; }
+.cuarto:nth-child(2) { border-radius: 10px var(--radio-grande) 10px 10px; }
+.cuarto:nth-child(3) { border-radius: 10px 10px 10px var(--radio-grande); }
+.cuarto:nth-child(4) { border-radius: 10px; }        /* la del pico */
 
 .cuarto__paso {
-  font-family: var(--f-dato);
-  font-size: .72rem; letter-spacing: .16em;
-  color: var(--ambar);
-  margin-bottom: .7rem;
+  font-family: var(--f-dato); font-size: .71rem; letter-spacing: .16em;
+  color: var(--ambar); margin-bottom: .65rem;
 }
 .cuarto__titulo {
-  font-family: var(--f-display);
-  font-variation-settings: 'wdth' 112;
-  font-weight: 700;
-  font-size: 1.15rem;
-  margin-bottom: .5rem;
+  font-family: var(--f-display); font-variation-settings: 'wdth' 112;
+  font-weight: 700; font-size: 1.12rem; margin-bottom: .45rem;
 }
-.cuarto p { color: var(--tenue); font-size: .95rem; }
+.cuarto p { color: var(--tenue); font-size: .94rem; }
 
-/* --------------------------------------------------------------- las reglas */
+/* ============================================================== cierre ==== */
 
-.reglas { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--calle); }
-.regla {
-  border: 1px solid var(--linea);
-  border-radius: var(--radio);
-  padding: 1.3rem;
-  background: var(--panel);
+.cierre {
+  border: 1px solid var(--linea-viva);
+  border-radius: var(--radio-grande) var(--radio) var(--radio) var(--radio);
+  background:
+    radial-gradient(90% 140% at 12% 0%, rgba(123, 105, 255, .22), transparent 60%),
+    var(--panel);
+  backdrop-filter: blur(14px);
+  padding: clamp(2rem, 5vw, 3.2rem);
+  box-shadow: var(--sombra-alta);
+  text-align: center;
 }
-.regla__cifra {
-  font-family: var(--f-display);
-  font-variation-settings: 'wdth' 120;
-  font-weight: 900;
-  font-size: 2.1rem;
-  line-height: 1;
-  margin-bottom: .35rem;
+.cierre__titulo {
+  font-family: var(--f-display); font-variation-settings: 'wdth' 118;
+  font-weight: 800; font-size: clamp(1.6rem, 3.6vw, 2.3rem);
+  margin-bottom: .7rem;
 }
-.regla__que { font-size: .9rem; color: var(--tenue); }
+.cierre__apunte { color: var(--tenue); margin-bottom: 1.7rem; max-width: 44ch; margin-inline: auto; }
+.cierre .hero__acciones { justify-content: center; }
 
-/* -------------------------------------------------------------------- pie */
+/* ================================================================= pie ==== */
 
-.pie {
-  border-top: 1px solid var(--linea);
-  padding: 2.5rem 0 3.5rem;
-  font-size: .84rem;
-  color: var(--tenue);
-}
-.pie p + p { margin-top: .6rem; }
+.pie { border-top: 1px solid var(--linea); padding: 2.8rem 0 3.5rem; font-size: .85rem; color: var(--tenue); }
+.pie__rejilla { display: grid; grid-template-columns: 1.4fr 1fr; gap: 2rem; }
+.pie p + p { margin-top: .55rem; }
 .pie a { color: var(--tinta-2); text-decoration: none; border-bottom: 1px solid var(--linea-viva); }
 .pie a:hover { color: var(--tinta); border-color: var(--violeta); }
-.pie__firma { margin-top: 1.4rem; font-family: var(--f-dato); font-size: .76rem; }
+.pie__firma { margin-top: 1.5rem; font-family: var(--f-dato); font-size: .76rem; }
 
-/* ------------------------------------------------------------------ estrecho */
+/* ============================================================= entrada ==== */
+/* Se toca una vez al cargar y se para. Nada queda girando. */
 
-@media (max-width: 860px) {
-  .hero__caja { grid-template-columns: 1fr; }
-  .graticula { max-width: 20rem; margin-inline: auto; order: -1; }
-  .reglas { grid-template-columns: 1fr; }
+@media (prefers-reduced-motion: no-preference) {
+  .entra { opacity: 0; animation: entrar .7s cubic-bezier(.2, .7, .3, 1) forwards; }
+  .entra--1 { animation-delay: .05s; }
+  .entra--2 { animation-delay: .14s; }
+  .entra--3 { animation-delay: .23s; }
+  .entra--4 { animation-delay: .32s; }
+  .visor { animation: asomar .9s cubic-bezier(.2, .8, .3, 1) .2s both; }
+  .hud > *, .brujula { animation: aparecer .5s ease-out .85s both; }
+  .minimapa { animation: aparecer .5s ease-out 1s both; }
+}
+@keyframes entrar { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes asomar { from { opacity: 0; transform: translateY(24px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
+
+/* Revelado al bajar. El observador quita la clase y no vuelve. */
+.surge { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+.surge.visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .surge { opacity: 1; transform: none; transition: none; } }
+
+/* ============================================================= estrecho === */
+
+@media (max-width: 1040px) {
+  .modos { grid-template-columns: repeat(2, 1fr); }
+  .modo--ancho { grid-column: span 2; }
+  .mapas { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 880px) {
+  .menu { display: none; }
+  .hero__caja { grid-template-columns: 1fr; }
+  .visor { order: -1; }
+  .datos { grid-template-columns: repeat(2, 1fr); }
+  .dato:nth-child(3) { border-left: 0; }
+  .dato:nth-child(n+3) { border-top: 1px solid var(--linea); }
+  .pie__rejilla { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .modos, .mapas { grid-template-columns: 1fr; }
+  .modo--ancho, .mapa--destacado { grid-column: span 1; }
   .cuartos { grid-template-columns: 1fr; }
-  .cuarto,
-  .cuarto:nth-child(1),
-  .cuarto:nth-child(2),
-  .cuarto:nth-child(3),
-  .cuarto:nth-child(4) { border-radius: var(--radio); }
+  .cuarto, .cuarto:nth-child(1), .cuarto:nth-child(2),
+  .cuarto:nth-child(3), .cuarto:nth-child(4) { border-radius: var(--radio); }
   .codigo { width: 100%; }
   .codigo input { flex: 1; width: auto; }
+  .datos { grid-template-columns: 1fr; }
+  .dato { border-left: 0; border-top: 1px solid var(--linea); }
+  .dato:first-child { border-top: 0; }
 }
