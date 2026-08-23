@@ -1,0 +1,342 @@
+/* HAWK — estilos de la portada.
+   ---------------------------------------------------------------------------
+   Lenguaje de IRIS: noche, violeta de ambiente, grano fino. Pero HAWK no es
+   QUIEBRA: aqui manda la precision, no la fiesta. De ahi Archivo en su eje
+   ancho (no la Black) y la monoespaciada como voz principal, porque en este
+   juego el contenido son coordenadas.
+
+   La retícula de la pagina es la del propio logo: cuatro cuartos, una calle en
+   cruz y una esquina en pico. Se repite en "como se juega".
+
+   Rendimiento: nada de animaciones infinitas en reposo. La entrada se toca una
+   vez y se para sola. */
+
+:root {
+  --noche: #07090e;
+  --panel: #131824;
+  --panel-2: #1b2130;
+  --linea: #2b3348;
+  --linea-viva: #3c4763;
+  --tinta: #f2f3f7;
+  --tinta-2: #cdd3e2;
+  --tenue: #8f98b0;
+  --violeta: #7b69ff;
+  --ambar: #f2a33c;          /* solo la chincheta: es el unico grito */
+
+  --f-display: 'Archivo', system-ui, sans-serif;
+  --f-cuerpo: 'Inter', system-ui, sans-serif;
+  --f-dato: 'Geist Mono', ui-monospace, monospace;
+
+  --ancho: 68rem;
+  --radio: 14px;
+  --radio-cuarto: 40px;      /* el redondeo de los cuartos, como en la marca */
+  --calle: 14px;             /* la calle en cruz */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  background: var(--noche);
+  color: var(--tinta);
+  font-family: var(--f-cuerpo);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Campo violeta y grano. Ambas capas estaticas: cuestan un pintado. */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(90% 60% at 50% -10%, rgba(123, 105, 255, .20), transparent 60%),
+    radial-gradient(70% 50% at 85% 100%, rgba(242, 163, 60, .07), transparent 65%),
+    linear-gradient(180deg, #0c111c, var(--noche) 55%);
+}
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  opacity: .05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+svg { display: block; }
+button { font: inherit; color: inherit; cursor: pointer; }
+input { font: inherit; }
+a { color: inherit; }
+
+::selection { background: var(--violeta); color: #fff; }
+
+* { scrollbar-width: thin; scrollbar-color: var(--linea-viva) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: var(--linea-viva); border-radius: 99px; }
+
+:focus-visible { outline: 2px solid var(--violeta); outline-offset: 3px; border-radius: 4px; }
+
+.envoltura { width: 100%; max-width: var(--ancho); margin-inline: auto; padding-inline: 1.5rem; }
+
+/* ---------------------------------------------------------------- cabecera */
+
+.cabecera {
+  position: sticky; top: 0; z-index: 10;
+  backdrop-filter: blur(12px);
+  background: rgba(7, 9, 14, .72);
+  border-bottom: 1px solid var(--linea);
+}
+.cabecera__fila {
+  display: flex; align-items: center; gap: .65rem;
+  height: 60px;
+}
+.cabecera__marca { width: 24px; height: 24px; color: var(--violeta); flex: none; }
+.cabecera__marca svg { width: 100%; height: 100%; }
+.cabecera__nombre {
+  font-family: var(--f-display);
+  font-variation-settings: 'wdth' 118;
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: .10em;
+}
+.cabecera__estudio {
+  margin-left: auto;
+  font-family: var(--f-dato);
+  font-size: .74rem;
+  color: var(--tenue);
+  text-decoration: none;
+}
+.cabecera__estudio:hover { color: var(--tinta-2); }
+
+/* -------------------------------------------------------------------- hero */
+
+.hero { padding: clamp(3rem, 9vw, 6rem) 0 clamp(2.5rem, 6vw, 4rem); }
+.hero__caja {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+
+.hero__titulo {
+  font-family: var(--f-display);
+  font-variation-settings: 'wdth' 122;
+  font-weight: 900;
+  font-size: clamp(3.2rem, 11vw, 6.5rem);
+  line-height: .92;
+  letter-spacing: -.01em;
+  margin-bottom: 1.1rem;
+}
+.hero__lema {
+  font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+  color: var(--tinta-2);
+  max-width: 30ch;
+  margin-bottom: 2rem;
+}
+.hero__lema strong { color: var(--tinta); font-weight: 600; }
+
+/* El lector: una coordenada que no sabes. Es el juego entero en una linea. */
+.lector {
+  display: inline-flex; align-items: baseline; gap: .9rem; flex-wrap: wrap;
+  font-family: var(--f-dato);
+  border: 1px solid var(--linea);
+  border-left: 2px solid var(--ambar);
+  background: var(--panel);
+  border-radius: 0 var(--radio) var(--radio) 0;
+  padding: .7rem 1.1rem;
+  margin-bottom: 2rem;
+}
+.lector__rotulo {
+  font-size: .68rem; text-transform: uppercase; letter-spacing: .16em;
+  color: var(--tenue);
+}
+.lector__cifra { font-size: 1.05rem; color: var(--ambar); letter-spacing: .04em; }
+
+/* --------------------------------------------------------------- graticula */
+
+.graticula { position: relative; aspect-ratio: 1; width: 100%; }
+.graticula__lienzo { width: 100%; height: 100%; }
+.graticula__linea { stroke: var(--linea); stroke-width: 1; fill: none; }
+.graticula__linea--eje { stroke: var(--linea-viva); }
+.graticula__anillo { stroke: var(--linea); stroke-width: 1; fill: none; }
+
+.graticula__pin {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 27%; height: 27%;
+  margin: -13.5% 0 0 -13.5%;
+  color: var(--ambar);
+}
+.graticula__pin svg { width: 100%; height: 100%; }
+
+/* La entrada se toca una vez. Al acabar, la pagina queda quieta. */
+@media (prefers-reduced-motion: no-preference) {
+  .graticula__anillo { opacity: 0; animation: brotar .8s ease-out forwards; }
+  .graticula__anillo:nth-of-type(1) { animation-delay: .05s; }
+  .graticula__anillo:nth-of-type(2) { animation-delay: .15s; }
+  .graticula__anillo:nth-of-type(3) { animation-delay: .25s; }
+  .graticula__pin { animation: caer .7s cubic-bezier(.34, 1.4, .5, 1) .35s both; }
+}
+@keyframes brotar { to { opacity: 1; } }
+@keyframes caer {
+  from { transform: translateY(-38%) scale(.6); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+/* ------------------------------------------------------------------ pulsar */
+
+.acciones { display: flex; flex-wrap: wrap; gap: .7rem; align-items: center; }
+
+.pulsar {
+  border: 1px solid var(--linea-viva);
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border-radius: 12px;
+  padding: .8rem 1.4rem;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 2px 0 rgba(0, 0, 0, .4);
+  transition: transform .12s ease, border-color .12s ease;
+}
+.pulsar:hover:not(:disabled) { transform: translateY(-1px); border-color: var(--violeta); }
+.pulsar:active:not(:disabled) { transform: translateY(1px); }
+.pulsar--principal {
+  background: linear-gradient(180deg, #8878ff, var(--violeta));
+  border-color: #9b8dff;
+  color: #fff;
+}
+.pulsar:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+
+.codigo {
+  display: flex; gap: .5rem;
+}
+.codigo input {
+  width: 8.5rem;
+  font-family: var(--f-dato);
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+  color: var(--tinta);
+  padding: .8rem .9rem;
+}
+.codigo input::placeholder { color: var(--tenue); letter-spacing: .18em; }
+
+/* Aviso de estado. Ni disculpas ni misterio: que falta y cuando. */
+.estado {
+  margin-top: 1.5rem;
+  display: flex; gap: .7rem; align-items: flex-start;
+  font-size: .88rem; color: var(--tenue);
+  max-width: 46ch;
+}
+.estado__punto {
+  width: 8px; height: 8px; border-radius: 99px; background: var(--ambar);
+  flex: none; margin-top: .5rem;
+}
+.estado b { color: var(--tinta-2); font-weight: 600; }
+
+/* ---------------------------------------------------------------- secciones */
+
+.seccion { padding: clamp(3rem, 8vw, 5rem) 0; }
+.seccion__rotulo {
+  font-family: var(--f-dato);
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .18em;
+  color: var(--tenue);
+  display: flex; align-items: center; gap: .8rem;
+  margin-bottom: 1.6rem;
+}
+.seccion__rotulo::after {
+  content: ""; flex: 1; height: 1px; background: var(--linea);
+}
+.seccion__titulo {
+  font-family: var(--f-display);
+  font-variation-settings: 'wdth' 115;
+  font-weight: 800;
+  font-size: clamp(1.7rem, 4.5vw, 2.5rem);
+  line-height: 1.1;
+  margin-bottom: 2.2rem;
+  max-width: 22ch;
+}
+
+/* Los cuatro cuartos: la retícula del logo, a tamaño de página. Tres esquinas
+   exteriores redondeadas y la de abajo a la derecha en pico. */
+.cuartos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--calle);
+}
+.cuarto {
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  padding: clamp(1.4rem, 3vw, 2rem);
+}
+.cuarto:nth-child(1) { border-radius: var(--radio-cuarto) 8px 8px 8px; }
+.cuarto:nth-child(2) { border-radius: 8px var(--radio-cuarto) 8px 8px; }
+.cuarto:nth-child(3) { border-radius: 8px 8px 8px var(--radio-cuarto); }
+.cuarto:nth-child(4) { border-radius: 8px; }          /* la del pico */
+
+.cuarto__paso {
+  font-family: var(--f-dato);
+  font-size: .72rem; letter-spacing: .16em;
+  color: var(--ambar);
+  margin-bottom: .7rem;
+}
+.cuarto__titulo {
+  font-family: var(--f-display);
+  font-variation-settings: 'wdth' 112;
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: .5rem;
+}
+.cuarto p { color: var(--tenue); font-size: .95rem; }
+
+/* --------------------------------------------------------------- las reglas */
+
+.reglas { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--calle); }
+.regla {
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  padding: 1.3rem;
+  background: var(--panel);
+}
+.regla__cifra {
+  font-family: var(--f-display);
+  font-variation-settings: 'wdth' 120;
+  font-weight: 900;
+  font-size: 2.1rem;
+  line-height: 1;
+  margin-bottom: .35rem;
+}
+.regla__que { font-size: .9rem; color: var(--tenue); }
+
+/* -------------------------------------------------------------------- pie */
+
+.pie {
+  border-top: 1px solid var(--linea);
+  padding: 2.5rem 0 3.5rem;
+  font-size: .84rem;
+  color: var(--tenue);
+}
+.pie p + p { margin-top: .6rem; }
+.pie a { color: var(--tinta-2); text-decoration: none; border-bottom: 1px solid var(--linea-viva); }
+.pie a:hover { color: var(--tinta); border-color: var(--violeta); }
+.pie__firma { margin-top: 1.4rem; font-family: var(--f-dato); font-size: .76rem; }
+
+/* ------------------------------------------------------------------ estrecho */
+
+@media (max-width: 860px) {
+  .hero__caja { grid-template-columns: 1fr; }
+  .graticula { max-width: 20rem; margin-inline: auto; order: -1; }
+  .reglas { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .cuartos { grid-template-columns: 1fr; }
+  .cuarto,
+  .cuarto:nth-child(1),
+  .cuarto:nth-child(2),
+  .cuarto:nth-child(3),
+  .cuarto:nth-child(4) { border-radius: var(--radio); }
+  .codigo { width: 100%; }
+  .codigo input { flex: 1; width: auto; }
+}

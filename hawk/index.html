@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HAWK — averigua dónde estás</title>
+<meta name="description" content="HAWK: te deja en un punto cualquiera del planeta y tienes que averiguar dónde. Hasta 10 personas por sala, o tú solo. Un juego de IRIS Studio.">
+<meta name="theme-color" content="#07090e">
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="HAWK — averigua dónde estás">
+<meta property="og:description" content="Te dejamos en un punto cualquiera del planeta. Mira alrededor y di dónde crees que estás. Hasta 10 personas por sala.">
+<meta property="og:url" content="https://iris.it.com/hawk/">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./hawk.css">
+</head>
+<body>
+
+<!-- La marca, una sola vez en el documento; el resto la reutiliza. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="marca" viewBox="0 0 256 256">
+    <path fill="currentColor" d="M 100 136 C 111.046 136 120 144.954 120 156 L 120 256 L 100 256 C 44.772 256 0 211.228 0 156 L 0 136 Z M 256 256 L 136 256 L 136 156 C 136 144.954 144.954 136 156 136 L 256 136 Z M 120 100 C 120 111.046 111.046 120 100 120 L 0 120 L 0 100 C 0 44.772 44.772 0 100 0 L 120 0 Z M 156 0 C 211.228 0 256 44.772 256 100 L 256 120 L 156 120 C 144.954 120 136 111.046 136 100 L 136 0 Z"/>
+  </symbol>
+</svg>
+
+<header class="cabecera">
+  <div class="envoltura cabecera__fila">
+    <span class="cabecera__marca"><svg><use href="#marca"></use></svg></span>
+    <span class="cabecera__nombre">HAWK</span>
+    <a class="cabecera__estudio" href="https://iris.it.com" rel="noopener">IRIS Studio</a>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="envoltura hero__caja">
+      <div>
+        <h1 class="hero__titulo">HAWK</h1>
+        <p class="hero__lema">
+          Te dejamos en un punto cualquiera del planeta.
+          <strong>Mira alrededor y di dónde estás.</strong>
+        </p>
+
+        <p class="lector">
+          <span class="lector__rotulo">Tu posición</span>
+          <span class="lector__cifra">??°??'??"&nbsp;·&nbsp;??°??'??"</span>
+        </p>
+
+        <div class="acciones">
+          <button class="pulsar pulsar--principal" id="bt-crear" disabled>Crear sala</button>
+          <form class="codigo" id="form-entrar">
+            <input id="in-codigo" maxlength="4" placeholder="CÓDIGO"
+                   autocomplete="off" spellcheck="false" autocapitalize="characters"
+                   aria-label="Código de sala" disabled>
+            <button class="pulsar" type="submit" disabled>Entrar</button>
+          </form>
+        </div>
+
+        <p class="estado">
+          <span class="estado__punto" aria-hidden="true"></span>
+          <span>
+            <b>Todavía no se puede jugar.</b> El catálogo de sitios está a medio
+            construir y el servidor de salas aún no existe. Esta página ya es la
+            definitiva; el juego entra encima.
+          </span>
+        </p>
+      </div>
+
+      <!-- Un punto sobre la retícula: la partida entera en un dibujo. -->
+      <div class="graticula" aria-hidden="true">
+        <svg class="graticula__lienzo" viewBox="0 0 200 200" fill="none">
+          <circle class="graticula__anillo" cx="100" cy="100" r="94"/>
+          <circle class="graticula__anillo" cx="100" cy="100" r="63"/>
+          <circle class="graticula__anillo" cx="100" cy="100" r="32"/>
+          <path class="graticula__linea graticula__linea--eje" d="M6 100 H194"/>
+          <path class="graticula__linea graticula__linea--eje" d="M100 6 V194"/>
+          <path class="graticula__linea" d="M100 6 C 148 44 148 156 100 194"/>
+          <path class="graticula__linea" d="M100 6 C 52 44 52 156 100 194"/>
+          <path class="graticula__linea" d="M17 62 H183"/>
+          <path class="graticula__linea" d="M17 138 H183"/>
+        </svg>
+        <span class="graticula__pin"><svg viewBox="0 0 256 256"><use href="#marca"></use></svg></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion" id="como">
+    <div class="envoltura">
+      <p class="seccion__rotulo">Cómo se juega</p>
+      <h2 class="seccion__titulo">Cuatro pasos, y se repite cada ronda</h2>
+
+      <div class="cuartos">
+        <article class="cuarto">
+          <p class="cuarto__paso">PASO 1</p>
+          <h3 class="cuarto__titulo">Apareces en algún sitio</h3>
+          <p>Una foto de 360 grados tomada en una calle real. Puedes girar la
+            vista y caminar, pero nadie te dice el país.</p>
+        </article>
+
+        <article class="cuarto">
+          <p class="cuarto__paso">PASO 2</p>
+          <h3 class="cuarto__titulo">Buscas pistas</h3>
+          <p>El idioma de los carteles, por qué lado circulan los coches, la
+            vegetación, las matrículas, la forma de los postes de luz.</p>
+        </article>
+
+        <article class="cuarto">
+          <p class="cuarto__paso">PASO 3</p>
+          <h3 class="cuarto__titulo">Pones el pin</h3>
+          <p>Marcas en el mapa del mundo dónde crees que estás. Cuando todos
+            han marcado, se revela el sitio real.</p>
+        </article>
+
+        <article class="cuarto">
+          <p class="cuarto__paso">PASO 4</p>
+          <h3 class="cuarto__titulo">Cobras según la distancia</h3>
+          <p>Cuanto más cerca del punto real, más puntos. Clavarlo son 5.000;
+            equivocarte de continente, casi nada.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion" id="reglas">
+    <div class="envoltura">
+      <p class="seccion__rotulo">La partida</p>
+      <h2 class="seccion__titulo">Con amigos o tú solo</h2>
+
+      <div class="reglas">
+        <div class="regla">
+          <p class="regla__cifra">10</p>
+          <p class="regla__que">personas como mucho en una sala. Se entra con un
+            código de cuatro letras, sin cuenta ni contraseña.</p>
+        </div>
+        <div class="regla">
+          <p class="regla__cifra">237</p>
+          <p class="regla__que">países entre los que elegir. O el mundo entero,
+            que es como duele de verdad.</p>
+        </div>
+        <div class="regla">
+          <p class="regla__cifra">5.000</p>
+          <p class="regla__que">puntos por ronda si clavas el sitio. La
+            puntuación cae rápido con los kilómetros.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <div class="envoltura">
+    <p>Las fotos de los panoramas son de
+      <a href="https://www.mapillary.com" rel="noopener">Mapillary</a>, con
+      licencia <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener">CC BY-SA 4.0</a>.
+      Cada ronda muestra el crédito de su propia foto.</p>
+    <p>El mapa usa datos de
+      <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>, bajo ODbL.
+      La marca es la Forma 69 de
+      <a href="https://shapes.gallery" rel="noopener">shapes.gallery</a>, de Monika Michalczyk.</p>
+    <p class="pie__firma">Un juego de
+      <a href="https://iris.it.com" rel="noopener">IRIS Studio</a></p>
+  </div>
+</footer>
+
+<script type="module" src="./js/portada.js"></script>
+</body>
+</html>
