@@ -32,6 +32,7 @@ npm install
 node --env-file=.env construir.js --probar     # comprobación rápida (~10 s)
 node --env-file=.env construir.js              # el barrido completo
 node construir.js --resumen                    # qué hay construido
+node --env-file=.env construir.js --publicar    # publica lo que ya hay, sin gastar teselas
 node --env-file=.env construir.js --pais PE,CL # rehacer países sueltos
 ```
 
@@ -78,6 +79,11 @@ eso se toma por una tesela vacía, el barrido entero termina "bien", con código
 de salida 0 y el banco a cero, sin una sola queja. `leerTesela` mira el
 `content-type` y lanza `LimiteDeTeselas`, que no se traga nadie y para el
 trabajo en seco. Si lo ves, espera al día siguiente y relanza: no se pierde nada.
+
+Ojo a una consecuencia: cuando el tope corta la cosecha, `publicar()` no llega a
+ejecutarse, y los países ya terminados se quedan en `datos/progreso.json` sin
+salir a `shared/banco/`. Para eso está `--publicar`, que vuelca lo que ya hay
+sin pedir una sola tesela (el remate va por el grafo, que es otra cuota).
 - Las dos consultas a la API están separadas a propósito: el descubrimiento va
   siempre por teselas (baratas y masivas) y el grafo solo remata candidatos ya
   filtrados. La búsqueda por área del grafo NO sirve aquí, está limitada a

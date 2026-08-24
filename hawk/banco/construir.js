@@ -66,6 +66,7 @@ const args = process.argv.slice(2);
 const soloResumen = args.includes('--resumen');
 const soloPrueba = args.includes('--probar');
 const soloPaises = leerOpcion('--pais');
+const soloPublicar = args.includes('--publicar');
 
 function leerOpcion(nombre) {
   const i = args.indexOf(nombre);
@@ -93,6 +94,12 @@ async function main() {
   usarToken(token);
 
   if (soloPrueba) return probar();
+
+  /* El tope diario corta la cosecha a media faena, y entonces los paises ya
+     terminados se quedan en progreso.json sin llegar a shared/banco/. Publicar
+     no cuesta ni una tesela —el remate va por el grafo, que es otra cuota—, asi
+     que se puede hacer aparte el mismo dia en que la cosecha se quedo a medias. */
+  if (soloPublicar) return publicar(progreso);
 
   const dondeEsta = indexar(paises);
   const semillas = await sembrar(paises, dondeEsta);
@@ -280,8 +287,10 @@ async function cosechar(paises, semillas, progreso, dondeEsta) {
   console.log(`COSECHAR - ${pendientes.length} paises por recorrer.\n`);
 
   let n = 0;
+  let gastoTotal = 0;
   for (const pais of pendientes) {
-    const puntos = await cosecharPais(pais, semillas[pais.iso], dondeEsta);
+    const { puntos, teselas } = await cosecharPais(pais, semillas[pais.iso], dondeEsta);
+    gastoTotal += teselas;
     progreso[pais.iso] = {
       iso: pais.iso,
       nombre: pais.nombre,
@@ -292,7 +301,12 @@ async function cosechar(paises, semillas, progreso, dondeEsta) {
     await escribirJson(PROGRESO, progreso);
     n++;
     const marca = puntos.length >= pais.cupo ? 'lleno' : `${puntos.length}/${pais.cupo}`;
-    console.log(`  ${String(n).padStart(3)}/${pendientes.length}  ${pais.iso}  ${pais.nombre.padEnd(26).slice(0, 26)} ${marca}`);
+    /* El gasto en teselas es lo unico que decide cuanto mundo cabe en un dia.
+       La cuota son 50.000 y un pais sin cobertura puede llevarse 2.500 para
+       sacar nueve puntos, asi que sin esta columna no hay forma de saber donde
+       se fue el dia cuando el barrido se corta a medias. */
+    const gasto = `${String(teselas).padStart(5)} tes  ac.${String(gastoTotal).padStart(6)}`;
+    console.log(`  ${String(n).padStart(3)}/${pendientes.length}  ${pais.iso}  ${pais.nombre.padEnd(26).slice(0, 26)} ${marca.padEnd(9)} ${gasto}`);
   }
 }
 
@@ -343,7 +357,7 @@ async function cosecharPais(pais, semillas, dondeEsta) {
 
     secos = elegidas.length > antes ? 0 : secos + 1;
   }
-  return elegidas;
+  return { puntos: elegidas, teselas: vistas.size };
 }
 
 /* El orden en que se visitan las semillas decide el reparto del banco.
