@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HAWK — prueba de ronda</title>
+<link rel="icon" href="../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../vendor/leaflet/leaflet.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:#070a10;color:#e8ebf2;font-family:'Inter',system-ui,sans-serif;overflow:hidden}
+  canvas{display:block}
+  #lienzo{width:100%;height:100%;cursor:grab;touch-action:none}
+  #lienzo.agarrando{cursor:grabbing}
+
+  /* ---------------- instrumentacion de arriba ---------------- */
+  .cabecera{
+    position:fixed;top:0;left:0;right:0;z-index:400;
+    display:flex;gap:.5rem;align-items:center;padding:.7rem 1rem;
+    background:linear-gradient(180deg,rgba(7,10,16,.92),transparent);
+    pointer-events:none;
+  }
+  .lectura{
+    border:1px solid #232a3a;background:rgba(11,13,18,.72);border-radius:8px;
+    padding:.35rem .6rem;backdrop-filter:blur(6px);
+  }
+  .lectura__et{
+    display:block;font-family:'Geist Mono',monospace;font-size:.56rem;
+    letter-spacing:.18em;color:#6b7690;margin-bottom:.1rem;
+  }
+  .lectura__v{font-family:'Geist Mono',monospace;font-size:.88rem;color:#f2a33c}
+
+  /* ---------------- mapa ---------------- */
+  /* Pequeño en la esquina y crece al acercarse: mirar la foto y marcar en el
+     mapa son dos momentos distintos, y el mapa grande todo el rato tapa la
+     mitad del paisaje. */
+  .mapa{
+    position:fixed;right:1rem;bottom:1rem;z-index:500;
+    width:22rem;height:15rem;border-radius:12px;overflow:hidden;
+    border:1px solid #2e3852;box-shadow:0 18px 50px rgba(0,0,0,.6);
+    opacity:.55;transition:width .18s ease,height .18s ease,opacity .18s ease;
+  }
+  .mapa:hover,.mapa.fijo{width:44rem;height:30rem;opacity:1}
+  @media(max-width:900px){
+    .mapa{width:11rem;height:8rem}
+    .mapa:hover,.mapa.fijo{width:calc(100vw - 2rem);height:60vh}
+  }
+  #lienzoMapa{width:100%;height:100%;background:#0b1020}
+
+  .mapa__pie{
+    position:absolute;left:0;right:0;bottom:0;z-index:600;
+    display:flex;gap:.5rem;padding:.5rem;
+    background:linear-gradient(0deg,rgba(7,10,16,.95),transparent);
+  }
+  .bt{
+    flex:1;font:inherit;font-size:.85rem;font-weight:600;color:#e8ebf2;cursor:pointer;
+    border:1px solid #3b4763;background:linear-gradient(180deg,#1c2433,#141a26);
+    border-radius:10px;padding:.55rem 1rem;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 2px 0 rgba(0,0,0,.45);
+  }
+  .bt:hover:not(:disabled){border-color:#4d5c7e}
+  .bt:disabled{opacity:.42;cursor:not-allowed}
+  .bt--p{
+    background:linear-gradient(180deg,#9b8dff,#7b69ff);border-color:#a99dff;color:#fff;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 0 #4b3ec2;
+  }
+
+  /* ---------------- resultado ---------------- */
+  .resultado{
+    position:fixed;inset:0;z-index:700;display:grid;place-items:center;
+    background:rgba(4,6,10,.72);backdrop-filter:blur(3px);
+  }
+  .tarjeta{
+    background:#0b0d12;border:1px solid #2e3852;border-radius:16px;
+    padding:1.6rem 1.8rem;min-width:22rem;text-align:center;
+    box-shadow:0 30px 80px rgba(0,0,0,.7);
+  }
+  .tarjeta__vered{font-size:.8rem;color:#8b95ad;letter-spacing:.04em;margin-bottom:.5rem}
+  .tarjeta__pts{
+    font-family:'Geist Mono',monospace;font-size:3rem;font-weight:500;
+    color:#f2a33c;line-height:1;margin-bottom:.3rem;
+  }
+  .tarjeta__km{font-family:'Geist Mono',monospace;font-size:.95rem;color:#c3cadd;margin-bottom:.4rem}
+  .tarjeta__donde{font-size:.88rem;color:#8b95ad;margin-bottom:1.2rem}
+  .tarjeta__total{
+    font-family:'Geist Mono',monospace;font-size:.72rem;color:#6b7690;
+    letter-spacing:.12em;margin-bottom:1.2rem;
+  }
+  .oculto{display:none}
+
+  .credito{
+    position:fixed;left:0;bottom:0;z-index:400;
+    font-family:'Geist Mono',monospace;font-size:.6rem;color:#9aa4bb;
+    padding:.4rem .9rem;letter-spacing:.04em;
+    background:rgba(7,10,16,.9);border-top-right-radius:8px;
+  }
+  .credito a{color:#c3cadd}
+
+  .aviso{position:fixed;inset:0;display:grid;place-content:center;gap:.6rem;text-align:center;background:#070a10;padding:2rem;z-index:900}
+  .aviso__t{font-size:1.05rem;font-weight:600}
+  .aviso__d{color:#8b95ad;font-size:.88rem;max-width:46ch;line-height:1.5}
+
+  /* Leaflet viene con su propio aspecto claro; aqui manda el nuestro. */
+  .leaflet-container{background:#0b1020;font-family:'Inter',sans-serif}
+  .leaflet-control-attribution{
+    background:rgba(7,10,16,.85)!important;color:#8b95ad!important;
+    font-family:'Geist Mono',monospace!important;font-size:.55rem!important;
+  }
+  .leaflet-control-attribution a{color:#c3cadd!important}
+  .leaflet-bar a{background:#141a26!important;color:#e8ebf2!important;border-color:#2e3852!important}
+  .leaflet-bar a:hover{background:#1c2433!important}
+</style>
+</head>
+<body>
+
+<canvas id="lienzo"></canvas>
+
+<div class="cabecera">
+  <div class="lectura"><span class="lectura__et">RONDA</span><span class="lectura__v" id="l-ronda">1/5</span></div>
+  <div class="lectura"><span class="lectura__et">RUMBO</span><span class="lectura__v" id="l-rumbo">---</span></div>
+  <div class="lectura"><span class="lectura__et">PUNTOS</span><span class="lectura__v" id="l-total">0</span></div>
+</div>
+
+<div class="mapa" id="mapa">
+  <div id="lienzoMapa"></div>
+  <div class="mapa__pie">
+    <button class="bt bt--p" id="bt-confirmar" disabled>Marca en el mapa</button>
+  </div>
+</div>
+
+<p class="credito" id="credito"></p>
+
+<div class="resultado oculto" id="resultado">
+  <div class="tarjeta">
+    <p class="tarjeta__vered" id="r-vered"></p>
+    <p class="tarjeta__pts" id="r-pts"></p>
+    <p class="tarjeta__km" id="r-km"></p>
+    <p class="tarjeta__donde" id="r-donde"></p>
+    <p class="tarjeta__total" id="r-total"></p>
+    <button class="bt bt--p" id="bt-siguiente">Siguiente ronda</button>
+  </div>
+</div>
+
+<div class="aviso oculto" id="aviso">
+  <p class="aviso__t" id="aviso-t"></p>
+  <p class="aviso__d" id="aviso-d"></p>
+</div>
+
+<!-- Leaflet vive en el repo, no en un CDN: una pagina de juego no puede
+     quedarse sin mapa porque unpkg tarde o este caido. -->
+<script src="../vendor/leaflet/leaflet.js"></script>
+<script type="module">
+/* HAWK — prueba de ronda completa.
+   ---------------------------------------------------------------------------
+   Visor + mapa para marcar + puntuacion. Es el juego de un jugador entero, sin
+   servidor: sirve para saber si esto se siente como una partida antes de
+   escribir una sola linea del worker de salas.
+
+   El visor y la puntuacion salen de ../js/, que es codigo compartido con el
+   juego de verdad. Aqui solo esta el pegamento y lo provisional: las fotos
+   vienen de puntos.json, que genera banco/resolver.mjs a mano. */
+
+import { crearVisor, SinWebGL } from '../js/visor.js';
+import { distanciaKm, puntos, distanciaBonita, puntosBonitos, veredicto, PUNTOS_MAX } from '../js/geo.js';
+
+const $ = (id) => document.getElementById(id);
+const RONDAS = 5;
+
+/* --------------------------- datos --------------------------- */
+
+let datos;
+try {
+  const r = await fetch('puntos.json', { cache: 'no-cache' });
+  if (!r.ok) throw new Error(r.status);
+  datos = await r.json();
+} catch {
+  fallo('Falta puntos.json', 'Genera las fotos con  node --env-file=.env resolver.mjs  desde hawk/banco/.');
+}
+if (!datos?.fotos?.length) fallo('puntos.json esta vacio', 'El banco no devolvio ninguna esferica utilizable.');
+if (datos.caduca && new Date(datos.caduca) < new Date()) {
+  fallo('Las URLs caducaron', 'La firma del CDN de Mapillary dura 30 dias. Relanza resolver.mjs.');
+}
+
+/* Se barajan para que dos partidas seguidas no sean la misma. */
+const baraja = [...datos.fotos].sort(() => Math.random() - 0.5).slice(0, RONDAS);
+
+/* --------------------------- estado de la partida --------------------------- */
+
+/* Se declara ANTES que el visor: `arranca()` pinta el primer cuadro en el acto y
+   ese cuadro ya llama a instrumentos(), que lee `i`. Declarado despues, la
+   primera pasada muere con "Cannot access 'i' before initialization" y la
+   pagina se queda negra. */
+let i = 0, total = 0, bloqueado = false;
+
+/* --------------------------- visor --------------------------- */
+
+let visor;
+try {
+  visor = crearVisor($('lienzo'), { alPintar: instrumentos });
+} catch (e) {
+  if (e instanceof SinWebGL) fallo('Sin WebGL', e.message);
+  throw e;
+}
+visor.arranca();
+
+/* --------------------------- mapa --------------------------- */
+
+/* Fondo oscuro de CARTO en vez del de OpenStreetMap: el estandar es claro y
+   junto a un panorama nocturno y la instrumentacion ambar canta muchisimo.
+   OJO para produccion: ni estas teselas ni las de OSM se pueden usar en un
+   juego con trafico de verdad sin pasar por su politica de uso. Habra que
+   contratar proveedor o servirlas nosotros. */
+const mapa = L.map('lienzoMapa', { worldCopyJump: true, zoomControl: true, attributionControl: true })
+  .setView([20, 0], 2);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  maxZoom: 19,
+  attribution: '&copy; OpenStreetMap &copy; CARTO',
+}).addTo(mapa);
+
+const iconoMarca = L.divIcon({
+  className: '',
+  html: '<svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="6" fill="none" stroke="#f2a33c" stroke-width="2"/><circle cx="11" cy="11" r="1.6" fill="#f2a33c"/></svg>',
+  iconSize: [22, 22], iconAnchor: [11, 11],
+});
+const iconoReal = L.divIcon({
+  className: '',
+  html: '<svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="7" fill="#7b69ff" fill-opacity=".28" stroke="#9b8dff" stroke-width="2"/><circle cx="11" cy="11" r="2" fill="#fff"/></svg>',
+  iconSize: [22, 22], iconAnchor: [11, 11],
+});
+
+let marca = null, real = null, linea = null;
+let apuesta = null;
+
+mapa.on('click', (e) => {
+  if (bloqueado) return;
+  apuesta = { lat: e.latlng.lat, lon: e.latlng.lng };
+  if (marca) marca.setLatLng(e.latlng);
+  else marca = L.marker(e.latlng, { icon: iconoMarca }).addTo(mapa);
+  $('bt-confirmar').disabled = false;
+  $('bt-confirmar').textContent = 'Confirmar';
+});
+
+/* Mientras se usa el mapa se queda abierto: si se encogiera al salir el raton
+   para pulsar el boton, marcar con precision seria imposible. */
+mapa.on('mousedown', () => $('mapa').classList.add('fijo'));
+$('mapa').addEventListener('mouseleave', () => { if (!bloqueado) $('mapa').classList.remove('fijo'); });
+
+/* --------------------------- partida --------------------------- */
+
+$('bt-confirmar').addEventListener('click', confirmar);
+$('bt-siguiente').addEventListener('click', () => { $('resultado').classList.add('oculto'); cargar(i + 1); });
+
+async function cargar(n) {
+  i = n;
+  if (i >= baraja.length) return terminar();
+
+  bloqueado = false;
+  visor.bloqueado = false;
+  apuesta = null;
+  $('bt-confirmar').disabled = true;
+  $('bt-confirmar').textContent = 'Marca en el mapa';
+  $('mapa').classList.remove('fijo');
+
+  for (const capa of [marca, real, linea]) if (capa) mapa.removeLayer(capa);
+  marca = real = linea = null;
+  mapa.setView([20, 0], 2);
+
+  const foto = baraja[i];
+  $('l-ronda').textContent = `${i + 1}/${baraja.length}`;
+
+  /* La original siempre: a 2048 no se lee un cartel, y sin carteles la ronda es
+     una loteria. No cuesta tiempo de cuadro, solo descarga. */
+  const [ancho, alto] = await visor.cargar(foto.imgGrande || foto.img);
+  visor.mirarA({ yaw: 0, pitch: 0 });
+
+  $('credito').innerHTML = `Foto <a href="https://www.mapillary.com/app?focus=photo&pKey=${foto.id}" target="_blank" rel="noopener">${foto.id}</a>`
+    + ` — Mapillary, CC BY-SA 4.0 — ${ancho}x${alto}`;
+}
+
+function confirmar() {
+  if (!apuesta || bloqueado) return;
+  bloqueado = true;
+  visor.bloqueado = true;
+
+  const foto = baraja[i];
+  const verdad = { lat: foto.lat, lon: foto.lon };
+  const km = distanciaKm(apuesta, verdad);
+  const pts = puntos(km);
+  total += pts;
+
+  real = L.marker([verdad.lat, verdad.lon], { icon: iconoReal }).addTo(mapa);
+  linea = L.polyline([[apuesta.lat, apuesta.lon], [verdad.lat, verdad.lon]], {
+    color: '#f2a33c', weight: 2, dashArray: '6 6', opacity: .9,
+  }).addTo(mapa);
+  mapa.fitBounds(linea.getBounds(), { padding: [60, 60], maxZoom: 12 });
+  $('mapa').classList.add('fijo');
+
+  $('r-vered').textContent = veredicto(km);
+  $('r-pts').textContent = `${puntosBonitos(pts)} / ${puntosBonitos(PUNTOS_MAX)}`;
+  $('r-km').textContent = `a ${distanciaBonita(km)}`;
+  $('r-donde').textContent = foto.pais;
+  $('r-total').textContent = `TOTAL ${puntosBonitos(total)}`;
+  $('l-total').textContent = puntosBonitos(total);
+  $('bt-siguiente').textContent = i + 1 >= baraja.length ? 'Ver el total' : 'Siguiente ronda';
+  $('resultado').classList.remove('oculto');
+}
+
+function terminar() {
+  const maximo = baraja.length * PUNTOS_MAX;
+  $('r-vered').textContent = 'Partida terminada';
+  $('r-pts').textContent = puntosBonitos(total);
+  $('r-km').textContent = `de ${puntosBonitos(maximo)} posibles`;
+  $('r-donde').textContent = `${Math.round((total / maximo) * 100)}% del maximo`;
+  $('r-total').textContent = '';
+  $('bt-siguiente').textContent = 'Otra partida';
+  $('bt-siguiente').onclick = () => location.reload();
+  $('resultado').classList.remove('oculto');
+}
+
+/* --------------------------- instrumentos --------------------------- */
+
+function instrumentos(est) {
+  const foto = baraja[i];
+  if (!foto) return;
+  /* El rumbo de verdad es el de la camara mas lo que se haya girado. Sin sumar
+     compass_angle la brujula seria pura decoracion. */
+  const g = (((foto.rumbo || 0) - (est.yaw * 180) / Math.PI) % 360 + 360) % 360;
+  $('l-rumbo').textContent = `${String(Math.round(g)).padStart(3, '0')}°`;
+}
+
+function fallo(titulo, detalle) {
+  $('aviso').classList.remove('oculto');
+  $('aviso-t').textContent = titulo;
+  $('aviso-d').textContent = detalle;
+  throw new Error(`${titulo}: ${detalle}`);
+}
+
+await cargar(0);
+</script>
+</body>
+</html>

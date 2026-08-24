@@ -134,67 +134,29 @@
 </div>
 
 <script type="module">
-/* HAWK — prueba del visor de esfericas.
+/* HAWK — banco de pruebas del visor.
    ---------------------------------------------------------------------------
-   Esto NO es el juego: es la prueba de que el juego puede existir. Lo unico que
-   se quiere saber aqui es si una esferica de Mapillary se ve bien y se mira
-   alrededor con soltura en el navegador. Si esto no sale, no hay HAWK.
+   Esto NO es el juego: es el banco donde se comprueba que el visor cumple. El
+   visor de verdad vive en ../js/visor.js y es el mismo que usa la ronda; aqui
+   solo estan los mandos para hacerle perrerias.
 
-   No hay esfera ni geometria: se pinta UN triangulo que tapa la pantalla y el
-   shader, por cada pixel, calcula hacia donde apunta ese rayo y va a buscar esa
-   muestra a la equirectangular. Sale mas barato que teselar una esfera y no
-   tiene costuras en los polos.
+   Tres cosas que se miran desde aqui:
+     ?rejilla=1   sube una equirectangular sintetica de geometria conocida, que
+                  es la unica forma de distinguir un fallo de proyeccion de una
+                  foto tomada con la camara torcida (hay muchas).
+     Nitidez      compara 1024 / 2048 / original en el MISMO encuadre.
+     CUADROS      tiempo de cuadro real, que es lo que decide si esto se juega.
 
-   Las fotos las deja `banco/resolver.mjs` en puntos.json. En el juego de verdad
+   Las fotos las deja banco/resolver.mjs en puntos.json. En el juego de verdad
    esa traduccion ID -> URL la hara el worker, porque el token de Mapillary no
    puede bajar al navegador. */
 
+import { crearVisor, SinWebGL } from '../js/visor.js';
+
 const $ = (id) => document.getElementById(id);
-const lienzo = $('lienzo');
+const q = new URLSearchParams(location.search);
 
-/* --------------------------- shaders --------------------------- */
-
-const VERT = `
-attribute vec2 pos;
-void main(){ gl_Position = vec4(pos, 0.0, 1.0); }`;
-
-const FRAG = `
-precision highp float;
-uniform vec2  uRes;
-uniform float uFov;    // campo vertical, en radianes
-uniform float uYaw;
-uniform float uPitch;
-uniform sampler2D uTex;
-const float PI = 3.14159265359;
-
-void main(){
-  /* Pixel -> rayo en el espacio de la camara. Se normaliza por la altura para
-     que el campo vertical sea el mismo pase lo que pase con el ancho. */
-  vec2 p = (gl_FragCoord.xy - 0.5 * uRes) / (0.5 * uRes.y);
-  vec3 d = normalize(vec3(p.x * tan(uFov * 0.5), p.y * tan(uFov * 0.5), -1.0));
-
-  float cp = cos(uPitch), sp = sin(uPitch);
-  d = vec3(d.x, d.y * cp - d.z * sp, d.y * sp + d.z * cp);
-  float cy = cos(uYaw), sy = sin(uYaw);
-  d = vec3(d.x * cy + d.z * sy, d.y, -d.x * sy + d.z * cy);
-
-  /* Rayo -> equirectangular. */
-  float lon = atan(d.x, -d.z);
-  float lat = asin(clamp(d.y, -1.0, 1.0));
-  gl_FragColor = texture2D(uTex, vec2(lon / (2.0 * PI) + 0.5, 0.5 - lat / PI));
-}`;
-
-/* --------------------------- arranque --------------------------- */
-
-/* WebGL2 primero, y no por capricho: las esfericas de Mapillary NO vienen en
-   potencias de dos —la original de esta prueba mide 5760x2880— y WebGL1 no
-   admite REPEAT en una textura asi: la da por incompleta y la pinta NEGRA, sin
-   avisar de nada. WebGL2 no tiene esa limitacion. Si solo hay WebGL1, la imagen
-   se reescala antes de subirla. */
-const opciones = { antialias: false, alpha: false };
-const gl = lienzo.getContext('webgl2', opciones) || lienzo.getContext('webgl', opciones);
-if (!gl) fallo('Sin WebGL', 'Este navegador no da contexto WebGL, y el visor no puede pintar la esferica sin el.');
-const ES2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
+/* --------------------------- datos --------------------------- */
 
 let datos;
 try {
@@ -218,121 +180,50 @@ if (datos.caduca && new Date(datos.caduca) < new Date()) {
     'La firma del CDN de Mapillary dura 30 dias. Vuelve a lanzar  node --env-file=.env resolver.mjs.');
 }
 
-const programa = compilar();
-const uRes = gl.getUniformLocation(programa, 'uRes');
-const uFov = gl.getUniformLocation(programa, 'uFov');
-const uYaw = gl.getUniformLocation(programa, 'uYaw');
-const uPitch = gl.getUniformLocation(programa, 'uPitch');
+/* --------------------------- visor --------------------------- */
 
-const buf = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-/* Un solo triangulo sobredimensionado tapa la pantalla con menos trabajo que
-   dos que formen un cuadrado. */
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-const aPos = gl.getAttribLocation(programa, 'pos');
-gl.enableVertexAttribArray(aPos);
-gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-
-const textura = gl.createTexture();
-gl.bindTexture(gl.TEXTURE_2D, textura);
-/* REPEAT en horizontal: la equirectangular da la vuelta entera, asi que el
-   borde derecho continua en el izquierdo y no debe haber costura. Vertical a
-   CLAMP, que arriba y abajo no continuan en ningun sitio. */
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
-/* --------------------------- camara --------------------------- */
-
-const FOV_MIN = 0.5, FOV_MAX = 1.9;          // radianes: de teleobjetivo a gran angular
-const TOPE_PITCH = Math.PI / 2 - 0.02;       // sin esto la vista se da la vuelta en el cenit
-
-const cam = { yaw: 0, pitch: 0, fov: 1.3 };
-const meta = { yaw: 0, pitch: 0, fov: 1.3 }; // a donde va; `cam` la persigue
+let visor;
+try {
+  visor = crearVisor($('lienzo'), { alPintar: instrumentos });
+} catch (e) {
+  if (e instanceof SinWebGL) fallo('Sin WebGL', e.message);
+  throw e;
+}
 
 let i = 0;
 let revelado = false;
 
 /* La resolucion no es un detalle de rendimiento, es una decision de juego: si
    no se lee un cartel, el jugador no tiene de donde agarrarse y la ronda se
-   vuelve una loteria. Se puede comparar en vivo y se fija por ?res= para poder
-   sacar dos capturas del mismo encuadre. */
+   vuelve una loteria. Medido: cambiar de 2048 a 5760 no cuesta NI UN
+   milisegundo de cuadro, porque el coste va con los pixeles de pantalla. */
 const RESOLUCIONES = ['imgLigera', 'img', 'imgGrande'];
 const NOMBRES = { imgLigera: '1024', img: '2048', imgGrande: 'original' };
-const pedida = new URLSearchParams(location.search).get('res');
-let res = Math.max(0, RESOLUCIONES.findIndex((r) => NOMBRES[r] === pedida));
-if (pedida === null) res = 1;
-
-/* --------------------------- entrada --------------------------- */
-
-let arrastrando = false, ultimo = null;
-
-lienzo.addEventListener('pointerdown', (e) => {
-  arrastrando = true; ultimo = { x: e.clientX, y: e.clientY };
-  lienzo.classList.add('agarrando');
-  lienzo.setPointerCapture(e.pointerId);
-});
-lienzo.addEventListener('pointerup', (e) => {
-  arrastrando = false; lienzo.classList.remove('agarrando');
-  lienzo.releasePointerCapture(e.pointerId);
-});
-lienzo.addEventListener('pointermove', (e) => {
-  if (!arrastrando || !ultimo) return;
-  /* El giro se escala con el campo: en teleobjetivo el mismo gesto tiene que
-     mover menos, o mirar de cerca es imposible. */
-  const k = meta.fov / lienzo.clientHeight;
-
-  /* Se agarra el MUNDO, no la camara: arrastrar a la derecha lleva el paisaje a
-     la derecha, como en Street View y GeoGuessr. Los dos ejes tienen que ir en
-     el mismo sentido; con el vertical agarrando y el horizontal empujando la
-     camara, la mano nunca se acostumbra. */
-  meta.yaw += (e.clientX - ultimo.x) * k;
-  meta.pitch = acotar(meta.pitch + (e.clientY - ultimo.y) * k, -TOPE_PITCH, TOPE_PITCH);
-  ultimo = { x: e.clientX, y: e.clientY };
-});
-
-lienzo.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  meta.fov = acotar(meta.fov * (e.deltaY > 0 ? 1.12 : 0.89), FOV_MIN, FOV_MAX);
-}, { passive: false });
-
-/* Las flechas NO agarran el mundo: mueven la mirada, que es lo que espera
-   cualquiera de un teclado. Arriba mira arriba. Es el sentido contrario al del
-   arrastre a proposito, y en Street View funciona igual. */
-addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowLeft') meta.yaw += 0.12;
-  else if (e.key === 'ArrowRight') meta.yaw -= 0.12;
-  else if (e.key === 'ArrowUp') meta.pitch = acotar(meta.pitch + 0.09, -TOPE_PITCH, TOPE_PITCH);
-  else if (e.key === 'ArrowDown') meta.pitch = acotar(meta.pitch - 0.09, -TOPE_PITCH, TOPE_PITCH);
-  else return;
-  e.preventDefault();
-});
+const pedida = q.get('res');
+let res = pedida === null ? 1 : Math.max(0, RESOLUCIONES.findIndex((r) => NOMBRES[r] === pedida));
 
 $('bt-sig').addEventListener('click', () => cargar(i + 1));
+$('bt-donde').addEventListener('click', () => { revelado = !revelado; pintarDonde(); });
 $('bt-nitidez').addEventListener('click', () => {
   res = (res + 1) % RESOLUCIONES.length;
-  cargar(i, true);   // el mismo encuadre, para que la comparacion valga algo
+  cargar(i, true);   // el mismo encuadre, o la comparacion no vale nada
 });
-$('bt-donde').addEventListener('click', () => { revelado = !revelado; pintarDonde(); });
 
-/* --------------------------- carga de foto --------------------------- */
+/* --------------------------- carga --------------------------- */
 
 async function cargar(n, mantenerVista = false) {
-  const foto = datos.fotos[(i = ((n % datos.fotos.length) + datos.fotos.length) % datos.fotos.length)];
+  i = ((n % datos.fotos.length) + datos.fotos.length) % datos.fotos.length;
+  const foto = datos.fotos[i];
   $('cargando').hidden = false;
   $('cargando').textContent = 'CARGANDO';
 
-  /* Modo rejilla: en vez de una foto se sube una equirectangular sintetica de
-     geometria conocida. Es la unica forma de saber si el horizonte torcido que
-     se ve en las fotos es de la foto o del shader. Con la rejilla, a pitch 0 el
-     ecuador TIENE que salir recto y horizontal por el centro exacto, y los
-     meridianos rectos y verticales. Si eso sale, el shader esta bien y lo
-     torcido es la camara del que tomo la foto. */
-  if (new URLSearchParams(location.search).has('rejilla')) {
-    gl.bindTexture(gl.TEXTURE_2D, textura);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, rejilla());
+  /* Modo rejilla: en vez de una foto se sube una equirectangular sintetica. Con
+     ella, a pitch 0 el ecuador TIENE que salir recto y horizontal por el centro
+     exacto, y los meridianos rectos y verticales. Si eso sale, el shader esta
+     bien y lo torcido es la camara del que tomo la foto. */
+  if (q.has('rejilla')) {
+    await visor.cargar(rejilla());
+    visor.arranca();
     $('cargando').hidden = true;
     $('capa').hidden = false;
     $('l-tex').textContent = 'rejilla';
@@ -340,44 +231,34 @@ async function cargar(n, mantenerVista = false) {
     return;
   }
 
-  const fuente = foto[RESOLUCIONES[res]] || foto.img;
-  const img = new Image();
-  img.crossOrigin = 'anonymous';   // sin esto la textura sale negra: el CDN es de otro origen
   const t0 = performance.now();
-
+  let ancho, alto;
   try {
-    await new Promise((ok, mal) => { img.onload = ok; img.onerror = mal; img.src = fuente; });
+    [ancho, alto] = await visor.cargar(foto[RESOLUCIONES[res]] || foto.img);
   } catch {
     $('cargando').textContent = 'ESA FOTO YA NO ESTA';
     return;
   }
 
-  gl.bindTexture(gl.TEXTURE_2D, textura);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, aPotenciaDeDos(img));
-
-  /* Se entra mirando al norte de la foto, no a donde apuntaba la camara: si
-     cada ronda empezara con un encuadre distinto, comparar seria injusto.
-     Al cambiar de nitidez NO se toca la vista, o la comparacion no vale. */
+  /* Se entra mirando al frente de la foto. Al cambiar de nitidez NO se toca la
+     vista, o la comparacion no sirve para nada. */
   if (!mantenerVista) {
-    cam.yaw = meta.yaw = 0;
-    cam.pitch = meta.pitch = 0;
-    cam.fov = meta.fov = 1.3;
+    visor.mirarA({ yaw: 0, pitch: 0 });
     revelado = false;
   }
 
   pintarDonde();
   $('l-n').textContent = `${i + 1}/${datos.fotos.length}`;
-  $('l-tex').textContent = `${img.naturalWidth}`;
+  $('l-tex').textContent = String(ancho);
   $('credito').innerHTML = `Foto <a href="https://www.mapillary.com/app?focus=photo&pKey=${foto.id}" target="_blank" rel="noopener">${foto.id}</a> `
-    + `— Mapillary, CC BY-SA 4.0 — ${img.naturalWidth}x${img.naturalHeight} en ${Math.round(performance.now() - t0)} ms`;
+    + `— Mapillary, CC BY-SA 4.0 — ${ancho}x${alto} en ${Math.round(performance.now() - t0)} ms`;
   $('cargando').hidden = true;
   $('capa').hidden = false;
+  visor.arranca();
 }
 
 function pintarDonde() {
-  const f = datos.fotos[i];
-  $('l-donde').textContent = revelado ? f.pais : 'oculto';
+  $('l-donde').textContent = revelado ? datos.fotos[i].pais : 'oculto';
   $('bt-donde').textContent = revelado ? 'Ocultar' : 'Revelar';
 }
 
@@ -385,8 +266,8 @@ function pintarDonde() {
 
 const RUMBOS = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
 const cinta = $('cinta');
-/* Una vuelta y nada mas. La posicion se calcula en modulo 360, asi que repetir
-   la cinta a izquierda y derecha solo apilaria marcas en el mismo sitio. */
+/* Una vuelta y nada mas: la posicion se calcula en modulo 360, asi que repetir
+   la cinta a los lados solo apilaria marcas en el mismo sitio. */
 for (let g = 0; g < 360; g += 15) {
   const m = document.createElement('span');
   m.className = 'brujula__marca';
@@ -396,112 +277,42 @@ for (let g = 0; g < 360; g += 15) {
 }
 const marcas = [...cinta.children];
 
-/* --------------------------- bucle --------------------------- */
+/* --------------------------- instrumentos --------------------------- */
 
-let fps = 0, cuadros = 0, tFps = performance.now();
+let cuadros = 0, tFps = performance.now();
 
-function bucle() {
-  /* Suavizado exponencial: el arrastre marca el destino y la camara lo
-     persigue, asi que soltar el raton no corta el movimiento en seco. */
-  cam.yaw += (meta.yaw - cam.yaw) * 0.22;
-  cam.pitch += (meta.pitch - cam.pitch) * 0.22;
-  cam.fov += (meta.fov - cam.fov) * 0.18;
-
-  redimensionar();
-  gl.useProgram(programa);
-  gl.uniform2f(uRes, lienzo.width, lienzo.height);
-  gl.uniform1f(uFov, cam.fov);
-  gl.uniform1f(uYaw, cam.yaw);
-  gl.uniform1f(uPitch, cam.pitch);
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-  instrumentos();
-  cuadros++;
-  const ahora = performance.now();
-  if (ahora - tFps >= 500) {
-    fps = Math.round((cuadros * 1000) / (ahora - tFps));
-    cuadros = 0; tFps = ahora;
-    $('l-fps').textContent = fps;
-  }
-  requestAnimationFrame(bucle);
-}
-
-function instrumentos() {
+function instrumentos(est) {
   const foto = datos.fotos[i];
-  /* El rumbo de verdad es el de la camara mas lo que hemos girado. Sin sumar
-     compass_angle, la brujula seria decorativa. */
-  const grados = (((foto.rumbo || 0) - (cam.yaw * 180) / Math.PI) % 360 + 360) % 360;
+  /* El rumbo de verdad es el de la camara mas lo que se haya girado. Sin sumar
+     compass_angle, la brujula seria pura decoracion. */
+  const grados = (((foto?.rumbo || 0) - (est.yaw * 180) / Math.PI) % 360 + 360) % 360;
   $('l-rumbo').textContent = `${String(Math.round(grados)).padStart(3, '0')}°`;
-  $('l-fov').textContent = `${Math.round((cam.fov * 180) / Math.PI)}°`;
+  $('l-fov').textContent = `${Math.round((est.fov * 180) / Math.PI)}°`;
 
-  /* La cinta tiene que ir al paso de la imagen: el campo del shader es el
-     VERTICAL, asi que para saber cuantos pixeles ocupa un grado en pantalla hay
-     que pasarlo a horizontal por el lado ancho. Si se usa el vertical a secas,
-     la brujula se desliza mas lenta que el paisaje y canta. */
-  const aspecto = lienzo.clientWidth / lienzo.clientHeight;
-  const fovH = 2 * Math.atan(Math.tan(cam.fov / 2) * aspecto) * 180 / Math.PI;
-  const porGrado = 100 / fovH;   // en % del ancho
+  /* La cinta va al paso del paisaje con el campo HORIZONTAL. Con el vertical a
+     secas se desliza mas lenta que la imagen y canta enseguida. */
+  const fovH = (est.fovH * 180) / Math.PI;
+  const porGrado = 100 / fovH;
   for (const m of marcas) {
     const d = ((Number(m.dataset.g) - grados + 540) % 360) - 180;
     if (Math.abs(d) > fovH / 2 + 10) { m.style.opacity = 0; continue; }
     m.style.opacity = 1;
     m.style.left = `${50 + d * porGrado}%`;
   }
-}
 
-function redimensionar() {
-  /* Se topa a 2 para que una pantalla a 3x no cuadruplique el trabajo del
-     shader sin que se note en la imagen. */
-  const dpr = Math.min(devicePixelRatio || 1, 2);
-  const a = Math.round(lienzo.clientWidth * dpr);
-  const h = Math.round(lienzo.clientHeight * dpr);
-  if (lienzo.width !== a || lienzo.height !== h) {
-    lienzo.width = a; lienzo.height = h;
-    gl.viewport(0, 0, a, h);
+  cuadros++;
+  const ahora = performance.now();
+  if (ahora - tFps >= 500) {
+    $('l-fps').textContent = Math.round((cuadros * 1000) / (ahora - tFps));
+    cuadros = 0; tFps = ahora;
   }
 }
 
-/* --------------------------- utilidades --------------------------- */
+/* --------------------------- rejilla de verificacion --------------------------- */
 
-function compilar() {
-  const p = gl.createProgram();
-  for (const [tipo, fuente] of [[gl.VERTEX_SHADER, VERT], [gl.FRAGMENT_SHADER, FRAG]]) {
-    const s = gl.createShader(tipo);
-    gl.shaderSource(s, fuente);
-    gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-      fallo('El shader no compila', gl.getShaderInfoLog(s) || 'sin detalle');
-    }
-    gl.attachShader(p, s);
-  }
-  gl.linkProgram(p);
-  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) fallo('El programa no enlaza', gl.getProgramInfoLog(p) || '');
-  return p;
-}
-
-const acotar = (v, a, b) => Math.max(a, Math.min(b, v));
-
-/* Red de seguridad para WebGL1: si la esferica no mide potencia de dos, se
-   reescala a la potencia de dos mas cercana por debajo antes de subirla. Cuesta
-   una pasada de dibujo y algo de nitidez, pero es preferible a un cuadro negro.
-   En WebGL2 no hace falta y se devuelve la imagen tal cual. */
-function aPotenciaDeDos(img) {
-  const pot = (n) => 2 ** Math.round(Math.log2(n));
-  if (ES2 || (esPot(img.naturalWidth) && esPot(img.naturalHeight))) return img;
-
-  const c = document.createElement('canvas');
-  c.width = Math.min(pot(img.naturalWidth), 4096);
-  c.height = c.width / 2;                       // la equirectangular es 2:1 siempre
-  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-  return c;
-}
-
-const esPot = (n) => (n & (n - 1)) === 0;
-
-/* Equirectangular de prueba: 2048x1024, un grado de longitud por cada 5.69 px.
-   Todo lo que se dibuja aqui son lineas de latitud/longitud constantes, asi que
-   cualquier curva o inclinacion que aparezca en pantalla la ha metido el
-   shader. */
+/* Equirectangular de prueba de 2048x1024. Todo lo que se dibuja aqui son lineas
+   de latitud y longitud constantes, asi que cualquier curva o inclinacion que
+   salga en pantalla la ha metido el shader. */
 function rejilla() {
   const c = document.createElement('canvas');
   c.width = 2048; c.height = 1024;
@@ -513,7 +324,7 @@ function rejilla() {
      direccion a la que apunta la camara, no en el borde izquierdo. Dibujar el
      meridiano 0 en x=0 deja el SUR en el centro cuando se mira al norte, que es
      justo la clase de error que esta rejilla existe para cazar. */
-  const aX = (lon) => (((lon + 180) % 360) + 360) % 360 * px;
+  const aX = (lon) => ((((lon + 180) % 360) + 360) % 360) * px;
 
   x.lineWidth = 2;
   for (let lon = 0; lon < 360; lon += 15) {
@@ -536,6 +347,8 @@ function rejilla() {
   return c;
 }
 
+/* --------------------------- utilidades --------------------------- */
+
 function fallo(titulo, detalle) {
   $('cargando').hidden = true;
   $('capa').hidden = true;
@@ -545,14 +358,14 @@ function fallo(titulo, detalle) {
   throw new Error(`${titulo}: ${detalle}`);
 }
 
-/* ?foto=N y ?yaw= sirven para volver al MISMO encuadre en dos capturas
-   distintas; sin eso no se puede comparar nada de una corrida a otra. */
-const q = new URLSearchParams(location.search);
+/* ?foto=N, ?yaw=, ?pitch= y ?fov= sirven para volver al MISMO encuadre en dos
+   capturas distintas; sin eso no se puede comparar nada de una corrida a otra. */
 await cargar(Number(q.get('foto') || 0));
-if (q.has('yaw')) cam.yaw = meta.yaw = Number(q.get('yaw')) * Math.PI / 180;
-if (q.has('pitch')) cam.pitch = meta.pitch = Number(q.get('pitch')) * Math.PI / 180;
-if (q.has('fov')) cam.fov = meta.fov = Number(q.get('fov')) * Math.PI / 180;
-bucle();
+visor.mirarA({
+  yaw: Number(q.get('yaw') || 0) * Math.PI / 180,
+  pitch: Number(q.get('pitch') || 0) * Math.PI / 180,
+  fov: q.has('fov') ? Number(q.get('fov')) * Math.PI / 180 : 1.3,
+});
 </script>
 </body>
 </html>
