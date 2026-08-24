@@ -282,7 +282,12 @@ lienzo.addEventListener('pointermove', (e) => {
   /* El giro se escala con el campo: en teleobjetivo el mismo gesto tiene que
      mover menos, o mirar de cerca es imposible. */
   const k = meta.fov / lienzo.clientHeight;
-  meta.yaw -= (e.clientX - ultimo.x) * k;
+
+  /* Se agarra el MUNDO, no la camara: arrastrar a la derecha lleva el paisaje a
+     la derecha, como en Street View y GeoGuessr. Los dos ejes tienen que ir en
+     el mismo sentido; con el vertical agarrando y el horizontal empujando la
+     camara, la mano nunca se acostumbra. */
+  meta.yaw += (e.clientX - ultimo.x) * k;
   meta.pitch = acotar(meta.pitch + (e.clientY - ultimo.y) * k, -TOPE_PITCH, TOPE_PITCH);
   ultimo = { x: e.clientX, y: e.clientY };
 });
@@ -292,11 +297,14 @@ lienzo.addEventListener('wheel', (e) => {
   meta.fov = acotar(meta.fov * (e.deltaY > 0 ? 1.12 : 0.89), FOV_MIN, FOV_MAX);
 }, { passive: false });
 
+/* Las flechas NO agarran el mundo: mueven la mirada, que es lo que espera
+   cualquiera de un teclado. Arriba mira arriba. Es el sentido contrario al del
+   arrastre a proposito, y en Street View funciona igual. */
 addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') meta.yaw += 0.12;
   else if (e.key === 'ArrowRight') meta.yaw -= 0.12;
-  else if (e.key === 'ArrowUp') meta.pitch = acotar(meta.pitch - 0.09, -TOPE_PITCH, TOPE_PITCH);
-  else if (e.key === 'ArrowDown') meta.pitch = acotar(meta.pitch + 0.09, -TOPE_PITCH, TOPE_PITCH);
+  else if (e.key === 'ArrowUp') meta.pitch = acotar(meta.pitch + 0.09, -TOPE_PITCH, TOPE_PITCH);
+  else if (e.key === 'ArrowDown') meta.pitch = acotar(meta.pitch - 0.09, -TOPE_PITCH, TOPE_PITCH);
   else return;
   e.preventDefault();
 });
