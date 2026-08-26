@@ -243,7 +243,11 @@ function despiertaBarra() {
 }
 // Mientras el foco siga dentro de la barra, la barra se queda. Se refresca por
 // debajo del temporizador de index.html para que no llegue a cerrarse.
+// SOLO en modo mando: con raton, clicar un boton de la barra deja el foco
+// dentro para siempre (nadie hace blur) y este mismo intervalo mantenia la
+// barra pegada en pantalla aunque el raton llevara rato quieto.
 setInterval(() => {
+  if (raiz.getAttribute('data-entrada') !== 'mando') return;
   const bar = $('#bar');
   if (bar && document.activeElement && bar.contains(document.activeElement)) despiertaBarra();
 }, 1800);
