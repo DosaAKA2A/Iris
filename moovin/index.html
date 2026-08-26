@@ -186,7 +186,6 @@ button.tag:hover{opacity:.7}
   display:-webkit-box; -webkit-box-orient:vertical;
   -webkit-line-clamp:2; line-clamp:2; overflow:hidden;
 }
-.lib-otra{margin-top:30px; border-top:1px solid var(--line); padding-top:8px; max-width:640px}
 .lib-vacia{grid-column:1/-1; color:var(--dim); font-size:12.5px; padding:18px 0; text-align:center}
 .lib-pie{
   margin-top:34px; padding-top:14px; border-top:1px solid var(--line);
@@ -465,13 +464,6 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 .btn.red{background:var(--red); color:#fff}
 .btn.red:hover{background:#e5533d}
 .btn:disabled{background:rgba(255,255,255,.05); color:var(--dim); cursor:default}
-.filebtn{
-  width:100%; margin-top:8px; padding:11px 13px; border-radius:10px;
-  border:1px dashed var(--line-2); color:var(--muted); font-size:12.8px;
-  text-align:center; transition:border-color .12s,color .12s;
-}
-.filebtn:hover{border-color:var(--muted); color:var(--text)}
-.fieldrow .filebtn{flex:1; margin-top:0}
 #loader-close{
   position:absolute; top:14px; right:14px; width:32px; height:32px;
   display:none; align-items:center; justify-content:center; border-radius:8px;
@@ -782,20 +774,11 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
           <div class="se-eps" id="se-eps"></div>
         </div>
 
-        <div class="lib-otra" id="lib-otra">
-          <div class="lbl">Otra fuente</div>
-          <div class="fieldrow">
-            <input id="in-url" class="in" type="url" placeholder="Enlace directo del video (https://…/pelicula.mp4)" />
-            <button id="btn-url" class="btn red">Cargar</button>
-          </div>
-          <div class="fieldrow" style="margin-top:8px">
-            <button id="btn-file" class="filebtn">Archivos de este equipo</button>
-            <button id="btn-subs" class="filebtn">Subtítulos .srt o .vtt</button>
-          </div>
-          <div class="hint" style="margin-top:8px; font-size:11.5px; color:var(--dim)">
-            Puedes elegir de una vez el video, sus pistas de audio y sus subtítulos.
-          </div>
-        </div>
+        <!-- La seccion "Otra fuente" (URL directa + archivos del equipo) se
+             quitó el 2026-08-26 a pedido de Dosa: los títulos entran SOLO por
+             el backoffice. Los inputs ocultos de más abajo se quedan porque la
+             copia local del Watch Party ("Usar mi copia", "Ya la descargué") y
+             el "Cargar archivo…" del menú CC los siguen usando. -->
         <!-- El backoffice NO se enlaza desde aquí. No es que el enlace diera
              acceso (todo /api/* exige la clave de administración y sin ella
              devuelve 401, incluso con el pase de la biblioteca), pero desde que
@@ -1807,18 +1790,13 @@ $('#tap-btn').addEventListener('click', () => {
   audioPlay();
 });
 
-/* Cargador */
-$('#btn-url').addEventListener('click', () => {
-  const u = $('#in-url').value.trim(); if (!u) return;
-  cargarURL(u); playSafe();
-});
-$('#in-url').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#btn-url').click(); });
-$('#btn-file').addEventListener('click', () => $('#in-file').click());
+/* Cargador. Los dos inputs de archivo están ocultos y los disparan la hoja de
+   descarga ("Ya la descargué"), el panel de sala ("Usar mi copia") y el menú
+   CC ("Cargar archivo…"). */
 $('#in-file').addEventListener('change', (e) => {
   if (e.target.files.length) { cargarArchivos(e.target.files); playSafe(); }
   e.target.value = '';   // volver a elegir el mismo archivo debe funcionar
 });
-$('#btn-subs').addEventListener('click', () => $('#in-subs').click());
 $('#in-subs').addEventListener('change', (e) => {
   if (e.target.files[0]) cargarSubs(e.target.files[0]);
   e.target.value = '';
@@ -1967,7 +1945,7 @@ function pintaBiblioteca(bib) {
   const tt = (bib && bib.titulos) || [];
   if (!tt.length) {
     const p = document.createElement('div'); p.className = 'lib-vacia';
-    p.textContent = 'La biblioteca está vacía. Usa "Otra fuente" mientras tanto.';
+    p.textContent = 'La biblioteca está vacía.';
     grid.appendChild(p);
     return;
   }
@@ -2102,7 +2080,6 @@ function abreSerie(t, sec) {
   $('#lib-h1').classList.add('oculto');
   $('#lib-sub').classList.add('oculto');
   $('#lib-grid').classList.add('oculto');
-  $('#lib-otra').classList.add('oculto');
   $('#serie').classList.add('on');
   pintaTabs();
   pintaSeccion();
@@ -2243,7 +2220,6 @@ function cierraSerie() {
   $('#lib-h1').classList.remove('oculto');
   $('#lib-sub').classList.remove('oculto');
   $('#lib-grid').classList.remove('oculto');
-  $('#lib-otra').classList.remove('oculto');
 }
 /* Una fila de la lista. Sirve igual para un capítulo que para una película de
    la saga: solo cambian la etiqueta de arriba y de dónde sale la imagen (un
@@ -2578,19 +2554,32 @@ function start(code, asHost) {
   const name = ($('#p-name').value.trim() || (asHost ? 'Anfitrión' : 'Invitado')).slice(0, 32);
   localStorage.__navPartyName = $('#p-name').value.trim();
   sala = { code, host: asHost, name, ws: null, ok: false, everOk: false, n: 1, status: 'Conectando…', msgs: [], lock: false, navLock: true };
+  /* El socket se abre aquí dentro para poder repetirlo: si se cae (el relay se
+     redespliega, el equipo se suspende, un bache de red) antes quedaba la sala
+     pintada con su código mientras ya no sincronizaba nada — que desde el sofá
+     se ve exactamente como "no me cambia el capítulo". Mismo esquema que el
+     addon de Naviris 2.7.1. */
+  let reintento = 0, reTimer = null;
+  const miSala = sala;
+  function abreSocket() {
+  if (sala !== miSala) return;
   let ws;
   try { ws = new WebSocket(SERVER); } catch (e) {
     sala.status = 'Sin conexión con el servidor'; pintaSala(); return;
   }
   sala.ws = ws;
-  ws.onopen = () => send({ t: 'join', room: code, name, host: asHost });
+  ws.onopen = () => { reintento = 0; send({ t: 'join', room: code, name, host: asHost }); };
   ws.onmessage = (ev) => {
     if (!sala || sala.ws !== ws) return;
     let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
     if (m.t === 'joined') {
+      const volvia = sala.everOk;
       sala.ok = true; sala.everOk = true; sala.n = m.n; sala.status = 'En la sala';
-      logAct(sala.name, asHost ? 'creó la sala' : 'se unió a la sala');
-      logSys(asHost ? 'Comparte el código o el enlace de invitación' : 'El anfitrión marca el ritmo');
+      if (volvia) logSys('Conexión recuperada');
+      else {
+        logAct(sala.name, asHost ? 'creó la sala' : 'se unió a la sala');
+        logSys(asHost ? 'Comparte el código o el enlace de invitación' : 'El anfitrión marca el ritmo');
+      }
       if (asHost) beatStart();
       // El código de sala no se queda en la URL: el enlace de invitación se
       // copia desde el botón y la URL de la pestaña identifica la película.
@@ -2612,14 +2601,44 @@ function start(code, asHost) {
     else if (m.t === 'error') sala.status = 'Error: ' + m.msg;
     pintaSala();
   };
-  ws.onclose = () => { if (sala && sala.ws === ws) { sala.ok = false; sala.status = sala.everOk ? 'Desconectado' : 'Sin conexión con el servidor'; beatStop(); pintaSala(); } };
+  ws.onclose = () => {
+    if (!sala || sala.ws !== ws) return;
+    sala.ok = false; beatStop();
+    if (!sala.everOk) { sala.status = 'Sin conexión con el servidor'; pintaSala(); return; }
+    // Ya había conectado alguna vez: es un corte, se vuelve a entrar solo.
+    reintento++;
+    const espera = Math.min(30000, 1000 * Math.pow(2, reintento - 1));
+    sala.status = 'Reconectando…';
+    if (reTimer) clearTimeout(reTimer);
+    reTimer = setTimeout(() => { reTimer = null; if (sala === miSala) abreSocket(); }, espera);
+    pintaSala();
+  };
   ws.onerror = () => { if (sala && sala.ws === ws) { sala.ok = false; sala.status = 'Sin conexión con el servidor'; pintaSala(); } };
+  }
+  const zombi = setInterval(() => {
+    if (sala !== miSala) { clearInterval(zombi); return; }
+    const w = sala.ws;
+    if (w && w.readyState >= 2 && !reTimer) {
+      // El onclose no llego (cierre a medias): se fuerza el mismo camino.
+      sala.ok = false; beatStop();
+      reintento++;
+      sala.status = 'Reconectando…';
+      reTimer = setTimeout(() => { reTimer = null; if (sala === miSala) abreSocket(); }, 1000);
+      pintaSala();
+    }
+  }, 3000);
+  sala.paraReconexion = () => {
+    if (reTimer) { clearTimeout(reTimer); reTimer = null; }
+    clearInterval(zombi);
+  };
+  abreSocket();
   panelAbre(true);
   pintaSala();
 }
 function leave(silent) {
   if (!sala) return;
   beatStop();
+  try { sala.paraReconexion && sala.paraReconexion(); } catch (e) { /* nada */ }
   try { sala.ws && sala.ws.close(); } catch (e) { /* nada */ }
   sala = null;
   chatEl.innerHTML = '';
@@ -2683,7 +2702,6 @@ function arranca() {
   cargaCatalogo();
   if (qs.get('v')) {
     cargarURL(qs.get('v'), { remoto: true });
-    $('#in-url').value = qs.get('v');
   }
   if (qs.get('sala')) {
     $('#p-codein').value = qs.get('sala').toUpperCase();

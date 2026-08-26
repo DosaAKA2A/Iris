@@ -80,10 +80,6 @@
 :root[data-plataforma="tv"] .lib-eps svg{width:15px; height:15px}
 :root[data-plataforma="tv"] .lib-pie{font-size:15px}
 
-/* En un televisor no hay ni explorador de archivos ni forma comoda de teclear
-   una URL, asi que "Otra fuente" solo estorba: se lleva una pantalla entera
-   de recorrido con el mando para llegar a algo inservible. */
-:root[data-plataforma="tv"] .lib-otra{display:none}
 /* La descarga tampoco: el televisor no tiene donde guardar el archivo. */
 :root[data-plataforma="tv"] .lib-dl{display:none}
 
