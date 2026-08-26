@@ -21,7 +21,7 @@
    conexion, no la fuente de la verdad.
    ========================================================================== */
 
-const CACHE = 'moovin-interfaz-v1';
+const CACHE = 'moovin-interfaz-v2';
 
 /* La interfaz completa. Si alguno falla no se aborta la instalacion entera:
    un icono que no este no puede dejar la app sin instalar. */
@@ -34,7 +34,19 @@ const INTERFAZ = [
   './icono-192.png',
   './icono-512.png',
   './icono-maskable-512.png',
-  '/assets/moovin-favicon.svg'
+  '/assets/moovin-favicon.svg',
+  './avatares/aria.svg',
+  './avatares/pj1.svg',
+  './avatares/pj2.svg',
+  './avatares/pj3.svg',
+  './avatares/pj4.svg',
+  './avatares/pj5.svg',
+  './avatares/pj6.svg',
+  './avatares/pj7.svg',
+  './avatares/pj8.svg',
+  './avatares/pj9.svg',
+  './avatares/pj10.svg',
+  './avatares/pj11.svg'
 ];
 
 self.addEventListener('install', (e) => {

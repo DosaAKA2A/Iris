@@ -659,10 +659,23 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 }
 .msg{display:flex; gap:9px; align-items:flex-start}
 .av{
-  width:28px; height:28px; border-radius:50%; flex:none;
+  width:28px; height:28px; border-radius:50%; flex:none; overflow:hidden;
   display:flex; align-items:center; justify-content:center;
   font-size:12px; font-weight:700; color:rgba(10,10,14,.78);
 }
+.av img{width:100%; height:100%; display:block}
+/* Selector de avatar: 13 botones (la inicial + los 12 del elenco de Verby) */
+#p-avs{display:flex; flex-wrap:wrap; gap:8px; margin-top:2px}
+#p-avs button{
+  width:40px; height:40px; border-radius:50%; overflow:hidden; flex:none;
+  border:2px solid transparent; padding:0; background:var(--surface);
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px; font-weight:700; color:var(--muted);
+  transition:border-color .12s, transform .12s;
+}
+#p-avs button:hover{transform:scale(1.08)}
+#p-avs button.on{border-color:var(--red)}
+#p-avs button img{width:100%; height:100%; display:block}
 .mb{min-width:0; flex:1; padding-top:1px}
 .who{font-size:12.5px; font-weight:700; line-height:1.4}
 .act{font-size:12px; font-style:italic; color:var(--muted); line-height:1.5}
@@ -869,6 +882,8 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
         <div class="hint">Crea una sala y comparte el código o el enlace: la película y la reproducción se sincronizan con las de todos. También funciona desde Naviris con el addon Watch Party.</div>
         <div class="lbl">Tu nombre</div>
         <input id="p-name" class="in" maxlength="32" placeholder="Cómo te verán en la sala" />
+        <div class="lbl">Tu avatar</div>
+        <div id="p-avs"></div>
         <button id="p-create" class="cta">Crear sala</button>
         <div class="lbl">O únete a una sala</div>
         <div class="fieldrow">
@@ -2349,6 +2364,10 @@ let hintLocal = 0;
 let avisoDescarga = 0;
 
 function send(obj) {
+  // El avatar viaja en TODO mensaje (join/ev/beat/chat): el relay reenvía los
+  // campos tal cual y así cualquier mensaje enseña la cara de quien lo manda.
+  // Campo ADITIVO: los clientes viejos lo ignoran sin romperse.
+  const av = miAv(); if (av && !obj.av) obj.av = av;
   try { if (sala && sala.ws && sala.ws.readyState === 1) sala.ws.send(JSON.stringify(obj)); } catch (e) { /* nada */ }
 }
 function randomCode() {
@@ -2377,11 +2396,55 @@ function narrate(kind, who, text) {
   narr.kind = kind; narr.at = now;
   logAct(who, text);
 }
+/* Avatares del elenco de Verby (moovin/avatares/<id>.svg). La lista es
+   cerrada: el `av` que viaja por la sala solo se usa si está aquí — nunca se
+   compone una URL con un valor ajeno. Sin avatar (o con uno desconocido) se
+   cae a la inicial de siempre, que es lo que pintan los clientes viejos. */
+const AVATARES = ['aria', 'pj1', 'pj2', 'pj3', 'pj4', 'pj5', 'pj6', 'pj7', 'pj8', 'pj9', 'pj10', 'pj11'];
+const avs = {};   // nombre -> id de avatar, aprendido de los mensajes de la sala
+function miAv() {
+  try { const v = localStorage.__navPartyAvatar; return AVATARES.includes(v) ? v : ''; }
+  catch (e) { return ''; }
+}
+function apuntaAv(who, av) {
+  if (who && AVATARES.includes(av)) avs[who] = av;
+}
 function avatar(who) {
-  const av = document.createElement('span'); av.className = 'av';
-  av.style.background = nameColor(who);
-  av.textContent = (who || '?').trim().charAt(0).toUpperCase() || '?';
-  return av;
+  const el = document.createElement('span'); el.className = 'av';
+  const id = avs[who];
+  if (id && AVATARES.includes(id)) {
+    const img = document.createElement('img');
+    img.src = 'avatares/' + id + '.svg'; img.alt = '';
+    el.appendChild(img);
+    return el;
+  }
+  el.style.background = nameColor(who);
+  el.textContent = (who || '?').trim().charAt(0).toUpperCase() || '?';
+  return el;
+}
+function pintaSelectorAv() {
+  const cont = $('#p-avs'); if (!cont) return;
+  cont.innerHTML = '';
+  const actual = miAv();
+  const haz = (id, contenido) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = (id === actual) ? 'on' : '';
+    b.title = id ? 'Avatar del elenco' : 'Tu inicial';
+    if (contenido) b.appendChild(contenido); else b.textContent = 'A';
+    b.addEventListener('click', () => {
+      try { if (id) localStorage.__navPartyAvatar = id; else delete localStorage.__navPartyAvatar; }
+      catch (e) { /* en la tele localStorage puede fallar: queda solo la inicial */ }
+      pintaSelectorAv();
+    });
+    cont.appendChild(b);
+  };
+  haz('', null);
+  for (const id of AVATARES) {
+    const img = document.createElement('img');
+    img.src = 'avatares/' + id + '.svg'; img.alt = id;
+    haz(id, img);
+  }
 }
 function pintarChat() {
   if (!sala) return;
@@ -2552,7 +2615,8 @@ function beatStop() { if (beatTimer) { clearInterval(beatTimer); beatTimer = nul
 function start(code, asHost) {
   leave(true);
   const name = ($('#p-name').value.trim() || (asHost ? 'Anfitrión' : 'Invitado')).slice(0, 32);
-  localStorage.__navPartyName = $('#p-name').value.trim();
+  try { localStorage.__navPartyName = $('#p-name').value.trim(); } catch (e) { /* nada */ }
+  apuntaAv(name, miAv());
   sala = { code, host: asHost, name, ws: null, ok: false, everOk: false, n: 1, status: 'Conectando…', msgs: [], lock: false, navLock: true };
   /* El socket se abre aquí dentro para poder repetirlo: si se cae (el relay se
      redespliega, el equipo se suspende, un bache de red) antes quedaba la sala
@@ -2586,8 +2650,9 @@ function start(code, asHost) {
       actualizarShare();
     }
     else if (m.t === 'peers') { sala.n = m.n; if (m.joined && m.who) logAct(m.who, 'se unió a la sala'); else if (m.left && m.who) logAct(m.who, 'salió de la sala'); }
-    else if (m.t === 'ev') applyRemote(m);
+    else if (m.t === 'ev') { apuntaAv(m.from, m.av); applyRemote(m); }
     else if (m.t === 'beat') {
+      apuntaAv(m.from, m.av);
       if (!sala.host) {
         const hadLock = !!sala.lock; sala.lock = !!m.lock;
         if (sala.lock !== hadLock) logSys(sala.lock ? 'El anfitrión activó el control exclusivo' : 'El anfitrión desactivó el control exclusivo');
@@ -2597,7 +2662,7 @@ function start(code, asHost) {
         if (typeof m.time === 'number') applyBeat(m);
       }
     }
-    else if (m.t === 'chat') logChat(m.from || '?', String(m.msg || ''));
+    else if (m.t === 'chat') { apuntaAv(m.from, m.av); logChat(m.from || '?', String(m.msg || '')); }
     else if (m.t === 'error') sala.status = 'Error: ' + m.msg;
     pintaSala();
   };
@@ -2656,6 +2721,7 @@ function panelAbre(force) {
 $('#btn-party').addEventListener('click', () => panelAbre());
 $('#p-close').addEventListener('click', () => panelAbre(false));
 $('#p-name').value = localStorage.__navPartyName || '';
+pintaSelectorAv();
 $('#p-create').addEventListener('click', () => start(randomCode(), true));
 const doJoin = () => {
   const c = $('#p-codein').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
