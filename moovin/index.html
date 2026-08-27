@@ -20,15 +20,25 @@
 <meta name="apple-mobile-web-app-title" content="MOOVIN" />
 <link rel="apple-touch-icon" href="icono-192.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
 /* ============================ Tokens IRIS ============================ */
 :root{
-  --bg:#0a0a0a; --surface:#121214; --panel:#0e0e10;
-  --text:#f5f5f5; --muted:rgba(245,245,245,.6); --dim:rgba(245,245,245,.38);
-  --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16);
-  --red:#dc402a; --ok:#9ee2b8; --err:#e6a9b4;
+  --bg:#0b0b0d; --surface:#131317; --panel:#0e0e11;
+  --text:#f4f4f6; --muted:rgba(244,244,246,.62); --dim:rgba(244,244,246,.40);
+  --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.17);
+  /* Cartelera: el acento de la interfaz es NEUTRO. `--red` conserva el nombre
+     porque lo usan decenas de reglas, pero ya no es rojo: el color de la marca
+     vive en el logo, la intro y las portadas. */
+  --red:#f4f4f6; --sobre-acc:#0b0b0d;
+  --rubi:#d61f45; --oro:#ffb62e;
+  --ok:#9ee2b8; --err:#e6a9b4;
   --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --display:"Bricolage Grotesque","Inter",system-ui,sans-serif;
+  --papel:#f2f0ec; --tinta:#17181b; --papel-suave:#5d5f67;
+  --mask-cartel:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%273546.40 -312.61 661.10 985.76%27%3E%3Cpath d=%27M4207.5-263.32v889.54c-25.91,0-46.92,21.01-46.92,46.93h-567.25c0-25.92-21.01-46.93-46.93-46.93V-263.32c0-27.22,22.07-49.29,49.29-49.29h562.52c27.22,0,49.29,22.07,49.29,49.29Z%27 fill=%27%23000%27/%3E%3C/svg%3E');
+  --mask-talon:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%273546.40 673.15 661.10 375.30%27%3E%3Cpath d=%27M4207.5,720.07v328.38h-661.1v-328.38c25.92,0,46.93-21.01,46.93-46.92h567.25c0,25.91,21.01,46.92,46.92,46.92Z%27 fill=%27%23000%27/%3E%3C/svg%3E');
+  --mask-roto:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%274670.00 673.15 661.10 375.30%27%3E%3Cpath d=%27M5331.1,720.07v328.38h-28c0-25.92-21-46.93-46.92-46.93s-46.93,21.01-46.93,46.93h-33.96c0-25.92-21.01-46.93-46.93-46.93s-46.92,21.01-46.92,46.93h-33.97c0-25.92-21.01-46.93-46.92-46.93s-46.93,21.01-46.93,46.93h-33.97c0-25.92-21-46.93-46.92-46.93s-46.93,21.01-46.93,46.93h-33.96c0-25.92-21.01-46.93-46.93-46.93s-46.92,21.01-46.92,46.93h-27.99v-328.38c25.92,0,46.93-21.01,46.93-46.92h567.25c0,25.91,21.01,46.92,46.92,46.92Z%27 fill=%27%23000%27/%3E%3C/svg%3E');
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -58,7 +68,7 @@ svg{display:block}
 #top .sep{width:1px; height:18px; background:var(--line-2)}
 #top .tag{
   font-family:var(--mono); font-size:11px; font-weight:700;
-  letter-spacing:.22em; color:var(--red);
+  letter-spacing:.22em; color:var(--text);
 }
 /* La marca es el camino de vuelta a la biblioteca. */
 button.tag{
@@ -296,7 +306,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   background:rgba(0,0,0,.72); border:1px solid var(--line-2);
   font-family:var(--mono); font-size:9.5px; color:var(--text);
 }
-.se-card.on .se-card-n{background:var(--red); border-color:var(--red); color:#fff}
+.se-card.on .se-card-n{background:var(--red); border-color:var(--red); color:var(--sobre-acc)}
 .se-card-nom{
   font-size:12px; font-weight:600; color:var(--muted); line-height:1.35;
   display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
@@ -393,7 +403,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   transition:border-color .12s,background .12s;
 }
 #acciones button:hover{border-color:var(--muted); background:rgba(24,24,27,.96)}
-#acciones button.red{background:var(--red); border-color:var(--red)}
+#acciones button.red{background:var(--red); border-color:var(--red); color:var(--sobre-acc)}
 #acciones button.red:hover{background:#e5533d; border-color:#e5533d}
 #acciones button svg{width:15px; height:15px}
 #acciones .sig-nota{
@@ -461,7 +471,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   background:rgba(255,255,255,.08); transition:background .12s;
 }
 .btn:hover{background:rgba(255,255,255,.14)}
-.btn.red{background:var(--red); color:#fff}
+.btn.red{background:var(--red); color:var(--sobre-acc)}
 .btn.red:hover{background:#e5533d}
 .btn:disabled{background:rgba(255,255,255,.05); color:var(--dim); cursor:default}
 #loader-close{
@@ -614,7 +624,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 }
 .cta{
   width:100%; margin-top:14px; padding:12px 16px; border-radius:10px;
-  font-size:13px; font-weight:700; background:var(--red); color:#fff;
+  font-size:13px; font-weight:700; background:var(--red); color:var(--sobre-acc);
   transition:background .12s;
 }
 .cta:hover{background:#e5533d}
@@ -688,7 +698,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 .compose .in{border-radius:999px; padding:10px 15px}
 #p-send{
   flex:none; width:38px; height:38px; border-radius:50%;
-  background:var(--red); color:#fff;
+  background:var(--red); color:var(--sobre-acc);
   display:flex; align-items:center; justify-content:center; transition:background .12s;
 }
 #p-send:hover{background:#e5533d}
@@ -707,12 +717,276 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 @media (max-width:760px){
   #party{position:fixed; right:0; top:52px; bottom:0; z-index:20; border-left:1px solid var(--line)}
 }
+
+/* ============================ REWORK 2026 ============================
+   Cartelera: interfaz neutra sobre oscuro. El color vive en el logo, la
+   intro y las portadas. Todo lo de aquí abajo pisa a propósito lo de
+   arriba; se mantiene separado para poder repasarlo de un vistazo. */
+
+/* ---------- intro VHS (una vez por sesión) ---------- */
+#intro{
+  position:fixed; inset:0; z-index:100; background:#000;
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+#intro.fin{opacity:0; pointer-events:none; transition:opacity .5s ease}
+#intro.oculto{display:none}
+#nieve{position:absolute; inset:0; width:100%; height:100%; opacity:0}
+#intro.senal #nieve{opacity:.5}
+#intro-linea{
+  position:absolute; left:8%; right:8%; top:50%; height:3px; border-radius:3px;
+  background:#fff; box-shadow:0 0 26px 6px rgba(255,255,255,.75);
+  transform:translateY(-50%) scaleX(0);
+}
+#intro.enciende #intro-linea{animation:mv-linea .5s ease-out forwards}
+@keyframes mv-linea{
+  0%{transform:translateY(-50%) scaleX(0)}
+  55%{transform:translateY(-50%) scaleX(1)}
+  100%{transform:translateY(-50%) scaleX(1) scaleY(46); opacity:0}
+}
+#intro-centro{
+  position:relative; z-index:2; display:flex; flex-direction:column;
+  align-items:center; gap:14px; opacity:0; transform:scale(.985);
+}
+#intro.marca #intro-centro{animation:mv-entra .55s ease-out forwards}
+@keyframes mv-entra{to{opacity:1; transform:scale(1)}}
+#intro-logo .mv-m{height:clamp(64px,11vw,104px); width:auto; display:block}
+#intro.glitch #intro-logo{animation:mv-glitch .38s steps(2,end) 2}
+@keyframes mv-glitch{
+  0%{transform:translateX(0); filter:none}
+  25%{transform:translateX(-5px); filter:drop-shadow(6px 0 rgba(255,0,64,.75)) drop-shadow(-6px 0 rgba(0,220,255,.6))}
+  50%{transform:translateX(4px)}
+  75%{transform:translateX(-2px); filter:drop-shadow(-4px 0 rgba(255,0,64,.6))}
+  100%{transform:translateX(0); filter:none}
+}
+#intro-palabra{height:clamp(17px,2.6vw,26px); width:auto; color:#fff}
+#intro-studio{
+  font-family:var(--mono); font-size:11px; letter-spacing:.34em;
+  text-transform:uppercase; color:#8a8a94;
+}
+#intro-tracking{
+  position:absolute; left:0; right:0; height:70px; top:-70px; pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(255,255,255,.09) 35%,rgba(255,255,255,.16) 50%,rgba(255,255,255,.05) 70%,transparent);
+  mix-blend-mode:screen;
+}
+#intro.senal #intro-tracking{animation:mv-track 1.5s linear 1 forwards}
+@keyframes mv-track{from{top:-70px} to{top:100%}}
+#intro::after{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:3;
+  background:repeating-linear-gradient(180deg,rgba(0,0,0,.30) 0 1px,transparent 1px 3px);
+  opacity:.55;
+}
+#intro-saltar{
+  position:absolute; right:22px; bottom:20px; z-index:4;
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:#9a9aa6; background:none; border:1px solid #33333c; border-radius:999px;
+  padding:8px 16px; cursor:pointer; transition:color .15s,border-color .15s;
+}
+#intro-saltar:hover{color:#fff; border-color:#6b6b75}
+
+/* ---------- marca de la cabecera ---------- */
+#top .tag{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:0; border:0; background:none; letter-spacing:0;
+}
+#top .tag .mv-m{height:22px; width:auto; display:block}
+#top .tag .mv-palabra{height:12px; width:auto; color:var(--text)}
+#top .tag:hover{opacity:.78}
+#btn-party .dot{background:var(--rubi)}
+
+/* ---------- portada grande de la biblioteca ---------- */
+#lib-hero{
+  position:relative; margin:-38px -34px 30px; padding:52px 34px 34px;
+  min-height:min(46vh,380px); display:flex; align-items:flex-end;
+  overflow:hidden; isolation:isolate;
+}
+#lib-hero.oculto{display:none}
+#lib-hero .hero-fondo{
+  position:absolute; inset:-70px; z-index:-2;
+  background-size:cover; background-position:center 20%;
+  filter:blur(34px) saturate(1.15) brightness(.5); transform:scale(1.1);
+}
+#lib-hero .hero-velo{
+  position:absolute; inset:0; z-index:-1;
+  background:linear-gradient(90deg,var(--bg) 6%,rgba(11,11,13,.86) 44%,rgba(11,11,13,.3) 72%,rgba(11,11,13,.92) 100%),
+             linear-gradient(0deg,var(--bg) 1%,transparent 58%);
+}
+#lib-hero .hero-tx{flex:1; min-width:0; max-width:52ch}
+#lib-hero .hero-eyebrow{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--oro);
+}
+#lib-hero .hero-tit{
+  font-family:var(--display); font-weight:800;
+  font-size:clamp(30px,5.4vw,60px); line-height:1; letter-spacing:-.025em;
+  margin-top:10px; text-wrap:balance;
+}
+#lib-hero .hero-meta{
+  font-family:var(--mono); font-size:11.5px; color:var(--muted);
+  margin-top:12px; letter-spacing:.04em;
+}
+#lib-hero .hero-acc{display:flex; gap:10px; margin-top:22px; flex-wrap:wrap}
+#lib-hero .hero-cartel{
+  width:154px; aspect-ratio:2/3; flex:none; border-radius:10px; margin-left:34px;
+  background-size:cover; background-position:center;
+  box-shadow:0 22px 60px rgba(0,0,0,.6);
+}
+.mv-btn{
+  display:inline-flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600;
+  border-radius:10px; padding:11px 22px; border:1px solid transparent; cursor:pointer;
+  transition:opacity .15s,border-color .15s;
+}
+.mv-btn.solido{background:var(--text); color:var(--bg)}
+.mv-btn.solido:hover{opacity:.86}
+.mv-btn.hueco{border-color:var(--line-2); color:var(--text)}
+.mv-btn.hueco:hover{border-color:var(--muted)}
+.mv-btn svg{width:13px; height:13px; fill:currentColor}
+
+/* Con la portada grande delante, repetir "MOOVIN" y su bajada sobra: la marca
+   ya está en la cabecera y el título de la película manda la pantalla. */
+#lib-hero:not(.oculto) ~ #lib-h1,
+#lib-hero:not(.oculto) ~ #lib-sub{display:none}
+
+/* ---------- títulos de sección ---------- */
+.lib h1{font-family:var(--display); font-weight:800; font-size:clamp(22px,3vw,30px); letter-spacing:-.02em}
+.lib-tabs{margin:0 0 22px}
+.lib-tab{font-size:10.5px}
+.lib-tab.on{border-bottom-color:var(--text)}
+
+/* ---------- tickets ---------- */
+.lib-rejilla{grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:24px}
+.lib-card{
+  background:none; border:0; border-radius:0; overflow:visible; padding:0;
+  transition:transform .2s ease;
+}
+.lib-card:hover{border-color:transparent; transform:translateY(-6px)}
+.lib-thumb{
+  aspect-ratio:661.1/985.76; background:#16161a; border-radius:0;
+  -webkit-mask-image:var(--mask-cartel); mask-image:var(--mask-cartel);
+  -webkit-mask-size:100% 100%; mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+}
+.lib-card.vista .lib-thumb img{filter:grayscale(.6) brightness(.62)}
+.lib-info{
+  display:flex; flex-direction:column; aspect-ratio:661.1/375.3;
+  background:var(--papel); color:var(--tinta);
+  -webkit-mask-image:var(--mask-talon); mask-image:var(--mask-talon);
+  -webkit-mask-size:100% 100%; mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+  padding:16px 16px 0;
+}
+.lib-card.vista .lib-info{-webkit-mask-image:var(--mask-roto); mask-image:var(--mask-roto)}
+.lib-tit{font-size:14.5px; font-weight:600; line-height:1.2;
+  display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; overflow:hidden}
+.lib-nota{margin-top:3px; font-size:11.5px; color:var(--papel-suave); -webkit-line-clamp:1; line-clamp:1}
+.tk-pie{display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin-top:auto; padding-bottom:22px}
+.tk-cod{
+  display:block; height:20px; width:82px; opacity:.82; flex:none;
+  background:repeating-linear-gradient(90deg,var(--tinta) 0 2px,transparent 2px 4px,var(--tinta) 4px 5px,transparent 5px 9px,var(--tinta) 9px 12px,transparent 12px 14px);
+}
+.tk-dur{font-family:var(--mono); font-size:10.5px; color:var(--papel-suave); letter-spacing:.04em; white-space:nowrap}
+/* las chapas sobre la portada sobran: el dato ya vive en el talón */
+.lib-card .lib-dur,.lib-card .lib-eps{display:none}
+.lib-dl{
+  left:auto; right:8px; bottom:8px; background:rgba(0,0,0,.7); border-radius:999px;
+}
+
+/* ---------- estante de discos (series y anime) ---------- */
+.estante{position:relative; margin-top:4px}
+.est-escena{perspective:1500px; perspective-origin:50% 44%; padding:18px 0 30px; overflow:hidden}
+.est-rail{
+  display:flex; align-items:flex-end; gap:6px; padding:0 6px;
+  transform-style:preserve-3d;
+  transition:transform .55s cubic-bezier(.22,.61,.36,1);
+  will-change:transform;
+}
+.disco{
+  flex:0 0 auto; width:58px; height:300px; position:relative; padding:0;
+  background:none; border:0; cursor:pointer; transform-style:preserve-3d;
+  transition:width .55s cubic-bezier(.22,.61,.36,1), transform .55s cubic-bezier(.22,.61,.36,1);
+  transform:rotateY(-34deg);
+}
+.disco .caja{position:absolute; inset:0; transform-style:preserve-3d}
+.disco .cara{position:absolute; inset:0; border-radius:3px; overflow:hidden;
+  background-size:cover; background-position:center}
+/* Las dos caras van DELANTE y se cruzan por opacidad: girar la caja para
+   enseñar una cara lateral deja la portada aplastada y el lomo ilegible. */
+.disco .frente{transform:translateZ(9px); opacity:0; transition:opacity .4s ease}
+.disco .lomo{
+  transform:translateZ(9.5px); opacity:1; transition:opacity .35s ease;
+  display:flex; align-items:flex-end; justify-content:center; padding-bottom:16px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08) inset;
+}
+.disco .lomo::before{
+  content:""; position:absolute; inset:0; background:inherit;
+  background-size:cover; background-position:center; filter:saturate(.85) brightness(.62);
+}
+.disco .lomo::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg,rgba(8,8,10,.15),rgba(8,8,10,.88));
+}
+.disco .lomo-tx{
+  position:relative; z-index:2; writing-mode:vertical-rl; transform:rotate(180deg);
+  font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+  color:#e7e7ec; white-space:nowrap; max-height:250px; overflow:hidden;
+  text-shadow:0 1px 3px rgba(0,0,0,.9);
+}
+.disco .canto{transform:translateZ(-9px); background:linear-gradient(180deg,#17171b,#0e0e11)}
+.disco.sel{width:200px; transform:rotateY(0deg) translateZ(58px)}
+.disco.sel .frente{opacity:1}
+.disco.sel .lomo{opacity:0}
+.disco.sel .caja{box-shadow:0 26px 60px rgba(0,0,0,.66); border-radius:3px}
+.disco:not(.sel):hover{transform:rotateY(-22deg) translateZ(18px)}
+.est-ficha{padding-top:6px; min-height:132px}
+.est-ficha .ef-meta{font-family:var(--mono); font-size:10.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--dim)}
+.est-ficha .ef-tit{font-family:var(--display); font-weight:800; font-size:clamp(22px,3.2vw,34px);
+  line-height:1.05; letter-spacing:-.02em; margin-top:8px; text-wrap:balance}
+.est-ficha .ef-dur{color:var(--muted); font-size:13.5px; margin-top:7px}
+.est-ficha .ef-acc{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap}
+.est-nav{position:absolute; right:0; top:0; display:flex; gap:8px}
+.est-b{
+  width:36px; height:36px; border-radius:50%; border:1px solid var(--line-2);
+  background:none; color:var(--muted); font-size:15px; cursor:pointer;
+  transition:color .15s,border-color .15s;
+}
+.est-b:hover{color:var(--text); border-color:var(--muted)}
+
+@media (max-width:640px){
+  #lib-hero{margin:-24px -18px 22px; padding:34px 18px 24px; min-height:min(42vh,300px)}
+  #lib-hero .hero-cartel{display:none}
+  .lib-rejilla{grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:14px}
+  .lib-info{padding:12px 11px 0}
+  .lib-tit{font-size:12.5px}
+  .lib-nota{font-size:10.5px}
+  .tk-pie{padding-bottom:15px}
+  .tk-cod{width:56px; height:15px}
+  .tk-dur{font-size:9.5px}
+  .est-escena{perspective:900px; padding:14px 0 22px}
+  .disco{width:38px; height:210px}
+  .disco.sel{width:140px; transform:rotateY(0deg) translateZ(30px)}
+  .est-nav{position:static; justify-content:flex-end; margin-top:-4px}
+  .est-ficha{min-height:0}
+}
+@media (prefers-reduced-motion:reduce){
+  #intro *,.disco,.est-rail,.lib-card{animation-duration:.001s !important; transition-duration:.001s !important}
+}
 </style>
 <!-- La capa adaptable va DESPUES de los estilos de arriba: reajusta lo justo
      para televisor y para telefono, y para eso tiene que poder pisarlos. -->
 <link rel="stylesheet" href="adaptable.css" />
 </head>
 <body>
+
+<div id="intro" aria-hidden="true">
+  <canvas id="nieve"></canvas>
+  <div id="intro-centro">
+    <div id="intro-logo"><svg class="mv-m" viewBox="0 0 220 179.98" aria-hidden="true"><defs><linearGradient id="mvqg1" x1="212.7" y1="95.95" x2="212.7" y2="-79.05" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#8f1338"/><stop offset=".55" stop-color="#d61f45"/><stop offset="1" stop-color="#ff4d5e"/></linearGradient><linearGradient id="mvqg2" x1="281.39" y1="47.91" x2="284.51" y2="-86.12" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe08a"/><stop offset=".41" stop-color="#ffb62e"/><stop offset=".98" stop-color="#ff7a45"/></linearGradient><linearGradient id="mvqg3" x1="233.78" y1="-88.6" x2="283.28" y2="-27.85" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".02" stop-color="#7a1f2e"/><stop offset=".65" stop-color="#7a1f2e" stop-opacity="0"/></linearGradient><linearGradient id="mvqg4" x1="329.17" y1="-102.97" x2="279.67" y2="-24.72" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".02" stop-color="#7a1f2e"/><stop offset=".65" stop-color="#7a1f2e" stop-opacity="0"/></linearGradient><linearGradient id="mvqg5" x1="353.99" y1="-80.1" x2="352.99" y2="94.9" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".03" stop-color="#ff7a45"/><stop offset=".51" stop-color="#d61f45"/><stop offset="1" stop-color="#8f1338"/></linearGradient></defs><g transform="translate(0,179.98) scale(1,-1)"><path fill="url(#mvqg1)" d="M140.84,164.58c14.05-.94,25.16-12.64,25.16-26.93V27c0-14.91,12.09-27,27-27s27,12.09,27,27v107.76c0,19.7-12.6,36.99-31.36,43.03-17.33,5.57-36,.27-47.8-13.21Z"/><path fill="url(#mvqg2)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvqg3)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvqg4)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvqg5)" d="M0,134.76V27C0,12.09,12.09,0,27,0s27,12.09,27,27v110.65c0,7.46,3.02,14.2,7.91,19.09,4.48,4.48,10.52,7.4,17.25,7.84-11.8,13.48-30.47,18.78-47.8,13.21C12.6,171.75,0,154.46,0,134.76Z"/></g></svg></div>
+    <svg id="intro-palabra" viewBox="0 0 816.44 139.16" aria-hidden="true"><path fill="currentColor" d="M255.76,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S292.18,7.27,255.76,7.27ZM255.76,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M399.87,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S436.29,7.27,399.87,7.27ZM399.87,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M177.6,59.04v80.12h-26.23V59.07c0-6.61-2.68-12.59-7.01-16.93-4.33-4.33-10.32-7.01-16.93-7.01-13.22,0-23.93,10.7-23.95,23.91v80.12h-29.36V59.07c0-6.61-2.68-12.59-7.01-16.93-4.34-4.33-10.32-7.01-16.94-7.01-13.22,0-23.94,10.72-23.94,23.94v80.09H0V59.04C0,30.95,22.77,8.18,50.86,8.18h1.76c14.35,0,27.31,5.94,36.55,15.5,9.24-9.56,22.2-15.5,36.55-15.5h1.02c28.09,0,50.86,22.77,50.86,50.86Z"/><g><rect fill="currentColor" x="641.77" y="35.5" width="30.22" height="103.21"/><rect fill="currentColor" x="641.77" width="30.22" height="23.94"/></g><path fill="currentColor" d="M816.44,74.65v64.34h-27.14v-65.52c0-21.44-17.38-38.81-38.81-38.81s-38.81,17.37-38.81,38.81v65.52h-27.14v-64.34c0-36.42,29.53-65.95,65.95-65.95s65.95,29.53,65.95,65.95Z"/><path fill="currentColor" d="M487.85,73.04V8.7h27.14v65.52c0,21.44,17.38,38.81,38.81,38.81s38.81-17.37,38.81-38.81V8.7h27.14v64.34c0,36.42-29.53,65.95-65.95,65.95s-65.95-29.53-65.95-65.95Z"/></svg>
+    <p id="intro-studio">IRIS Studio</p>
+  </div>
+  <div id="intro-linea"></div>
+  <div id="intro-tracking"></div>
+  <button id="intro-saltar">Saltar</button>
+</div>
 
 <header id="top">
   <a class="logo" href="/" aria-label="IRIS Studio">
@@ -730,7 +1004,10 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
     </svg>
   </a>
   <span class="sep"></span>
-  <button class="tag" id="marca" title="Volver a la biblioteca">MOOVIN</button>
+  <button class="tag" id="marca" title="Volver a la biblioteca" aria-label="MOOVIN">
+    <svg class="mv-m" viewBox="0 0 220 179.98" aria-hidden="true"><defs><linearGradient id="mvbg1" x1="212.7" y1="95.95" x2="212.7" y2="-79.05" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#e8e8ee"/><stop offset="1" stop-color="#cfcfd8"/></linearGradient><linearGradient id="mvbg2" x1="281.39" y1="47.91" x2="284.51" y2="-86.12" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9a9aa6"/><stop offset=".41" stop-color="#b9b9c6"/><stop offset=".98" stop-color="#8a8a96"/></linearGradient><linearGradient id="mvbg3" x1="233.78" y1="-88.6" x2="283.28" y2="-27.85" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".02" stop-color="#3a3a42"/><stop offset=".65" stop-color="#3a3a42" stop-opacity="0"/></linearGradient><linearGradient id="mvbg4" x1="329.17" y1="-102.97" x2="279.67" y2="-24.72" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".02" stop-color="#3a3a42"/><stop offset=".65" stop-color="#3a3a42" stop-opacity="0"/></linearGradient><linearGradient id="mvbg5" x1="353.99" y1="-80.1" x2="352.99" y2="94.9" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".03" stop-color="#cfcfd8"/><stop offset=".51" stop-color="#ffffff"/><stop offset="1" stop-color="#e8e8ee"/></linearGradient></defs><g transform="translate(0,179.98) scale(1,-1)"><path fill="url(#mvbg1)" d="M140.84,164.58c14.05-.94,25.16-12.64,25.16-26.93V27c0-14.91,12.09-27,27-27s27,12.09,27,27v107.76c0,19.7-12.6,36.99-31.36,43.03-17.33,5.57-36,.27-47.8-13.21Z"/><path fill="url(#mvbg2)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvbg3)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvbg4)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvbg5)" d="M0,134.76V27C0,12.09,12.09,0,27,0s27,12.09,27,27v110.65c0,7.46,3.02,14.2,7.91,19.09,4.48,4.48,10.52,7.4,17.25,7.84-11.8,13.48-30.47,18.78-47.8,13.21C12.6,171.75,0,154.46,0,134.76Z"/></g></svg>
+    <svg class="mv-palabra" viewBox="0 0 816.44 139.16" aria-hidden="true"><path fill="currentColor" d="M255.76,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S292.18,7.27,255.76,7.27ZM255.76,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M399.87,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S436.29,7.27,399.87,7.27ZM399.87,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M177.6,59.04v80.12h-26.23V59.07c0-6.61-2.68-12.59-7.01-16.93-4.33-4.33-10.32-7.01-16.93-7.01-13.22,0-23.93,10.7-23.95,23.91v80.12h-29.36V59.07c0-6.61-2.68-12.59-7.01-16.93-4.34-4.33-10.32-7.01-16.94-7.01-13.22,0-23.94,10.72-23.94,23.94v80.09H0V59.04C0,30.95,22.77,8.18,50.86,8.18h1.76c14.35,0,27.31,5.94,36.55,15.5,9.24-9.56,22.2-15.5,36.55-15.5h1.02c28.09,0,50.86,22.77,50.86,50.86Z"/><g><rect fill="currentColor" x="641.77" y="35.5" width="30.22" height="103.21"/><rect fill="currentColor" x="641.77" width="30.22" height="23.94"/></g><path fill="currentColor" d="M816.44,74.65v64.34h-27.14v-65.52c0-21.44-17.38-38.81-38.81-38.81s-38.81,17.37-38.81,38.81v65.52h-27.14v-64.34c0-36.42,29.53-65.95,65.95-65.95s65.95,29.53,65.95,65.95Z"/><path fill="currentColor" d="M487.85,73.04V8.7h27.14v65.52c0,21.44,17.38,38.81,38.81,38.81s38.81-17.37,38.81-38.81V8.7h27.14v64.34c0,36.42-29.53,65.95-65.95,65.95s-65.95-29.53-65.95-65.95Z"/></svg>
+  </button>
   <div class="right">
     <button id="btn-party" title="Abrir Watch Party">
       <span class="dot"></span>
@@ -761,6 +1038,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
         <button id="loader-close" title="Cerrar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18L18 6M6 6L18 18"/></svg>
         </button>
+        <div id="lib-hero" class="oculto"></div>
         <h1 id="lib-h1">MOOVIN</h1>
         <div class="sub" id="lib-sub">La biblioteca del estudio. Elige un título y, si están en una sala de Watch Party, se abre solo en la pantalla de todos.</div>
         <div id="lib-grid"></div>
@@ -1986,8 +2264,18 @@ function pintaBiblioteca(bib) {
     });
     grid.appendChild(tabs);
   }
+  const dentro = tt.filter((t) => grupoDe(t) === libSec);
+  /* La portada grande manda el último título de la sección: es lo recién
+     llegado y es lo que justifica una imagen de este tamaño. */
+  pintaHero(dentro[dentro.length - 1]);
+  /* Las películas se ven como tickets; el anime, como discos en un estante.
+     Son dos formas de mirar lo mismo y cada catálogo pide la suya. */
+  if (libSec === 'anime' && dentro.length) {
+    grid.appendChild(estanteDe(dentro));
+    return;
+  }
   const rejilla = document.createElement('div'); rejilla.className = 'lib-rejilla';
-  tt.filter((t) => grupoDe(t) === libSec).forEach((t) => rejilla.appendChild(tarjetaDe(t)));
+  dentro.forEach((t) => rejilla.appendChild(tarjetaDe(t)));
   grid.appendChild(rejilla);
 }
 function tarjetaDe(t) {
@@ -2026,19 +2314,25 @@ function tarjetaDe(t) {
     th.appendChild(dl);
   }
   card.appendChild(th);
+  /* El talón del ticket: título, género y año, y la duración abajo junto al
+     código de barras. Si la película ya se vio, el talón sale ROTO. */
+  if (vistaDe(t)) card.classList.add('vista');
   const info = document.createElement('div'); info.className = 'lib-info';
   const tit = document.createElement('div'); tit.className = 'lib-tit'; tit.textContent = t.titulo || 'Sin título';
   info.appendChild(tit);
-  if (t.nota) {
+  const meta = metaDe(t);
+  if (meta) {
     const no = document.createElement('div'); no.className = 'lib-nota';
-    no.textContent = t.nota; no.title = t.nota;   // el recorte no debe ocultar nada
+    no.textContent = meta; no.title = t.nota || meta;
     info.appendChild(no);
   }
+  const pie = document.createElement('div'); pie.className = 'tk-pie';
+  const cod = document.createElement('span'); cod.className = 'tk-cod';
+  const cif = document.createElement('span'); cif.className = 'tk-dur'; cif.textContent = cifraDe(t);
+  pie.append(cod, cif);
+  info.appendChild(pie);
   card.appendChild(info);
-  card.addEventListener('click', () => {
-    if (esSerie) { abreSerie(t); return; }
-    cargarURL(absCat(t.url), { nombre: t.titulo }); playSafe();
-  });
+  card.addEventListener('click', () => abreTitulo(t));
   return card;
 }
 
@@ -2092,6 +2386,7 @@ function abreSerie(t, sec) {
   serieAbierta = t;
   const secs = seccionesDe(t);
   seccion = (sec > 0 && sec < secs.length) ? sec : 0;
+  $('#lib-hero').classList.add('oculto');
   $('#lib-h1').classList.add('oculto');
   $('#lib-sub').classList.add('oculto');
   $('#lib-grid').classList.add('oculto');
@@ -2814,6 +3109,197 @@ $('#pase-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') dePase
 })();
 
 // Gancho de consola para pruebas: window.MOOVIN.sala() / cargar(url) / video
+
+/* ============================ REWORK 2026 ============================
+   Intro VHS, portada grande y estante de discos. Todo lo demás (reproductor,
+   sala, subtítulos) se queda como estaba. */
+
+/* ---------- intro: una vez por sesión, nunca en el televisor ---------- */
+(function introVHS() {
+  const cap = document.getElementById('intro');
+  if (!cap) return;
+  const salta = () => { cap.classList.add('fin'); setTimeout(() => cap.classList.add('oculto'), 520); };
+  const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const enTV = document.documentElement.getAttribute('data-plataforma') === 'tv' ||
+               /\btv=1\b/.test(location.search);
+  let yaVista = false;
+  try { yaVista = sessionStorage.moovinIntro === '1'; sessionStorage.moovinIntro = '1'; } catch (e) { /* nada */ }
+  if (yaVista || enTV) { cap.classList.add('oculto'); return; }
+
+  const btn = document.getElementById('intro-saltar');
+  const cv = document.getElementById('nieve');
+  const ctx = cv.getContext('2d', { alpha: false });
+  let vivo = true, raf = 0;
+  const tempo = [];
+  function fin() {
+    if (!vivo) return;
+    vivo = false;
+    cancelAnimationFrame(raf);
+    tempo.forEach(clearTimeout);
+    salta();
+  }
+  btn.addEventListener('click', fin);
+  if (quieto) { cap.classList.add('marca'); tempo.push(setTimeout(fin, 1200)); return; }
+
+  cv.width = Math.ceil(innerWidth / 3); cv.height = Math.ceil(innerHeight / 3);
+  let ultimo = 0;
+  function nieve(t) {
+    if (!vivo) return;
+    if (t - ultimo > 42) {
+      ultimo = t;
+      const img = ctx.createImageData(cv.width, cv.height), d = img.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const v = (Math.random() * 255) | 0;
+        d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255;
+      }
+      ctx.putImageData(img, 0, 0);
+    }
+    raf = requestAnimationFrame(nieve);
+  }
+  cap.classList.add('enciende');
+  tempo.push(setTimeout(() => { cap.classList.add('senal'); raf = requestAnimationFrame(nieve); }, 420));
+  tempo.push(setTimeout(() => cap.classList.add('marca'), 900));
+  tempo.push(setTimeout(() => cap.classList.add('glitch'), 950));
+  tempo.push(setTimeout(() => { cap.classList.remove('senal'); cancelAnimationFrame(raf); }, 2200));
+  tempo.push(setTimeout(fin, 3300));
+})();
+
+/* ---------- datos de la ficha, en una línea ---------- */
+function metaDe(t) {
+  const n = (t.nota || '').match(/^(.*?),\s*(\d{4})\b/);
+  if (n) return n[1] + ' · ' + n[2];
+  const a = (t.nota || '').match(/\b(19|20)\d{2}\b/);
+  return a ? a[0] : (t.nota || '').split('.')[0].slice(0, 30);
+}
+/* "1:50:28" se lee mejor como "1 h 50 min": el segundero no le importa a
+   nadie eligiendo qué ver. */
+function durTexto(d) {
+  const p = String(d || '').split(':').map(Number);
+  if (p.length < 2 || p.some(isNaN)) return d || '';
+  const [h, m] = p.length === 3 ? p : [0, p[0]];
+  return h ? h + ' h ' + String(m).padStart(2, '0') + ' min' : m + ' min';
+}
+function cifraDe(t) {
+  if (t.tipo !== 'serie' && t.dur) return durTexto(t.dur);
+  const n = listasDe(t).reduce((a, l) => a + l.eps.length, 0);
+  return n + (n === 1 ? ' capítulo' : ' capítulos');
+}
+/* Una película está "vista" cuando su progreso llegó al final: el talón del
+   ticket sale roto, como el que se rompe al entrar a la función. */
+function vistaDe(t) {
+  if (t.tipo === 'serie' || !t.url) return false;
+  const p = progreso()[absCat(t.url)];
+  return !!(p && p.p >= 1);
+}
+function abreTitulo(t) {
+  if (t.tipo === 'serie') { abreSerie(t); return; }
+  cargarURL(absCat(t.url), { nombre: t.titulo }); playSafe();
+}
+
+/* ---------- portada grande ---------- */
+function pintaHero(t) {
+  const box = $('#lib-hero');
+  if (!box) return;
+  if (!t) { box.classList.add('oculto'); box.innerHTML = ''; return; }
+  const img = conPase(absCat(t.poster || t.miniatura || ''));
+  box.classList.remove('oculto');
+  box.innerHTML = '';
+  const fondo = document.createElement('div'); fondo.className = 'hero-fondo';
+  const velo = document.createElement('div'); velo.className = 'hero-velo';
+  if (img) fondo.style.backgroundImage = 'url("' + img + '")';
+  const tx = document.createElement('div'); tx.className = 'hero-tx';
+  const eb = document.createElement('p'); eb.className = 'hero-eyebrow';
+  eb.textContent = t.tipo === 'serie' ? 'Serie destacada' : 'Recién llegada';
+  const h = document.createElement('div'); h.className = 'hero-tit'; h.textContent = t.titulo || '';
+  const me = document.createElement('p'); me.className = 'hero-meta';
+  me.textContent = [metaDe(t), cifraDe(t)].filter(Boolean).join(' · ');
+  const acc = document.createElement('div'); acc.className = 'hero-acc';
+  const b1 = document.createElement('button'); b1.className = 'mv-btn solido';
+  b1.textContent = t.tipo === 'serie' ? 'Ver la serie' : 'Ver ahora';
+  b1.addEventListener('click', () => abreTitulo(t));
+  acc.appendChild(b1);
+  if (t.tipo !== 'serie') {
+    const b2 = document.createElement('button'); b2.className = 'mv-btn hueco';
+    b2.textContent = 'Descargar';
+    b2.addEventListener('click', () => abreDescarga(t));
+    acc.appendChild(b2);
+  }
+  tx.append(eb, h, me, acc);
+  const cartel = document.createElement('div'); cartel.className = 'hero-cartel';
+  if (img) cartel.style.backgroundImage = 'url("' + img + '")';
+  box.append(fondo, velo, tx, cartel);
+}
+
+/* ---------- estante de discos ----------
+   El elegido se abre en el centro de la escena y el resto queda de canto,
+   como lomos en una balda. */
+function estanteDe(lista) {
+  const est = document.createElement('div'); est.className = 'estante';
+  const escena = document.createElement('div'); escena.className = 'est-escena';
+  const rail = document.createElement('div'); rail.className = 'est-rail';
+  const ficha = document.createElement('div'); ficha.className = 'est-ficha';
+  const meta = document.createElement('p'); meta.className = 'ef-meta';
+  const tit = document.createElement('div'); tit.className = 'ef-tit';
+  const dur = document.createElement('p'); dur.className = 'ef-dur';
+  const acc = document.createElement('div'); acc.className = 'ef-acc';
+  const ver = document.createElement('button'); ver.className = 'mv-btn solido';
+  const baja = document.createElement('button'); baja.className = 'mv-btn hueco'; baja.textContent = 'Descargar';
+  acc.append(ver, baja);
+  ficha.append(meta, tit, dur, acc);
+
+  const discos = lista.map((t, i) => {
+    const b = document.createElement('button');
+    b.className = 'disco' + (i ? '' : ' sel');
+    b.setAttribute('aria-label', t.titulo || '');
+    const caja = document.createElement('span'); caja.className = 'caja';
+    const img = conPase(absCat(t.poster || t.miniatura || ''));
+    const fr = document.createElement('span'); fr.className = 'cara frente';
+    const lo = document.createElement('span'); lo.className = 'cara lomo';
+    if (img) { fr.style.backgroundImage = 'url("' + img + '")'; lo.style.backgroundImage = 'url("' + img + '")'; }
+    const lt = document.createElement('span'); lt.className = 'lomo-tx';
+    lt.textContent = t.titulo || ''; lo.appendChild(lt);
+    const ca = document.createElement('span'); ca.className = 'cara canto';
+    caja.append(fr, lo, ca); b.appendChild(caja);
+    return b;
+  });
+  discos.forEach((d) => rail.appendChild(d));
+  escena.appendChild(rail);
+
+  let sel = 0;
+  function coloca(i) {
+    sel = (i + lista.length) % lista.length;
+    discos.forEach((d, k) => d.classList.toggle('sel', k === sel));
+    const d = discos[sel];
+    const desfase = d.offsetLeft + d.offsetWidth / 2 - escena.clientWidth / 2;
+    rail.style.transform = 'translateX(' + (-desfase) + 'px)';
+    const t = lista[sel];
+    meta.textContent = metaDe(t);
+    tit.textContent = t.titulo || '';
+    dur.textContent = cifraDe(t);
+    ver.textContent = t.tipo === 'serie' ? 'Ver la serie' : 'Ver ahora';
+    baja.style.display = t.tipo === 'serie' ? 'none' : '';
+  }
+  discos.forEach((d, i) => {
+    d.addEventListener('click', () => { if (i === sel) { abreTitulo(lista[i]); return; } coloca(i); });
+    d.addEventListener('focus', () => coloca(i));
+  });
+  ver.addEventListener('click', () => abreTitulo(lista[sel]));
+  baja.addEventListener('click', () => abreDescarga(lista[sel]));
+
+  const nav = document.createElement('div'); nav.className = 'est-nav';
+  [['-1', '←', 'Anterior'], ['1', '→', 'Siguiente']].forEach(([paso, gl, rot]) => {
+    const b = document.createElement('button'); b.className = 'est-b';
+    b.textContent = gl; b.setAttribute('aria-label', rot);
+    b.addEventListener('click', () => coloca(sel + Number(paso)));
+    nav.appendChild(b);
+  });
+  est.append(escena, ficha, nav);
+  /* offsetLeft solo es real cuando el estante ya está en el documento */
+  requestAnimationFrame(() => coloca(0));
+  addEventListener('resize', () => coloca(sel), { passive: true });
+  return est;
+}
+
 window.MOOVIN = {
   sala: () => sala, cargar: cargarURL, video, audio: a2, enviar: send, entrar, arranca,
   audios: () => audios, eligeAudio, eligeSub, tamSub: ponTamSub, estSub: ponEstSub,
