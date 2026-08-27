@@ -840,22 +840,24 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    de siempre — ancho 100vw y un margen negativo que deshace el centrado — y
    funciona igual en el televisor, donde .lib ocupa todo. Para que el texto
    siga alineado con la rejilla de abajo, el margen del texto es --lado. */
+/* TRES PISOS, en todas las plataformas: la UI tiene sus propias barras —
+   las categorias arriba y la informacion del titulo abajo, las dos solidas —
+   y el arte queda LIMPIO en medio, sin degradados ni texto flotando encima
+   (pedido de Dosa: "la UI no tiene su propia barra y tambien se pierde"). */
 #lib-hero{
   --lado:var(--gutter);
   position:relative; width:100vw; margin:-38px 0 30px calc(50% - 50vw); padding:0;
-  /* LA PANTALLA ENTERA al entrar: alto de la ventana menos la cabecera. Y no
-     es capricho — a pantalla completa la banda queda casi en 16:9, que es la
-     forma del arte, y el recorte se vuelve de unas decenas de pixeles en vez
-     de comerse medio cartel. dvh, no vh: en el movil vh cuenta la barra del
-     navegador y el hero se iba por debajo del borde. */
+  /* la pantalla entera al entrar; dvh porque en el movil vh cuenta la barra
+     del navegador y el hero se iba por debajo del borde */
   height:calc(100dvh - var(--alto-top,52px));
-  min-height:460px; display:flex; align-items:flex-end;
+  min-height:460px; display:flex; flex-direction:column; align-items:stretch;
   overflow:hidden; isolation:isolate;
 }
 #lib-hero.oculto{display:none}
-/* el relleno borroso: solo asoma cuando el arte es vertical y no cubre */
+#lib-hero .hero-lienzo{position:relative; flex:1; min-height:0; overflow:hidden}
+/* el relleno borroso: solo asoma cuando el arte no cubre el lienzo */
 #lib-hero .hero-fondo{
-  position:absolute; inset:0; z-index:-3;
+  position:absolute; inset:0; z-index:1;
   background-size:cover; background-position:center 26%;
   filter:blur(30px) saturate(1.25) brightness(.38); transform:scale(1.16);
 }
@@ -864,7 +866,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    derecha y se funde hacia la izquierda: estirar un 2:3 a lo ancho deja un
    recorte sin cara ni cabeza. */
 #lib-hero .hero-arte{
-  position:absolute; inset:0 0 0 auto; z-index:-2; width:min(62%,900px);
+  position:absolute; inset:0 0 0 auto; z-index:2; width:min(62%,900px);
   background-image:var(--arte-ancho,none);
   /* no-repeat: en el movil el arte va en contain y sin esto el navegador
      rellenaba los lados repitiendo el poster en vez de dejar ver el fondo */
@@ -883,19 +885,18 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    se contaba el margen izquierdo dentro de esos 54ch (box-sizing:border-box)
    y el titulo se partia en dos a media pantalla. */
 #lib-hero .hero-tx{
-  position:relative; width:100%;
-  padding:0 var(--lado) clamp(38px,9vh,96px);
+  position:relative; width:100%; flex:none;
+  display:flex; align-items:center; gap:26px;
+  background:var(--bg); border-top:1px solid var(--line);
+  padding:18px var(--lado) 20px;
 }
-#lib-hero .hero-tit{max-width:min(15ch,52%)}
-#lib-hero .hero-eyebrow,#lib-hero .hero-meta{max-width:min(74ch,52%)}
+#lib-hero .hero-col{min-width:0; flex:1}
 #lib-hero .hero-meta span{white-space:nowrap}
 #lib-hero .hero-eyebrow{
   display:flex; align-items:center; gap:9px; flex-wrap:wrap;
   font-family:var(--mono); font-size:11px; letter-spacing:.22em;
   text-transform:uppercase; color:rgba(244,244,246,.92);
-  text-shadow:0 1px 2px rgba(0,0,0,.95), 0 0 18px rgba(0,0,0,.8);
 }
-#lib-hero .lib-tab{text-shadow:0 1px 2px rgba(0,0,0,.95), 0 0 18px rgba(0,0,0,.8)}
 #lib-hero .hero-eyebrow .mv-m{height:17px; width:auto}
 #lib-hero .hero-eyebrow .nuevo{color:var(--oro)}
 #lib-hero .hero-eyebrow .pt{
@@ -903,8 +904,9 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 }
 #lib-hero .hero-tit{
   font-family:var(--display); font-weight:800;
-  font-size:clamp(38px,5.6vw,76px); line-height:.96; letter-spacing:-.03em;
-  margin-top:14px; text-wrap:balance; text-shadow:0 4px 30px rgba(0,0,0,.55);
+  font-size:clamp(24px,2.6vw,40px); line-height:1.04; letter-spacing:-.02em;
+  margin-top:8px; text-wrap:balance;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 /* Sin el titulo delante (arte rotulado), los datos quedarian pegados al
    renglon de arriba. */
@@ -912,28 +914,22 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 #lib-hero .hero-meta{
   display:flex; align-items:center; flex-wrap:wrap;
   font-family:var(--mono); font-size:12px; color:rgba(244,244,246,.88);
-  margin-top:16px; letter-spacing:.04em;
-  text-shadow:0 1px 2px rgba(0,0,0,.95), 0 0 18px rgba(0,0,0,.8);
+  margin-top:12px; letter-spacing:.04em;
 }
 /* El punto va PEGADO al dato anterior, no delante del siguiente: al partirse
    la linea en el telefono, una fila que empieza por "·" se lee fatal. */
 #lib-hero .hero-meta span:not(:last-child)::after{
   content:' ·'; margin-right:9px; color:rgba(244,244,246,.42);
 }
-#lib-hero .hero-acc{display:flex; gap:10px; margin-top:26px; flex-wrap:wrap}
+#lib-hero .hero-acc{display:flex; gap:10px; flex:none; flex-wrap:wrap; justify-content:flex-end}
 /* Las categorias van ARRIBA, dentro de la portada: es lo primero que se elige
    y no tiene sentido tener que bajar para encontrarlas. */
-/* SIN degradados en el hero (pedido expreso de Dosa): ni velo sobre el arte
-   ni respaldo detras de las pestañas. Lo que necesita leerse lleva sombra de
-   TEXTO, que no mancha la imagen. */
 #lib-hero .lib-tabs{
-  position:absolute; top:0; left:0; right:0; z-index:2;
-  padding:18px var(--lado) 16px; margin:0; border-bottom:0; gap:2px;
+  position:relative; order:-1; flex:none;
+  padding:12px var(--lado) 10px; margin:0; border-bottom:1px solid var(--line);
+  background:var(--bg); gap:2px;
 }
-#lib-hero .lib-tab{
-  padding:8px 14px; color:rgba(244,244,246,.62);
-  text-shadow:0 1px 6px rgba(0,0,0,.6);
-}
+#lib-hero .lib-tab{color:var(--dim)}
 #lib-hero .lib-tab:hover{color:var(--text)}
 #lib-hero .lib-tab.on{color:var(--text); border-bottom-color:var(--text)}
 #lib-hero .hero-acc svg{width:16px; height:16px}
@@ -1008,40 +1004,21 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 }
 
 @media (max-width:640px){
-  /* En el telefono el hero se APILA en tres pisos, sin nada encima del arte:
-     las categorias en su propia franja arriba (pisaban el lettering del
-     cartel), el cartel ENTERO en medio — sin velo: la caratula ya trae su
-     titulo impreso y el degradado lo tapaba ("no deberiamos usarlo") — y el
-     texto con los botones debajo, en su zona negra. El cartel va en contain
-     para que no se recorte, y el fondo difuminado rellena los lados. */
-  #lib-hero{
-    --alto-top:48px; margin:-22px 0 20px calc(50% - 50vw); min-height:420px;
-    flex-direction:column; align-items:stretch;
-  }
-  #lib-hero .lib-tabs{
-    position:static; order:-1; background:var(--bg);
-    padding:10px var(--lado) 12px;
-  }
-  #lib-hero .lib-tab{text-shadow:none; color:var(--dim)}
-  #lib-hero .lib-tab.on{color:var(--text)}
+  /* Los mismos tres pisos que en escritorio; aqui la franja va en columna y
+     centrada, el cartel ENTERO en contain y el fondo difuminado a los lados. */
+  #lib-hero{--alto-top:48px; margin:-22px 0 20px calc(50% - 50vw); min-height:420px}
+  #lib-hero .lib-tabs{padding:10px var(--lado) 10px}
   #lib-hero .hero-arte{
-    position:relative; inset:auto; width:100%; flex:1; min-height:0; order:0;
+    inset:0; width:auto;
     background-image:var(--arte-alto,var(--arte-ancho,none));
     background-size:contain; background-position:center;
     -webkit-mask-image:none; mask-image:none;
   }
-  #lib-hero .hero-tx{
-    position:static; order:1; width:100%; padding:16px 18px 24px;
-    text-align:center; background:var(--bg);
-  }
-  /* La caratula vertical SIEMPRE trae el titulo impreso: aqui el rotulo
-     nuestro solo lo repetiria. El nombre sigue en el aria-label del hero. */
-  #lib-hero .hero-tit{display:none}
-  #lib-hero .hero-eyebrow,#lib-hero .hero-meta{max-width:100%}
+  #lib-hero .hero-tx{flex-direction:column; gap:0; text-align:center; padding:14px 18px 20px}
+  #lib-hero .hero-tit{font-size:clamp(20px,5.6vw,26px); white-space:normal; margin-top:6px}
   #lib-hero .hero-eyebrow,#lib-hero .hero-meta,#lib-hero .hero-acc{justify-content:center}
-  #lib-hero .hero-meta{font-size:11px; margin-top:12px}
-  #lib-hero .hero-eyebrow + .hero-meta{margin-top:12px}
-  #lib-hero .hero-acc{margin-top:16px}
+  #lib-hero .hero-meta{font-size:11px; margin-top:8px}
+  #lib-hero .hero-acc{margin-top:14px}
   /* Los botones de accion, SIEMPRE en una fila (pedido de Dosa): compactos y
      sin envolver. Vale para el hero, la pasarela y la ficha. */
   #lib-hero .hero-acc,.ef-acc,.caja-acc{flex-wrap:nowrap; gap:8px}
@@ -3936,10 +3913,12 @@ function pintaHero(t) {
   box.style.setProperty('--arte-ancho', 'url("' + (ancho || cartel) + '")');
   box.style.setProperty('--arte-alto', 'url("' + cartel + '")');
 
+  const lienzo = document.createElement('div'); lienzo.className = 'hero-lienzo';
   const fondo = document.createElement('div'); fondo.className = 'hero-fondo';
   if (cartel) fondo.style.backgroundImage = 'url("' + cartel + '")';
   const arte = document.createElement('div');
   arte.className = 'hero-arte' + (ancho ? ' ancho' : '');
+  lienzo.append(fondo, arte);
 
   const tx = document.createElement('div'); tx.className = 'hero-tx';
   /* El renglón de arriba, como el "N SERIE" de Netflix: la marca, qué es, y
@@ -3961,12 +3940,8 @@ function pintaHero(t) {
   nue.textContent = 'Recién llegada';
   eb.append(pt, nue);
 
-  /* Si el arte ya trae el titulo impreso (`tituloEnArte` en el catalogo), no
-     se repite: se enseñan el renglon, los datos y los botones, y el titulo lo
-     pone la propia imagen. Cuando el arte NO lo lleva — pasa a menudo con las
-     ilustraciones de anime — el rotulo hace falta o el hero se queda sin
-     nombre. Para quien no ve la imagen, el titulo sigue en el aria-label. */
-  const rotulado = !!t.tituloEnArte && !!ancho;
+  /* El titulo va SIEMPRE en la franja de abajo: es UI con su propia barra,
+     no un rotulo flotando sobre el cartel, asi que repetirlo no estorba. */
   box.setAttribute('aria-label', t.titulo || '');
   const h = document.createElement('div'); h.className = 'hero-tit';
   h.textContent = t.titulo || '';
@@ -3980,10 +3955,10 @@ function pintaHero(t) {
   /* "Más información" abre la caja: la ficha de MOOVIN es su contraportada. */
   acc.appendChild(botonHero('hueco', IC.info, 'Más información', () => abreCaja(t)));
 
-  tx.append(eb);
-  if (!rotulado) tx.appendChild(h);
-  tx.append(me, acc);
-  box.append(fondo, arte, tx);
+  const col = document.createElement('div'); col.className = 'hero-col';
+  col.append(eb, h, me);
+  tx.append(col, acc);
+  box.append(lienzo, tx);
 }
 
 
