@@ -872,17 +872,6 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   inset:0; width:auto; background-position:center;
   -webkit-mask-image:none; mask-image:none;
 }
-/* Con el texto pegado al margen, el velo puede ser mucho mas flojo: antes
-   habia que oscurecer hasta la mitad del ancho para que se leyera algo que
-   estaba en el centro. Ahora: un poco de sombra a la izquierda, la caida de
-   abajo (que ademas cose el hero con lo que viene despues) y un velo fino
-   arriba para las categorias. */
-#lib-hero .hero-velo{
-  position:absolute; inset:0; z-index:-1;
-  background:linear-gradient(90deg,rgba(11,11,13,.86) 0%,rgba(11,11,13,.52) 17%,rgba(11,11,13,.14) 36%,transparent 54%),
-             linear-gradient(0deg,var(--bg) 0%,rgba(11,11,13,.74) 12%,rgba(11,11,13,.18) 32%,transparent 56%),
-             linear-gradient(180deg,rgba(11,11,13,.34) 0%,transparent 12%);
-}
 /* El bloque de texto ocupa el ancho entero y es el MARGEN el que lo coloca;
    lo que se estrecha es cada linea por dentro. Poniendole el ancho al bloque
    se contaba el margen izquierdo dentro de esos 54ch (box-sizing:border-box)
@@ -897,8 +886,10 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 #lib-hero .hero-eyebrow{
   display:flex; align-items:center; gap:9px; flex-wrap:wrap;
   font-family:var(--mono); font-size:11px; letter-spacing:.22em;
-  text-transform:uppercase; color:rgba(244,244,246,.82);
+  text-transform:uppercase; color:rgba(244,244,246,.92);
+  text-shadow:0 1px 2px rgba(0,0,0,.95), 0 0 18px rgba(0,0,0,.8);
 }
+#lib-hero .lib-tab{text-shadow:0 1px 2px rgba(0,0,0,.95), 0 0 18px rgba(0,0,0,.8)}
 #lib-hero .hero-eyebrow .mv-m{height:17px; width:auto}
 #lib-hero .hero-eyebrow .nuevo{color:var(--oro)}
 #lib-hero .hero-eyebrow .pt{
@@ -914,8 +905,9 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 #lib-hero .hero-eyebrow + .hero-meta{margin-top:20px}
 #lib-hero .hero-meta{
   display:flex; align-items:center; flex-wrap:wrap;
-  font-family:var(--mono); font-size:12px; color:rgba(244,244,246,.74);
+  font-family:var(--mono); font-size:12px; color:rgba(244,244,246,.88);
   margin-top:16px; letter-spacing:.04em;
+  text-shadow:0 1px 2px rgba(0,0,0,.95), 0 0 18px rgba(0,0,0,.8);
 }
 /* El punto va PEGADO al dato anterior, no delante del siguiente: al partirse
    la linea en el telefono, una fila que empieza por "·" se lee fatal. */
@@ -925,13 +917,12 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 #lib-hero .hero-acc{display:flex; gap:10px; margin-top:26px; flex-wrap:wrap}
 /* Las categorias van ARRIBA, dentro de la portada: es lo primero que se elige
    y no tiene sentido tener que bajar para encontrarlas. */
+/* SIN degradados en el hero (pedido expreso de Dosa): ni velo sobre el arte
+   ni respaldo detras de las pestañas. Lo que necesita leerse lleva sombra de
+   TEXTO, que no mancha la imagen. */
 #lib-hero .lib-tabs{
   position:absolute; top:0; left:0; right:0; z-index:2;
   padding:18px var(--lado) 16px; margin:0; border-bottom:0; gap:2px;
-  /* Su propia sombra: hay caratulas con el cielo blanco justo detras de las
-     categorias, y fiarlo al velo del hero obligaba a oscurecer de mas toda la
-     parte de arriba de la portada. */
-  background:linear-gradient(180deg,rgba(11,11,13,.9) 0%,rgba(11,11,13,.62) 52%,transparent 100%);
 }
 #lib-hero .lib-tab{
   padding:8px 14px; color:rgba(244,244,246,.62);
@@ -1030,7 +1021,6 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
     background-size:contain; background-position:center;
     -webkit-mask-image:none; mask-image:none;
   }
-  #lib-hero .hero-velo{display:none}
   #lib-hero .hero-tx{
     position:static; order:1; width:100%; padding:16px 18px 24px;
     text-align:center; background:var(--bg);
@@ -3927,7 +3917,6 @@ function pintaHero(t) {
   if (cartel) fondo.style.backgroundImage = 'url("' + cartel + '")';
   const arte = document.createElement('div');
   arte.className = 'hero-arte' + (ancho ? ' ancho' : '');
-  const velo = document.createElement('div'); velo.className = 'hero-velo';
 
   const tx = document.createElement('div'); tx.className = 'hero-tx';
   /* El renglón de arriba, como el "N SERIE" de Netflix: la marca, qué es, y
@@ -3971,7 +3960,7 @@ function pintaHero(t) {
   tx.append(eb);
   if (!rotulado) tx.appendChild(h);
   tx.append(me, acc);
-  box.append(fondo, arte, velo, tx);
+  box.append(fondo, arte, tx);
 }
 
 
