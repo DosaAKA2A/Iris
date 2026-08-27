@@ -1008,28 +1008,41 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 }
 
 @media (max-width:640px){
-  /* En el movil manda la caratula VERTICAL a pantalla completa y el texto va
-     centrado abajo, que es como se ve Netflix en el telefono. */
-  #lib-hero{--alto-top:48px; margin:-22px 0 20px calc(50% - 50vw); min-height:420px}
+  /* En el telefono el hero se APILA en tres pisos, sin nada encima del arte:
+     las categorias en su propia franja arriba (pisaban el lettering del
+     cartel), el cartel ENTERO en medio — sin velo: la caratula ya trae su
+     titulo impreso y el degradado lo tapaba ("no deberiamos usarlo") — y el
+     texto con los botones debajo, en su zona negra. El cartel va en contain
+     para que no se recorte, y el fondo difuminado rellena los lados. */
+  #lib-hero{
+    --alto-top:48px; margin:-22px 0 20px calc(50% - 50vw); min-height:420px;
+    flex-direction:column; align-items:stretch;
+  }
+  #lib-hero .lib-tabs{
+    position:static; order:-1; background:var(--bg);
+    padding:10px var(--lado) 12px;
+  }
+  #lib-hero .lib-tab{text-shadow:none; color:var(--dim)}
+  #lib-hero .lib-tab.on{color:var(--text)}
   #lib-hero .hero-arte{
-    inset:0; width:auto; background-image:var(--arte-alto,var(--arte-ancho,none));
-    background-position:center 12%;
+    position:relative; inset:auto; width:100%; flex:1; min-height:0; order:0;
+    background-image:var(--arte-alto,var(--arte-ancho,none));
+    background-size:contain; background-position:center;
     -webkit-mask-image:none; mask-image:none;
   }
-  /* Mas oscuro y antes: la caratula vertical trae su propio titulo impreso y
-     sin esto se cruzaba con el nuestro. */
-  #lib-hero .hero-velo{
-    background:linear-gradient(0deg,var(--bg) 2%,rgba(11,11,13,.95) 32%,rgba(11,11,13,.62) 55%,rgba(11,11,13,.2) 82%,rgba(11,11,13,.08) 100%),
-               linear-gradient(180deg,rgba(11,11,13,.34) 0%,transparent 12%);
+  #lib-hero .hero-velo{display:none}
+  #lib-hero .hero-tx{
+    position:static; order:1; width:100%; padding:16px 18px 24px;
+    text-align:center; background:var(--bg);
   }
-  #lib-hero .hero-tx{width:100%; padding:0 18px 26px; text-align:center}
-  /* Los topes de ancho de escritorio (la mitad de la pantalla) aqui parten el
-     renglon y los datos en varias lineas: en el telefono manda el ancho entero. */
-  #lib-hero .hero-tit,#lib-hero .hero-eyebrow,#lib-hero .hero-meta{max-width:100%}
+  /* La caratula vertical SIEMPRE trae el titulo impreso: aqui el rotulo
+     nuestro solo lo repetiria. El nombre sigue en el aria-label del hero. */
+  #lib-hero .hero-tit{display:none}
+  #lib-hero .hero-eyebrow,#lib-hero .hero-meta{max-width:100%}
   #lib-hero .hero-eyebrow,#lib-hero .hero-meta,#lib-hero .hero-acc{justify-content:center}
-  #lib-hero .hero-tit{font-size:clamp(30px,9vw,44px)}
   #lib-hero .hero-meta{font-size:11px; margin-top:12px}
-  #lib-hero .hero-acc{margin-top:20px}
+  #lib-hero .hero-eyebrow + .hero-meta{margin-top:12px}
+  #lib-hero .hero-acc{margin-top:16px}
   .lib-rejilla{grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:14px}
   .lib-tit{font-size:12.5px}
   .lib-nota{font-size:10.5px}
