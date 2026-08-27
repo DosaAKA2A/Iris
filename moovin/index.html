@@ -1065,7 +1065,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    cover recortaba los bordes de la caratula y se notaba en las que traen
    marco. El JS del centrado LEE esta variable: un solo sitio que cambiar. */
 .estante{--caja-ar:.6667; --caja-h:372px; --lomo-w:60px; position:relative; margin-top:2px}
-.est-escena{
+.est-escena{touch-action:pan-y;
   position:relative; height:calc(var(--caja-h) + 96px);
   perspective:1500px; perspective-origin:50% 44%; overflow:hidden;
 }
@@ -4198,6 +4198,37 @@ function estanteDe(lista) {
     b.addEventListener('click', () => { if (i === sel) { abreTitulo(lista[i]); return; } coloca(i); });
     b.addEventListener('focus', () => coloca(i));
   });
+
+  /* Deslizar con el dedo: lo que se espera en un telefono. La escena declara
+     touch-action pan-y, asi que el navegador se queda el gesto vertical (el
+     scroll de la pagina sigue vivo) y el horizontal llega entero aqui: cada
+     70 px de arrastre es un paso, y arrastrando largo se encadenan. El tap
+     corto no llega al umbral y los clicks de las cajas siguen funcionando;
+     tras un swipe se traga el click fantasma que suelta el navegador. */
+  let sw = null, swT = 0;
+  escena.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    sw = { x: e.clientX, y: e.clientY, id: e.pointerId, eje: 0 };
+  });
+  escena.addEventListener('pointermove', (e) => {
+    if (!sw || e.pointerId !== sw.id) return;
+    const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+    if (!sw.eje) {
+      if (Math.abs(dx) < 14 && Math.abs(dy) < 14) return;
+      sw.eje = Math.abs(dx) > Math.abs(dy) * 1.2 ? 1 : -1;   // 1 = horizontal
+      if (sw.eje < 0) { sw = null; return; }                 // vertical: scroll
+    }
+    if (Math.abs(dx) < 70) return;
+    coloca(sel + (dx < 0 ? 1 : -1));
+    swT = Date.now();
+    sw.x = e.clientX; sw.y = e.clientY;                      // pasos encadenados
+  });
+  const finSwipe = () => { sw = null; };
+  escena.addEventListener('pointerup', finSwipe);
+  escena.addEventListener('pointercancel', finSwipe);
+  escena.addEventListener('click', (e) => {
+    if (Date.now() - swT < 420) { e.stopPropagation(); e.preventDefault(); }
+  }, true);
   ver.addEventListener('click', () => abreTitulo(lista[sel]));
   baja.addEventListener('click', () => abreDescarga(lista[sel]));
   dorso.addEventListener('click', () => abreCaja(lista[sel]));
