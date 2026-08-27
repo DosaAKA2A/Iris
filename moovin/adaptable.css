@@ -70,7 +70,8 @@
    le pone tope de alto para que las pestañas de seccion no caigan fuera. */
 :root[data-plataforma="tv"] #lib-hero{
   --lado:calc(30px + var(--safe-x));
-  min-height:min(58vh,560px); margin-top:calc(-30px - var(--safe-y));
+  --alto-top:76px;
+  margin-top:calc(-30px - var(--safe-y));
 }
 :root[data-plataforma="tv"] #lib-hero .hero-eyebrow{font-size:15px}
 :root[data-plataforma="tv"] #lib-hero .hero-tit{font-size:clamp(46px,4.4vw,72px)}

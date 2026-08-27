@@ -832,7 +832,13 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 #lib-hero{
   --lado:max(34px,calc((100vw - 1080px) / 2 + 34px));
   position:relative; width:100vw; margin:-38px 0 30px calc(50% - 50vw); padding:0;
-  min-height:min(72vh,600px); display:flex; align-items:flex-end;
+  /* LA PANTALLA ENTERA al entrar: alto de la ventana menos la cabecera. Y no
+     es capricho — a pantalla completa la banda queda casi en 16:9, que es la
+     forma del arte, y el recorte se vuelve de unas decenas de pixeles en vez
+     de comerse medio cartel. dvh, no vh: en el movil vh cuenta la barra del
+     navegador y el hero se iba por debajo del borde. */
+  height:calc(100dvh - var(--alto-top,52px));
+  min-height:460px; display:flex; align-items:flex-end;
   overflow:hidden; isolation:isolate;
 }
 #lib-hero.oculto{display:none}
@@ -853,8 +859,10 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 44%);
   mask-image:linear-gradient(90deg,transparent,#000 44%);
 }
+/* Con el hero a pantalla completa el arte apaisado va CENTRADO y entero: la
+   ventana ya tiene casi su misma forma, asi que no hay nada que elegir. */
 #lib-hero .hero-arte.ancho{
-  inset:0; width:auto; background-position:72% 22%;
+  inset:0; width:auto; background-position:center;
   -webkit-mask-image:none; mask-image:none;
 }
 #lib-hero .hero-velo{
@@ -868,7 +876,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    y el titulo se partia en dos a media pantalla. */
 #lib-hero .hero-tx{
   position:relative; width:100%;
-  padding:0 var(--lado) clamp(30px,6vh,58px);
+  padding:0 var(--lado) clamp(38px,9vh,96px);
 }
 #lib-hero .hero-tit{max-width:min(15ch,52%)}
 #lib-hero .hero-eyebrow,#lib-hero .hero-meta{max-width:min(74ch,52%)}
@@ -965,7 +973,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 @media (max-width:640px){
   /* En el movil manda la caratula VERTICAL a pantalla completa y el texto va
      centrado abajo, que es como se ve Netflix en el telefono. */
-  #lib-hero{--lado:18px; margin:-22px 0 20px calc(50% - 50vw); min-height:min(66vh,520px)}
+  #lib-hero{--lado:18px; --alto-top:48px; margin:-22px 0 20px calc(50% - 50vw); min-height:420px}
   #lib-hero .hero-arte{
     inset:0; width:auto; background-image:var(--arte-alto,var(--arte-ancho,none));
     background-position:center 12%;
