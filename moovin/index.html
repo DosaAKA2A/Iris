@@ -4001,18 +4001,45 @@ function sacaPaleta(img) {
   g.drawImage(img, 0, 0, 48, 72);
   const d = g.getImageData(0, 0, 48, 72).data;
   const cubos = new Map();
+  /* Para el tono DOMINANTE no vale contar pixeles por tono: en un cartel
+     nocturno el 70 % es un marron casi negro que el ojo lee como NEGRO, y
+     contandolo salia un ticket rosa para un cartel que se ve azul y naranja.
+     Lo que pesa es el croma percibido, s*(1-|2l-1|): lo que se ve gris,
+     negro o blanco no vota (w<.06). La FAMILIA de color la gana el croma
+     lineal (el ambiente, no un acento chico); el tono exacto dentro de la
+     familia lo afina croma al cuadrado (el naranja franco de un letrero
+     manda sobre la masa de piel apagada de su mismo lado de la rueda). */
+  const fam = new Map(), fino = new Map();
   for (let i = 0; i < d.length; i += 4) {
     const [h, l, s] = aHLS(d[i] / 255, d[i + 1] / 255, d[i + 2] / 255);
-    if (s < .18 || l < .10 || l > .93) continue;
     const k = Math.floor(h * 18) % 18;
-    cubos.set(k, (cubos.get(k) || 0) + 1);
+    if (!(s < .18 || l < .10 || l > .93)) cubos.set(k, (cubos.get(k) || 0) + 1);
+    const w = s * (1 - Math.abs(2 * l - 1));
+    if (w < .06) continue;
+    fam.set(k, (fam.get(k) || 0) + w);
+    const a = 2 * Math.PI * h, w2 = w * w;
+    const fn = fino.get(k) || [0, 0];
+    fn[0] += w2 * Math.cos(a); fn[1] += w2 * Math.sin(a);
+    fino.set(k, fn);
   }
+  /* las franjas del lomo siguen saliendo del conteo de siempre */
   const tonos = [...cubos.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k]) => (k + .5) / 18);
-  if (!tonos.length) return null;
+  if (!tonos.length && !fam.size) return null;
+  if (!tonos.length) tonos.push((([...fam.entries()].sort((a, b) => b[1] - a[1])[0][0]) + .5) / 18);
   while (tonos.length < 5) tonos.push(tonos[tonos.length % tonos.length]);
   const luces = [.60, .53, .46, .39, .33], sats = [.46, .50, .48, .44, .38];
   const f = tonos.map((h, i) => tinta(h, luces[i], sats[i]));
-  const dom = tonos[0];
+  let dom = tonos[0];
+  if (fam.size) {
+    const tri = (k) => (fam.get((k + 17) % 18) || 0) * .5 + (fam.get(k) || 0) + (fam.get((k + 1) % 18) || 0) * .5;
+    let mk = 0, mv = -1;
+    fam.forEach((v, k) => { const t = tri(k); if (t > mv) { mv = t; mk = k; } });
+    let sx = 0, sy = 0;
+    [(mk + 17) % 18, mk, (mk + 1) % 18].forEach((kk) => {
+      const fn = fino.get(kk); if (fn) { sx += fn[0]; sy += fn[1]; }
+    });
+    if (sx || sy) dom = ((Math.atan2(sy, sx) / (2 * Math.PI)) + 1) % 1;
+  }
   return {
     f, carton: hex(...aRGB(dom, .90, .26)),
     etiq: hex(...aRGB(dom, .90, .22)), pega: tinta(tonos[2 % tonos.length], .52, .38),
