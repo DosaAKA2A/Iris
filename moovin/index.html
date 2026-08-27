@@ -977,19 +977,22 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    en papel de color. Los dos tonos y la tinta los pone el guion por tarjeta
    (pintaTicket); si la caratula no da color, se quedan los de fabrica. */
 .lib-info{
-  display:flex; flex-direction:column; aspect-ratio:661.1/375.3;
+  display:flex; flex-direction:column; align-items:center; text-align:center;
+  aspect-ratio:661.1/375.3;
   background:linear-gradient(180deg,var(--papel) 0%,var(--papel-2,var(--papel)) 100%);
   color:var(--tinta);
   -webkit-mask-image:var(--mask-talon); mask-image:var(--mask-talon);
   -webkit-mask-size:100% 100%; mask-size:100% 100%;
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
-  padding:6.5% 9% 0;
+  padding:7% 11% 0;
 }
 .lib-card.vista .lib-info{-webkit-mask-image:var(--mask-roto); mask-image:var(--mask-roto)}
 .lib-tit{font-size:14.5px; font-weight:700; line-height:1.2; letter-spacing:-.01em;
   display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; overflow:hidden}
 .lib-nota{margin-top:3px; font-size:11.5px; color:var(--papel-suave); -webkit-line-clamp:1; line-clamp:1}
-.tk-pie{display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin-top:auto; padding-bottom:9.5%}
+/* el pie tambien centrado, como el resto del talon: el codigo y la cifra
+   juntos en medio, no cada uno tirado a su esquina */
+.tk-pie{display:flex; align-items:center; justify-content:center; gap:12px; margin-top:auto; padding-bottom:9.5%; width:100%}
 .tk-cod{
   display:block; height:20px; width:82px; opacity:.82; flex:none;
   background:repeating-linear-gradient(90deg,var(--tinta) 0 2px,transparent 2px 4px,var(--tinta) 4px 5px,transparent 5px 9px,var(--tinta) 9px 12px,transparent 12px 14px);
