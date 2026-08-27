@@ -1061,7 +1061,10 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    uno con un trozo de SU caratula y el titulo en medio. Asi el central no
    tapa a nadie. Solo transiciones al cambiar: nada de animaciones infinitas,
    y sin cqw (la tele no lo entiende): la geometria la pone el JS. */
-.estante{--caja-ar:.5918; --caja-h:372px; --lomo-w:60px; position:relative; margin-top:2px}
+/* --caja-ar es 2:3, la proporcion del poster: con la de caja VHS (.5918)
+   cover recortaba los bordes de la caratula y se notaba en las que traen
+   marco. El JS del centrado LEE esta variable: un solo sitio que cambiar. */
+.estante{--caja-ar:.6667; --caja-h:372px; --lomo-w:60px; position:relative; margin-top:2px}
 .est-escena{
   position:relative; height:calc(var(--caja-h) + 96px);
   perspective:1500px; perspective-origin:50% 44%; overflow:hidden;
@@ -4163,7 +4166,7 @@ function estanteDe(lista) {
     const gap = movil ? 30 : GAP, selZ = movil ? 34 : SEL_Z;
     const cs = getComputedStyle(est);
     const cajaH = parseFloat(cs.getPropertyValue('--caja-h')) || 372;
-    const halfSel = cajaH * 0.5918 / 2;
+    const halfSel = cajaH * (parseFloat(cs.getPropertyValue('--caja-ar')) || .6667) / 2;
     const halfLomo = parseFloat(cs.getPropertyValue('--lomo-w')) / 2 || 30;
     const BASE = halfSel + gap + halfLomo + (movil ? 6 : 0);
     cajas.forEach((b, k) => {
