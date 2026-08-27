@@ -60,16 +60,16 @@
 /* En escritorio la biblioteca es una columna de 1080 px centrada, que a esa
    distancia se lee bien. En un televisor de 1920 esa misma columna deja media
    pantalla en negro a cada lado: aqui se ocupa el ancho entero. */
+:root[data-plataforma="tv"]{--gutter:calc(30px + var(--safe-x))}
 :root[data-plataforma="tv"] .lib{
   width:100%;
   max-width:none;
-  padding:calc(30px + var(--safe-y)) calc(20px + var(--safe-x)) calc(50px + var(--safe-y));
+  padding:calc(30px + var(--safe-y)) var(--gutter) calc(50px + var(--safe-y));
 }
 /* La portada grande va a sangre tambien aqui, pero el texto se alinea con el
    margen seguro del televisor, no con la columna de 1080 del escritorio; y se
    le pone tope de alto para que las pestañas de seccion no caigan fuera. */
 :root[data-plataforma="tv"] #lib-hero{
-  --lado:calc(30px + var(--safe-x));
   --alto-top:76px;
   margin-top:calc(-30px - var(--safe-y));
 }
@@ -176,11 +176,12 @@
      debajo del borde visible. dvh mide el alto que de verdad se ve. */
   html,body{height:100dvh}
 
+  :root{--gutter:16px}
   #top{height:48px; padding:0 12px; gap:10px}
   #top .tag{font-size:10px; letter-spacing:.18em}
   #btn-party{padding:7px 11px; font-size:12px}
 
-  .lib{padding:22px 14px 34px}
+  .lib{padding:22px var(--gutter) 34px}
   .lib h1{font-size:20px}
   .lib .sub{font-size:12.5px}
   .lib-rejilla{grid-template-columns:repeat(auto-fill,minmax(124px,1fr)); gap:12px}

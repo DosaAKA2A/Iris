@@ -33,6 +33,12 @@
   --red:#f4f4f6; --sobre-acc:#0b0b0d;
   --rubi:#d61f45; --oro:#ffb62e;
   --ok:#9ee2b8; --err:#e6a9b4;
+  /* El margen de la pagina, uno para todo: la rejilla, el texto del hero y
+     las categorias se alinean con el mismo. Antes la biblioteca era una
+     columna de 1080 centrada y en una pantalla ancha el texto del hero caia
+     a 450 px del borde, lo que obligaba a tapar media portada con negro solo
+     para que se leyera. */
+  --gutter:clamp(20px,3.4vw,62px);
   --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --display:"Bricolage Grotesque","Inter",system-ui,sans-serif;
   --papel:#f2f0ec; --tinta:#17181b; --papel-suave:#5d5f67;
@@ -145,12 +151,13 @@ button.tag:hover{opacity:.7}
    barra de desplazamiento. */
 #loader{background:var(--bg); align-items:flex-start; overflow-y:auto; overflow-x:hidden}
 .lib{
-  position:relative; width:min(1080px,100%);
-  padding:38px 34px 46px; margin:0 auto;
+  position:relative; width:100%;
+  padding:38px var(--gutter) 46px; margin:0 auto;
 }
 .lib h1{font-size:24px; font-weight:700; letter-spacing:-.015em}
 .lib .sub{margin-top:8px; font-size:13.5px; color:var(--muted); line-height:1.65; max-width:560px}
 #lib-grid{margin-top:26px}
+#lib-hero:not(.oculto) + #lib-grid{margin-top:0}
 /* Las secciones (películas / anime) van en una barra horizontal y comparten
    una sola rejilla, con el mismo aspecto que las secciones de una saga. Una
    debajo de otra no valía: cada título nuevo empujaba el anime más al fondo
@@ -830,7 +837,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    funciona igual en el televisor, donde .lib ocupa todo. Para que el texto
    siga alineado con la rejilla de abajo, el margen del texto es --lado. */
 #lib-hero{
-  --lado:max(34px,calc((100vw - 1080px) / 2 + 34px));
+  --lado:var(--gutter);
   position:relative; width:100vw; margin:-38px 0 30px calc(50% - 50vw); padding:0;
   /* LA PANTALLA ENTERA al entrar: alto de la ventana menos la cabecera. Y no
      es capricho — a pantalla completa la banda queda casi en 16:9, que es la
@@ -865,10 +872,16 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   inset:0; width:auto; background-position:center;
   -webkit-mask-image:none; mask-image:none;
 }
+/* Con el texto pegado al margen, el velo puede ser mucho mas flojo: antes
+   habia que oscurecer hasta la mitad del ancho para que se leyera algo que
+   estaba en el centro. Ahora: un poco de sombra a la izquierda, la caida de
+   abajo (que ademas cose el hero con lo que viene despues) y un velo fino
+   arriba para las categorias. */
 #lib-hero .hero-velo{
   position:absolute; inset:0; z-index:-1;
-  background:linear-gradient(90deg,var(--bg) 0%,rgba(11,11,13,.94) 24%,rgba(11,11,13,.62) 46%,rgba(11,11,13,.18) 72%,transparent 100%),
-             linear-gradient(0deg,var(--bg) 0%,rgba(11,11,13,.72) 13%,rgba(11,11,13,.12) 36%,transparent 64%);
+  background:linear-gradient(90deg,rgba(11,11,13,.86) 0%,rgba(11,11,13,.52) 17%,rgba(11,11,13,.14) 36%,transparent 54%),
+             linear-gradient(0deg,var(--bg) 0%,rgba(11,11,13,.74) 12%,rgba(11,11,13,.18) 32%,transparent 56%),
+             linear-gradient(180deg,rgba(11,11,13,.34) 0%,transparent 12%);
 }
 /* El bloque de texto ocupa el ancho entero y es el MARGEN el que lo coloca;
    lo que se estrecha es cada linea por dentro. Poniendole el ancho al bloque
@@ -910,6 +923,22 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   content:' ·'; margin-right:9px; color:rgba(244,244,246,.42);
 }
 #lib-hero .hero-acc{display:flex; gap:10px; margin-top:26px; flex-wrap:wrap}
+/* Las categorias van ARRIBA, dentro de la portada: es lo primero que se elige
+   y no tiene sentido tener que bajar para encontrarlas. */
+#lib-hero .lib-tabs{
+  position:absolute; top:0; left:0; right:0; z-index:2;
+  padding:18px var(--lado) 16px; margin:0; border-bottom:0; gap:2px;
+  /* Su propia sombra: hay caratulas con el cielo blanco justo detras de las
+     categorias, y fiarlo al velo del hero obligaba a oscurecer de mas toda la
+     parte de arriba de la portada. */
+  background:linear-gradient(180deg,rgba(11,11,13,.9) 0%,rgba(11,11,13,.62) 52%,transparent 100%);
+}
+#lib-hero .lib-tab{
+  padding:8px 14px; color:rgba(244,244,246,.62);
+  text-shadow:0 1px 6px rgba(0,0,0,.6);
+}
+#lib-hero .lib-tab:hover{color:var(--text)}
+#lib-hero .lib-tab.on{color:var(--text); border-bottom-color:var(--text)}
 #lib-hero .hero-acc svg{width:16px; height:16px}
 .mv-btn{
   display:inline-flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600;
@@ -946,16 +975,21 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
 }
 .lib-card.vista .lib-thumb img{filter:grayscale(.6) brightness(.62)}
+/* El talon es papel TEÑIDO con el tono de su propia caratula, no crema para
+   todos: un degradado de claro a algo mas cargado, como una entrada impresa
+   en papel de color. Los dos tonos y la tinta los pone el guion por tarjeta
+   (pintaTicket); si la caratula no da color, se quedan los de fabrica. */
 .lib-info{
   display:flex; flex-direction:column; aspect-ratio:661.1/375.3;
-  background:var(--papel); color:var(--tinta);
+  background:linear-gradient(180deg,var(--papel) 0%,var(--papel-2,var(--papel)) 100%);
+  color:var(--tinta);
   -webkit-mask-image:var(--mask-talon); mask-image:var(--mask-talon);
   -webkit-mask-size:100% 100%; mask-size:100% 100%;
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
   padding:6.5% 9% 0;
 }
 .lib-card.vista .lib-info{-webkit-mask-image:var(--mask-roto); mask-image:var(--mask-roto)}
-.lib-tit{font-size:14.5px; font-weight:600; line-height:1.2;
+.lib-tit{font-size:14.5px; font-weight:700; line-height:1.2; letter-spacing:-.01em;
   display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; overflow:hidden}
 .lib-nota{margin-top:3px; font-size:11.5px; color:var(--papel-suave); -webkit-line-clamp:1; line-clamp:1}
 .tk-pie{display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin-top:auto; padding-bottom:9.5%}
@@ -976,7 +1010,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 @media (max-width:640px){
   /* En el movil manda la caratula VERTICAL a pantalla completa y el texto va
      centrado abajo, que es como se ve Netflix en el telefono. */
-  #lib-hero{--lado:18px; --alto-top:48px; margin:-22px 0 20px calc(50% - 50vw); min-height:420px}
+  #lib-hero{--alto-top:48px; margin:-22px 0 20px calc(50% - 50vw); min-height:420px}
   #lib-hero .hero-arte{
     inset:0; width:auto; background-image:var(--arte-alto,var(--arte-ancho,none));
     background-position:center 12%;
@@ -985,7 +1019,8 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   /* Mas oscuro y antes: la caratula vertical trae su propio titulo impreso y
      sin esto se cruzaba con el nuestro. */
   #lib-hero .hero-velo{
-    background:linear-gradient(0deg,var(--bg) 2%,rgba(11,11,13,.95) 32%,rgba(11,11,13,.62) 55%,rgba(11,11,13,.2) 82%,rgba(11,11,13,.08) 100%);
+    background:linear-gradient(0deg,var(--bg) 2%,rgba(11,11,13,.95) 32%,rgba(11,11,13,.62) 55%,rgba(11,11,13,.2) 82%,rgba(11,11,13,.08) 100%),
+               linear-gradient(180deg,rgba(11,11,13,.34) 0%,transparent 12%);
   }
   #lib-hero .hero-tx{width:100%; padding:0 18px 26px; text-align:center}
   /* Los topes de ancho de escritorio (la mitad de la pantalla) aqui parten el
@@ -1083,8 +1118,29 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   overflow-y:auto; padding:22px 16px; z-index:6}
 .caja-esc{perspective:1700px; flex:0 0 auto;
   width:min(calc(100vw - 32px),calc(64vh * .5918),408px)}
+/* la cinta: mas pequeña que la funda y casi escondida; al abrir se desliza */
+.caja-cinta{
+  position:absolute; top:3%; left:0; height:94%; aspect-ratio:929.49/1570.66;
+  z-index:0; border-radius:3px; overflow:hidden;
+  transform:translateX(12px);
+  transition:transform .8s cubic-bezier(.22,.61,.36,1);
+  box-shadow:0 14px 34px rgba(0,0,0,.55);
+}
+#caja.abierta .caja-cinta{transform:translateX(46%)}
+.caja-cinta>svg{width:100%; height:100%; display:block}
+.caja-cinta .et{
+  position:absolute; left:28.9%; top:37.4%; width:54.3%; height:25.3%;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px; text-align:center; padding:0 5%;
+}
+.caja-cinta .et b{font-size:calc(var(--u) * 3); font-weight:700; line-height:1.1; color:#20222a}
+.caja-cinta .et i{font-family:var(--mono); font-size:calc(var(--u) * 1.7); letter-spacing:.2em;
+  text-transform:uppercase; color:#5c5f6b; font-style:normal}
+@media (prefers-reduced-motion:reduce){
+  .caja-cinta{transition-duration:.001s}
+}
 .caja-giro{
-  position:relative; width:100%; aspect-ratio:929.49/1570.66; cursor:pointer;
+  position:relative; z-index:1; width:100%; aspect-ratio:929.49/1570.66; cursor:pointer;
   transform-style:preserve-3d; transition:transform .74s cubic-bezier(.22,.61,.36,1);
 }
 .caja-giro.dorso{transform:rotateY(180deg)}
@@ -1094,6 +1150,10 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   box-shadow:0 26px 60px rgba(0,0,0,.75), 0 0 0 1px rgba(0,0,0,.5);
 }
 .caja-frente{background:#141416 center/cover no-repeat}
+.caja-frente::after{
+  content:''; position:absolute; inset:0 0 0 auto; width:9%;
+  background:linear-gradient(270deg,rgba(0,0,0,.5),transparent);
+}
 .caja-frente .vhs-sello{position:absolute; left:6%; bottom:5%; width:30%; height:auto}
 .caja-dorso{transform:rotateY(180deg); background:var(--vhs-carton,#fdf4d5); color:#20222a}
 .caja-dorso>svg{position:absolute; inset:0; width:100%; height:100%; display:block}
@@ -1424,7 +1484,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
               <div class="se-cifra" id="se-cifra"></div>
               <button class="cta se-seguir" id="se-seguir"></button>
               <!-- La ficha de verdad es la contraportada de la caja. -->
-              <button class="se-caja" id="se-caja">Ver la caja</button>
+              <button class="se-caja" id="se-caja">Información</button>
             </div>
           </div>
           <div class="se-eps" id="se-eps"></div>
@@ -1470,6 +1530,10 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
     <!-- La ficha de un titulo: la caja de VHS y su contraportada -->
     <div id="caja" class="veil hidden">
       <div class="caja-esc">
+        <!-- La cinta vive DETRAS de la funda y asoma al abrir, el mismo gesto
+             que en el estante: primero sale el casete, luego la caja se da la
+             vuelta para leerle el dorso. -->
+        <div class="caja-cinta" id="caja-cinta"></div>
         <div class="caja-giro" id="caja-giro">
           <div class="caja-cara caja-frente" id="caja-frente"></div>
           <div class="caja-cara caja-dorso" id="caja-dorso"></div>
@@ -2638,8 +2702,9 @@ function pintaBiblioteca(bib) {
   // llevan a ningún sitio sobran.
   const conTitulos = GRUPOS.filter((g) => tt.some((t) => grupoDe(t) === g.clave));
   if (!conTitulos.some((g) => g.clave === libSec)) libSec = conTitulos[0].clave;
+  let tabs = null;
   if (conTitulos.length > 1) {
-    const tabs = document.createElement('div'); tabs.className = 'lib-tabs';
+    tabs = document.createElement('div'); tabs.className = 'lib-tabs';
     conTitulos.forEach((g) => {
       const b = document.createElement('button');
       b.className = 'lib-tab' + (g.clave === libSec ? ' on' : '');
@@ -2653,12 +2718,19 @@ function pintaBiblioteca(bib) {
       });
       tabs.appendChild(b);
     });
-    grid.appendChild(tabs);
   }
   const dentro = tt.filter((t) => grupoDe(t) === libSec);
   /* La portada grande manda el último título de la sección: es lo recién
      llegado y es lo que justifica una imagen de este tamaño. */
   pintaHero(dentro[dentro.length - 1]);
+  /* Las categorías viven DENTRO de la portada. Va después de pintaHero, que
+     vacía el hero entero. Si no hay portada que enseñar (biblioteca sin nada
+     en la sección), vuelven arriba de la rejilla para no perderlas. */
+  if (tabs) {
+    const hero = $('#lib-hero');
+    if (hero && !hero.classList.contains('oculto')) hero.appendChild(tabs);
+    else grid.appendChild(tabs);
+  }
   /* Las películas se ven como tickets; el anime, como discos en un estante.
      Son dos formas de mirar lo mismo y cada catálogo pide la suya. */
   if (libSec === 'anime' && dentro.length) {
@@ -2682,6 +2754,8 @@ function tarjetaDe(t) {
     const ini = document.createElement('span'); ini.className = 'ini';
     ini.textContent = (t.titulo || '?').slice(0, 2).toUpperCase(); th.appendChild(ini);
   }
+  /* cada ticket, del color de su cartel */
+  paletaVHS(conPase(absCat(img0 || ''))).then((p) => pintaTicket(card, p));
   const esSerie = t.tipo === 'serie';
   if (esSerie) {
     /* Una serie no tiene duración propia; lo útil es cuántos capítulos trae, y
@@ -2706,7 +2780,7 @@ function tarjetaDe(t) {
     /* La ficha, sin quitarle a la entrada lo que ya hace: tocar el ticket
        sigue poniendo la película, y la caja se pide aparte. */
     const fi = document.createElement('span');
-    fi.className = 'lib-ficha'; fi.title = 'Ver la caja';
+    fi.className = 'lib-ficha'; fi.title = 'Información';
     fi.setAttribute('role', 'button'); fi.tabIndex = 0;
     fi.innerHTML = IC.ficha;
     fi.addEventListener('click', (ev) => { ev.stopPropagation(); abreCaja(t); });
@@ -2876,7 +2950,7 @@ function pintaSeccion() {
   const s = secs[i];
   const ent = s.ent;
   $('#se-caja').textContent = s.tipo === 'pelis' && s.ents.length === 1
-    ? 'Ver la caja de la película' : 'Ver la caja';
+    ? 'Información de la película' : 'Información';
   const poster = $('#se-poster');
   /* La carátula grande solo sale cuando NO hay selector: con la rejilla de
      tarjetas arriba, la de la sección abierta ya está ahí marcada en rojo y
@@ -3602,7 +3676,7 @@ function abreTitulo(t) {
    todo se tiñe con la paleta de la propia carátula, igual que el estante.
    Se abre por la portada y la caja se da la vuelta sola: ese gesto es lo que
    dice que la información está DETRÁS, no en una tarjeta cualquiera. */
-const CAJA = { t: null, giro: 0 };
+const CAJA = { t: null, giro: 0, saca: 0 };
 function anioDe(t) {
   const m = (t.nota || '').match(/\b(19|20)\d{2}\b/);
   return m ? m[0] : '—';
@@ -3728,7 +3802,9 @@ function ajustaCaja() {
 }
 function cierraCaja() {
   clearTimeout(CAJA.giro);
+  clearTimeout(CAJA.saca);
   $('#caja').classList.add('hidden');
+  $('#caja').classList.remove('abierta');
   CAJA.t = null;
 }
 function abreCaja(t) {
@@ -3742,7 +3818,15 @@ function abreCaja(t) {
   const sello = usaVHS('vhs-sello'); sello.setAttribute('class', 'vhs-sello');
   frente.appendChild(sello);
   pintaDorso(dorso, t);
-  paletaVHS(img).then((p) => { pintaVHS(giro, p); pintaVHS(dorso, p); });
+  /* la cinta, con la etiqueta de SU titulo */
+  const cinta = $('#caja-cinta');
+  cinta.innerHTML = '';
+  cinta.appendChild(usaVHS('vhs-cinta'));
+  const et = document.createElement('span'); et.className = 'et';
+  const etT = document.createElement('b'); etT.textContent = t.titulo || '';
+  const etM = document.createElement('i'); etM.textContent = 'MOOVIN';
+  et.append(etT, etM); cinta.appendChild(et);
+  paletaVHS(img).then((p) => { pintaVHS(giro, p); pintaVHS(dorso, p); pintaVHS(cinta, p); });
 
   const acc = $('#caja-acc'); acc.innerHTML = '';
   const ver = document.createElement('button'); ver.className = 'mv-btn solido';
@@ -3770,14 +3854,21 @@ function abreCaja(t) {
   acc.appendChild(cerrar);
 
   velo.classList.remove('hidden');
+  velo.classList.remove('abierta');
   ajustaCaja();
   giro.classList.remove('dorso');
-  /* La vuelta sola, un pelín después de abrir: si se pone el dorso de salida
-     no se entiende que lo que se lee es la parte de atrás de ESA caja. Con el
-     movimiento reducido se enseña ya girada, sin baile. */
+  /* La coreografia, en el orden en que se coge una cinta de verdad: primero
+     el casete ASOMA de la funda (el mismo gesto que en el estante) y luego la
+     caja se da la vuelta para leerle el dorso. Todo finito. Con el movimiento
+     reducido se enseña ya girada y con la cinta fuera, sin baile. */
   clearTimeout(CAJA.giro);
+  clearTimeout(CAJA.saca);
   const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  CAJA.giro = setTimeout(() => giro.classList.add('dorso'), quieto ? 0 : 360);
+  if (quieto) { velo.classList.add('abierta'); giro.classList.add('dorso'); }
+  else {
+    CAJA.saca = setTimeout(() => velo.classList.add('abierta'), 240);
+    CAJA.giro = setTimeout(() => giro.classList.add('dorso'), 900);
+  }
 }
 $('#caja-giro').addEventListener('click', () => {
   clearTimeout(CAJA.giro);
@@ -3934,7 +4025,14 @@ function sacaPaleta(img) {
   const dom = tonos[0];
   return {
     f, carton: hex(...aRGB(dom, .90, .26)),
-    etiq: hex(...aRGB(dom, .90, .22)), pega: tinta(tonos[2 % tonos.length], .52, .38)
+    etiq: hex(...aRGB(dom, .90, .22)), pega: tinta(tonos[2 % tonos.length], .52, .38),
+    /* El papel del ticket, del mismo tono: claro arriba, algo mas cargado
+       abajo. La tinta y el texto flojo salen del MISMO tono, muy oscuros, que
+       es lo que hace que se lean sin pelear con el color del papel. */
+    papel: hex(...aRGB(dom, .88, .42)),
+    papel2: hex(...aRGB(dom, .68, .46)),
+    tintaTk: hex(...aRGB(dom, .13, .52)),
+    tintaSuave: hex(...aRGB(dom, .30, .40))
   };
 }
 function paletaVHS(url) {
@@ -3949,6 +4047,15 @@ function paletaVHS(url) {
   });
   paletasVHS.set(url, p);
   return p;
+}
+/* Tiñe el talon de un ticket con la paleta de su caratula. Las tres variables
+   ya las usaban las reglas del ticket, asi que no hay nada mas que tocar. */
+function pintaTicket(el, pal) {
+  if (!pal) return;
+  el.style.setProperty('--papel', pal.papel);
+  el.style.setProperty('--papel-2', pal.papel2);
+  el.style.setProperty('--tinta', pal.tintaTk);
+  el.style.setProperty('--papel-suave', pal.tintaSuave);
 }
 function pintaVHS(el, pal) {
   if (!pal) return;
@@ -3984,7 +4091,7 @@ function estanteDe(lista) {
   const acc = document.createElement('div'); acc.className = 'ef-acc';
   const ver = document.createElement('button'); ver.className = 'mv-btn solido';
   const baja = document.createElement('button'); baja.className = 'mv-btn hueco'; baja.textContent = 'Descargar';
-  const dorso = document.createElement('button'); dorso.className = 'mv-btn hueco'; dorso.textContent = 'La caja';
+  const dorso = document.createElement('button'); dorso.className = 'mv-btn hueco'; dorso.textContent = 'Información';
   acc.append(ver, baja, dorso);
   ficha.append(meta, tit, dur, acc);
 
