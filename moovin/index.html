@@ -940,70 +940,57 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   .tk-dur{font-size:9.5px}
 }
 @media (prefers-reduced-motion:reduce){
-  #intro *,.est-rail,.est-frontal,.vhs-lomo,.vhs-cinta,.lib-card{animation-duration:.001s !important; transition-duration:.001s !important}
+  #intro *,.pas-caja,.lib-card{animation-duration:.001s !important; transition-duration:.001s !important}
 }
 
-/* ---------- estante de cajas VHS ----------
-   Como en la referencia: los lomos van PLANOS en fila y el volumen lo pone
-   la caratula, que aparece DELANTE de la fila. Nada de girar los lomos en 3D:
-   eso era otra cosa. Los colores de cada caja salen de su propia portada. */
-.estante{position:relative; margin-top:2px}
-.est-pista{position:relative; height:372px; overflow:hidden}
-.est-rail{
-  position:absolute; inset:0; display:flex; align-items:center; gap:13px;
-  transition:transform .5s cubic-bezier(.22,.61,.36,1); will-change:transform;
+/* ---------- pasarela 3D de cajas VHS ----------
+   Coverflow: el titulo elegido va de FRENTE en el centro (su portada limpia,
+   sin sello) y los vecinos se abren a los lados como lomos inclinados, cada
+   uno con un trozo de SU caratula y el titulo en medio. Asi el central no
+   tapa a nadie. Solo transiciones al cambiar: nada de animaciones infinitas,
+   y sin cqw (la tele no lo entiende): la geometria la pone el JS. */
+.estante{--caja-ar:.5918; --caja-h:372px; --lomo-w:60px; position:relative; margin-top:2px}
+.est-escena{
+  position:relative; height:calc(var(--caja-h) + 96px);
+  perspective:1500px; perspective-origin:50% 44%; overflow:hidden;
 }
-.vhs-lomo{
-  flex:0 0 auto; width:46px; height:286px; position:relative; padding:0;
-  background:none; border:0; cursor:pointer;
-  transition:height .35s ease, opacity .35s ease;
+.est-mundo{position:absolute; inset:0; transform-style:preserve-3d}
+.pas-caja{
+  position:absolute; top:50%; left:50%;
+  height:var(--caja-h); width:var(--lomo-w);
+  margin:calc(var(--caja-h) / -2) 0 0 calc(var(--lomo-w) / -2);
+  transform-style:preserve-3d; cursor:pointer;
+  background:#141416; border:0; padding:0;
+  transition:transform .55s cubic-bezier(.22,.61,.36,1),
+             width .55s cubic-bezier(.22,.61,.36,1);
+  will-change:transform,width;
 }
-.vhs-lomo>svg{width:100%; height:100%; display:block; border-radius:2px;
-  box-shadow:0 8px 22px rgba(0,0,0,.5)}
-.vhs-lomo .lomo-tx{
-  position:absolute; left:0; right:0; top:20px; display:flex; justify-content:center;
-  pointer-events:none;
+.pas-cara{
+  position:absolute; inset:0; border-radius:3px; overflow:hidden;
+  background-size:cover; background-position:center;
+  box-shadow:0 18px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.5);
 }
-.vhs-lomo .lomo-tx span{
+.pas-velo{
+  position:absolute; inset:0; transition:opacity .4s ease;
+  background:linear-gradient(180deg,rgba(8,8,10,.15) 0%,rgba(8,8,10,.62) 55%,rgba(8,8,10,.15) 100%);
+}
+.pas-tit{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  pointer-events:none; padding:8px 0}
+.pas-tit span{
   writing-mode:vertical-rl; transform:rotate(180deg);
-  font-family:var(--mono); font-size:9.5px; letter-spacing:.12em;
-  text-transform:uppercase; color:#20222a; white-space:nowrap;
-  max-height:212px; overflow:hidden;
+  font-family:var(--mono); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:#fff; white-space:nowrap;
+  max-height:100%; overflow:hidden; text-shadow:0 1px 3px rgba(0,0,0,.85);
 }
-.vhs-lomo.act{height:318px}
-.vhs-lomo.cerca{opacity:.45}
-/* la caratula y su cinta, delante de todo */
-.est-frontal{
-  position:absolute; top:50%; left:50%; z-index:5; pointer-events:none;
-  transform:translate(-50%,-50%) scale(.94); opacity:0;
-  transition:opacity .34s ease, transform .34s cubic-bezier(.22,.61,.36,1);
+.pas-canto{position:absolute; top:0; bottom:0; right:0; width:8px;
+  transform:translateZ(-1px); border-radius:0 3px 3px 0;
+  background:linear-gradient(90deg,rgba(0,0,0,.5),rgba(0,0,0,.85))}
+.pas-caja.sel{
+  width:calc(var(--caja-h) * var(--caja-ar));
+  margin-left:calc(var(--caja-h) * var(--caja-ar) / -2); cursor:default;
 }
-.est-frontal.on{opacity:1; transform:translate(-50%,-50%) scale(1)}
-.vhs-caja{
-  position:relative; height:330px; aspect-ratio:929.49/1570.66;
-  background-size:cover; background-position:center; border-radius:3px;
-  box-shadow:0 26px 60px rgba(0,0,0,.75), 0 0 0 1px rgba(0,0,0,.5);
-  z-index:2;
-}
-.vhs-caja .vhs-sello{position:absolute; left:6%; bottom:5%; width:30%; height:auto}
-/* la cinta asoma por detras: es el "efecto combinado" */
-.vhs-cinta{
-  position:absolute; top:3%; left:0; height:94%; aspect-ratio:929.49/1570.66;
-  border-radius:3px; overflow:hidden; z-index:1;
-  transform:translateX(10px);
-  transition:transform .8s cubic-bezier(.22,.61,.36,1) .12s;
-  box-shadow:0 14px 34px rgba(0,0,0,.55);
-}
-.est-frontal.on .vhs-cinta{transform:translateX(46%)}
-.vhs-cinta>svg{width:100%; height:100%; display:block}
-.vhs-cinta .et{
-  position:absolute; left:28.9%; top:37.4%; width:54.3%; height:25.3%;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:3px; text-align:center; padding:0 5%;
-}
-.vhs-cinta .et b{font-size:11px; font-weight:700; line-height:1.1; color:#20222a}
-.vhs-cinta .et i{font-family:var(--mono); font-size:6.5px; letter-spacing:.2em;
-  text-transform:uppercase; color:#5c5f6b; font-style:normal}
+.pas-caja.sel .pas-cara{box-shadow:0 34px 70px rgba(0,0,0,.75), 0 0 0 1px rgba(0,0,0,.5)}
+.pas-caja.sel .pas-velo,.pas-caja.sel .pas-tit,.pas-caja.sel .pas-canto{opacity:0}
 .est-ficha{text-align:center; padding-top:20px}
 .est-ficha .ef-meta{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em;
   text-transform:uppercase; color:var(--dim)}
@@ -1012,8 +999,8 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   margin-top:7px; text-wrap:balance}
 .est-ficha .ef-dur{color:var(--muted); font-size:13.5px; margin-top:6px}
 .est-ficha .ef-acc{display:flex; gap:10px; margin-top:18px; justify-content:center; flex-wrap:wrap}
-.est-nav{position:absolute; top:150px; left:0; right:0; display:flex;
-  justify-content:space-between; pointer-events:none; z-index:6}
+.est-nav{position:absolute; top:calc(var(--caja-h)/2 + 30px); left:0; right:0; display:flex;
+  justify-content:space-between; padding:0 12px; pointer-events:none; z-index:40}
 .est-b{
   pointer-events:auto; width:36px; height:36px; border-radius:50%;
   border:1px solid var(--line-2); background:rgba(11,11,13,.72); color:var(--muted);
@@ -1099,12 +1086,8 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 }
 
 @media (max-width:640px){
-  .est-pista{height:286px}
-  .vhs-lomo{width:34px; height:214px}
-  .vhs-lomo.act{height:238px}
-  .vhs-lomo .lomo-tx span{font-size:8px; max-height:158px}
-  .vhs-caja{height:248px}
-  .est-nav{top:106px}
+  .estante{--caja-h:300px; --lomo-w:46px}
+  .pas-tit span{font-size:10px; letter-spacing:.12em}
   .est-ficha{padding-top:14px}
 }
 </style>
@@ -3882,19 +3865,9 @@ const usaVHS = (id) => {
    cinta"; detras, la cinta asoma de su funda. */
 function estanteDe(lista) {
   const est = document.createElement('div'); est.className = 'estante';
-  const pista = document.createElement('div'); pista.className = 'est-pista';
-  const rail = document.createElement('div'); rail.className = 'est-rail';
-
-  const frontal = document.createElement('div'); frontal.className = 'est-frontal';
-  const cinta = document.createElement('div'); cinta.className = 'vhs-cinta';
-  cinta.appendChild(usaVHS('vhs-cinta'));
-  const et = document.createElement('span'); et.className = 'et';
-  const etT = document.createElement('b'); const etM = document.createElement('i');
-  etM.textContent = 'MOOVIN'; et.append(etT, etM); cinta.appendChild(et);
-  const caja = document.createElement('div'); caja.className = 'vhs-caja';
-  const sello = usaVHS('vhs-sello'); sello.setAttribute('class', 'vhs-sello');
-  caja.appendChild(sello);
-  frontal.append(cinta, caja);
+  const escena = document.createElement('div'); escena.className = 'est-escena';
+  const mundo = document.createElement('div'); mundo.className = 'est-mundo';
+  escena.appendChild(mundo);
 
   const ficha = document.createElement('div'); ficha.className = 'est-ficha';
   const meta = document.createElement('p'); meta.className = 'ef-meta';
@@ -3907,49 +3880,64 @@ function estanteDe(lista) {
   acc.append(ver, baja, dorso);
   ficha.append(meta, tit, dur, acc);
 
-  const lomos = lista.map((t2, i) => {
+  /* Cada titulo es una caja en el espacio 3D: el lomo ensena un trozo de SU
+     caratula con el titulo en medio; el elegido se pone de frente y limpio. */
+  const cajas = lista.map((t2) => {
     const b = document.createElement('button');
-    b.className = 'vhs-lomo';
+    b.className = 'pas-caja';
     b.setAttribute('aria-label', t2.titulo || '');
-    b.appendChild(usaVHS('vhs-lomo'));
-    const cap = document.createElement('span'); cap.className = 'lomo-tx';
+    const img = conPase(absCat(t2.poster || t2.miniatura || ''));
+    const cara = document.createElement('div'); cara.className = 'pas-cara';
+    if (img) cara.style.backgroundImage = 'url("' + img + '")';
+    const velo = document.createElement('div'); velo.className = 'pas-velo';
+    const canto = document.createElement('div'); canto.className = 'pas-canto';
+    const cap = document.createElement('div'); cap.className = 'pas-tit';
     const sp = document.createElement('span'); sp.textContent = t2.titulo || '';
-    cap.appendChild(sp); b.appendChild(cap);
-    /* cada lomo con los colores de SU portada */
-    paletaVHS(conPase(absCat(t2.poster || t2.miniatura || ''))).then((p) => pintaVHS(b, p));
-    rail.appendChild(b);
+    cap.appendChild(sp);
+    b.append(cara, velo, canto, cap);
+    mundo.appendChild(b);
     return b;
   });
-  pista.append(rail, frontal);
 
-  let sel = 0, aviso = 0;
+  const GAP = 40, STEP = 54, ANG = 38, DEPTH = 55, SEL_Z = 70, MAXV = 4;
+  let sel = 0;
   function coloca(i) {
     sel = (i + lista.length) % lista.length;
-    lomos.forEach((l, k) => {
-      l.classList.toggle('act', k === sel);
-      l.classList.toggle('cerca', Math.abs(k - sel) <= 1);
+    const movil = innerWidth <= 640;
+    const gap = movil ? 30 : GAP, selZ = movil ? 34 : SEL_Z;
+    const cs = getComputedStyle(est);
+    const cajaH = parseFloat(cs.getPropertyValue('--caja-h')) || 372;
+    const halfSel = cajaH * 0.5918 / 2;
+    const halfLomo = parseFloat(cs.getPropertyValue('--lomo-w')) / 2 || 30;
+    const BASE = halfSel + gap + halfLomo + (movil ? 6 : 0);
+    cajas.forEach((b, k) => {
+      const o = k - sel, rank = Math.abs(o), sign = Math.sign(o);
+      b.classList.toggle('sel', o === 0);
+      if (o === 0) {
+        b.style.transform = 'translateZ(' + selZ + 'px)';
+        b.style.opacity = 1; b.style.zIndex = 30; b.style.pointerEvents = 'auto';
+        return;
+      }
+      if (rank > MAXV) {
+        b.style.opacity = 0; b.style.pointerEvents = 'none'; b.style.zIndex = 0;
+        b.style.transform = 'translateX(' + (sign * 760) + 'px) rotateY(' + (-sign * ANG) + 'deg) translateZ(-300px)';
+        return;
+      }
+      const x = sign * (BASE + (rank - 1) * STEP);
+      b.style.transform = 'translateX(' + x + 'px) rotateY(' + (-sign * ANG) + 'deg) translateZ(' + (-rank * DEPTH) + 'px)';
+      b.style.opacity = Math.max(0.4, 1 - rank * 0.15);
+      b.style.zIndex = 20 - rank; b.style.pointerEvents = 'auto';
     });
-    const d = lomos[sel];
-    rail.style.transform = 'translateX(' + (pista.clientWidth / 2 - (d.offsetLeft + d.offsetWidth / 2)) + 'px)';
-
     const t2 = lista[sel];
-    const img = conPase(absCat(t2.poster || t2.miniatura || ''));
     meta.textContent = metaDe(t2);
     tit.textContent = t2.titulo || '';
     dur.textContent = cifraDe(t2);
-    etT.textContent = t2.titulo || '';
     ver.textContent = t2.tipo === 'serie' ? 'Ver la serie' : 'Ver ahora';
     baja.style.display = t2.tipo === 'serie' ? 'none' : '';
-    if (img) caja.style.backgroundImage = 'url("' + img + '")';
-    paletaVHS(img).then((p) => pintaVHS(frontal, p));
-    /* el parpadeo: se apaga y vuelve, como quien cambia de cinta */
-    frontal.classList.remove('on');
-    clearTimeout(aviso);
-    aviso = setTimeout(() => frontal.classList.add('on'), 130);
   }
-  lomos.forEach((l, i) => {
-    l.addEventListener('click', () => { if (i === sel) { abreTitulo(lista[i]); return; } coloca(i); });
-    l.addEventListener('focus', () => coloca(i));
+  cajas.forEach((b, i) => {
+    b.addEventListener('click', () => { if (i === sel) { abreTitulo(lista[i]); return; } coloca(i); });
+    b.addEventListener('focus', () => coloca(i));
   });
   ver.addEventListener('click', () => abreTitulo(lista[sel]));
   baja.addEventListener('click', () => abreDescarga(lista[sel]));
@@ -3962,9 +3950,8 @@ function estanteDe(lista) {
     b.addEventListener('click', () => coloca(sel + Number(paso)));
     nav.appendChild(b);
   });
-  est.append(pista, nav, ficha);
-  /* Arranca por el MEDIO de la fila: con el primero elegido, la mitad
-     izquierda del estante queda vacia y no se lee como una balda llena. */
+  est.append(escena, nav, ficha);
+  /* Arranca por el MEDIO de la fila para que el central quede centrado. */
   requestAnimationFrame(() => coloca(Math.floor((lista.length - 1) / 2)));
   addEventListener('resize', () => coloca(sel), { passive: true });
   return est;
