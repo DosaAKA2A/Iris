@@ -204,6 +204,16 @@ button.tag:hover{opacity:.7}
 .lib-card:hover .lib-dl,.lib-dl:focus-visible{opacity:1}
 .lib-dl:hover{color:var(--text)}
 .lib-dl svg{width:14px; height:14px}
+/* la ficha, en la esquina de enfrente de la descarga */
+.lib-ficha{
+  position:absolute; right:7px; bottom:7px; width:28px; height:28px; padding:0;
+  display:flex; align-items:center; justify-content:center; border-radius:7px;
+  background:rgba(0,0,0,.74); color:var(--muted);
+  opacity:0; transition:opacity .15s,color .12s; cursor:pointer;
+}
+.lib-card:hover .lib-ficha,.lib-ficha:focus-visible{opacity:1}
+.lib-ficha:hover{color:var(--text)}
+.lib-ficha svg{width:14px; height:14px}
 /* Marca de serie sobre la miniatura: una serie no se reproduce al tocarla,
    abre su lista de capítulos, y conviene que se note antes de hacer clic. */
 /* La chapa va ENCIMA de la carátula, así que se queda en una línea pase lo que
@@ -249,6 +259,13 @@ button.tag:hover{opacity:.7}
    llenaría su columna y cambiaría de ancho con el texto de la ficha. */
 button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:center; gap:9px; justify-content:center}
 .se-seguir svg{width:15px; height:15px}
+.se-caja{
+  display:block; margin-top:10px; padding:0; border:0; background:none; cursor:pointer;
+  font-family:var(--mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--dim); border-bottom:1px solid var(--line-2); padding-bottom:3px;
+  transition:color .15s, border-color .15s;
+}
+.se-caja:hover{color:var(--text); border-bottom-color:var(--muted)}
 .se-eps{margin-top:26px; display:flex; flex-direction:column; gap:8px}
 /* Las pestañas de la biblioteca (Películas / Anime). Las secciones de una saga
    ya NO son pestañas: son la rejilla de tarjetas de más abajo. */
@@ -903,6 +920,9 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 .lib-dl{
   left:auto; right:8px; bottom:8px; background:rgba(0,0,0,.7); border-radius:999px;
 }
+.lib-ficha{
+  right:auto; left:8px; bottom:8px; background:rgba(0,0,0,.7); border-radius:999px;
+}
 
 @media (max-width:640px){
   #lib-hero{margin:-24px -18px 22px; min-height:min(56vh,420px)}
@@ -1000,6 +1020,83 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   font-size:14px; cursor:pointer; transition:color .15s,border-color .15s;
 }
 .est-b:hover{color:var(--text); border-color:var(--muted)}
+
+/* ---------- la ficha de un titulo: la caja, por detras ----------
+   La contraportada del VHS ES la ficha: los datos van en las viñetas
+   impresas, la sinopsis debajo y la marca sobre las franjas. Se abre con la
+   portada de frente y la caja se da la vuelta sola, como quien coge una
+   cinta del estante para leerle el dorso.
+   Las medidas van en % de la propia cara (viewBox 929.49 x 1570.66) para que
+   el texto caiga SIEMPRE dentro de lo impreso, a cualquier tamaño. El tamaño
+   de letra sale de --u (la centesima parte del ancho de la caja), que pone
+   el guion al abrir: aqui no se puede usar cqw, que la tele no entiende. */
+#caja{flex-direction:column; gap:16px; background:rgba(6,6,8,.93);
+  overflow-y:auto; padding:22px 16px; z-index:6}
+.caja-esc{perspective:1700px; flex:0 0 auto;
+  width:min(calc(100vw - 32px),calc(64vh * .5918),408px)}
+.caja-giro{
+  position:relative; width:100%; aspect-ratio:929.49/1570.66; cursor:pointer;
+  transform-style:preserve-3d; transition:transform .74s cubic-bezier(.22,.61,.36,1);
+}
+.caja-giro.dorso{transform:rotateY(180deg)}
+.caja-cara{
+  position:absolute; inset:0; border-radius:3px; overflow:hidden;
+  -webkit-backface-visibility:hidden; backface-visibility:hidden;
+  box-shadow:0 26px 60px rgba(0,0,0,.75), 0 0 0 1px rgba(0,0,0,.5);
+}
+.caja-frente{background:#141416 center/cover no-repeat}
+.caja-frente .vhs-sello{position:absolute; left:6%; bottom:5%; width:30%; height:auto}
+.caja-dorso{transform:rotateY(180deg); background:var(--vhs-carton,#fdf4d5); color:#20222a}
+.caja-dorso>svg{position:absolute; inset:0; width:100%; height:100%; display:block}
+.cn-tit{
+  position:absolute; left:7.34%; top:3.4%; width:85.33%;
+  font-family:var(--display); font-weight:800; line-height:1.03;
+  letter-spacing:-.02em; font-size:calc(var(--u) * 6.4);
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.cn-meta{
+  position:absolute; left:7.34%; top:12.1%; width:85.33%;
+  font-family:var(--mono); font-size:calc(var(--u) * 2.5); letter-spacing:.16em;
+  text-transform:uppercase; color:#6b6d78; white-space:nowrap; overflow:hidden;
+}
+/* las ocho viñetas impresas: una por dato */
+.cn-rej{
+  position:absolute; left:7.99%; top:15.85%; width:84.03%; height:29.25%;
+  display:grid; grid-template-columns:1fr 1fr; grid-template-rows:repeat(4,1fr);
+  column-gap:.78%; row-gap:1.32%;
+}
+.cn-cel{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:calc(var(--u) * .5); padding:0 4%; min-width:0; text-align:center;
+}
+.cn-cel b{
+  font-family:var(--mono); font-weight:500; font-size:calc(var(--u) * 1.85);
+  letter-spacing:.18em; text-transform:uppercase; color:#7c7e88;
+}
+.cn-cel span{
+  font-size:calc(var(--u) * 3.2); font-weight:700; line-height:1.1;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+}
+.cn-sin{
+  position:absolute; left:7.34%; top:47.2%; width:85.33%; height:10.7%;
+  font-size:calc(var(--u) * 2.5); line-height:1.5; color:#33353d; overflow:hidden;
+  display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical;
+}
+/* sobre las franjas, en blanco: la marca del sello que edita la cinta */
+.cn-marca{position:absolute; left:7.34%; top:78.4%; color:#fff;
+  text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.cn-marca b{display:block; font-family:var(--display); font-weight:800;
+  font-size:calc(var(--u) * 5.4); letter-spacing:-.01em; line-height:1}
+.cn-marca i{display:block; margin-top:calc(var(--u) * .8); font-style:normal;
+  font-family:var(--mono); font-size:calc(var(--u) * 1.9); letter-spacing:.22em;
+  text-transform:uppercase; opacity:.86}
+.caja-acc{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; flex:0 0 auto}
+.caja-pista{font-family:var(--mono); font-size:9.5px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--dim); flex:0 0 auto}
+@media (max-width:640px){
+  #caja{padding:16px 12px; gap:12px}
+  .caja-esc{width:min(calc(100vw - 24px),calc(58vh * .5918),408px)}
+}
 
 @media (max-width:640px){
   .est-pista{height:286px}
@@ -1195,7 +1292,31 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
       </g>
     </g>
     <polygon points="2668.16 772.93 2630.18 794.87 2668.16 816.81 2668.16 804.18 2687.08 804.18 2687.08 785.55 2668.16 785.55 2668.16 772.93"/>
-  </g></symbol></svg>
+  </g></symbol><symbol id="vhs-contra" viewBox="1295.94 0.6 929.49 1570.66"><rect fill="var(--vhs-carton,#fdf4d5)" x="1295.94" y=".6" width="929.49" height="1570.66" transform="translate(3521.3691 1571.8662) rotate(-180)"/><path fill="#1d1d1b" d="M2157.24,243.45h-793.12v471.69h393.54v.34h6.04v-.34h393.54V243.45ZM2151.2,476.22h-387.5v-110.31h387.5v110.31ZM1757.66,372.34v103.89h-387.5v-110.31h387.5v6.42ZM1370.17,482.26h387.5v110.31h-387.5v-110.31ZM1763.71,587.63v-105.37h387.5v110.31h-387.5v-4.94ZM2151.2,249.49v110.38h-387.5v-110.38h387.5ZM1370.17,249.49h387.5v110.38h-387.5v-110.38ZM1370.17,598.62h387.5v110.48h-387.5v-110.48ZM2151.2,709.09h-387.5v-110.48h387.5v110.48Z"/><rect fill="var(--vhs-f1,#ff9362)" x="1295.94" y="916.12" width="929.49" height="131.03"/><rect fill="var(--vhs-f2,#fb3f35)" x="1295.94" y="1047.15" width="929.49" height="131.03"/><rect fill="var(--vhs-f3,#ff29b6)" x="1295.94" y="1178.17" width="929.49" height="131.03"/><rect fill="var(--vhs-f4,#b82bf1)" x="1295.94" y="1309.2" width="929.49" height="131.03"/><rect fill="var(--vhs-f5,#7a32af)" x="1295.94" y="1440.23" width="929.49" height="131.03"/><g>
+    <rect fill="#ededed" x="1681.27" y="1260.86" width="475.97" height="248.16"/>
+    <rect fill="#1d1d1b" x="1699.22" y="1278.46" width="11.73" height="212.97"/>
+    <rect fill="#1d1d1b" x="1732.62" y="1278.46" width="5.87" height="212.97"/>
+    <rect fill="#1d1d1b" x="1765.87" y="1278.46" width="11.59" height="212.97"/>
+    <rect fill="#1d1d1b" x="1802.73" y="1278.46" width="9.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="1718.85" y="1278.46" width="5.87" height="212.97"/>
+    <rect fill="#1d1d1b" x="1746.38" y="1278.46" width="11.59" height="212.97"/>
+    <rect fill="#1d1d1b" x="1785.36" y="1278.46" width="9.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="1820.09" y="1278.46" width="20.92" height="212.97"/>
+    <rect fill="#1d1d1b" x="1867.27" y="1278.46" width="10.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="1848.91" y="1278.46" width="10.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="1885.63" y="1278.46" width="10.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="1903.99" y="1278.46" width="10.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="1922.35" y="1278.46" width="10.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="1940.71" y="1278.46" width="10.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="1959.07" y="1278.46" width="10.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="2055.39" y="1278.46" width="10.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="2037.03" y="1278.46" width="10.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="2073.76" y="1278.46" width="10.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="2092.12" y="1278.46" width="10.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="2110.48" y="1278.46" width="10.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="2128.84" y="1278.46" width="10.46" height="212.97"/>
+    <rect fill="#1d1d1b" x="1977.43" y="1278.46" width="51.71" height="212.97"/>
+  </g><rect x="1295.94" y="0.6" width="929.49" height="1570.66" filter="url(#vhs-grano)" opacity=".16" style="mix-blend-mode:multiply"/></symbol></svg>
 
 <header id="top">
   <!-- El logo de IRIS se quitó de aquí el 2026-08-27 a pedido de Dosa: en la
@@ -1257,6 +1378,8 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
               <div class="se-sub" id="se-nota"></div>
               <div class="se-cifra" id="se-cifra"></div>
               <button class="cta se-seguir" id="se-seguir"></button>
+              <!-- La ficha de verdad es la contraportada de la caja. -->
+              <button class="se-caja" id="se-caja">Ver la caja</button>
             </div>
           </div>
           <div class="se-eps" id="se-eps"></div>
@@ -1296,6 +1419,19 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
           <button class="btn" id="dl-cerrar">Cerrar</button>
         </div>
       </div>
+    </div>
+
+
+    <!-- La ficha de un titulo: la caja de VHS y su contraportada -->
+    <div id="caja" class="veil hidden">
+      <div class="caja-esc">
+        <div class="caja-giro" id="caja-giro">
+          <div class="caja-cara caja-frente" id="caja-frente"></div>
+          <div class="caja-cara caja-dorso" id="caja-dorso"></div>
+        </div>
+      </div>
+      <p class="caja-pista">Toca la caja para darle la vuelta</p>
+      <div class="caja-acc" id="caja-acc"></div>
     </div>
 
     <!-- Pase de acceso: la biblioteca es privada y el worker no sirve nada sin él -->
@@ -2084,6 +2220,7 @@ const IC = {
   descarga: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>',
   capitulos: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>',
   siguiente: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.25l9 6.75-9 6.75V5.25ZM18.75 5.25v13.5"/></svg>',
+  ficha: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 5.25h16.5v13.5H3.75zM9 5.25v13.5M6.4 8.4h.01M6.4 15.6h.01"/></svg>',
   saltar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.25 12 12l-9 6.75V5.25ZM12.75 5.25 21.75 12l-9 6.75V5.25Z"/></svg>'
 };
 $('#c-play').innerHTML = IC.play;
@@ -2258,6 +2395,9 @@ muestraBarra();
 /* Atajos: espacio, flechas, F, M. */
 document.addEventListener('keydown', (e) => {
   if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+  /* Con la ficha abierta manda la ficha: el espacio o las flechas no pueden
+     mover un vídeo que ni se ve. */
+  if (!$('#caja').classList.contains('hidden')) return;
   if (!video.src) return;
   if (e.code === 'Space') { e.preventDefault(); video.paused ? playSafe() : video.pause(); }
   else if (e.key === 'ArrowRight') video.currentTime += 5;
@@ -2517,6 +2657,14 @@ function tarjetaDe(t) {
     dl.innerHTML = IC.descarga;
     dl.addEventListener('click', (ev) => { ev.stopPropagation(); abreDescarga(t); });
     th.appendChild(dl);
+    /* La ficha, sin quitarle a la entrada lo que ya hace: tocar el ticket
+       sigue poniendo la película, y la caja se pide aparte. */
+    const fi = document.createElement('span');
+    fi.className = 'lib-ficha'; fi.title = 'Ver la caja';
+    fi.setAttribute('role', 'button'); fi.tabIndex = 0;
+    fi.innerHTML = IC.ficha;
+    fi.addEventListener('click', (ev) => { ev.stopPropagation(); abreCaja(t); });
+    th.appendChild(fi);
   }
   card.appendChild(th);
   /* El talón del ticket: título, género y año, y la duración abajo junto al
@@ -2586,6 +2734,21 @@ function seccionDeUrl(u) {
     ? secs.findIndex((s) => s.ents && s.ents.indexOf(u.ent) >= 0)
     : secs.findIndex((s) => s.ent === (u.temporada || u.serie));
   return i > 0 ? i : 0;
+}
+/* Qué caja se enseña desde la vista de serie: la de la temporada abierta, la
+   de la película si la sección tiene una sola, o la de la saga entera. Una
+   temporada suelta no trae `tipo`, así que se le pone para que cuente como
+   serie al sacar capítulos y estado. */
+function fichaDeSeccion() {
+  const t = serieAbierta;
+  if (!t) return null;
+  const secs = seccionesDe(t);
+  const s = secs[(seccion >= 0 && seccion < secs.length) ? seccion : 0];
+  if (s.tipo === 'pelis') return (s.ents && s.ents.length === 1) ? s.ents[0] : t;
+  if (s.ent === t) return t;
+  const c = Object.assign({}, s.ent);
+  c.tipo = 'serie';
+  return c;
 }
 function abreSerie(t, sec) {
   serieAbierta = t;
@@ -2666,6 +2829,8 @@ function pintaSeccion() {
   const i = (seccion >= 0 && seccion < secs.length) ? seccion : 0;
   const s = secs[i];
   const ent = s.ent;
+  $('#se-caja').textContent = s.tipo === 'pelis' && s.ents.length === 1
+    ? 'Ver la caja de la película' : 'Ver la caja';
   const poster = $('#se-poster');
   /* La carátula grande solo sale cuando NO hay selector: con la rejilla de
      tarjetas arriba, la de la sección abierta ya está ahí marcada en rojo y
@@ -3295,6 +3460,10 @@ const dePase = async () => {
   $('#pase-in').select();
 };
 $('#pase-ok').addEventListener('click', dePase);
+$('#se-caja').addEventListener('click', () => abreCaja(fichaDeSeccion()));
+/* La carátula de la ficha también abre la caja: es lo que se mira. */
+$('#se-poster').addEventListener('click', () => abreCaja(fichaDeSeccion()));
+$('#se-poster').style.cursor = 'pointer';
 $('#pase-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') dePase(); });
 
 (async () => {
@@ -3380,6 +3549,206 @@ function abreTitulo(t) {
   if (t.tipo === 'serie') { abreSerie(t); return; }
   cargarURL(absCat(t.url), { nombre: t.titulo }); playSafe();
 }
+
+/* ---------- la ficha de un título: la caja, por detrás ----------
+   La contraportada del VHS no es un adorno: es la ficha. Los datos van en las
+   ocho viñetas impresas, la sinopsis debajo y la marca sobre las franjas, y
+   todo se tiñe con la paleta de la propia carátula, igual que el estante.
+   Se abre por la portada y la caja se da la vuelta sola: ese gesto es lo que
+   dice que la información está DETRÁS, no en una tarjeta cualquiera. */
+const CAJA = { t: null, giro: 0 };
+function anioDe(t) {
+  const m = (t.nota || '').match(/\b(19|20)\d{2}\b/);
+  return m ? m[0] : '—';
+}
+function generoDe(t) {
+  const m = (t.nota || '').match(/^(.*?),\s*(?:19|20)\d{2}\b/);
+  return m ? m[1].trim() : '—';
+}
+/* La nota del catálogo suele venir como "Género, Año. Sinopsis…": en el dorso
+   el género y el año ya tienen su viñeta, así que aquí sobra ese encabezado. */
+function sinopsisDe(t) {
+  const n = (t.nota || '').trim();
+  const m = n.match(/^.*?,\s*(?:19|20)\d{2}\s*[.·:–—-]?\s*/);
+  return (m && n.length > m[0].length) ? n.slice(m[0].length) : n;
+}
+function primeraUrl(t) {
+  if (t.url) return t.url;
+  const ls = listasDe(t);
+  for (let i = 0; i < ls.length; i++) if (ls[i].eps.length) return ls[i].eps[0].url || '';
+  const p = t.peliculas || [];
+  return (p[0] && p[0].url) || '';
+}
+function formatoDe(t) {
+  const m = String(primeraUrl(t)).match(/\.([a-z0-9]{2,4})(?:[?#]|$)/i);
+  return m ? m[1].toUpperCase() : '—';
+}
+function pesoDe(n) {
+  if (!n) return '—';
+  const g = n / 1073741824;
+  return g >= 1 ? String(Math.round(g * 10) / 10).replace('.', ',') + ' GB'
+                : Math.round(n / 1048576) + ' MB';
+}
+/* Las pistas viven en el título si es película y en los capítulos si es serie:
+   se mira donde haga falta y se enseña la PRIMERA, que es la que suena. */
+function pistasDe(t) {
+  const cand = [t];
+  listasDe(t).forEach((l) => { if (l.eps[0]) cand.push(l.eps[0]); });
+  (t.peliculas || []).forEach((p) => cand.push(p));
+  let au = '', su = '';
+  cand.forEach((c) => {
+    if (!c) return;
+    if (!au && c.audios && c.audios.length) au = String(c.audios[0].label || '').trim();
+    if (!su && c.subs && c.subs.length) su = String(c.subs[0].label || '').trim();
+  });
+  return { au: au || 'Original', su: su || 'Sin subtítulos' };
+}
+function estadoDe(t) {
+  const pr = progreso();
+  if (t.tipo !== 'serie') {
+    const p = pr[absCat(t.url || '')];
+    if (!p) return 'Sin ver';
+    if (p.p >= 1) return 'Vista';
+    return 'A medias ' + Math.round(p.p * 100) + ' %';
+  }
+  let n = 0, v = 0;
+  listasDe(t).forEach((l) => l.eps.forEach((e) => {
+    n++;
+    const p = pr[absCat(e.url || '')];
+    if (p && p.p >= 0.95) v++;
+  }));
+  if (!n) return '—';
+  if (!v) return 'Sin ver';
+  return v >= n ? 'Vista entera' : v + ' de ' + n;
+}
+/* Las ocho viñetas, en el orden en que se leen: dos columnas, cuatro filas. */
+function vinetasDe(t) {
+  const pi = pistasDe(t);
+  if (t.tipo === 'serie') {
+    const temps = (t.temporadas || []).length;
+    const eps = listasDe(t).reduce((a, l) => a + l.eps.length, 0);
+    const pel = (t.peliculas || []).length;
+    return [
+      ['Año', anioDe(t)],
+      ['Género', generoDe(t)],
+      temps ? ['Temporadas', String(temps)] : (pel ? ['Películas', String(pel)] : ['Temporadas', '1']),
+      ['Capítulos', String(eps)],
+      ['Audio', pi.au],
+      ['Subtítulos', pi.su],
+      ['Formato', formatoDe(t)],
+      ['Estado', estadoDe(t)]
+    ];
+  }
+  return [
+    ['Año', anioDe(t)],
+    ['Género', generoDe(t)],
+    ['Duración', t.dur ? durTexto(t.dur) : '—'],
+    ['Tamaño', pesoDe(t.tam)],
+    ['Audio', pi.au],
+    ['Subtítulos', pi.su],
+    ['Formato', formatoDe(t)],
+    ['Estado', estadoDe(t)]
+  ];
+}
+function pintaDorso(box, t) {
+  box.innerHTML = '';
+  box.appendChild(usaVHS('vhs-contra'));
+  const tit = document.createElement('div');
+  tit.className = 'cn-tit'; tit.textContent = t.titulo || 'Sin título';
+  const meta = document.createElement('div');
+  meta.className = 'cn-meta';
+  meta.textContent = (t.tipo === 'serie' ? 'Serie' : 'Película') + ' · ' + cifraDe(t);
+  const rej = document.createElement('div'); rej.className = 'cn-rej';
+  vinetasDe(t).forEach((par) => {
+    const c = document.createElement('div'); c.className = 'cn-cel';
+    const b = document.createElement('b'); b.textContent = par[0];
+    const v = document.createElement('span'); v.textContent = par[1]; v.title = par[1];
+    c.append(b, v); rej.appendChild(c);
+  });
+  const sin = document.createElement('p'); sin.className = 'cn-sin';
+  sin.textContent = sinopsisDe(t) || 'Sin sinopsis.';
+  const mar = document.createElement('div'); mar.className = 'cn-marca';
+  const mb = document.createElement('b'); mb.textContent = 'MOOVIN';
+  const mi = document.createElement('i'); mi.textContent = 'IRIS Studio';
+  mar.append(mb, mi);
+  box.append(tit, meta, rej, sin, mar);
+}
+/* El tamaño de letra del dorso sale del ancho real de la caja: así el texto
+   impreso se lee igual en el móvil que en una pantalla grande. Aquí no vale
+   cqw (la tele no lo entiende) ni una medida fija. */
+function ajustaCaja() {
+  const e = $('.caja-esc');
+  if (e) e.style.setProperty('--u', (e.clientWidth / 100) + 'px');
+}
+function cierraCaja() {
+  clearTimeout(CAJA.giro);
+  $('#caja').classList.add('hidden');
+  CAJA.t = null;
+}
+function abreCaja(t) {
+  if (!t) return;
+  CAJA.t = t;
+  const velo = $('#caja'), giro = $('#caja-giro');
+  const frente = $('#caja-frente'), dorso = $('#caja-dorso');
+  const img = conPase(absCat(t.poster || t.miniatura || ''));
+  frente.innerHTML = '';
+  frente.style.backgroundImage = img ? 'url("' + img + '")' : '';
+  const sello = usaVHS('vhs-sello'); sello.setAttribute('class', 'vhs-sello');
+  frente.appendChild(sello);
+  pintaDorso(dorso, t);
+  paletaVHS(img).then((p) => { pintaVHS(giro, p); pintaVHS(dorso, p); });
+
+  const acc = $('#caja-acc'); acc.innerHTML = '';
+  const ver = document.createElement('button'); ver.className = 'mv-btn solido';
+  /* Si la caja se abrió DESDE la vista de la serie, "Ver la serie" no lleva a
+     ningún sitio: ya se está ahí. Ahí el botón hace lo mismo que el grande de
+     la ficha, que es empezar o seguir por donde iba. */
+  const enLaSerie = t.tipo === 'serie' && $('#serie').classList.contains('on');
+  if (enLaSerie) {
+    ver.textContent = ($('#se-seguir').textContent || 'Empezar').trim();
+    ver.addEventListener('click', () => { cierraCaja(); $('#se-seguir').click(); });
+  } else {
+    ver.textContent = t.tipo === 'serie' ? 'Ver la serie' : 'Ver ahora';
+    ver.addEventListener('click', () => { cierraCaja(); abreTitulo(t); });
+  }
+  acc.appendChild(ver);
+  if (t.tipo !== 'serie') {
+    const baja = document.createElement('button'); baja.className = 'mv-btn hueco';
+    baja.textContent = 'Descargar';
+    baja.addEventListener('click', () => { cierraCaja(); abreDescarga(t); });
+    acc.appendChild(baja);
+  }
+  const cerrar = document.createElement('button'); cerrar.className = 'mv-btn hueco';
+  cerrar.textContent = 'Cerrar';
+  cerrar.addEventListener('click', cierraCaja);
+  acc.appendChild(cerrar);
+
+  velo.classList.remove('hidden');
+  ajustaCaja();
+  giro.classList.remove('dorso');
+  /* La vuelta sola, un pelín después de abrir: si se pone el dorso de salida
+     no se entiende que lo que se lee es la parte de atrás de ESA caja. Con el
+     movimiento reducido se enseña ya girada, sin baile. */
+  clearTimeout(CAJA.giro);
+  const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  CAJA.giro = setTimeout(() => giro.classList.add('dorso'), quieto ? 0 : 360);
+}
+$('#caja-giro').addEventListener('click', () => {
+  clearTimeout(CAJA.giro);
+  $('#caja-giro').classList.toggle('dorso');
+});
+/* Fuera de la caja se cierra; dentro no, o girarla la cerraría. */
+$('#caja').addEventListener('click', (e) => { if (e.target === $('#caja')) cierraCaja(); });
+document.addEventListener('keydown', (e) => {
+  if ($('#caja').classList.contains('hidden')) return;
+  if (e.key === 'Escape') cierraCaja();
+  else if (e.key === 'Enter' || e.code === 'Space') {
+    e.preventDefault();
+    clearTimeout(CAJA.giro);
+    $('#caja-giro').classList.toggle('dorso');
+  }
+});
+addEventListener('resize', ajustaCaja, { passive: true });
 
 /* ---------- portada grande ---------- */
 function pintaHero(t) {
@@ -3534,7 +3903,8 @@ function estanteDe(lista) {
   const acc = document.createElement('div'); acc.className = 'ef-acc';
   const ver = document.createElement('button'); ver.className = 'mv-btn solido';
   const baja = document.createElement('button'); baja.className = 'mv-btn hueco'; baja.textContent = 'Descargar';
-  acc.append(ver, baja);
+  const dorso = document.createElement('button'); dorso.className = 'mv-btn hueco'; dorso.textContent = 'La caja';
+  acc.append(ver, baja, dorso);
   ficha.append(meta, tit, dur, acc);
 
   const lomos = lista.map((t2, i) => {
@@ -3583,6 +3953,7 @@ function estanteDe(lista) {
   });
   ver.addEventListener('click', () => abreTitulo(lista[sel]));
   baja.addEventListener('click', () => abreDescarga(lista[sel]));
+  dorso.addEventListener('click', () => abreCaja(lista[sel]));
 
   const nav = document.createElement('div'); nav.className = 'est-nav';
   [['-1', '\u2190', 'Anterior'], ['1', '\u2192', 'Siguiente']].forEach(([paso, gl, rot]) => {
