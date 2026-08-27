@@ -140,7 +140,10 @@ button.tag:hover{opacity:.7}
 .veil.hidden{display:none}
 .pase-card{max-width:400px}
 /* La biblioteca ES la landing: capa opaca a pantalla completa con scroll */
-#loader{background:var(--bg); align-items:flex-start; overflow-y:auto}
+/* overflow-x oculto: el hero se sale a proposito hasta los bordes de la
+   ventana y sin esto aparecia una barra horizontal del ancho de la
+   barra de desplazamiento. */
+#loader{background:var(--bg); align-items:flex-start; overflow-y:auto; overflow-x:hidden}
 .lib{
   position:relative; width:min(1080px,100%);
   padding:38px 34px 46px; margin:0 auto;
@@ -821,47 +824,82 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    Manda la imagen: el cartel entra a sangre por la derecha y el texto se
    apoya sobre él. Antes el cartel iba pequeño al lado de un fondo desenfocado
    casi negro, y eso no era una portada, era un hueco con un título. */
+/* Va A SANGRE, de borde a borde: la columna de 1080 px vale para la rejilla,
+   pero una portada que se corta a los lados no es una portada. El truco es el
+   de siempre — ancho 100vw y un margen negativo que deshace el centrado — y
+   funciona igual en el televisor, donde .lib ocupa todo. Para que el texto
+   siga alineado con la rejilla de abajo, el margen del texto es --lado. */
 #lib-hero{
-  position:relative; margin:-38px -34px 26px; padding:0;
-  min-height:min(62vh,520px); display:flex; align-items:stretch;
+  --lado:max(34px,calc((100vw - 1080px) / 2 + 34px));
+  position:relative; width:100vw; margin:-38px 0 30px calc(50% - 50vw); padding:0;
+  min-height:min(72vh,600px); display:flex; align-items:flex-end;
   overflow:hidden; isolation:isolate;
 }
 #lib-hero.oculto{display:none}
+/* el relleno borroso: solo asoma cuando el arte es vertical y no cubre */
 #lib-hero .hero-fondo{
   position:absolute; inset:0; z-index:-3;
   background-size:cover; background-position:center 26%;
-  filter:blur(26px) saturate(1.2) brightness(.42); transform:scale(1.14);
+  filter:blur(30px) saturate(1.25) brightness(.38); transform:scale(1.16);
 }
-/* el cartel, nítido y a sangre, ocupando la mitad derecha */
-#lib-hero .hero-cartel{
-  position:absolute; inset:0 0 0 auto; z-index:-2; width:min(56%,760px);
-  background-size:cover; background-position:center 22%;
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 42%);
-  mask-image:linear-gradient(90deg,transparent,#000 42%);
+/* El arte. Con imagen APAISADA ocupa la pantalla entera y los degradados hacen
+   el trabajo, como en Netflix. Con solo la carátula vertical se queda a la
+   derecha y se funde hacia la izquierda: estirar un 2:3 a lo ancho deja un
+   recorte sin cara ni cabeza. */
+#lib-hero .hero-arte{
+  position:absolute; inset:0 0 0 auto; z-index:-2; width:min(62%,900px);
+  background-image:var(--arte-ancho,none);
+  background-size:cover; background-position:center 20%;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 44%);
+  mask-image:linear-gradient(90deg,transparent,#000 44%);
+}
+#lib-hero .hero-arte.ancho{
+  inset:0; width:auto; background-position:72% 22%;
+  -webkit-mask-image:none; mask-image:none;
 }
 #lib-hero .hero-velo{
   position:absolute; inset:0; z-index:-1;
-  background:linear-gradient(90deg,var(--bg) 4%,rgba(11,11,13,.92) 30%,rgba(11,11,13,.45) 58%,transparent 88%),
-             linear-gradient(0deg,var(--bg) 1%,rgba(11,11,13,.2) 26%,transparent 62%);
+  background:linear-gradient(90deg,var(--bg) 0%,rgba(11,11,13,.94) 24%,rgba(11,11,13,.62) 46%,rgba(11,11,13,.18) 72%,transparent 100%),
+             linear-gradient(0deg,var(--bg) 0%,rgba(11,11,13,.72) 13%,rgba(11,11,13,.12) 36%,transparent 64%);
 }
+/* El bloque de texto ocupa el ancho entero y es el MARGEN el que lo coloca;
+   lo que se estrecha es cada linea por dentro. Poniendole el ancho al bloque
+   se contaba el margen izquierdo dentro de esos 54ch (box-sizing:border-box)
+   y el titulo se partia en dos a media pantalla. */
 #lib-hero .hero-tx{
-  position:relative; align-self:flex-end; max-width:min(46ch,58%);
-  padding:44px 34px 40px;
+  position:relative; width:100%;
+  padding:0 var(--lado) clamp(30px,6vh,58px);
 }
+#lib-hero .hero-tit{max-width:min(15ch,52%)}
+#lib-hero .hero-eyebrow,#lib-hero .hero-meta{max-width:min(74ch,52%)}
+#lib-hero .hero-meta span{white-space:nowrap}
 #lib-hero .hero-eyebrow{
-  font-family:var(--mono); font-size:10.5px; letter-spacing:.2em;
-  text-transform:uppercase; color:var(--oro);
+  display:flex; align-items:center; gap:9px; flex-wrap:wrap;
+  font-family:var(--mono); font-size:11px; letter-spacing:.22em;
+  text-transform:uppercase; color:rgba(244,244,246,.82);
+}
+#lib-hero .hero-eyebrow .mv-m{height:17px; width:auto}
+#lib-hero .hero-eyebrow .nuevo{color:var(--oro)}
+#lib-hero .hero-eyebrow .pt{
+  width:3px; height:3px; border-radius:50%; background:rgba(244,244,246,.42);
 }
 #lib-hero .hero-tit{
   font-family:var(--display); font-weight:800;
-  font-size:clamp(34px,6vw,68px); line-height:.98; letter-spacing:-.03em;
-  margin-top:12px; text-wrap:balance; text-shadow:0 4px 30px rgba(0,0,0,.5);
+  font-size:clamp(38px,5.6vw,76px); line-height:.96; letter-spacing:-.03em;
+  margin-top:14px; text-wrap:balance; text-shadow:0 4px 30px rgba(0,0,0,.55);
 }
 #lib-hero .hero-meta{
-  font-family:var(--mono); font-size:11.5px; color:var(--muted);
-  margin-top:14px; letter-spacing:.04em;
+  display:flex; align-items:center; flex-wrap:wrap;
+  font-family:var(--mono); font-size:12px; color:rgba(244,244,246,.74);
+  margin-top:16px; letter-spacing:.04em;
 }
-#lib-hero .hero-acc{display:flex; gap:10px; margin-top:24px; flex-wrap:wrap}
+/* El punto va PEGADO al dato anterior, no delante del siguiente: al partirse
+   la linea en el telefono, una fila que empieza por "·" se lee fatal. */
+#lib-hero .hero-meta span:not(:last-child)::after{
+  content:' ·'; margin-right:9px; color:rgba(244,244,246,.42);
+}
+#lib-hero .hero-acc{display:flex; gap:10px; margin-top:26px; flex-wrap:wrap}
+#lib-hero .hero-acc svg{width:16px; height:16px}
 .mv-btn{
   display:inline-flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600;
   border-radius:10px; padding:11px 22px; border:1px solid transparent; cursor:pointer;
@@ -925,14 +963,27 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 }
 
 @media (max-width:640px){
-  #lib-hero{margin:-24px -18px 22px; min-height:min(56vh,420px)}
-  #lib-hero .hero-cartel{
-    width:100%; background-position:center 18%;
-    -webkit-mask-image:linear-gradient(180deg,#000 30%,transparent 92%);
-    mask-image:linear-gradient(180deg,#000 30%,transparent 92%);
+  /* En el movil manda la caratula VERTICAL a pantalla completa y el texto va
+     centrado abajo, que es como se ve Netflix en el telefono. */
+  #lib-hero{--lado:18px; margin:-22px 0 20px calc(50% - 50vw); min-height:min(66vh,520px)}
+  #lib-hero .hero-arte{
+    inset:0; width:auto; background-image:var(--arte-alto,var(--arte-ancho,none));
+    background-position:center 12%;
+    -webkit-mask-image:none; mask-image:none;
   }
-  #lib-hero .hero-velo{background:linear-gradient(0deg,var(--bg) 6%,rgba(11,11,13,.78) 38%,rgba(11,11,13,.15) 74%,transparent 100%)}
-  #lib-hero .hero-tx{max-width:100%; padding:28px 18px 24px}
+  /* Mas oscuro y antes: la caratula vertical trae su propio titulo impreso y
+     sin esto se cruzaba con el nuestro. */
+  #lib-hero .hero-velo{
+    background:linear-gradient(0deg,var(--bg) 2%,rgba(11,11,13,.95) 32%,rgba(11,11,13,.62) 55%,rgba(11,11,13,.2) 82%,rgba(11,11,13,.08) 100%);
+  }
+  #lib-hero .hero-tx{width:100%; padding:0 18px 26px; text-align:center}
+  /* Los topes de ancho de escritorio (la mitad de la pantalla) aqui parten el
+     renglon y los datos en varias lineas: en el telefono manda el ancho entero. */
+  #lib-hero .hero-tit,#lib-hero .hero-eyebrow,#lib-hero .hero-meta{max-width:100%}
+  #lib-hero .hero-eyebrow,#lib-hero .hero-meta,#lib-hero .hero-acc{justify-content:center}
+  #lib-hero .hero-tit{font-size:clamp(30px,9vw,44px)}
+  #lib-hero .hero-meta{font-size:11px; margin-top:12px}
+  #lib-hero .hero-acc{margin-top:20px}
   .lib-rejilla{grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:14px}
   .lib-tit{font-size:12.5px}
   .lib-nota{font-size:10.5px}
@@ -2203,6 +2254,7 @@ const IC = {
   descarga: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>',
   capitulos: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>',
   siguiente: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.25l9 6.75-9 6.75V5.25ZM18.75 5.25v13.5"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.25"/><path d="M12 10.5v6M12 7.6h.01"/></svg>',
   ficha: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.75 5.25h16.5v13.5H3.75zM9 5.25v13.5M6.4 8.4h.01M6.4 15.6h.01"/></svg>',
   saltar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.25 12 12l-9 6.75V5.25ZM12.75 5.25 21.75 12l-9 6.75V5.25Z"/></svg>'
 };
@@ -3734,37 +3786,73 @@ document.addEventListener('keydown', (e) => {
 addEventListener('resize', ajustaCaja, { passive: true });
 
 /* ---------- portada grande ---------- */
+/* La firma de la nota: lo que va detrás del guion largo, que en este catálogo
+   es el estudio o quien la dirige. */
+function firmaDe(t) {
+  const m = (t.nota || '').split(/\s[—–-]\s/);
+  return m.length > 1 ? m[m.length - 1].trim() : '';
+}
+/* Un botón del hero, con su icono: mismo gesto que en Netflix, reproducir a la
+   izquierda y la información al lado. */
+function botonHero(clase, icono, rotulo, alPulsar) {
+  const b = document.createElement('button');
+  b.className = 'mv-btn ' + clase;
+  b.innerHTML = icono;
+  b.appendChild(document.createTextNode(rotulo));
+  b.addEventListener('click', alPulsar);
+  return b;
+}
 function pintaHero(t) {
   const box = $('#lib-hero');
   if (!box) return;
   if (!t) { box.classList.add('oculto'); box.innerHTML = ''; return; }
-  const img = conPase(absCat(t.poster || t.miniatura || ''));
+  const cartel = conPase(absCat(t.poster || t.miniatura || ''));
+  const ancho = t.miniatura ? conPase(absCat(t.miniatura)) : '';
   box.classList.remove('oculto');
   box.innerHTML = '';
+  box.style.setProperty('--arte-ancho', 'url("' + (ancho || cartel) + '")');
+  box.style.setProperty('--arte-alto', 'url("' + cartel + '")');
+
   const fondo = document.createElement('div'); fondo.className = 'hero-fondo';
+  if (cartel) fondo.style.backgroundImage = 'url("' + cartel + '")';
+  const arte = document.createElement('div');
+  arte.className = 'hero-arte' + (ancho ? ' ancho' : '');
   const velo = document.createElement('div'); velo.className = 'hero-velo';
-  if (img) fondo.style.backgroundImage = 'url("' + img + '")';
+
   const tx = document.createElement('div'); tx.className = 'hero-tx';
+  /* El renglón de arriba, como el "N SERIE" de Netflix: la marca, qué es, y
+     que acaba de entrar. La M se clona de la cabecera SIN sus degradados, que
+     ya viven en el documento: duplicar los ids sobra. */
   const eb = document.createElement('p'); eb.className = 'hero-eyebrow';
-  eb.textContent = t.tipo === 'serie' ? 'Serie destacada' : 'Recién llegada';
-  const h = document.createElement('div'); h.className = 'hero-tit'; h.textContent = t.titulo || '';
-  const me = document.createElement('p'); me.className = 'hero-meta';
-  me.textContent = [metaDe(t), cifraDe(t)].filter(Boolean).join(' · ');
-  const acc = document.createElement('div'); acc.className = 'hero-acc';
-  const b1 = document.createElement('button'); b1.className = 'mv-btn solido';
-  b1.textContent = t.tipo === 'serie' ? 'Ver la serie' : 'Ver ahora';
-  b1.addEventListener('click', () => abreTitulo(t));
-  acc.appendChild(b1);
-  if (t.tipo !== 'serie') {
-    const b2 = document.createElement('button'); b2.className = 'mv-btn hueco';
-    b2.textContent = 'Descargar';
-    b2.addEventListener('click', () => abreDescarga(t));
-    acc.appendChild(b2);
+  const marca = document.querySelector('#marca .mv-m');
+  if (marca) {
+    const m = marca.cloneNode(true);
+    const d = m.querySelector('defs');
+    if (d) d.parentNode.removeChild(d);
+    eb.appendChild(m);
   }
+  const clase = document.createElement('span');
+  clase.textContent = t.tipo === 'serie' ? 'Serie' : 'Película';
+  eb.appendChild(clase);
+  const pt = document.createElement('span'); pt.className = 'pt';
+  const nue = document.createElement('span'); nue.className = 'nuevo';
+  nue.textContent = 'Recién llegada';
+  eb.append(pt, nue);
+
+  const h = document.createElement('div'); h.className = 'hero-tit';
+  h.textContent = t.titulo || '';
+  const me = document.createElement('p'); me.className = 'hero-meta';
+  [anioDe(t), generoDe(t), cifraDe(t), firmaDe(t)]
+    .filter((x) => x && x !== '—')
+    .forEach((x) => { const e = document.createElement('span'); e.textContent = x; me.appendChild(e); });
+
+  const acc = document.createElement('div'); acc.className = 'hero-acc';
+  acc.appendChild(botonHero('solido', IC.play, 'Reproducir', () => abreTitulo(t)));
+  /* "Más información" abre la caja: la ficha de MOOVIN es su contraportada. */
+  acc.appendChild(botonHero('hueco', IC.info, 'Más información', () => abreCaja(t)));
+
   tx.append(eb, h, me, acc);
-  const cartel = document.createElement('div'); cartel.className = 'hero-cartel';
-  if (img) cartel.style.backgroundImage = 'url("' + img + '")';
-  box.append(fondo, cartel, velo, tx);
+  box.append(fondo, arte, velo, tx);
 }
 
 

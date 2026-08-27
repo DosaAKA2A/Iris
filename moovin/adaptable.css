@@ -65,6 +65,16 @@
   max-width:none;
   padding:calc(30px + var(--safe-y)) calc(20px + var(--safe-x)) calc(50px + var(--safe-y));
 }
+/* La portada grande va a sangre tambien aqui, pero el texto se alinea con el
+   margen seguro del televisor, no con la columna de 1080 del escritorio; y se
+   le pone tope de alto para que las pestañas de seccion no caigan fuera. */
+:root[data-plataforma="tv"] #lib-hero{
+  --lado:calc(30px + var(--safe-x));
+  min-height:min(58vh,560px); margin-top:calc(-30px - var(--safe-y));
+}
+:root[data-plataforma="tv"] #lib-hero .hero-eyebrow{font-size:15px}
+:root[data-plataforma="tv"] #lib-hero .hero-tit{font-size:clamp(46px,4.4vw,72px)}
+:root[data-plataforma="tv"] #lib-hero .hero-meta{font-size:16px}
 :root[data-plataforma="tv"] .lib h1{font-size:34px}
 :root[data-plataforma="tv"] .lib .sub{font-size:18px; max-width:820px}
 :root[data-plataforma="tv"] .lib-tab{font-size:14px; padding:13px 18px}
