@@ -4040,8 +4040,10 @@ function sacaPaleta(img) {
      familia lo afina croma al cuadrado (el naranja franco de un letrero
      manda sobre la masa de piel apagada de su mismo lado de la rueda). */
   const fam = new Map(), fino = new Map();
+  let luz = 0, nPix = 0;
   for (let i = 0; i < d.length; i += 4) {
     const [h, l, s] = aHLS(d[i] / 255, d[i + 1] / 255, d[i + 2] / 255);
+    luz += l; nPix++;
     const k = Math.floor(h * 18) % 18;
     if (!(s < .18 || l < .10 || l > .93)) cubos.set(k, (cubos.get(k) || 0) + 1);
     const w = s * (1 - Math.abs(2 * l - 1));
@@ -4073,13 +4075,23 @@ function sacaPaleta(img) {
   return {
     f, carton: hex(...aRGB(dom, .90, .26)),
     etiq: hex(...aRGB(dom, .90, .22)), pega: tinta(tonos[2 % tonos.length], .52, .38),
-    /* El papel del ticket, del mismo tono: claro arriba, algo mas cargado
-       abajo. La tinta y el texto flojo salen del MISMO tono, muy oscuros, que
-       es lo que hace que se lean sin pelear con el color del papel. */
-    papel: hex(...aRGB(dom, .88, .42)),
-    papel2: hex(...aRGB(dom, .68, .46)),
-    tintaTk: hex(...aRGB(dom, .13, .52)),
-    tintaSuave: hex(...aRGB(dom, .30, .40))
+    /* El papel del ticket hereda tambien la CLARIDAD de su caratula (pedido
+       de Dosa: "hay portadas que de claras no tienen nada"). Dos regimenes:
+       caratula oscura -> papel oscuro con tinta CLARA del mismo tono;
+       caratula clara -> papel claro con tinta oscura, como una entrada
+       impresa en papel del color del cartel. El punto medio (l=.55) no
+       existe a proposito: ahi ninguna tinta contrasta bien. */
+    ...(luz / nPix < .45 ? {
+      papel: hex(...aRGB(dom, .20 + (luz / nPix) * .35, .38)),
+      papel2: hex(...aRGB(dom, Math.max(.12, .11 + (luz / nPix) * .35), .42)),
+      tintaTk: hex(...aRGB(dom, .88, .42)),
+      tintaSuave: hex(...aRGB(dom, .66, .30))
+    } : {
+      papel: hex(...aRGB(dom, .78 + (luz / nPix - .45) * .22, .42)),
+      papel2: hex(...aRGB(dom, .60 + (luz / nPix - .45) * .22, .46)),
+      tintaTk: hex(...aRGB(dom, .13, .52)),
+      tintaSuave: hex(...aRGB(dom, .30, .40))
+    })
   };
 }
 function paletaVHS(url) {
