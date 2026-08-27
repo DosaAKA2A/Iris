@@ -723,65 +723,80 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    intro y las portadas. Todo lo de aquí abajo pisa a propósito lo de
    arriba; se mantiene separado para poder repasarlo de un vistazo. */
 
-/* ---------- intro VHS (una vez por sesión) ---------- */
+/* ---------- intro: título filmado con ojo de pez ----------
+   La referencia no es una tele con nieve: es un plano de cámara con lente de
+   ojo de pez — el círculo de la lente recorta la imagen por los lados y el
+   rótulo va encima, centrado. El aire de cinta queda en lo justo: grano,
+   una pasada de tracking y un pelo de aberración en el logo. */
 #intro{
-  position:fixed; inset:0; z-index:100; background:#000;
+  position:fixed; inset:0; z-index:100; background:#050505;
   display:flex; align-items:center; justify-content:center; overflow:hidden;
 }
-#intro.fin{opacity:0; pointer-events:none; transition:opacity .5s ease}
+#intro.fin{opacity:0; pointer-events:none; transition:opacity .6s ease}
 #intro.oculto{display:none}
-#nieve{position:absolute; inset:0; width:100%; height:100%; opacity:0}
-#intro.senal #nieve{opacity:.5}
-#intro-linea{
-  position:absolute; left:8%; right:8%; top:50%; height:3px; border-radius:3px;
-  background:#fff; box-shadow:0 0 26px 6px rgba(255,255,255,.75);
-  transform:translateY(-50%) scaleX(0);
+/* El círculo es más ancho que la pantalla, así que arriba y abajo se corta:
+   quedan los costados curvos del ojo de pez y el encuadre apaisado. */
+#lente{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(.86);
+  width:min(148vh,124vw); aspect-ratio:1; border-radius:50%; overflow:hidden;
+  opacity:0; transition:transform 1.5s cubic-bezier(.16,.7,.3,1), opacity .9s ease;
 }
-#intro.enciende #intro-linea{animation:mv-linea .5s ease-out forwards}
-@keyframes mv-linea{
-  0%{transform:translateY(-50%) scaleX(0)}
-  55%{transform:translateY(-50%) scaleX(1)}
-  100%{transform:translateY(-50%) scaleX(1) scaleY(46); opacity:0}
+#intro.abre #lente{opacity:1; transform:translate(-50%,-50%) scale(1)}
+#lente-fondo{
+  position:absolute; inset:0; border-radius:50%;
+  background:
+    radial-gradient(60% 50% at 50% 38%, #4a2a24 0%, #2a1a1c 42%, #140e12 68%, #0a0a0c 100%);
+}
+/* la caída de luz de una lente ancha: el centro pega y los bordes se apagan */
+#lente-brillo{
+  position:absolute; inset:0; border-radius:50%;
+  background:
+    radial-gradient(36% 30% at 50% 33%, rgba(255,196,128,.26), transparent 68%),
+    radial-gradient(circle at 50% 50%, transparent 44%, rgba(5,5,6,.55) 72%, rgba(5,5,6,.96) 92%, #050506 100%);
+  /* el filo del cristal: sin este aro la curvatura no se lee */
+  box-shadow:inset 0 0 0 1px rgba(255,225,190,.16), inset 0 0 90px 20px rgba(5,5,6,.9);
 }
 #intro-centro{
-  position:relative; z-index:2; display:flex; flex-direction:column;
-  align-items:center; gap:14px; opacity:0; transform:scale(.985);
+  position:relative; z-index:3; display:flex; flex-direction:column;
+  align-items:center; gap:16px; opacity:0; transform:scale(.97);
+  padding:0 24px; text-align:center;
 }
-#intro.marca #intro-centro{animation:mv-entra .55s ease-out forwards}
+#intro.marca #intro-centro{animation:mv-entra 1s cubic-bezier(.16,.7,.3,1) forwards}
 @keyframes mv-entra{to{opacity:1; transform:scale(1)}}
-#intro-logo .mv-m{height:clamp(64px,11vw,104px); width:auto; display:block}
-#intro.glitch #intro-logo{animation:mv-glitch .38s steps(2,end) 2}
-@keyframes mv-glitch{
-  0%{transform:translateX(0); filter:none}
-  25%{transform:translateX(-5px); filter:drop-shadow(6px 0 rgba(255,0,64,.75)) drop-shadow(-6px 0 rgba(0,220,255,.6))}
-  50%{transform:translateX(4px)}
-  75%{transform:translateX(-2px); filter:drop-shadow(-4px 0 rgba(255,0,64,.6))}
-  100%{transform:translateX(0); filter:none}
+#intro-logo .mv-m{height:clamp(58px,9.5vw,96px); width:auto; display:block}
+/* un pelo de aberración cromática, como una cinta leída de más */
+#intro.marca #intro-logo{animation:mv-crom 1.1s ease-out forwards}
+@keyframes mv-crom{
+  0%{filter:drop-shadow(3px 0 rgba(255,60,90,.55)) drop-shadow(-3px 0 rgba(70,200,255,.45))}
+  100%{filter:none}
 }
-#intro-palabra{height:clamp(17px,2.6vw,26px); width:auto; color:#fff}
+#intro-palabra{height:clamp(15px,2.3vw,23px); width:auto; color:#f6f2ea}
 #intro-studio{
-  font-family:var(--mono); font-size:11px; letter-spacing:.34em;
-  text-transform:uppercase; color:#8a8a94;
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.42em;
+  text-transform:uppercase; color:rgba(246,242,234,.62); margin-top:2px;
 }
+/* una sola pasada de tracking, como cuando la cinta engancha */
 #intro-tracking{
-  position:absolute; left:0; right:0; height:70px; top:-70px; pointer-events:none;
-  background:linear-gradient(180deg,transparent,rgba(255,255,255,.09) 35%,rgba(255,255,255,.16) 50%,rgba(255,255,255,.05) 70%,transparent);
+  position:absolute; left:0; right:0; height:96px; top:-96px; z-index:4;
+  pointer-events:none; opacity:.5;
+  background:linear-gradient(180deg,transparent,rgba(255,255,255,.05) 38%,rgba(255,255,255,.11) 50%,rgba(255,255,255,.04) 66%,transparent);
   mix-blend-mode:screen;
 }
-#intro.senal #intro-tracking{animation:mv-track 1.5s linear 1 forwards}
-@keyframes mv-track{from{top:-70px} to{top:100%}}
+#intro.marca #intro-tracking{animation:mv-track 2.1s linear 1 forwards}
+@keyframes mv-track{from{top:-96px} to{top:100%}}
+/* grano y líneas de barrido, muy por debajo */
 #intro::after{
-  content:""; position:absolute; inset:0; pointer-events:none; z-index:3;
-  background:repeating-linear-gradient(180deg,rgba(0,0,0,.30) 0 1px,transparent 1px 3px);
-  opacity:.55;
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:5;
+  background:repeating-linear-gradient(180deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px);
+  opacity:.5;
 }
 #intro-saltar{
-  position:absolute; right:22px; bottom:20px; z-index:4;
-  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
-  color:#9a9aa6; background:none; border:1px solid #33333c; border-radius:999px;
-  padding:8px 16px; cursor:pointer; transition:color .15s,border-color .15s;
+  position:absolute; right:22px; bottom:20px; z-index:6;
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:rgba(246,242,234,.5); background:none; border:1px solid rgba(246,242,234,.18);
+  border-radius:999px; padding:8px 16px; cursor:pointer; transition:color .15s,border-color .15s;
 }
-#intro-saltar:hover{color:#fff; border-color:#6b6b75}
+#intro-saltar:hover{color:#f6f2ea; border-color:rgba(246,242,234,.45)}
 
 /* ---------- marca de la cabecera ---------- */
 #top .tag{
@@ -793,53 +808,60 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 #top .tag:hover{opacity:.78}
 #btn-party .dot{background:var(--rubi)}
 
-/* ---------- portada grande de la biblioteca ---------- */
+/* ---------- portada grande de la biblioteca ----------
+   Manda la imagen: el cartel entra a sangre por la derecha y el texto se
+   apoya sobre él. Antes el cartel iba pequeño al lado de un fondo desenfocado
+   casi negro, y eso no era una portada, era un hueco con un título. */
 #lib-hero{
-  position:relative; margin:-38px -34px 30px; padding:52px 34px 34px;
-  min-height:min(46vh,380px); display:flex; align-items:flex-end;
+  position:relative; margin:-38px -34px 26px; padding:0;
+  min-height:min(62vh,520px); display:flex; align-items:stretch;
   overflow:hidden; isolation:isolate;
 }
 #lib-hero.oculto{display:none}
 #lib-hero .hero-fondo{
-  position:absolute; inset:-70px; z-index:-2;
-  background-size:cover; background-position:center 20%;
-  filter:blur(34px) saturate(1.15) brightness(.5); transform:scale(1.1);
+  position:absolute; inset:0; z-index:-3;
+  background-size:cover; background-position:center 26%;
+  filter:blur(26px) saturate(1.2) brightness(.42); transform:scale(1.14);
+}
+/* el cartel, nítido y a sangre, ocupando la mitad derecha */
+#lib-hero .hero-cartel{
+  position:absolute; inset:0 0 0 auto; z-index:-2; width:min(56%,760px);
+  background-size:cover; background-position:center 22%;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 42%);
+  mask-image:linear-gradient(90deg,transparent,#000 42%);
 }
 #lib-hero .hero-velo{
   position:absolute; inset:0; z-index:-1;
-  background:linear-gradient(90deg,var(--bg) 6%,rgba(11,11,13,.86) 44%,rgba(11,11,13,.3) 72%,rgba(11,11,13,.92) 100%),
-             linear-gradient(0deg,var(--bg) 1%,transparent 58%);
+  background:linear-gradient(90deg,var(--bg) 4%,rgba(11,11,13,.92) 30%,rgba(11,11,13,.45) 58%,transparent 88%),
+             linear-gradient(0deg,var(--bg) 1%,rgba(11,11,13,.2) 26%,transparent 62%);
 }
-#lib-hero .hero-tx{flex:1; min-width:0; max-width:52ch}
+#lib-hero .hero-tx{
+  position:relative; align-self:flex-end; max-width:min(46ch,58%);
+  padding:44px 34px 40px;
+}
 #lib-hero .hero-eyebrow{
   font-family:var(--mono); font-size:10.5px; letter-spacing:.2em;
   text-transform:uppercase; color:var(--oro);
 }
 #lib-hero .hero-tit{
   font-family:var(--display); font-weight:800;
-  font-size:clamp(30px,5.4vw,60px); line-height:1; letter-spacing:-.025em;
-  margin-top:10px; text-wrap:balance;
+  font-size:clamp(34px,6vw,68px); line-height:.98; letter-spacing:-.03em;
+  margin-top:12px; text-wrap:balance; text-shadow:0 4px 30px rgba(0,0,0,.5);
 }
 #lib-hero .hero-meta{
   font-family:var(--mono); font-size:11.5px; color:var(--muted);
-  margin-top:12px; letter-spacing:.04em;
+  margin-top:14px; letter-spacing:.04em;
 }
-#lib-hero .hero-acc{display:flex; gap:10px; margin-top:22px; flex-wrap:wrap}
-#lib-hero .hero-cartel{
-  width:154px; aspect-ratio:2/3; flex:none; border-radius:10px; margin-left:34px;
-  background-size:cover; background-position:center;
-  box-shadow:0 22px 60px rgba(0,0,0,.6);
-}
+#lib-hero .hero-acc{display:flex; gap:10px; margin-top:24px; flex-wrap:wrap}
 .mv-btn{
   display:inline-flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600;
   border-radius:10px; padding:11px 22px; border:1px solid transparent; cursor:pointer;
-  transition:opacity .15s,border-color .15s;
+  transition:opacity .15s,border-color .15s,background .15s;
 }
 .mv-btn.solido{background:var(--text); color:var(--bg)}
 .mv-btn.solido:hover{opacity:.86}
-.mv-btn.hueco{border-color:var(--line-2); color:var(--text)}
+.mv-btn.hueco{border-color:rgba(255,255,255,.28); color:var(--text); background:rgba(0,0,0,.35)}
 .mv-btn.hueco:hover{border-color:var(--muted)}
-.mv-btn svg{width:13px; height:13px; fill:currentColor}
 
 /* Con la portada grande delante, repetir "MOOVIN" y su bajada sobra: la marca
    ya está en la cabecera y el título de la película manda la pantalla. */
@@ -951,8 +973,14 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 .est-b:hover{color:var(--text); border-color:var(--muted)}
 
 @media (max-width:640px){
-  #lib-hero{margin:-24px -18px 22px; padding:34px 18px 24px; min-height:min(42vh,300px)}
-  #lib-hero .hero-cartel{display:none}
+  #lib-hero{margin:-24px -18px 22px; min-height:min(56vh,420px)}
+  #lib-hero .hero-cartel{
+    width:100%; background-position:center 18%;
+    -webkit-mask-image:linear-gradient(180deg,#000 30%,transparent 92%);
+    mask-image:linear-gradient(180deg,#000 30%,transparent 92%);
+  }
+  #lib-hero .hero-velo{background:linear-gradient(0deg,var(--bg) 6%,rgba(11,11,13,.78) 38%,rgba(11,11,13,.15) 74%,transparent 100%)}
+  #lib-hero .hero-tx{max-width:100%; padding:28px 18px 24px}
   .lib-rejilla{grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:14px}
   .lib-info{padding:12px 11px 0}
   .lib-tit{font-size:12.5px}
@@ -977,13 +1005,15 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 <body>
 
 <div id="intro" aria-hidden="true">
-  <canvas id="nieve"></canvas>
+  <div id="lente">
+    <div id="lente-fondo"></div>
+    <div id="lente-brillo"></div>
+  </div>
   <div id="intro-centro">
     <div id="intro-logo"><svg class="mv-m" viewBox="0 0 220 179.98" aria-hidden="true"><defs><linearGradient id="mvqg1" x1="212.7" y1="95.95" x2="212.7" y2="-79.05" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#8f1338"/><stop offset=".55" stop-color="#d61f45"/><stop offset="1" stop-color="#ff4d5e"/></linearGradient><linearGradient id="mvqg2" x1="281.39" y1="47.91" x2="284.51" y2="-86.12" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe08a"/><stop offset=".41" stop-color="#ffb62e"/><stop offset=".98" stop-color="#ff7a45"/></linearGradient><linearGradient id="mvqg3" x1="233.78" y1="-88.6" x2="283.28" y2="-27.85" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".02" stop-color="#7a1f2e"/><stop offset=".65" stop-color="#7a1f2e" stop-opacity="0"/></linearGradient><linearGradient id="mvqg4" x1="329.17" y1="-102.97" x2="279.67" y2="-24.72" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".02" stop-color="#7a1f2e"/><stop offset=".65" stop-color="#7a1f2e" stop-opacity="0"/></linearGradient><linearGradient id="mvqg5" x1="353.99" y1="-80.1" x2="352.99" y2="94.9" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".03" stop-color="#ff7a45"/><stop offset=".51" stop-color="#d61f45"/><stop offset="1" stop-color="#8f1338"/></linearGradient></defs><g transform="translate(0,179.98) scale(1,-1)"><path fill="url(#mvqg1)" d="M140.84,164.58c14.05-.94,25.16-12.64,25.16-26.93V27c0-14.91,12.09-27,27-27s27,12.09,27,27v107.76c0,19.7-12.6,36.99-31.36,43.03-17.33,5.57-36,.27-47.8-13.21Z"/><path fill="url(#mvqg2)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvqg3)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvqg4)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvqg5)" d="M0,134.76V27C0,12.09,12.09,0,27,0s27,12.09,27,27v110.65c0,7.46,3.02,14.2,7.91,19.09,4.48,4.48,10.52,7.4,17.25,7.84-11.8,13.48-30.47,18.78-47.8,13.21C12.6,171.75,0,154.46,0,134.76Z"/></g></svg></div>
     <svg id="intro-palabra" viewBox="0 0 816.44 139.16" aria-hidden="true"><path fill="currentColor" d="M255.76,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S292.18,7.27,255.76,7.27ZM255.76,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M399.87,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S436.29,7.27,399.87,7.27ZM399.87,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M177.6,59.04v80.12h-26.23V59.07c0-6.61-2.68-12.59-7.01-16.93-4.33-4.33-10.32-7.01-16.93-7.01-13.22,0-23.93,10.7-23.95,23.91v80.12h-29.36V59.07c0-6.61-2.68-12.59-7.01-16.93-4.34-4.33-10.32-7.01-16.94-7.01-13.22,0-23.94,10.72-23.94,23.94v80.09H0V59.04C0,30.95,22.77,8.18,50.86,8.18h1.76c14.35,0,27.31,5.94,36.55,15.5,9.24-9.56,22.2-15.5,36.55-15.5h1.02c28.09,0,50.86,22.77,50.86,50.86Z"/><g><rect fill="currentColor" x="641.77" y="35.5" width="30.22" height="103.21"/><rect fill="currentColor" x="641.77" width="30.22" height="23.94"/></g><path fill="currentColor" d="M816.44,74.65v64.34h-27.14v-65.52c0-21.44-17.38-38.81-38.81-38.81s-38.81,17.37-38.81,38.81v65.52h-27.14v-64.34c0-36.42,29.53-65.95,65.95-65.95s65.95,29.53,65.95,65.95Z"/><path fill="currentColor" d="M487.85,73.04V8.7h27.14v65.52c0,21.44,17.38,38.81,38.81,38.81s38.81-17.37,38.81-38.81V8.7h27.14v64.34c0,36.42-29.53,65.95-65.95,65.95s-65.95-29.53-65.95-65.95Z"/></svg>
     <p id="intro-studio">IRIS Studio</p>
   </div>
-  <div id="intro-linea"></div>
   <div id="intro-tracking"></div>
   <button id="intro-saltar">Saltar</button>
 </div>
@@ -2029,7 +2059,15 @@ function abreBiblioteca() {
   $('#loader-close').style.display = video.src ? 'flex' : 'none';
 }
 $('#c-open').addEventListener('click', abreBiblioteca);
-$('#marca').addEventListener('click', abreBiblioteca);
+/* La marca vuelve SIEMPRE a la raíz de la biblioteca. `abreBiblioteca` es
+   otra cosa: reabre por donde ibas (y desde la ficha de una serie se quedaba
+   en la ficha, que es justo lo que no hace un botón que dice "volver"). */
+$('#marca').addEventListener('click', () => {
+  if (typeof cierraSerie === 'function' && $('#serie').classList.contains('on')) cierraSerie();
+  $('#loader').classList.remove('hidden');
+  $('#loader-close').style.display = video.src ? 'flex' : 'none';
+  $('#loader').scrollTop = 0;
+});
 video.addEventListener('click', () => { if (video.src) { video.paused ? playSafe() : video.pause(); } });
 video.addEventListener('dblclick', () => $('#c-fs').click());
 
@@ -2527,6 +2565,7 @@ function pintaSeguir() {
 function cierraSerie() {
   serieAbierta = null;
   $('#serie').classList.remove('on');
+  $('#lib-hero').classList.remove('oculto');
   $('#lib-h1').classList.remove('oculto');
   $('#lib-sub').classList.remove('oculto');
   $('#lib-grid').classList.remove('oculto');
@@ -3115,10 +3154,9 @@ $('#pase-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') dePase
    sala, subtítulos) se queda como estaba. */
 
 /* ---------- intro: una vez por sesión, nunca en el televisor ---------- */
-(function introVHS() {
+(function introOjoDePez() {
   const cap = document.getElementById('intro');
   if (!cap) return;
-  const salta = () => { cap.classList.add('fin'); setTimeout(() => cap.classList.add('oculto'), 520); };
   const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const enTV = document.documentElement.getAttribute('data-plataforma') === 'tv' ||
                /\btv=1\b/.test(location.search);
@@ -3126,42 +3164,22 @@ $('#pase-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') dePase
   try { yaVista = sessionStorage.moovinIntro === '1'; sessionStorage.moovinIntro = '1'; } catch (e) { /* nada */ }
   if (yaVista || enTV) { cap.classList.add('oculto'); return; }
 
-  const btn = document.getElementById('intro-saltar');
-  const cv = document.getElementById('nieve');
-  const ctx = cv.getContext('2d', { alpha: false });
-  let vivo = true, raf = 0;
   const tempo = [];
+  let vivo = true;
   function fin() {
     if (!vivo) return;
     vivo = false;
-    cancelAnimationFrame(raf);
     tempo.forEach(clearTimeout);
-    salta();
+    cap.classList.add('fin');
+    setTimeout(() => cap.classList.add('oculto'), 620);
   }
-  btn.addEventListener('click', fin);
-  if (quieto) { cap.classList.add('marca'); tempo.push(setTimeout(fin, 1200)); return; }
+  document.getElementById('intro-saltar').addEventListener('click', fin);
+  if (quieto) { cap.classList.add('abre', 'marca'); tempo.push(setTimeout(fin, 1400)); return; }
 
-  cv.width = Math.ceil(innerWidth / 3); cv.height = Math.ceil(innerHeight / 3);
-  let ultimo = 0;
-  function nieve(t) {
-    if (!vivo) return;
-    if (t - ultimo > 42) {
-      ultimo = t;
-      const img = ctx.createImageData(cv.width, cv.height), d = img.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const v = (Math.random() * 255) | 0;
-        d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255;
-      }
-      ctx.putImageData(img, 0, 0);
-    }
-    raf = requestAnimationFrame(nieve);
-  }
-  cap.classList.add('enciende');
-  tempo.push(setTimeout(() => { cap.classList.add('senal'); raf = requestAnimationFrame(nieve); }, 420));
-  tempo.push(setTimeout(() => cap.classList.add('marca'), 900));
-  tempo.push(setTimeout(() => cap.classList.add('glitch'), 950));
-  tempo.push(setTimeout(() => { cap.classList.remove('senal'); cancelAnimationFrame(raf); }, 2200));
-  tempo.push(setTimeout(fin, 3300));
+  /* La lente abre, el rótulo entra y se va: sin bucles ni canvas pintando. */
+  cap.classList.add('abre');
+  tempo.push(setTimeout(() => cap.classList.add('marca'), 520));
+  tempo.push(setTimeout(fin, 3600));
 })();
 
 /* ---------- datos de la ficha, en una línea ---------- */
@@ -3227,7 +3245,7 @@ function pintaHero(t) {
   tx.append(eb, h, me, acc);
   const cartel = document.createElement('div'); cartel.className = 'hero-cartel';
   if (img) cartel.style.backgroundImage = 'url("' + img + '")';
-  box.append(fondo, velo, tx, cartel);
+  box.append(fondo, cartel, velo, tx);
 }
 
 /* ---------- estante de discos ----------
