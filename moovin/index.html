@@ -58,14 +58,6 @@ svg{display:block}
 }
 /* El símbolo y el logotipo son la misma marca, IRIS, y van juntos: llevan a la
    portada del estudio. MOOVIN queda como texto y vuelve a la biblioteca. */
-#top .logo{
-  display:inline-flex; align-items:center; gap:8px;
-  color:var(--text); transition:opacity .12s;
-}
-#top .logo:hover{opacity:.7}
-#top .logo svg{height:15px; width:auto}
-#top .logo .marca-ico{width:15px; height:15px; flex:0 0 auto}
-#top .sep{width:1px; height:18px; background:var(--line-2)}
 #top .tag{
   font-family:var(--mono); font-size:11px; font-weight:700;
   letter-spacing:.22em; color:var(--text);
@@ -894,13 +886,13 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   -webkit-mask-image:var(--mask-talon); mask-image:var(--mask-talon);
   -webkit-mask-size:100% 100%; mask-size:100% 100%;
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
-  padding:16px 16px 0;
+  padding:6.5% 9% 0;
 }
 .lib-card.vista .lib-info{-webkit-mask-image:var(--mask-roto); mask-image:var(--mask-roto)}
 .lib-tit{font-size:14.5px; font-weight:600; line-height:1.2;
   display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; overflow:hidden}
 .lib-nota{margin-top:3px; font-size:11.5px; color:var(--papel-suave); -webkit-line-clamp:1; line-clamp:1}
-.tk-pie{display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin-top:auto; padding-bottom:22px}
+.tk-pie{display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin-top:auto; padding-bottom:9.5%}
 .tk-cod{
   display:block; height:20px; width:82px; opacity:.82; flex:none;
   background:repeating-linear-gradient(90deg,var(--tinta) 0 2px,transparent 2px 4px,var(--tinta) 4px 5px,transparent 5px 9px,var(--tinta) 9px 12px,transparent 12px 14px);
@@ -982,10 +974,8 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   #lib-hero .hero-velo{background:linear-gradient(0deg,var(--bg) 6%,rgba(11,11,13,.78) 38%,rgba(11,11,13,.15) 74%,transparent 100%)}
   #lib-hero .hero-tx{max-width:100%; padding:28px 18px 24px}
   .lib-rejilla{grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:14px}
-  .lib-info{padding:12px 11px 0}
   .lib-tit{font-size:12.5px}
   .lib-nota{font-size:10.5px}
-  .tk-pie{padding-bottom:15px}
   .tk-cod{width:56px; height:15px}
   .tk-dur{font-size:9.5px}
   .est-escena{perspective:900px; padding:14px 0 22px}
@@ -1019,21 +1009,9 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 </div>
 
 <header id="top">
-  <a class="logo" href="/" aria-label="IRIS Studio">
-    <!-- El símbolo es el mismo trazado que assets/iris-favicon.svg: es la marca
-         de IRIS, así que acompaña al logotipo de IRIS y no al del producto. -->
-    <svg class="marca-ico" viewBox="0 0 876.27 874.82" fill="currentColor" aria-hidden="true">
-      <path d="M1.08,582.41L0,302.19C-.65,131.46,130.07-1.65,303,.02l306.38,2.95c152.34,1.47,267.72,141.24,266.88,290.55l-1.72,307.39c-.86,154.14-136.95,274.21-288.33,273.92l-299.69-.58C128.09,873.93,1.69,742.98,1.08,582.41ZM670.98,820.63c85.92-7.81,145.77-71.41,151.41-157.79,5.07-77.74-16.57-152.57-53.84-222.68-82.97-156.09-213.93-281-375.71-352.86-56.61-25.15-115.91-37.9-176.04-34.9C124.83,56.97,57.47,124.72,53.55,217.62c-11.51,273.02,343.75,627.9,617.43,603.01Z"/>
-    </svg>
-    <svg viewBox="0 0 1705.36 523.43" fill="currentColor" aria-hidden="true">
-      <path d="M87.79.43h0c48.46,0,87.79,39.34,87.79,87.79v435.12H0V88.22C0,39.77,39.34.43,87.79.43Z"/>
-      <path d="M1705.36,355.5c0,46.36-18.79,88.32-49.16,118.7-30.38,30.37-72.35,49.16-118.7,49.16h-215.23v.07h-301.59c-41.02,0-74.26-33.25-74.26-74.26h0c0-41.02,33.25-74.26,74.26-74.26h301.59s0,.3,0,.3h187.26c10.91,0,20.14-8.64,20.24-19.54.05-5.54-2.17-10.54-5.78-14.16-3.57-3.57-8.5-5.78-13.96-5.78h-266.02c-92.9,0-169.81-76.01-169.12-168.9.34-45.78,19.03-87.2,49.1-117.26,30.33-30.34,72.24-49.1,118.53-49.1h314.78c3.07,0,6.11.09,9.13.28,95.04,5.78,89.98,147.79-5.24,147.79h-290.69c-10.61,0-19.64,8.25-20.02,18.85-.4,11.12,8.5,20.26,19.55,20.26h267.47c92.71,0,167.86,75.16,167.86,167.86Z"/>
-      <path d="M956.74.43h0c48.46,0,87.79,39.34,87.79,87.79v435.12h-175.59V88.22c0-48.46,39.34-87.79,87.79-87.79Z"/>
-      <path d="M661.69,375.2h27.42c81.77,0,148.16,66.39,148.16,148.16h-175.59v-148.16h0Z"/>
-      <path d="M688.74,0H207.25v187.46h-45.19c-41.02,0-74.27,33.25-74.27,74.27h0c0,41.02,33.25,74.27,74.27,74.27h45.19v187.36h175.59v-187.36h305.9c82.04,0,148.54-66.5,148.54-148.54v-38.92C837.28,66.5,770.78,0,688.74,0ZM655.99,181.76c-3.53,3.52-8.4,5.7-13.77,5.7h-259.38v-38.92h258.89c10.75,0,19.85,8.51,19.96,19.26.05,5.46-2.14,10.4-5.7,13.96Z"/>
-    </svg>
-  </a>
-  <span class="sep"></span>
+  <!-- El logo de IRIS se quitó de aquí el 2026-08-27 a pedido de Dosa: en la
+       cabecera de MOOVIN manda la marca del producto. Al estudio se sigue
+       llegando por iris.it.com. -->
   <button class="tag" id="marca" title="Volver a la biblioteca" aria-label="MOOVIN">
     <svg class="mv-m" viewBox="0 0 220 179.98" aria-hidden="true"><defs><linearGradient id="mvbg1" x1="212.7" y1="95.95" x2="212.7" y2="-79.05" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#e8e8ee"/><stop offset="1" stop-color="#cfcfd8"/></linearGradient><linearGradient id="mvbg2" x1="281.39" y1="47.91" x2="284.51" y2="-86.12" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9a9aa6"/><stop offset=".41" stop-color="#b9b9c6"/><stop offset=".98" stop-color="#8a8a96"/></linearGradient><linearGradient id="mvbg3" x1="233.78" y1="-88.6" x2="283.28" y2="-27.85" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".02" stop-color="#3a3a42"/><stop offset=".65" stop-color="#3a3a42" stop-opacity="0"/></linearGradient><linearGradient id="mvbg4" x1="329.17" y1="-102.97" x2="279.67" y2="-24.72" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".02" stop-color="#3a3a42"/><stop offset=".65" stop-color="#3a3a42" stop-opacity="0"/></linearGradient><linearGradient id="mvbg5" x1="353.99" y1="-80.1" x2="352.99" y2="94.9" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".03" stop-color="#cfcfd8"/><stop offset=".51" stop-color="#ffffff"/><stop offset="1" stop-color="#e8e8ee"/></linearGradient></defs><g transform="translate(0,179.98) scale(1,-1)"><path fill="url(#mvbg1)" d="M140.84,164.58c14.05-.94,25.16-12.64,25.16-26.93V27c0-14.91,12.09-27,27-27s27,12.09,27,27v107.76c0,19.7-12.6,36.99-31.36,43.03-17.33,5.57-36,.27-47.8-13.21Z"/><path fill="url(#mvbg2)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvbg3)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvbg4)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvbg5)" d="M0,134.76V27C0,12.09,12.09,0,27,0s27,12.09,27,27v110.65c0,7.46,3.02,14.2,7.91,19.09,4.48,4.48,10.52,7.4,17.25,7.84-11.8,13.48-30.47,18.78-47.8,13.21C12.6,171.75,0,154.46,0,134.76Z"/></g></svg>
     <svg class="mv-palabra" viewBox="0 0 816.44 139.16" aria-hidden="true"><path fill="currentColor" d="M255.76,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S292.18,7.27,255.76,7.27ZM255.76,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M399.87,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S436.29,7.27,399.87,7.27ZM399.87,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M177.6,59.04v80.12h-26.23V59.07c0-6.61-2.68-12.59-7.01-16.93-4.33-4.33-10.32-7.01-16.93-7.01-13.22,0-23.93,10.7-23.95,23.91v80.12h-29.36V59.07c0-6.61-2.68-12.59-7.01-16.93-4.34-4.33-10.32-7.01-16.94-7.01-13.22,0-23.94,10.72-23.94,23.94v80.09H0V59.04C0,30.95,22.77,8.18,50.86,8.18h1.76c14.35,0,27.31,5.94,36.55,15.5,9.24-9.56,22.2-15.5,36.55-15.5h1.02c28.09,0,50.86,22.77,50.86,50.86Z"/><g><rect fill="currentColor" x="641.77" y="35.5" width="30.22" height="103.21"/><rect fill="currentColor" x="641.77" width="30.22" height="23.94"/></g><path fill="currentColor" d="M816.44,74.65v64.34h-27.14v-65.52c0-21.44-17.38-38.81-38.81-38.81s-38.81,17.37-38.81,38.81v65.52h-27.14v-64.34c0-36.42,29.53-65.95,65.95-65.95s65.95,29.53,65.95,65.95Z"/><path fill="currentColor" d="M487.85,73.04V8.7h27.14v65.52c0,21.44,17.38,38.81,38.81,38.81s38.81-17.37,38.81-38.81V8.7h27.14v64.34c0,36.42-29.53,65.95-65.95,65.95s-65.95-29.53-65.95-65.95Z"/></svg>
