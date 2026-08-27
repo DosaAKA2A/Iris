@@ -904,66 +904,6 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   left:auto; right:8px; bottom:8px; background:rgba(0,0,0,.7); border-radius:999px;
 }
 
-/* ---------- estante de discos (series y anime) ---------- */
-.estante{position:relative; margin-top:4px}
-.est-escena{perspective:1500px; perspective-origin:50% 44%; padding:18px 0 30px; overflow:hidden}
-.est-rail{
-  display:flex; align-items:flex-end; gap:6px; padding:0 6px;
-  transform-style:preserve-3d;
-  transition:transform .55s cubic-bezier(.22,.61,.36,1);
-  will-change:transform;
-}
-.disco{
-  flex:0 0 auto; width:58px; height:300px; position:relative; padding:0;
-  background:none; border:0; cursor:pointer; transform-style:preserve-3d;
-  transition:width .55s cubic-bezier(.22,.61,.36,1), transform .55s cubic-bezier(.22,.61,.36,1);
-  transform:rotateY(-34deg);
-}
-.disco .caja{position:absolute; inset:0; transform-style:preserve-3d}
-.disco .cara{position:absolute; inset:0; border-radius:3px; overflow:hidden;
-  background-size:cover; background-position:center}
-/* Las dos caras van DELANTE y se cruzan por opacidad: girar la caja para
-   enseñar una cara lateral deja la portada aplastada y el lomo ilegible. */
-.disco .frente{transform:translateZ(9px); opacity:0; transition:opacity .4s ease}
-.disco .lomo{
-  transform:translateZ(9.5px); opacity:1; transition:opacity .35s ease;
-  display:flex; align-items:flex-end; justify-content:center; padding-bottom:16px;
-  box-shadow:0 0 0 1px rgba(255,255,255,.08) inset;
-}
-.disco .lomo::before{
-  content:""; position:absolute; inset:0; background:inherit;
-  background-size:cover; background-position:center; filter:saturate(.85) brightness(.62);
-}
-.disco .lomo::after{
-  content:""; position:absolute; inset:0;
-  background:linear-gradient(180deg,rgba(8,8,10,.15),rgba(8,8,10,.88));
-}
-.disco .lomo-tx{
-  position:relative; z-index:2; writing-mode:vertical-rl; transform:rotate(180deg);
-  font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase;
-  color:#e7e7ec; white-space:nowrap; max-height:250px; overflow:hidden;
-  text-shadow:0 1px 3px rgba(0,0,0,.9);
-}
-.disco .canto{transform:translateZ(-9px); background:linear-gradient(180deg,#17171b,#0e0e11)}
-.disco.sel{width:200px; transform:rotateY(0deg) translateZ(58px)}
-.disco.sel .frente{opacity:1}
-.disco.sel .lomo{opacity:0}
-.disco.sel .caja{box-shadow:0 26px 60px rgba(0,0,0,.66); border-radius:3px}
-.disco:not(.sel):hover{transform:rotateY(-22deg) translateZ(18px)}
-.est-ficha{padding-top:6px; min-height:132px}
-.est-ficha .ef-meta{font-family:var(--mono); font-size:10.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--dim)}
-.est-ficha .ef-tit{font-family:var(--display); font-weight:800; font-size:clamp(22px,3.2vw,34px);
-  line-height:1.05; letter-spacing:-.02em; margin-top:8px; text-wrap:balance}
-.est-ficha .ef-dur{color:var(--muted); font-size:13.5px; margin-top:7px}
-.est-ficha .ef-acc{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap}
-.est-nav{position:absolute; right:0; top:0; display:flex; gap:8px}
-.est-b{
-  width:36px; height:36px; border-radius:50%; border:1px solid var(--line-2);
-  background:none; color:var(--muted); font-size:15px; cursor:pointer;
-  transition:color .15s,border-color .15s;
-}
-.est-b:hover{color:var(--text); border-color:var(--muted)}
-
 @media (max-width:640px){
   #lib-hero{margin:-24px -18px 22px; min-height:min(56vh,420px)}
   #lib-hero .hero-cartel{
@@ -978,14 +918,97 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   .lib-nota{font-size:10.5px}
   .tk-cod{width:56px; height:15px}
   .tk-dur{font-size:9.5px}
-  .est-escena{perspective:900px; padding:14px 0 22px}
-  .disco{width:38px; height:210px}
-  .disco.sel{width:140px; transform:rotateY(0deg) translateZ(30px)}
-  .est-nav{position:static; justify-content:flex-end; margin-top:-4px}
-  .est-ficha{min-height:0}
 }
 @media (prefers-reduced-motion:reduce){
-  #intro *,.disco,.est-rail,.lib-card{animation-duration:.001s !important; transition-duration:.001s !important}
+  #intro *,.est-rail,.est-frontal,.vhs-lomo,.vhs-cinta,.lib-card{animation-duration:.001s !important; transition-duration:.001s !important}
+}
+
+/* ---------- estante de cajas VHS ----------
+   Como en la referencia: los lomos van PLANOS en fila y el volumen lo pone
+   la caratula, que aparece DELANTE de la fila. Nada de girar los lomos en 3D:
+   eso era otra cosa. Los colores de cada caja salen de su propia portada. */
+.estante{position:relative; margin-top:2px}
+.est-pista{position:relative; height:372px; overflow:hidden}
+.est-rail{
+  position:absolute; inset:0; display:flex; align-items:center; gap:13px;
+  transition:transform .5s cubic-bezier(.22,.61,.36,1); will-change:transform;
+}
+.vhs-lomo{
+  flex:0 0 auto; width:46px; height:286px; position:relative; padding:0;
+  background:none; border:0; cursor:pointer;
+  transition:height .35s ease, opacity .35s ease;
+}
+.vhs-lomo>svg{width:100%; height:100%; display:block; border-radius:2px;
+  box-shadow:0 8px 22px rgba(0,0,0,.5)}
+.vhs-lomo .lomo-tx{
+  position:absolute; left:0; right:0; top:20px; display:flex; justify-content:center;
+  pointer-events:none;
+}
+.vhs-lomo .lomo-tx span{
+  writing-mode:vertical-rl; transform:rotate(180deg);
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.12em;
+  text-transform:uppercase; color:#20222a; white-space:nowrap;
+  max-height:212px; overflow:hidden;
+}
+.vhs-lomo.act{height:318px}
+.vhs-lomo.cerca{opacity:.45}
+/* la caratula y su cinta, delante de todo */
+.est-frontal{
+  position:absolute; top:50%; left:50%; z-index:5; pointer-events:none;
+  transform:translate(-50%,-50%) scale(.94); opacity:0;
+  transition:opacity .34s ease, transform .34s cubic-bezier(.22,.61,.36,1);
+}
+.est-frontal.on{opacity:1; transform:translate(-50%,-50%) scale(1)}
+.vhs-caja{
+  position:relative; height:330px; aspect-ratio:929.49/1570.66;
+  background-size:cover; background-position:center; border-radius:3px;
+  box-shadow:0 26px 60px rgba(0,0,0,.75), 0 0 0 1px rgba(0,0,0,.5);
+  z-index:2;
+}
+.vhs-caja .vhs-sello{position:absolute; left:6%; bottom:5%; width:30%; height:auto}
+/* la cinta asoma por detras: es el "efecto combinado" */
+.vhs-cinta{
+  position:absolute; top:3%; left:0; height:94%; aspect-ratio:929.49/1570.66;
+  border-radius:3px; overflow:hidden; z-index:1;
+  transform:translateX(10px);
+  transition:transform .8s cubic-bezier(.22,.61,.36,1) .12s;
+  box-shadow:0 14px 34px rgba(0,0,0,.55);
+}
+.est-frontal.on .vhs-cinta{transform:translateX(46%)}
+.vhs-cinta>svg{width:100%; height:100%; display:block}
+.vhs-cinta .et{
+  position:absolute; left:28.9%; top:37.4%; width:54.3%; height:25.3%;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px; text-align:center; padding:0 5%;
+}
+.vhs-cinta .et b{font-size:11px; font-weight:700; line-height:1.1; color:#20222a}
+.vhs-cinta .et i{font-family:var(--mono); font-size:6.5px; letter-spacing:.2em;
+  text-transform:uppercase; color:#5c5f6b; font-style:normal}
+.est-ficha{text-align:center; padding-top:20px}
+.est-ficha .ef-meta{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--dim)}
+.est-ficha .ef-tit{font-family:var(--display); font-weight:800;
+  font-size:clamp(22px,3.2vw,32px); line-height:1.05; letter-spacing:-.02em;
+  margin-top:7px; text-wrap:balance}
+.est-ficha .ef-dur{color:var(--muted); font-size:13.5px; margin-top:6px}
+.est-ficha .ef-acc{display:flex; gap:10px; margin-top:18px; justify-content:center; flex-wrap:wrap}
+.est-nav{position:absolute; top:150px; left:0; right:0; display:flex;
+  justify-content:space-between; pointer-events:none; z-index:6}
+.est-b{
+  pointer-events:auto; width:36px; height:36px; border-radius:50%;
+  border:1px solid var(--line-2); background:rgba(11,11,13,.72); color:var(--muted);
+  font-size:14px; cursor:pointer; transition:color .15s,border-color .15s;
+}
+.est-b:hover{color:var(--text); border-color:var(--muted)}
+
+@media (max-width:640px){
+  .est-pista{height:286px}
+  .vhs-lomo{width:34px; height:214px}
+  .vhs-lomo.act{height:238px}
+  .vhs-lomo .lomo-tx span{font-size:8px; max-height:158px}
+  .vhs-caja{height:248px}
+  .est-nav{top:106px}
+  .est-ficha{padding-top:14px}
 }
 </style>
 <!-- La capa adaptable va DESPUES de los estilos de arriba: reajusta lo justo
@@ -1007,6 +1030,172 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   <div id="intro-tracking"></div>
   <button id="intro-saltar">Saltar</button>
 </div>
+
+<svg id="vhs-piezas" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><defs><filter id="vhs-grano" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></defs><symbol id="vhs-sello" viewBox="82.63 1385.43 270.81 119.78"><g>
+    <rect fill="#f11a0e" x="82.63" y="1385.43" width="270.81" height="119.78"/>
+    <g>
+      <path fill="#fff" d="M138.6,1473.79v-8.83h-8.83v-8.83h-8.83v-8.83h-8.83v-35.3h17.65v26.48h8.83v8.83h8.83v-8.83h8.83v-26.48h17.65v35.3h-8.83v8.83h-8.83v8.83h-8.83v8.83h-8.83Z"/>
+      <path fill="#fff" d="M182.73,1473.79v-61.78h17.65v26.48h26.48v-26.48h17.65v61.78h-17.65v-26.48h-26.48v26.48h-17.65Z"/>
+      <path fill="#fff" d="M262.16,1473.79v-8.83h-8.83v-8.83h17.65v8.83h26.48v-17.65h-35.3v-8.83h-8.83v-17.65h8.83v-8.83h44.13v8.83h8.83v8.83h-17.65v-8.83h-26.48v17.65h35.3v8.83h8.83v17.65h-8.83v8.83h-44.13Z"/>
+    </g>
+  </g></symbol><symbol id="vhs-lomo" viewBox="996.01 0.6 233.41 1570.66"><rect fill="var(--vhs-carton,#fdf4d5)" x="996.01" y=".6" width="233.41" height="1570.66"/><rect fill="var(--vhs-f1,#ff9362)" x="996.01" y="916.12" width="233.41" height="131.03"/><rect fill="var(--vhs-f2,#fb3f35)" x="996.01" y="1047.15" width="233.41" height="131.03"/><rect fill="var(--vhs-f3,#ff29b6)" x="996.01" y="1178.17" width="233.41" height="131.03"/><rect fill="var(--vhs-f4,#b82bf1)" x="996.01" y="1309.2" width="233.41" height="131.03"/><rect fill="var(--vhs-f5,#7a32af)" x="996.01" y="1440.23" width="233.41" height="131.03"/></symbol><symbol id="vhs-cinta" viewBox="2591.87 7.68 929.50 1570.66"><g>
+    <path fill="#242420" d="M2819.84,7.68v42.12h-115.33v1486.41h115.33v42.12h653.2c26.69,0,48.33-21.64,48.33-48.33V56.01c0-26.69-21.64-48.33-48.33-48.33h-653.2Z"/>
+    <path fill="#242420" d="M2591.88,1578.34h191.3c13.35,0,24.16-10.82,24.16-24.16v-17.96h-102.83V49.8h102.83v-21.06c0-11.63-9.43-21.06-21.06-21.06h-194.41v1570.66Z"/>
+    <rect fill="#575756" x="2591.88" y="7.68" width="22.35" height="1570.66"/>
+    <g>
+      <rect x="3449.11" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="3387.33" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="3325.56" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="3263.79" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="3202.01" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="3140.24" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="3078.46" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="3016.69" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="2954.91" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="2893.14" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="2831.37" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="2769.59" y="49.8" width="6.04" height="1486.52"/>
+      <rect x="2707.82" y="51.61" width="6.04" height="1486.51"/>
+      <rect x="3479.99" y="12.9" width="6.04" height="1560.23"/>
+      <rect x="3418.22" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="3356.45" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="3294.67" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="3232.9" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="3171.12" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="3109.35" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="3047.58" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="2985.8" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="2924.03" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="2862.25" y="7.68" width="6.04" height="1570.66"/>
+      <rect x="2800.48" y="49.8" width="6.04" height="1486.52"/>
+      <rect x="2738.7" y="51.61" width="6.04" height="1486.51"/>
+    </g>
+    <path fill="#575756" d="M2874.56,253.13v1079.75c0,72.13,106.73,130.59,238.38,130.59s238.38-58.47,238.38-130.59V253.13c0-72.13-106.73-130.59-238.38-130.59s-238.38,58.47-238.38,130.59Z"/>
+    <g>
+      <path fill="#706f6f" d="M2895.84,1332.89c0,25.28,21.15,51.22,58.04,71.15,42.08,22.75,98.57,35.28,159.06,35.28s116.98-12.53,159.06-35.28c36.88-19.94,58.04-45.87,58.04-71.15v-233.43h-434.2v233.43Z"/>
+      <path fill="#706f6f" d="M2953.88,181.98c-36.88,19.94-58.04,45.87-58.04,71.15v233.43h434.2v-233.43c0-25.28-21.15-51.22-58.04-71.15-42.09-22.75-98.58-35.28-159.06-35.28s-116.98,12.53-159.06,35.28Z"/>
+    </g>
+    <g>
+      <path fill="#242420" d="M3112.94,1442.34c-60.98,0-117.98-12.66-160.5-35.64-37.89-20.48-59.62-47.39-59.62-73.81v-236.45h440.24v236.45c0,26.43-21.73,53.33-59.62,73.81-42.52,22.98-99.52,35.64-160.5,35.64ZM2898.86,1102.48v230.41c0,24.14,20.58,49.1,56.45,68.5,41.65,22.51,97.63,34.91,157.63,34.91s115.98-12.4,157.63-34.91c35.88-19.39,56.45-44.36,56.45-68.5v-230.41h-428.16Z"/>
+      <path fill="#242420" d="M3333.06,489.58h-440.24v-236.45c0-26.42,21.74-53.33,59.62-73.81h0c42.52-22.98,99.52-35.64,160.5-35.64s117.98,12.66,160.5,35.64c37.89,20.48,59.62,47.38,59.62,73.81v236.45ZM2898.86,483.54h428.16v-230.41c0-24.14-20.58-49.1-56.45-68.5-41.65-22.51-97.63-34.91-157.63-34.91s-115.98,12.4-157.63,34.91h0c-35.88,19.39-56.45,44.36-56.45,68.5v230.41Z"/>
+    </g>
+    <rect fill="#3c3c3b" x="2860.74" y="575.91" width="504.39" height="434.2" rx="25.27" ry="25.27" transform="translate(2319.9314 3905.9482) rotate(-90)"/>
+    <rect fill="var(--vhs-etiq,#e3dbbf)" x="2860.74" y="594.51" width="504.39" height="397" rx="24.16" ry="24.16" transform="translate(2319.9315 3905.9483) rotate(-90)"/>
+    <path fill="#242420" d="M3304.77,1048.23h-383.66c-15.6,0-28.29-12.69-28.29-28.29v-453.85c0-15.6,12.69-28.29,28.29-28.29h383.66c15.6,0,28.29,12.69,28.29,28.29v453.85c0,15.6-12.69,28.29-28.29,28.29ZM2921.11,543.83c-12.27,0-22.25,9.98-22.25,22.25v453.85c0,12.27,9.98,22.25,22.25,22.25h383.66c12.27,0,22.25-9.98,22.25-22.25v-453.85c0-12.27-9.98-22.25-22.25-22.25h-383.66Z"/>
+    <g>
+      <path fill="#d9cfae" d="M2981.61,984.08c-1.74,0-3.15-1.41-3.15-3.15v-375.84c0-1.74,1.41-3.15,3.15-3.15s3.15,1.41,3.15,3.15v375.84c0,1.74-1.41,3.15-3.15,3.15Z"/>
+      <path fill="#d9cfae" d="M3047.27,984.08c-1.74,0-3.15-1.41-3.15-3.15v-375.84c0-1.74,1.41-3.15,3.15-3.15s3.15,1.41,3.15,3.15v375.84c0,1.74-1.41,3.15-3.15,3.15Z"/>
+      <path fill="#d9cfae" d="M3112.94,984.08c-1.74,0-3.15-1.41-3.15-3.15v-375.84c0-1.74,1.41-3.15,3.15-3.15s3.15,1.41,3.15,3.15v375.84c0,1.74-1.41,3.15-3.15,3.15Z"/>
+      <path fill="#d9cfae" d="M3178.61,984.08c-1.74,0-3.15-1.41-3.15-3.15v-375.84c0-1.74,1.41-3.15,3.15-3.15s3.15,1.41,3.15,3.15v375.84c0,1.74-1.41,3.15-3.15,3.15Z"/>
+      <path fill="#d9cfae" d="M3244.27,984.08c-1.74,0-3.15-1.41-3.15-3.15v-375.84c0-1.74,1.41-3.15,3.15-3.15s3.15,1.41,3.15,3.15v375.84c0,1.74-1.41,3.15-3.15,3.15Z"/>
+    </g>
+    <path fill="#575756" d="M3473.04,19.76c19.99,0,36.25,16.26,36.25,36.25v1474c0,19.99-16.26,36.25-36.25,36.25h-641.12v-42.12h-115.33V61.89h115.33V19.76h641.12ZM3473.04,7.68h-653.2v42.12h-115.33v1486.41h115.33v42.12h653.2c26.69,0,48.33-21.64,48.33-48.33V56.01c0-26.69-21.64-48.33-48.33-48.33h0Z"/>
+    <g >
+      <g>
+        <g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="1099.46" r="280.95" transform="translate(134.1582 2522.8016) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,1383.43c-75.85,0-147.16-29.54-200.8-83.17-53.64-53.64-83.17-124.95-83.17-200.8s29.54-147.16,83.17-200.8c53.64-53.64,124.95-83.17,200.8-83.17s147.16,29.54,200.8,83.17c53.64,53.64,83.17,124.95,83.17,200.8s-29.54,147.17-83.17,200.8c-53.64,53.64-124.95,83.17-200.8,83.17ZM3112.37,821.52c-153.25,0-277.93,124.68-277.93,277.93s124.68,277.93,277.93,277.93,277.93-124.68,277.93-277.93-124.68-277.93-277.93-277.93Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="1099.46" r="266.02"/>
+            <path fill="#242420" d="M3112.37,1368.5c-71.86,0-139.43-27.99-190.24-78.8-50.82-50.82-78.8-118.38-78.8-190.24s27.98-139.43,78.8-190.24c50.82-50.82,118.38-78.8,190.24-78.8s139.43,27.99,190.24,78.8c50.82,50.82,78.8,118.38,78.8,190.24s-27.99,139.43-78.8,190.24c-50.82,50.82-118.38,78.8-190.24,78.8ZM3112.37,836.46c-145.02,0-263,117.98-263,263s117.98,263,263,263,263-117.98,263-263-117.98-263-263-263Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="1099.46" r="251.09"/>
+            <path fill="#242420" d="M3112.37,1353.57c-140.12,0-254.11-113.99-254.11-254.11s113.99-254.11,254.11-254.11,254.11,113.99,254.11,254.11-113.99,254.11-254.11,254.11ZM3112.37,851.39c-136.79,0-248.07,111.28-248.07,248.07s111.28,248.07,248.07,248.07,248.07-111.28,248.07-248.07-111.28-248.07-248.07-248.07Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="1099.46" r="236.16" transform="translate(134.1582 2522.8016) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,1338.64c-131.88,0-239.18-107.3-239.18-239.18s107.3-239.18,239.18-239.18,239.18,107.3,239.18,239.18-107.3,239.18-239.18,239.18ZM3112.37,866.32c-128.55,0-233.14,104.59-233.14,233.14s104.59,233.14,233.14,233.14,233.14-104.59,233.14-233.14-104.59-233.14-233.14-233.14Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="1099.46" r="221.23" transform="translate(134.1582 2522.8016) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,1323.71c-123.65,0-224.25-100.6-224.25-224.25s100.6-224.25,224.25-224.25,224.25,100.6,224.25,224.25-100.6,224.25-224.25,224.25ZM3112.37,881.25c-120.32,0-218.21,97.89-218.21,218.21s97.89,218.21,218.21,218.21,218.21-97.89,218.21-218.21-97.89-218.21-218.21-218.21Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="1099.46" r="206.3" transform="translate(134.1582 2522.8016) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,1308.77c-115.42,0-209.32-93.9-209.32-209.32s93.9-209.32,209.32-209.32,209.32,93.9,209.32,209.32-93.9,209.32-209.32,209.32ZM3112.37,896.18c-112.09,0-203.28,91.19-203.28,203.27s91.19,203.28,203.28,203.28,203.28-91.19,203.28-203.28-91.19-203.27-203.28-203.27Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="1099.46" r="191.36" transform="translate(134.1582 2522.8016) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,1293.84c-107.18,0-194.38-87.2-194.38-194.39s87.2-194.38,194.38-194.38,194.38,87.2,194.38,194.38-87.2,194.39-194.38,194.39ZM3112.37,911.11c-103.85,0-188.34,84.49-188.34,188.34s84.49,188.34,188.34,188.34,188.34-84.49,188.34-188.34-84.49-188.34-188.34-188.34Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="1099.46" r="176.43" transform="translate(134.1582 2522.8016) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,1278.91c-98.95,0-179.45-80.5-179.45-179.45s80.5-179.45,179.45-179.45,179.45,80.5,179.45,179.45-80.5,179.45-179.45,179.45ZM3112.37,926.05c-95.62,0-173.41,77.79-173.41,173.41s77.79,173.41,173.41,173.41,173.41-77.79,173.41-173.41-77.79-173.41-173.41-173.41Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="1099.46" r="161.5" transform="translate(134.1582 2522.8016) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,1263.98c-90.72,0-164.52-73.8-164.52-164.52s73.8-164.52,164.52-164.52,164.52,73.8,164.52,164.52-73.8,164.52-164.52,164.52ZM3112.37,940.98c-87.39,0-158.48,71.09-158.48,158.48s71.09,158.48,158.48,158.48,158.48-71.09,158.48-158.48-71.09-158.48-158.48-158.48Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="1099.46" r="146.57" transform="translate(134.1582 2522.8016) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,1249.05c-82.48,0-149.59-67.11-149.59-149.59s67.11-149.59,149.59-149.59,149.59,67.11,149.59,149.59-67.11,149.59-149.59,149.59ZM3112.37,955.91c-79.15,0-143.55,64.4-143.55,143.55s64.4,143.55,143.55,143.55,143.55-64.4,143.55-143.55-64.4-143.55-143.55-143.55Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="1099.46" r="131.64" transform="translate(134.1582 2522.8016) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,1234.12c-74.25,0-134.66-60.41-134.66-134.66s60.41-134.66,134.66-134.66,134.66,60.41,134.66,134.66-60.41,134.66-134.66,134.66ZM3112.37,970.84c-70.92,0-128.62,57.7-128.62,128.62s57.7,128.62,128.62,128.62,128.62-57.7,128.62-128.62-57.7-128.62-128.62-128.62Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="1099.46" r="116.71" transform="translate(134.1582 2522.8016) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,1219.18c-66.02,0-119.73-53.71-119.73-119.73s53.71-119.73,119.73-119.73,119.73,53.71,119.73,119.73-53.71,119.73-119.73,119.73ZM3112.37,985.77c-62.69,0-113.69,51-113.69,113.69s51,113.69,113.69,113.69,113.69-51,113.69-113.69-51-113.69-113.69-113.69Z"/>
+          </g>
+        </g>
+        <g>
+          <circle fill="#c6c6c6" cx="3112.37" cy="1099.46" r="103.72" transform="translate(134.1582 2522.8016) rotate(-45)"/>
+          <path fill="#242420" d="M3112.37,1206.19c-58.85,0-106.74-47.88-106.74-106.74s47.88-106.73,106.74-106.73,106.74,47.88,106.74,106.73-47.88,106.74-106.74,106.74ZM3112.37,998.76c-55.52,0-100.69,45.17-100.69,100.69s45.17,100.69,100.69,100.69,100.69-45.17,100.69-100.69-45.17-100.69-100.69-100.69Z"/>
+        </g>
+        <g>
+          <circle fill="#c6c6c6" cx="3112.37" cy="1099.46" r="65.1" transform="translate(-169.34 744.49) rotate(-13.28)"/>
+          <path fill="#242420" d="M3112.37,1167.57c-37.56,0-68.12-30.56-68.12-68.12s30.56-68.12,68.12-68.12,68.12,30.56,68.12,68.12-30.56,68.12-68.12,68.12ZM3112.37,1037.38c-34.23,0-62.08,27.85-62.08,62.07s27.85,62.08,62.08,62.08,62.08-27.85,62.08-62.08-27.85-62.07-62.08-62.07Z"/>
+        </g>
+        <g>
+          <circle fill="#c6c6c6" cx="3112.37" cy="1099.46" r="32.51" transform="translate(-122.41 442.31) rotate(-7.97)"/>
+          <path fill="#242420" d="M3112.37,1134.99c-19.59,0-35.53-15.94-35.53-35.53s15.94-35.53,35.53-35.53,35.53,15.94,35.53,35.53-15.94,35.53-35.53,35.53ZM3112.37,1069.97c-16.26,0-29.49,13.23-29.49,29.49s13.23,29.49,29.49,29.49,29.49-13.23,29.49-29.49-13.23-29.49-29.49-29.49Z"/>
+        </g>
+      </g>
+    </g>
+    <g >
+      <g>
+        <g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="486.56" r="176.43" transform="translate(567.5427 2343.2879) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,666.01c-98.95,0-179.45-80.5-179.45-179.45s80.5-179.45,179.45-179.45,179.45,80.5,179.45,179.45-80.5,179.45-179.45,179.45ZM3112.37,313.15c-95.62,0-173.41,77.79-173.41,173.41s77.79,173.41,173.41,173.41,173.41-77.79,173.41-173.41-77.79-173.41-173.41-173.41Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="486.56" r="161.5" transform="translate(567.5427 2343.2879) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,651.08c-90.72,0-164.52-73.8-164.52-164.52s73.8-164.52,164.52-164.52,164.52,73.8,164.52,164.52-73.8,164.52-164.52,164.52ZM3112.37,328.08c-87.39,0-158.48,71.09-158.48,158.48s71.09,158.48,158.48,158.48,158.48-71.09,158.48-158.48-71.09-158.48-158.48-158.48Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="486.56" r="146.57"/>
+            <path fill="#242420" d="M3112.37,636.15c-82.48,0-149.59-67.11-149.59-149.59s67.11-149.59,149.59-149.59,149.59,67.11,149.59,149.59-67.11,149.59-149.59,149.59ZM3112.37,343.01c-79.15,0-143.55,64.4-143.55,143.55s64.4,143.55,143.55,143.55,143.55-64.4,143.55-143.55-64.4-143.55-143.55-143.55Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="486.56" r="131.64" transform="translate(567.5427 2343.2879) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,621.22c-74.25,0-134.66-60.41-134.66-134.66s60.41-134.66,134.66-134.66,134.66,60.41,134.66,134.66-60.41,134.66-134.66,134.66ZM3112.37,357.94c-70.92,0-128.62,57.7-128.62,128.62s57.7,128.62,128.62,128.62,128.62-57.7,128.62-128.62-57.7-128.62-128.62-128.62Z"/>
+          </g>
+          <g>
+            <circle fill="#3c3c3b" cx="3112.37" cy="486.56" r="116.71" transform="translate(567.5427 2343.2879) rotate(-45)"/>
+            <path fill="#242420" d="M3112.37,606.29c-66.02,0-119.73-53.71-119.73-119.73s53.71-119.73,119.73-119.73,119.73,53.71,119.73,119.73-53.71,119.73-119.73,119.73ZM3112.37,372.87c-62.69,0-113.69,51-113.69,113.69s51,113.69,113.69,113.69,113.69-51,113.69-113.69-51-113.69-113.69-113.69Z"/>
+          </g>
+        </g>
+        <g>
+          <circle fill="#c6c6c6" cx="3112.37" cy="486.56" r="103.71" transform="translate(567.5427 2343.2879) rotate(-45)"/>
+          <path fill="#242420" d="M3112.37,593.3c-58.85,0-106.74-47.88-106.74-106.74s47.88-106.74,106.74-106.74,106.74,47.88,106.74,106.74-47.88,106.74-106.74,106.74ZM3112.37,385.86c-55.52,0-100.69,45.17-100.69,100.69s45.17,100.69,100.69,100.69,100.69-45.17,100.69-100.69-45.17-100.69-100.69-100.69Z"/>
+        </g>
+        <g>
+          <circle fill="#c6c6c6" cx="3112.37" cy="486.56" r="65.1" transform="translate(1214.7853 3001.069) rotate(-61.845)"/>
+          <path fill="#242420" d="M3112.37,554.68c-37.56,0-68.12-30.56-68.12-68.12s30.56-68.12,68.12-68.12,68.12,30.56,68.12,68.12-30.56,68.12-68.12,68.12ZM3112.37,424.48c-34.23,0-62.08,27.85-62.08,62.08s27.85,62.08,62.08,62.08,62.08-27.85,62.08-62.08-27.85-62.08-62.08-62.08Z"/>
+        </g>
+        <g>
+          <circle fill="#c6c6c6" cx="3112.37" cy="486.56" r="32.51" transform="translate(2133.5477 3480.8028) rotate(-80.7825)"/>
+          <path fill="#242420" d="M3112.37,522.09c-19.59,0-35.53-15.94-35.53-35.53s15.94-35.53,35.53-35.53,35.53,15.94,35.53,35.53-15.94,35.53-35.53,35.53ZM3112.37,457.07c-16.26,0-29.49,13.23-29.49,29.49s13.23,29.49,29.49,29.49,29.49-13.23,29.49-29.49-13.23-29.49-29.49-29.49Z"/>
+        </g>
+      </g>
+    </g>
+    <polygon points="2668.16 772.93 2630.18 794.87 2668.16 816.81 2668.16 804.18 2687.08 804.18 2687.08 785.55 2668.16 785.55 2668.16 772.93"/>
+  </g></symbol></svg>
 
 <header id="top">
   <!-- El logo de IRIS se quitó de aquí el 2026-08-27 a pedido de Dosa: en la
@@ -3226,13 +3415,118 @@ function pintaHero(t) {
   box.append(fondo, cartel, velo, tx);
 }
 
-/* ---------- estante de discos ----------
-   El elegido se abre en el centro de la escena y el resto queda de canto,
-   como lomos en una balda. */
+
+/* ---------- la caja de VHS ----------
+   Cada titulo tiene su caja, teñida con los colores de su propia portada. La
+   paleta se saca en el navegador (el worker sirve las imagenes con CORS
+   abierto, asi que el canvas no se mancha) y se guarda por URL. */
+const paletasVHS = new Map();
+function aHLS(r, g, b) {
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2;
+  if (mx === mn) return [0, l, 0];
+  const d = mx - mn;
+  const s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn);
+  let h;
+  if (mx === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+  else if (mx === g) h = ((b - r) / d + 2) / 6;
+  else h = ((r - g) / d + 4) / 6;
+  return [h, l, s];
+}
+function aRGB(h, l, s) {
+  if (!s) return [l, l, l];
+  const q = l < .5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
+  const f = (x) => {
+    if (x < 0) x += 1; if (x > 1) x -= 1;
+    if (x < 1 / 6) return p + (q - p) * 6 * x;
+    if (x < 1 / 2) return q;
+    if (x < 2 / 3) return p + (q - p) * (2 / 3 - x) * 6;
+    return p;
+  };
+  return [f(h + 1 / 3), f(h), f(h - 1 / 3)];
+}
+const hex = (r, g, b) => '#' + [r, g, b].map((v) =>
+  Math.max(0, Math.min(255, Math.round(v * 255))).toString(16).padStart(2, '0')).join('');
+/* Mate, como tinta impresa: la luz se mueve poco, la saturacion se queda a
+   media asta y todo se mezcla un pelo con el crema del cartón. */
+const PAPEL = [0.937, 0.902, 0.824];
+function tinta(h, luz, sat) {
+  let [r, g, b] = aRGB(h, luz, sat);
+  const k = 0.14;
+  return hex(r * (1 - k) + PAPEL[0] * k, g * (1 - k) + PAPEL[1] * k, b * (1 - k) + PAPEL[2] * k);
+}
+function sacaPaleta(img) {
+  const c = document.createElement('canvas'); c.width = 48; c.height = 72;
+  const g = c.getContext('2d', { willReadFrequently: true });
+  g.drawImage(img, 0, 0, 48, 72);
+  const d = g.getImageData(0, 0, 48, 72).data;
+  const cubos = new Map();
+  for (let i = 0; i < d.length; i += 4) {
+    const [h, l, s] = aHLS(d[i] / 255, d[i + 1] / 255, d[i + 2] / 255);
+    if (s < .18 || l < .10 || l > .93) continue;
+    const k = Math.floor(h * 18) % 18;
+    cubos.set(k, (cubos.get(k) || 0) + 1);
+  }
+  const tonos = [...cubos.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k]) => (k + .5) / 18);
+  if (!tonos.length) return null;
+  while (tonos.length < 5) tonos.push(tonos[tonos.length % tonos.length]);
+  const luces = [.60, .53, .46, .39, .33], sats = [.46, .50, .48, .44, .38];
+  const f = tonos.map((h, i) => tinta(h, luces[i], sats[i]));
+  const dom = tonos[0];
+  return {
+    f, carton: hex(...aRGB(dom, .90, .26)),
+    etiq: hex(...aRGB(dom, .90, .22)), pega: tinta(tonos[2 % tonos.length], .52, .38)
+  };
+}
+function paletaVHS(url) {
+  if (paletasVHS.has(url)) return paletasVHS.get(url);
+  const p = new Promise((res) => {
+    if (!url) { res(null); return; }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { try { res(sacaPaleta(img)); } catch (e) { res(null); } };
+    img.onerror = () => res(null);   // sin CORS o sin imagen: se queda el color de fabrica
+    img.src = url;
+  });
+  paletasVHS.set(url, p);
+  return p;
+}
+function pintaVHS(el, pal) {
+  if (!pal) return;
+  pal.f.forEach((c, i) => el.style.setProperty('--vhs-f' + (i + 1), c));
+  el.style.setProperty('--vhs-carton', pal.carton);
+  el.style.setProperty('--vhs-etiq', pal.etiq);
+  el.style.setProperty('--vhs-pega', pal.pega);
+}
+const usaVHS = (id) => {
+  const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const u = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  u.setAttribute('href', '#' + id);
+  s.appendChild(u);
+  return s;
+};
+
+/* ---------- estante de cajas de VHS ----------
+   La referencia (la web de VHS de Kurosawa) NO gira los lomos: los pone
+   planos en fila y saca la caratula DELANTE de todos. El volumen lo pone
+   la caratula tapando a sus vecinas, no la perspectiva. Al cambiar de
+   titulo la caratula parpadea, que es lo que se lee como "sacar otra
+   cinta"; detras, la cinta asoma de su funda. */
 function estanteDe(lista) {
   const est = document.createElement('div'); est.className = 'estante';
-  const escena = document.createElement('div'); escena.className = 'est-escena';
+  const pista = document.createElement('div'); pista.className = 'est-pista';
   const rail = document.createElement('div'); rail.className = 'est-rail';
+
+  const frontal = document.createElement('div'); frontal.className = 'est-frontal';
+  const cinta = document.createElement('div'); cinta.className = 'vhs-cinta';
+  cinta.appendChild(usaVHS('vhs-cinta'));
+  const et = document.createElement('span'); et.className = 'et';
+  const etT = document.createElement('b'); const etM = document.createElement('i');
+  etM.textContent = 'MOOVIN'; et.append(etT, etM); cinta.appendChild(et);
+  const caja = document.createElement('div'); caja.className = 'vhs-caja';
+  const sello = usaVHS('vhs-sello'); sello.setAttribute('class', 'vhs-sello');
+  caja.appendChild(sello);
+  frontal.append(cinta, caja);
+
   const ficha = document.createElement('div'); ficha.className = 'est-ficha';
   const meta = document.createElement('p'); meta.className = 'ef-meta';
   const tit = document.createElement('div'); tit.className = 'ef-tit';
@@ -3243,55 +3537,64 @@ function estanteDe(lista) {
   acc.append(ver, baja);
   ficha.append(meta, tit, dur, acc);
 
-  const discos = lista.map((t, i) => {
+  const lomos = lista.map((t2, i) => {
     const b = document.createElement('button');
-    b.className = 'disco' + (i ? '' : ' sel');
-    b.setAttribute('aria-label', t.titulo || '');
-    const caja = document.createElement('span'); caja.className = 'caja';
-    const img = conPase(absCat(t.poster || t.miniatura || ''));
-    const fr = document.createElement('span'); fr.className = 'cara frente';
-    const lo = document.createElement('span'); lo.className = 'cara lomo';
-    if (img) { fr.style.backgroundImage = 'url("' + img + '")'; lo.style.backgroundImage = 'url("' + img + '")'; }
-    const lt = document.createElement('span'); lt.className = 'lomo-tx';
-    lt.textContent = t.titulo || ''; lo.appendChild(lt);
-    const ca = document.createElement('span'); ca.className = 'cara canto';
-    caja.append(fr, lo, ca); b.appendChild(caja);
+    b.className = 'vhs-lomo';
+    b.setAttribute('aria-label', t2.titulo || '');
+    b.appendChild(usaVHS('vhs-lomo'));
+    const cap = document.createElement('span'); cap.className = 'lomo-tx';
+    const sp = document.createElement('span'); sp.textContent = t2.titulo || '';
+    cap.appendChild(sp); b.appendChild(cap);
+    /* cada lomo con los colores de SU portada */
+    paletaVHS(conPase(absCat(t2.poster || t2.miniatura || ''))).then((p) => pintaVHS(b, p));
+    rail.appendChild(b);
     return b;
   });
-  discos.forEach((d) => rail.appendChild(d));
-  escena.appendChild(rail);
+  pista.append(rail, frontal);
 
-  let sel = 0;
+  let sel = 0, aviso = 0;
   function coloca(i) {
     sel = (i + lista.length) % lista.length;
-    discos.forEach((d, k) => d.classList.toggle('sel', k === sel));
-    const d = discos[sel];
-    const desfase = d.offsetLeft + d.offsetWidth / 2 - escena.clientWidth / 2;
-    rail.style.transform = 'translateX(' + (-desfase) + 'px)';
-    const t = lista[sel];
-    meta.textContent = metaDe(t);
-    tit.textContent = t.titulo || '';
-    dur.textContent = cifraDe(t);
-    ver.textContent = t.tipo === 'serie' ? 'Ver la serie' : 'Ver ahora';
-    baja.style.display = t.tipo === 'serie' ? 'none' : '';
+    lomos.forEach((l, k) => {
+      l.classList.toggle('act', k === sel);
+      l.classList.toggle('cerca', Math.abs(k - sel) <= 1);
+    });
+    const d = lomos[sel];
+    rail.style.transform = 'translateX(' + (pista.clientWidth / 2 - (d.offsetLeft + d.offsetWidth / 2)) + 'px)';
+
+    const t2 = lista[sel];
+    const img = conPase(absCat(t2.poster || t2.miniatura || ''));
+    meta.textContent = metaDe(t2);
+    tit.textContent = t2.titulo || '';
+    dur.textContent = cifraDe(t2);
+    etT.textContent = t2.titulo || '';
+    ver.textContent = t2.tipo === 'serie' ? 'Ver la serie' : 'Ver ahora';
+    baja.style.display = t2.tipo === 'serie' ? 'none' : '';
+    if (img) caja.style.backgroundImage = 'url("' + img + '")';
+    paletaVHS(img).then((p) => pintaVHS(frontal, p));
+    /* el parpadeo: se apaga y vuelve, como quien cambia de cinta */
+    frontal.classList.remove('on');
+    clearTimeout(aviso);
+    aviso = setTimeout(() => frontal.classList.add('on'), 130);
   }
-  discos.forEach((d, i) => {
-    d.addEventListener('click', () => { if (i === sel) { abreTitulo(lista[i]); return; } coloca(i); });
-    d.addEventListener('focus', () => coloca(i));
+  lomos.forEach((l, i) => {
+    l.addEventListener('click', () => { if (i === sel) { abreTitulo(lista[i]); return; } coloca(i); });
+    l.addEventListener('focus', () => coloca(i));
   });
   ver.addEventListener('click', () => abreTitulo(lista[sel]));
   baja.addEventListener('click', () => abreDescarga(lista[sel]));
 
   const nav = document.createElement('div'); nav.className = 'est-nav';
-  [['-1', '←', 'Anterior'], ['1', '→', 'Siguiente']].forEach(([paso, gl, rot]) => {
+  [['-1', '\u2190', 'Anterior'], ['1', '\u2192', 'Siguiente']].forEach(([paso, gl, rot]) => {
     const b = document.createElement('button'); b.className = 'est-b';
     b.textContent = gl; b.setAttribute('aria-label', rot);
     b.addEventListener('click', () => coloca(sel + Number(paso)));
     nav.appendChild(b);
   });
-  est.append(escena, ficha, nav);
-  /* offsetLeft solo es real cuando el estante ya está en el documento */
-  requestAnimationFrame(() => coloca(0));
+  est.append(pista, nav, ficha);
+  /* Arranca por el MEDIO de la fila: con el primero elegido, la mitad
+     izquierda del estante queda vacia y no se lee como una balda llena. */
+  requestAnimationFrame(() => coloca(Math.floor((lista.length - 1) / 2)));
   addEventListener('resize', () => coloca(sel), { passive: true });
   return est;
 }
