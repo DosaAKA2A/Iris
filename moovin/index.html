@@ -149,7 +149,11 @@ button.tag:hover{opacity:.7}
 /* overflow-x oculto: el hero se sale a proposito hasta los bordes de la
    ventana y sin esto aparecia una barra horizontal del ancho de la
    barra de desplazamiento. */
-#loader{background:var(--bg); align-items:flex-start; overflow-y:auto; overflow-x:hidden}
+/* touch-action pan-y: el dedo nunca arrastra perfectamente vertical, y si el
+   gesto arranca torcido Chrome elige el eje X — que con overflow-x oculto no
+   panea nada y el scroll parece muerto. Aqui solo se panea en vertical. */
+#loader{background:var(--bg); align-items:flex-start; overflow-y:auto; overflow-x:hidden;
+  touch-action:pan-y pinch-zoom}
 .lib{
   position:relative; width:100%;
   padding:38px var(--gutter) 46px; margin:0 auto;
@@ -1033,6 +1037,12 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   #lib-hero .hero-meta{font-size:11px; margin-top:12px}
   #lib-hero .hero-eyebrow + .hero-meta{margin-top:12px}
   #lib-hero .hero-acc{margin-top:16px}
+  /* Los botones de accion, SIEMPRE en una fila (pedido de Dosa): compactos y
+     sin envolver. Vale para el hero, la pasarela y la ficha. */
+  #lib-hero .hero-acc,.ef-acc,.caja-acc{flex-wrap:nowrap; gap:8px}
+  #lib-hero .hero-acc .mv-btn,.ef-acc .mv-btn,.caja-acc .mv-btn{
+    font-size:12px; padding:10px 12px; white-space:nowrap;
+  }
   .lib-rejilla{grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:14px}
   .lib-tit{font-size:12.5px}
   .lib-nota{font-size:10.5px}
@@ -1118,8 +1128,10 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    de letra sale de --u (la centesima parte del ancho de la caja), que pone
    el guion al abrir: aqui no se puede usar cqw, que la tele no entiende. */
 #caja{flex-direction:column; gap:16px; background:rgba(6,6,8,.93);
-  overflow-y:auto; overflow-x:hidden; padding:22px 16px; z-index:6}
-.caja-esc{perspective:1700px; flex:0 0 auto; position:relative;
+  overflow-y:auto; overflow-x:hidden; padding:22px 16px; z-index:6;
+  touch-action:pan-y}
+.caja-esc{perspective:1700px; flex:0 0 auto; position:relative; cursor:pointer;
+  touch-action:manipulation;
   width:min(calc((100vw - 32px) / 1.37),calc(64vh * .5918),408px);
   transition:transform .8s cubic-bezier(.22,.61,.36,1)}
 #caja.abierta .caja-esc{transform:translateX(-18.5%)}
@@ -3868,7 +3880,10 @@ function abreCaja(t) {
     CAJA.giro = setTimeout(() => giro.classList.add('dorso'), 900);
   }
 }
-$('#caja-giro').addEventListener('click', () => {
+/* El toque vale en toda la escena — la caja Y el casete que asoma — y no
+   solo en la cara de delante: en tactil real el hit-test de una cara girada
+   180 grados en 3D no es de fiar. */
+$('.caja-esc').addEventListener('click', () => {
   clearTimeout(CAJA.giro);
   $('#caja-giro').classList.toggle('dorso');
 });
