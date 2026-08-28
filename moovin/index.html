@@ -888,7 +888,9 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   position:relative; width:100%; flex:none;
   display:flex; align-items:center; gap:26px;
   background:var(--bg); border-top:1px solid var(--line);
-  padding:18px var(--lado) 20px;
+  /* mas respiro arriba que abajo: el renglon mono apenas deja tinta y el
+     margen superior se percibe menor del que mide */
+  padding:30px var(--lado) 20px;
 }
 #lib-hero .hero-col{min-width:0; flex:1}
 #lib-hero .hero-meta span{white-space:nowrap}
