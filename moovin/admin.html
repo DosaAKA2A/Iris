@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex" />
 <title>Backoffice — MOOVIN</title>
-<link rel="icon" type="image/svg+xml" href="/assets/moovin-favicon.svg" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
@@ -326,14 +326,14 @@ async function guardaCatalogo() {
 function pintaLista() {
   const el = $('#lista'); el.innerHTML = '';
   $('#p-resumen').textContent = catalogo.titulos.length
-    ? catalogo.titulos.length + ' título' + (catalogo.titulos.length === 1 ? '' : 's') + ' publicados en iris.it.com/moovin'
+    ? catalogo.titulos.length + ' título' + (catalogo.titulos.length === 1 ? '' : 's') + ' publicados en ' + location.host
     : 'La biblioteca está vacía: agrega el primer título.';
   catalogo.titulos.forEach((t, idx) => {
     const fila = document.createElement('div'); fila.className = 'fila';
     const mini = document.createElement('div'); mini.className = 'mini';
     if (t.poster) {
       const im = document.createElement('img'); im.alt = '';
-      im.src = conPase(new URL(t.poster, 'https://iris.it.com/moovin/').href);
+      im.src = conPase(new URL(t.poster, location.href).href);
       mini.appendChild(im);
     }
     else mini.textContent = (t.titulo || '?').slice(0, 2).toUpperCase();
