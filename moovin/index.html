@@ -1089,16 +1089,22 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 /* La CINTA negra que asoma inclinada detras de la caratula sacada, como el
    casete tras la funda en la referencia: solo existe en la elegida. */
 .pas-cinta{
-  position:absolute; top:2%; bottom:5%; left:16%; right:-6%;
-  border-radius:5px; opacity:0; pointer-events:none;
+  position:absolute; top:-4%; bottom:9%; left:24%; right:-13%;
+  border-radius:6px; opacity:0; pointer-events:none;
   background:
-    linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,0) 26%),
-    linear-gradient(90deg,#0b0b0d 0 10%,#151518 10% 90%,#09090b 90%);
+    linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,0) 22%),
+    linear-gradient(90deg,#0b0b0d 0 8%,#17171b 8% 60%,#111114 60% 92%,#09090b 92%);
   box-shadow:0 26px 54px rgba(0,0,0,.65), 0 0 0 1px rgba(0,0,0,.75);
   transition:opacity .35s ease .1s, transform .5s cubic-bezier(.22,.61,.36,1);
   transform:rotate(0deg);
 }
-.pas-caja.sel .pas-cinta{opacity:1; transform:rotate(4deg)}
+/* la ventanilla de la etiqueta, el unico detalle que un casete pide */
+.pas-cinta::after{
+  content:''; position:absolute; left:18%; right:18%; top:9%; height:11%;
+  border-radius:3px; background:linear-gradient(180deg,#232327,#1a1a1e);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.6);
+}
+.pas-caja.sel .pas-cinta{opacity:1; transform:rotate(5.5deg)}
 .pas-cara{
   position:absolute; inset:0; border-radius:3px; overflow:hidden;
   background-size:cover; background-position:center;
@@ -4209,14 +4215,14 @@ function estanteDe(lista) {
      sacado del estante con la caratula hacia la camara. El paso es fijo (el
      ancho del canto mas un aire); lo que crece con la pantalla es CUANTOS
      cantos hay, y el anillo se rellena repitiendo la lista. */
-  const GAP = 46, SEL_Z = 0;
+  const GAP = 96, SEL_Z = 0;
   const pasoDe = (lomoW) => lomoW + 38;
   let sel = 0, colocado = false;
   function coloca(i) {
     const n = lista.length;
     aseguraCajas(n);
     const movil = innerWidth <= 640;
-    const gap = movil ? 26 : GAP;
+    const gap = movil ? 34 : GAP;
     const cs = getComputedStyle(est);
     /* La altura sale del lomo YA PINTADO, no de --caja-h: ahora es un clamp()
        y getPropertyValue devuelve el token sin resolver (NaN al parsearlo). */
