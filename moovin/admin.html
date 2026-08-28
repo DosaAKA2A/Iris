@@ -400,7 +400,8 @@ async function borrar(idx) {
   const suma = (u) => { const k = claveDe(u); if (k) claves.push(k); };
   suma(t.poster);
   suma(t.miniatura);
-  (t.temporadas || []).forEach((s) => { suma(s.poster); suma(s.miniatura); });
+  suma(t.lomo);
+  (t.temporadas || []).forEach((s) => { suma(s.poster); suma(s.miniatura); suma(s.lomo); });
   partes.forEach((p) => {
     [p.url, p.poster, p.miniatura].forEach(suma);
     (p.subs || []).concat(p.audios || []).forEach((s) => suma(s.url));

@@ -4219,9 +4219,13 @@ function estanteDe(lista) {
     const img = conPase(absCat(t2.poster || t2.miniatura || ''));
     const cara = document.createElement('div'); cara.className = 'pas-cara';
     if (img) cara.style.backgroundImage = 'url("' + img + '")';
-    /* El lomo es la portada cortada: la misma imagen, recortada al canto. */
+    /* El lomo es la portada cortada al canto. Si el titulo trae arte de lomo
+       propio (`lomo`, una tira estrecha) se usa ese: recortar una caratula 2:3
+       al ancho del canto deja solo su franja central, y en las que llevan el
+       titulo a un lado no se lee nada. Sin `lomo` no cambia nada. */
+    const artLomo = conPase(absCat(t2.lomo || '')) || img;
     const lomo = document.createElement('div'); lomo.className = 'pas-lomo';
-    if (img) lomo.style.backgroundImage = 'url("' + img + '")';
+    if (artLomo) lomo.style.backgroundImage = 'url("' + artLomo + '")';
     const cinta = document.createElement('div'); cinta.className = 'pas-cinta';
     const anioVHS = ((t2.nota || '').match(/(19|20)\d{2}/) || [''])[0];
     const pinta = (pal) => {
