@@ -1043,8 +1043,11 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    y sin cqw (la tele no lo entiende): la geometria la pone el JS. */
 /* --caja-ar es 2:3, la proporcion del poster: con la de caja VHS (.5918)
    cover recortaba los bordes de la caratula y se notaba en las que traen
-   marco. El JS del centrado LEE esta variable: un solo sitio que cambiar. */
-.estante{--caja-ar:.6667; --caja-h:372px; --lomo-w:60px; position:relative; margin-top:2px}
+   marco. El JS del centrado LEE esta variable: un solo sitio que cambiar.
+   La ALTURA va con la pantalla (en un monitor grande 372 px se perdian en el
+   centro); como es un clamp(), el JS la mide del lomo ya pintado. */
+.estante{--caja-ar:.6667; --caja-h:clamp(330px,36vh,470px); --lomo-w:60px;
+  position:relative; margin-top:2px}
 .est-escena{touch-action:pan-y;
   position:relative; height:calc(var(--caja-h) + 96px);
   perspective:1500px; perspective-origin:50% 44%; overflow:hidden;
@@ -4148,31 +4151,50 @@ function estanteDe(lista) {
     return b;
   });
 
-  const GAP = 40, STEP = 54, ANG = 38, DEPTH = 55, SEL_Z = 70, MAXV = 4;
-  let sel = 0;
+  /* La fila DA LA VUELTA: el hueco de cada caja se mide por el lado corto del
+     anillo, asi que los ultimos de la derecha vuelven a entrar por la
+     izquierda y el elegido siempre tiene la misma cola a los dos lados.
+     Y la geometria sale del ancho REAL de la escena, no de una constante: en
+     una pantalla ancha caben mas lomos y se separan mas; en una estrecha,
+     menos. Antes eran 4 fijos con paso de 54 px y en un monitor ancho la
+     pasarela se quedaba en un grupito en el centro. */
+  const PASO_MIN = 54, PASO_MAX = 86, GAP = 40, ANG = 38, DEPTH = 55, SEL_Z = 70;
+  let sel = 0, colocado = false;
   function coloca(i) {
-    sel = (i + lista.length) % lista.length;
+    const n = lista.length;
+    sel = ((i % n) + n) % n;
+    colocado = true;
     const movil = innerWidth <= 640;
     const gap = movil ? 30 : GAP, selZ = movil ? 34 : SEL_Z;
     const cs = getComputedStyle(est);
-    const cajaH = parseFloat(cs.getPropertyValue('--caja-h')) || 372;
+    /* La altura sale del lomo YA PINTADO, no de --caja-h: ahora es un clamp()
+       y getPropertyValue devuelve el token sin resolver (NaN al parsearlo). */
+    const cajaH = parseFloat(getComputedStyle(cajas[0]).height) ||
+      parseFloat(cs.getPropertyValue('--caja-h')) || 372;
     const halfSel = cajaH * (parseFloat(cs.getPropertyValue('--caja-ar')) || .6667) / 2;
     const halfLomo = parseFloat(cs.getPropertyValue('--lomo-w')) / 2 || 30;
     const BASE = halfSel + gap + halfLomo + (movil ? 6 : 0);
+    const libre = (escena.clientWidth || innerWidth) / 2 - BASE - halfLomo;
+    const tope = Math.floor((n - 1) / 2);                  // media vuelta al anillo
+    const lados = Math.max(1, Math.min(tope, Math.floor(libre / PASO_MIN)));
+    const paso = Math.min(PASO_MAX, Math.max(PASO_MIN, libre / lados));
     cajas.forEach((b, k) => {
-      const o = k - sel, rank = Math.abs(o), sign = Math.sign(o);
+      let o = ((k - sel) % n + n) % n;
+      if (o * 2 > n) o -= n;                               // por el lado corto
+      const rank = Math.abs(o), sign = Math.sign(o);
       b.classList.toggle('sel', o === 0);
       if (o === 0) {
         b.style.transform = 'translateZ(' + selZ + 'px)';
         b.style.opacity = 1; b.style.zIndex = 30; b.style.pointerEvents = 'auto';
         return;
       }
-      if (rank > MAXV) {
+      if (rank > lados) {
         b.style.opacity = 0; b.style.pointerEvents = 'none'; b.style.zIndex = 0;
-        b.style.transform = 'translateX(' + (sign * 760) + 'px) rotateY(' + (-sign * ANG) + 'deg) translateZ(-300px)';
+        b.style.transform = 'translateX(' + (sign * (BASE + lados * paso + 120)) +
+          'px) rotateY(' + (-sign * ANG) + 'deg) translateZ(-300px)';
         return;
       }
-      const x = sign * (BASE + (rank - 1) * STEP);
+      const x = sign * (BASE + (rank - 1) * paso);
       b.style.transform = 'translateX(' + x + 'px) rotateY(' + (-sign * ANG) + 'deg) translateZ(' + (-rank * DEPTH) + 'px)';
       b.style.opacity = Math.max(0.4, 1 - rank * 0.15);
       b.style.zIndex = 20 - rank; b.style.pointerEvents = 'auto';
@@ -4232,7 +4254,9 @@ function estanteDe(lista) {
   });
   est.append(escena, nav, ficha);
   /* Arranca por el MEDIO de la fila para que el central quede centrado. */
-  requestAnimationFrame(() => coloca(Math.floor((lista.length - 1) / 2)));
+  const inicio = Math.floor((lista.length - 1) / 2);
+  requestAnimationFrame(() => { if (!colocado) coloca(inicio); });
+  setTimeout(() => { if (!colocado) coloca(inicio); }, 400);
   addEventListener('resize', () => coloca(sel), { passive: true });
   return est;
 }
