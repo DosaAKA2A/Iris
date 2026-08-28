@@ -4181,8 +4181,7 @@ function estanteDe(lista) {
     const cajaH = parseFloat(getComputedStyle(cajas[0]).height) ||
       parseFloat(cs.getPropertyValue('--caja-h')) || 372;
     const halfSel = cajaH * (parseFloat(cs.getPropertyValue('--caja-ar')) || .6667) / 2;
-    const lomoW = parseFloat(getComputedStyle(cajas[0]).width) ||
-      parseFloat(cs.getPropertyValue('--lomo-w')) || 60;
+    const lomoW = parseFloat(cs.getPropertyValue('--lomo-w')) || 60;
     const halfLomo = lomoW / 2;
     const paso = pasoDe(lomoW);
     const BASE = halfSel + gap + halfLomo + (movil ? 6 : 0);
@@ -4192,7 +4191,7 @@ function estanteDe(lista) {
     const lados = Math.max(1, Math.ceil(libre / paso) + 1);
     // El anillo lleva vueltas ENTERAS de la lista; si no, al cerrarse saltaria
     // del ultimo titulo a uno de en medio.
-    const total = Math.max(n, Math.ceil((lados * 2 + 1) / n) * n);
+    const total = Math.max(n, Math.ceil((lados * 2 + 3) / n) * n);
     aseguraCajas(total);
     sel = ((i % total) + total) % total;
     colocado = true;
@@ -4204,6 +4203,12 @@ function estanteDe(lista) {
       let o = ((k - sel) % total + total) % total;
       if (o * 2 > total) o -= total;                       // el hueco, por el lado corto
       const rank = Math.abs(o), sign = Math.sign(o);
+      /* Al cerrarse el anillo, un lomo pasa del extremo derecho al izquierdo:
+         eso NO se anima, se teletransporta. Con la transicion puesta cruzaba la
+         fila entera a la vista y parecia que los titulos se barajaban solos. */
+      const salto = b.pos !== undefined && Math.abs(o - b.pos) > 1;
+      if (salto) b.style.transition = 'none';
+      b.pos = o;
       b.classList.toggle('sel', o === 0);
       if (o === 0) {
         b.style.transform = 'translateZ(' + selZ + 'px)';
@@ -4211,6 +4216,7 @@ function estanteDe(lista) {
         return;
       }
       if (rank > lados) {
+        b.style.transition = 'none';                       // la cola no se anima
         b.style.opacity = 0; b.style.pointerEvents = 'none'; b.style.zIndex = 0;
         b.style.transform = 'translateX(' + (sign * (BASE + lados * paso)) +
           'px) rotateY(' + (-sign * ANG) + 'deg) translateZ(-300px)';
@@ -4229,6 +4235,12 @@ function estanteDe(lista) {
       b.style.opacity = alFinal <= 2 ? Math.max(0.06, alFinal / 3) : 1;
       b.style.zIndex = Math.max(1, 30 - rank); b.style.pointerEvents = 'auto';
     });
+    // Un solo reflujo para todos los que saltaron, y les vuelve la transicion.
+    const saltaron = cajas.filter((b) => b.style.transition === 'none');
+    if (saltaron.length) {
+      void mundo.offsetWidth;
+      saltaron.forEach((b) => { b.style.transition = ''; });
+    }
     const t2 = lista[sel % n];
     meta.textContent = metaDe(t2);
     tit.textContent = t2.titulo || '';
