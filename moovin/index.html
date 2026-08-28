@@ -1048,7 +1048,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    marco. El JS del centrado LEE esta variable: un solo sitio que cambiar.
    La ALTURA va con la pantalla (en un monitor grande 372 px se perdian en el
    centro); como es un clamp(), el JS la mide del lomo ya pintado. */
-.estante{--caja-ar:.6667; --caja-h:clamp(330px,36vh,470px); --lomo-w:132px;
+.estante{--caja-ar:.6667; --caja-h:clamp(330px,36vh,470px); --lomo-w:64px;
   position:relative; margin-top:2px}
 .est-escena{touch-action:pan-y;
   position:relative; height:calc(var(--caja-h) + 96px);
@@ -1064,30 +1064,70 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   position:absolute; top:50%; left:50%;
   height:var(--caja-h); width:var(--lomo-w);
   margin:calc(var(--caja-h) / -2) 0 0 calc(var(--lomo-w) / -2);
-  transform-style:preserve-3d; cursor:pointer;
-  background:#141416; border:0; padding:0;
+  cursor:pointer; perspective:1100px;
+  background:transparent; border:0; padding:0;
   transition:transform .55s cubic-bezier(.22,.61,.36,1),
              width .55s cubic-bezier(.22,.61,.36,1);
   will-change:transform,width;
 }
+/* El LOMO impreso: la cara lateral del empaque, plana y de frente, como en un
+   estante real. No es la caratula comprimida: es una pieza de imprenta propia
+   (fondo con la tinta de SU caratula, marca arriba, titulo en vertical, año y
+   franjas abajo) fabricada porque el escaneo lateral no existe. */
+.pas-lomo{
+  position:absolute; inset:0; border-radius:2px; overflow:hidden;
+  display:flex; flex-direction:column; align-items:center;
+  background:linear-gradient(180deg,var(--lomo-bg1,#23232a),var(--lomo-bg2,#17171c));
+  box-shadow:0 16px 34px rgba(0,0,0,.5), 0 0 0 1px rgba(0,0,0,.55);
+  transition:opacity .3s ease .12s;
+}
+/* luz de canto: un filo claro a la izquierda y sombra a la derecha, que es lo
+   que hace leer la tira como un objeto con grosor y no como un rectangulo */
+.pas-lomo::after{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(90deg,rgba(255,255,255,.16) 0,rgba(255,255,255,.05) 12%,
+    rgba(0,0,0,0) 30%,rgba(0,0,0,0) 68%,rgba(0,0,0,.28) 100%);
+}
+.pas-lomo .lm-marca{
+  flex:none; margin-top:12px; height:14px; width:auto; opacity:.85;
+  color:var(--lomo-tinta,#e8e8ee);
+}
+.pas-lomo .lm-tit{
+  flex:1; min-height:0; display:flex; align-items:center; justify-content:center;
+  writing-mode:vertical-rl; transform:rotate(180deg);
+  font-family:var(--display); font-weight:700; font-size:15px;
+  letter-spacing:.08em; text-transform:uppercase;
+  color:var(--lomo-tinta,#e8e8ee); white-space:nowrap; overflow:hidden;
+  max-height:100%; padding:10px 0;
+}
+.pas-lomo .lm-anio{
+  flex:none; font-family:var(--mono); font-size:9px; letter-spacing:.18em;
+  color:var(--lomo-suave,#9a9aa6); margin-bottom:8px;
+}
+.pas-lomo .lm-franjas{flex:none; width:100%; height:14px; display:flex; margin-bottom:0}
+.pas-lomo .lm-franjas i{flex:1}
 .pas-cara{
   position:absolute; inset:0; border-radius:3px; overflow:hidden;
   background-size:cover; background-position:center;
-  box-shadow:0 18px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.5);
+  box-shadow:0 34px 70px rgba(0,0,0,.75), 0 0 0 1px rgba(0,0,0,.5);
+  opacity:0; pointer-events:none; backface-visibility:hidden;
 }
 .pas-velo{
-  position:absolute; inset:0; transition:opacity .4s ease;
-  background:linear-gradient(180deg,rgba(8,8,10,.15) 0%,rgba(8,8,10,.62) 55%,rgba(8,8,10,.15) 100%);
+  position:absolute; inset:0; transition:opacity .4s ease; pointer-events:none;
+  background:#08080a; opacity:0;
 }
-.pas-canto{position:absolute; top:0; bottom:0; right:0; width:8px;
-  transform:translateZ(-1px); border-radius:0 3px 3px 0;
-  background:linear-gradient(90deg,rgba(0,0,0,.5),rgba(0,0,0,.85))}
 .pas-caja.sel{
   width:calc(var(--caja-h) * var(--caja-ar));
   margin-left:calc(var(--caja-h) * var(--caja-ar) / -2); cursor:default;
 }
-.pas-caja.sel .pas-cara{box-shadow:0 34px 70px rgba(0,0,0,.75), 0 0 0 1px rgba(0,0,0,.5)}
-.pas-caja.sel .pas-velo,.pas-caja.sel .pas-canto{opacity:0}
+.pas-caja.sel .pas-lomo{opacity:0; transition-delay:0s}
+.pas-caja.sel .pas-velo{opacity:0}
+/* la cinta elegida se SACA del estante y se gira hacia la camara */
+.pas-caja.sel .pas-cara{opacity:1; animation:vhs-saca .5s cubic-bezier(.22,.61,.36,1)}
+@keyframes vhs-saca{
+  0%{transform:rotateY(-58deg); opacity:.25}
+  100%{transform:rotateY(0); opacity:1}
+}
 .est-ficha{text-align:center; padding-top:20px}
 .est-ficha .ef-meta{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em;
   text-transform:uppercase; color:var(--dim)}
@@ -4147,9 +4187,39 @@ function estanteDe(lista) {
     const img = conPase(absCat(t2.poster || t2.miniatura || ''));
     const cara = document.createElement('div'); cara.className = 'pas-cara';
     if (img) cara.style.backgroundImage = 'url("' + img + '")';
+    /* El lomo impreso. La marca de arriba es la M de MOOVIN (el simbolo del
+       encabezado); el año sale de la nota; las franjas de abajo son las
+       tintas de la propia caratula, el gesto de los VHS reales. */
+    const lomo = document.createElement('div'); lomo.className = 'pas-lomo';
+    const marca = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    marca.setAttribute('viewBox', '0 0 220 179.98'); marca.setAttribute('class', 'lm-marca');
+    marca.innerHTML = document.querySelector('.mv-m g')
+      ? '<g fill="currentColor" transform="translate(0,179.98) scale(1,-1)">' +
+        document.querySelector('.mv-m g').innerHTML.replace(/fill="[^"]*"/g, '') + '</g>'
+      : '';
+    const lTit = document.createElement('span'); lTit.className = 'lm-tit';
+    lTit.textContent = t2.titulo || '';
+    if ((t2.titulo || '').length > 34) lTit.style.fontSize = '11.5px';
+    else if ((t2.titulo || '').length > 24) lTit.style.fontSize = '13px';
+    const lAnio = document.createElement('span'); lAnio.className = 'lm-anio';
+    const anio = ((t2.nota || '').match(/\b(19|20)\d{2}\b/) || [''])[0];
+    lAnio.textContent = anio || (t2.tipo === 'serie' ? 'SERIE' : 'FILM');
+    const lFranjas = document.createElement('span'); lFranjas.className = 'lm-franjas';
+    for (let i = 0; i < 4; i++) lFranjas.appendChild(document.createElement('i'));
+    lomo.append(marca, lTit, lAnio, lFranjas);
+    paletaVHS(img).then((pal) => {
+      if (!pal) return;
+      /* Tinta entintada y honda (las franjas 2 y 4 de la paleta), no el papel
+         palido de los tickets: en el estante mandan los colores saturados,
+         como en los lomos reales. La letra va crema fija, letra de imprenta. */
+      b.style.setProperty('--lomo-bg1', pal.f[2]);
+      b.style.setProperty('--lomo-bg2', pal.f[4]);
+      b.style.setProperty('--lomo-tinta', '#f4f1e8');
+      b.style.setProperty('--lomo-suave', 'rgba(244,241,232,.62)');
+      [...lFranjas.children].forEach((f, i) => { f.style.background = pal.f[i % pal.f.length]; });
+    });
     const velo = document.createElement('div'); velo.className = 'pas-velo';
-    const canto = document.createElement('div'); canto.className = 'pas-canto';
-    b.append(cara, velo, canto);
+    b.append(lomo, cara, velo);
     b.velo = velo;
     b.addEventListener('pointerdown', () => { alEmpezar = sel; });
     b.addEventListener('click', () => {
@@ -4162,21 +4232,19 @@ function estanteDe(lista) {
   }
   const aseguraCajas = (n) => { while (cajas.length < n) creaCaja(cajas.length); };
 
-  /* El paso es FIJO: lo que crece con la pantalla es CUANTOS lomos hay, no lo
-     separados que estan; separarlos deja de parecer un estante y pasa a ser una
-     hilera de tablillas sueltas. Los huecos salen del ancho real de la escena y
-     el anillo se rellena repitiendo la lista. */
-  const GAP = 40, ANG = 38, DEPTH = 55, SEL_Z = 70;
-  const HUNDE = 5;              // a partir del quinto ya no se hunden mas
-  // Girado 38 grados, un lomo ocupa a lo ancho su anchura por el coseno; +6 px
-  // de aire. Asi el paso se regula SOLO con --lomo-w y nunca quedan huecos.
-  const pasoDe = (lomoW) => Math.max(40, lomoW * Math.cos(ANG * Math.PI / 180) + 6);
+  /* Estante PLANO, como la referencia de Kurosawa: nadie esta girado. Cada
+     titulo guardado enseña su LOMO impreso de frente, y solo el elegido esta
+     sacado del estante con la caratula hacia la camara. El paso es fijo (el
+     ancho del canto mas un aire); lo que crece con la pantalla es CUANTOS
+     cantos hay, y el anillo se rellena repitiendo la lista. */
+  const GAP = 46, SEL_Z = 0;
+  const pasoDe = (lomoW) => lomoW + 14;
   let sel = 0, colocado = false;
   function coloca(i) {
     const n = lista.length;
     aseguraCajas(n);
     const movil = innerWidth <= 640;
-    const gap = movil ? 30 : GAP, selZ = movil ? 34 : SEL_Z;
+    const gap = movil ? 26 : GAP;
     const cs = getComputedStyle(est);
     /* La altura sale del lomo YA PINTADO, no de --caja-h: ahora es un clamp()
        y getPropertyValue devuelve el token sin resolver (NaN al parsearlo). */
@@ -4213,28 +4281,24 @@ function estanteDe(lista) {
       b.pos = o;
       b.classList.toggle('sel', o === 0);
       if (o === 0) {
-        b.style.transform = 'translateZ(' + selZ + 'px)';
+        b.style.transform = 'translateZ(0)';
         b.style.opacity = 1; b.style.zIndex = 30; b.style.pointerEvents = 'auto';
+        b.velo.style.opacity = 0;
         return;
       }
       if (rank > lados) {
         b.style.transition = 'none';                       // la cola no se anima
         b.style.opacity = 0; b.style.pointerEvents = 'none'; b.style.zIndex = 0;
-        b.style.transform = 'translateX(' + (sign * (BASE + lados * paso)) +
-          'px) rotateY(' + (-sign * ANG) + 'deg) translateZ(-300px)';
+        b.style.transform = 'translateX(' + (sign * (BASE + lados * paso)) + 'px)';
         return;
       }
       const x = sign * (BASE + (rank - 1) * paso);
-      const z = -Math.min(rank, HUNDE) * DEPTH;
-      b.style.transform = 'translateX(' + x + 'px) rotateY(' + (-sign * ANG) + 'deg) translateZ(' + z + 'px)';
-      /* La lejania se pinta OSCURECIENDO el lomo, no volviendolo transparente:
-         con opacity los lomos se ven unos a traves de otros y aquello parecia
-         un doble expuesto. La transparencia se guarda para los dos ultimos,
-         que es donde la fila tiene que desvanecerse contra el marco. */
-      const hondo = rank / lados;
-      b.velo.style.opacity = Math.min(0.94, 0.1 + hondo * 1.15);
+      b.style.transform = 'translateX(' + x + 'px)';
+      /* El estante es plano y con luz pareja; solo un velo suave que crece
+         hacia los bordes, y los dos ultimos se funden contra el marco. */
+      b.velo.style.opacity = Math.min(0.55, (rank / lados) * 0.6);
       const alFinal = lados - rank;
-      b.style.opacity = alFinal <= 2 ? Math.max(0.06, alFinal / 3) : 1;
+      b.style.opacity = alFinal <= 2 ? Math.max(0.08, alFinal / 3) : 1;
       b.style.zIndex = Math.max(1, 30 - rank); b.style.pointerEvents = 'auto';
     });
     // Un solo reflujo para todos los que saltaron, y les vuelve la transicion.
