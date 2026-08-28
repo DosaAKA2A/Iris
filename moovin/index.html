@@ -1046,7 +1046,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    marco. El JS del centrado LEE esta variable: un solo sitio que cambiar.
    La ALTURA va con la pantalla (en un monitor grande 372 px se perdian en el
    centro); como es un clamp(), el JS la mide del lomo ya pintado. */
-.estante{--caja-ar:.6667; --caja-h:clamp(330px,36vh,470px); --lomo-w:60px;
+.estante{--caja-ar:.6667; --caja-h:clamp(330px,36vh,470px); --lomo-w:132px;
   position:relative; margin-top:2px}
 .est-escena{touch-action:pan-y;
   position:relative; height:calc(var(--caja-h) + 96px);
@@ -1089,6 +1089,9 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 }
 .pas-caja.sel .pas-cara{box-shadow:0 34px 70px rgba(0,0,0,.75), 0 0 0 1px rgba(0,0,0,.5)}
 .pas-caja.sel .pas-velo,.pas-caja.sel .pas-tit,.pas-caja.sel .pas-canto{opacity:0}
+/* Con la fila llena, un titulo escrito en CADA lomo es ruido y no se lee
+   ninguno: solo lo llevan los de delante. */
+.pas-caja.sin-rotulo .pas-tit{opacity:0}
 .est-ficha{text-align:center; padding-top:20px}
 .est-ficha .ef-meta{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em;
   text-transform:uppercase; color:var(--dim)}
@@ -4132,9 +4135,16 @@ function estanteDe(lista) {
   acc.append(ver, baja, dorso);
   ficha.append(meta, tit, dur, acc);
 
-  /* Cada titulo es una caja en el espacio 3D: el lomo ensena un trozo de SU
-     caratula con el titulo en medio; el elegido se pone de frente y limpio. */
-  const cajas = lista.map((t2) => {
+  /* Cada caja del anillo ensena un trozo de SU caratula con el titulo en medio;
+     la elegida se pone de frente y limpia. El anillo REPITE la lista tantas
+     veces como huecos quepan en la escena: con nueve titulos y un monitor ancho
+     la fila se quedaba en un grupito en el centro, y reordenar no lo arregla
+     (nueve titulos son nueve lomos). Repitiendo, el mismo titulo asoma por los
+     dos lados y la fila llega a los bordes: eso es el efecto de infinito.
+     Las cajas se crean segun hacen falta; al ensanchar la ventana se añaden. */
+  const cajas = [];
+  function creaCaja(k) {
+    const t2 = lista[k % lista.length];
     const b = document.createElement('button');
     b.className = 'pas-caja';
     b.setAttribute('aria-label', t2.titulo || '');
@@ -4147,23 +4157,31 @@ function estanteDe(lista) {
     const sp = document.createElement('span'); sp.textContent = t2.titulo || '';
     cap.appendChild(sp);
     b.append(cara, velo, canto, cap);
+    b.velo = velo;
+    b.addEventListener('click', () => {
+      if (k === sel) { abreTitulo(lista[k % lista.length]); return; }
+      coloca(k);
+    });
+    b.addEventListener('focus', () => coloca(k));
     mundo.appendChild(b);
-    return b;
-  });
+    cajas[k] = b;
+  }
+  const aseguraCajas = (n) => { while (cajas.length < n) creaCaja(cajas.length); };
 
-  /* La fila DA LA VUELTA: el hueco de cada caja se mide por el lado corto del
-     anillo, asi que los ultimos de la derecha vuelven a entrar por la
-     izquierda y el elegido siempre tiene la misma cola a los dos lados.
-     Y la geometria sale del ancho REAL de la escena, no de una constante: en
-     una pantalla ancha caben mas lomos y se separan mas; en una estrecha,
-     menos. Antes eran 4 fijos con paso de 54 px y en un monitor ancho la
-     pasarela se quedaba en un grupito en el centro. */
-  const PASO_MIN = 54, PASO_MAX = 86, GAP = 40, ANG = 38, DEPTH = 55, SEL_Z = 70;
+  /* El paso es FIJO: lo que crece con la pantalla es CUANTOS lomos hay, no lo
+     separados que estan; separarlos deja de parecer un estante y pasa a ser una
+     hilera de tablillas sueltas. Los huecos salen del ancho real de la escena y
+     el anillo se rellena repitiendo la lista. */
+  const GAP = 40, ANG = 38, DEPTH = 55, SEL_Z = 70;
+  const HUNDE = 5;              // a partir del quinto ya no se hunden mas
+  const ROTULOS = 5;            // el titulo vertical solo en los de delante
+  // Girado 38 grados, un lomo ocupa a lo ancho su anchura por el coseno; +6 px
+  // de aire. Asi el paso se regula SOLO con --lomo-w y nunca quedan huecos.
+  const pasoDe = (lomoW) => Math.max(40, lomoW * Math.cos(ANG * Math.PI / 180) + 6);
   let sel = 0, colocado = false;
   function coloca(i) {
     const n = lista.length;
-    sel = ((i % n) + n) % n;
-    colocado = true;
+    aseguraCajas(n);
     const movil = innerWidth <= 640;
     const gap = movil ? 30 : GAP, selZ = movil ? 34 : SEL_Z;
     const cs = getComputedStyle(est);
@@ -4172,15 +4190,28 @@ function estanteDe(lista) {
     const cajaH = parseFloat(getComputedStyle(cajas[0]).height) ||
       parseFloat(cs.getPropertyValue('--caja-h')) || 372;
     const halfSel = cajaH * (parseFloat(cs.getPropertyValue('--caja-ar')) || .6667) / 2;
-    const halfLomo = parseFloat(cs.getPropertyValue('--lomo-w')) / 2 || 30;
+    const lomoW = parseFloat(getComputedStyle(cajas[0]).width) ||
+      parseFloat(cs.getPropertyValue('--lomo-w')) || 60;
+    const halfLomo = lomoW / 2;
+    const paso = pasoDe(lomoW);
     const BASE = halfSel + gap + halfLomo + (movil ? 6 : 0);
-    const libre = (escena.clientWidth || innerWidth) / 2 - BASE - halfLomo;
-    const tope = Math.floor((n - 1) / 2);                  // media vuelta al anillo
-    const lados = Math.max(1, Math.min(tope, Math.floor(libre / PASO_MIN)));
-    const paso = Math.min(PASO_MAX, Math.max(PASO_MIN, libre / lados));
+    const libre = (escena.clientWidth || innerWidth) / 2 - BASE;
+    // Uno de mas por lado: es el que entra desde fuera al dar un paso, para que
+    // ninguno aparezca de la nada en mitad del borde.
+    const lados = Math.max(1, Math.ceil(libre / paso) + 1);
+    // El anillo lleva vueltas ENTERAS de la lista; si no, al cerrarse saltaria
+    // del ultimo titulo a uno de en medio.
+    const total = Math.max(n, Math.ceil((lados * 2 + 1) / n) * n);
+    aseguraCajas(total);
+    sel = ((i % total) + total) % total;
+    colocado = true;
     cajas.forEach((b, k) => {
-      let o = ((k - sel) % n + n) % n;
-      if (o * 2 > n) o -= n;                               // por el lado corto
+      if (k >= total) {                                    // sobraban de un ancho mayor
+        b.style.opacity = 0; b.style.pointerEvents = 'none'; b.style.zIndex = 0;
+        return;
+      }
+      let o = ((k - sel) % total + total) % total;
+      if (o * 2 > total) o -= total;                       // el hueco, por el lado corto
       const rank = Math.abs(o), sign = Math.sign(o);
       b.classList.toggle('sel', o === 0);
       if (o === 0) {
@@ -4190,26 +4221,31 @@ function estanteDe(lista) {
       }
       if (rank > lados) {
         b.style.opacity = 0; b.style.pointerEvents = 'none'; b.style.zIndex = 0;
-        b.style.transform = 'translateX(' + (sign * (BASE + lados * paso + 120)) +
+        b.style.transform = 'translateX(' + (sign * (BASE + lados * paso)) +
           'px) rotateY(' + (-sign * ANG) + 'deg) translateZ(-300px)';
         return;
       }
       const x = sign * (BASE + (rank - 1) * paso);
-      b.style.transform = 'translateX(' + x + 'px) rotateY(' + (-sign * ANG) + 'deg) translateZ(' + (-rank * DEPTH) + 'px)';
-      b.style.opacity = Math.max(0.4, 1 - rank * 0.15);
-      b.style.zIndex = 20 - rank; b.style.pointerEvents = 'auto';
+      const z = -Math.min(rank, HUNDE) * DEPTH;
+      b.style.transform = 'translateX(' + x + 'px) rotateY(' + (-sign * ANG) + 'deg) translateZ(' + z + 'px)';
+      /* La lejania se pinta OSCURECIENDO el lomo, no volviendolo transparente:
+         con opacity los lomos se ven unos a traves de otros y aquello parecia
+         un doble expuesto. La transparencia se guarda para los dos ultimos,
+         que es donde la fila tiene que desvanecerse contra el marco. */
+      const hondo = rank / lados;
+      b.velo.style.opacity = Math.min(0.94, 0.1 + hondo * 1.15);
+      const alFinal = lados - rank;
+      b.style.opacity = alFinal <= 2 ? Math.max(0.06, alFinal / 3) : 1;
+      b.style.zIndex = Math.max(1, 30 - rank); b.style.pointerEvents = 'auto';
+      b.classList.toggle('sin-rotulo', rank > ROTULOS);
     });
-    const t2 = lista[sel];
+    const t2 = lista[sel % n];
     meta.textContent = metaDe(t2);
     tit.textContent = t2.titulo || '';
     dur.textContent = cifraDe(t2);
     ver.textContent = t2.tipo === 'serie' ? 'Ver la serie' : 'Ver ahora';
     baja.style.display = t2.tipo === 'serie' ? 'none' : '';
   }
-  cajas.forEach((b, i) => {
-    b.addEventListener('click', () => { if (i === sel) { abreTitulo(lista[i]); return; } coloca(i); });
-    b.addEventListener('focus', () => coloca(i));
-  });
 
   /* Deslizar con el dedo: lo que se espera en un telefono. La escena declara
      touch-action pan-y, asi que el navegador se queda el gesto vertical (el
@@ -4241,9 +4277,9 @@ function estanteDe(lista) {
   escena.addEventListener('click', (e) => {
     if (Date.now() - swT < 420) { e.stopPropagation(); e.preventDefault(); }
   }, true);
-  ver.addEventListener('click', () => abreTitulo(lista[sel]));
-  baja.addEventListener('click', () => abreDescarga(lista[sel]));
-  dorso.addEventListener('click', () => abreCaja(lista[sel]));
+  ver.addEventListener('click', () => abreTitulo(lista[sel % lista.length]));
+  baja.addEventListener('click', () => abreDescarga(lista[sel % lista.length]));
+  dorso.addEventListener('click', () => abreCaja(lista[sel % lista.length]));
 
   const nav = document.createElement('div'); nav.className = 'est-nav';
   [['-1', '\u2190', 'Anterior'], ['1', '\u2192', 'Siguiente']].forEach(([paso, gl, rot]) => {
