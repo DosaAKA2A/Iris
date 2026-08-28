@@ -4223,7 +4223,9 @@ function estanteDe(lista) {
        propio (`lomo`, una tira estrecha) se usa ese: recortar una caratula 2:3
        al ancho del canto deja solo su franja central, y en las que llevan el
        titulo a un lado no se lee nada. Sin `lomo` no cambia nada. */
-    const artLomo = conPase(absCat(t2.lomo || '')) || img;
+    /* Ojo: absCat('') devuelve la URL de la pagina, no cadena vacia. Hay que
+       mirar `t2.lomo` antes de resolverlo o todos los lomos se quedan en negro. */
+    const artLomo = t2.lomo ? conPase(absCat(t2.lomo)) : img;
     const lomo = document.createElement('div'); lomo.className = 'pas-lomo';
     if (artLomo) lomo.style.backgroundImage = 'url("' + artLomo + '")';
     const cinta = document.createElement('div'); cinta.className = 'pas-cinta';
