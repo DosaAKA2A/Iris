@@ -1052,7 +1052,12 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   position:relative; height:calc(var(--caja-h) + 96px);
   perspective:1500px; perspective-origin:50% 44%; overflow:hidden;
 }
-.est-mundo{position:absolute; inset:0; transform-style:preserve-3d}
+/* pointer-events:none NO es cosmetico: este div no lleva transformacion, o sea
+   que vive en z=0, y los lomos van empujados hacia ATRAS (translateZ negativo).
+   En un contexto 3D el plano del padre queda DELANTE de esos hijos y se comia
+   todos los clics: solo respondia la caratula central, que va a translateZ(+70).
+   Los lomos reciben el raton por su propio pointer-events:auto. */
+.est-mundo{position:absolute; inset:0; transform-style:preserve-3d; pointer-events:none}
 .pas-caja{
   position:absolute; top:50%; left:50%;
   height:var(--caja-h); width:var(--lomo-w);
@@ -1072,14 +1077,6 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   position:absolute; inset:0; transition:opacity .4s ease;
   background:linear-gradient(180deg,rgba(8,8,10,.15) 0%,rgba(8,8,10,.62) 55%,rgba(8,8,10,.15) 100%);
 }
-.pas-tit{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  pointer-events:none; padding:8px 0}
-.pas-tit span{
-  writing-mode:vertical-rl; transform:rotate(180deg);
-  font-family:var(--mono); font-size:11px; letter-spacing:.16em;
-  text-transform:uppercase; color:#fff; white-space:nowrap;
-  max-height:100%; overflow:hidden; text-shadow:0 1px 3px rgba(0,0,0,.85);
-}
 .pas-canto{position:absolute; top:0; bottom:0; right:0; width:8px;
   transform:translateZ(-1px); border-radius:0 3px 3px 0;
   background:linear-gradient(90deg,rgba(0,0,0,.5),rgba(0,0,0,.85))}
@@ -1088,10 +1085,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   margin-left:calc(var(--caja-h) * var(--caja-ar) / -2); cursor:default;
 }
 .pas-caja.sel .pas-cara{box-shadow:0 34px 70px rgba(0,0,0,.75), 0 0 0 1px rgba(0,0,0,.5)}
-.pas-caja.sel .pas-velo,.pas-caja.sel .pas-tit,.pas-caja.sel .pas-canto{opacity:0}
-/* Con la fila llena, un titulo escrito en CADA lomo es ruido y no se lee
-   ninguno: solo lo llevan los de delante. */
-.pas-caja.sin-rotulo .pas-tit{opacity:0}
+.pas-caja.sel .pas-velo,.pas-caja.sel .pas-canto{opacity:0}
 .est-ficha{text-align:center; padding-top:20px}
 .est-ficha .ef-meta{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em;
   text-transform:uppercase; color:var(--dim)}
@@ -1219,7 +1213,6 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 
 @media (max-width:640px){
   .estante{--caja-h:300px; --lomo-w:46px}
-  .pas-tit span{font-size:10px; letter-spacing:.12em}
   .est-ficha{padding-top:14px}
 }
 </style>
@@ -4143,6 +4136,7 @@ function estanteDe(lista) {
      dos lados y la fila llega a los bordes: eso es el efecto de infinito.
      Las cajas se crean segun hacen falta; al ensanchar la ventana se añaden. */
   const cajas = [];
+  let alEmpezar = -1;           // que caja mandaba cuando empezo el gesto
   function creaCaja(k) {
     const t2 = lista[k % lista.length];
     const b = document.createElement('button');
@@ -4153,16 +4147,14 @@ function estanteDe(lista) {
     if (img) cara.style.backgroundImage = 'url("' + img + '")';
     const velo = document.createElement('div'); velo.className = 'pas-velo';
     const canto = document.createElement('div'); canto.className = 'pas-canto';
-    const cap = document.createElement('div'); cap.className = 'pas-tit';
-    const sp = document.createElement('span'); sp.textContent = t2.titulo || '';
-    cap.appendChild(sp);
-    b.append(cara, velo, canto, cap);
+    b.append(cara, velo, canto);
     b.velo = velo;
+    b.addEventListener('pointerdown', () => { alEmpezar = sel; });
     b.addEventListener('click', () => {
-      if (k === sel) { abreTitulo(lista[k % lista.length]); return; }
+      if (k === alEmpezar) { abreTitulo(lista[k % lista.length]); return; }
       coloca(k);
     });
-    b.addEventListener('focus', () => coloca(k));
+    b.addEventListener('focus', () => { if (b.matches(':focus-visible')) coloca(k); });
     mundo.appendChild(b);
     cajas[k] = b;
   }
@@ -4174,7 +4166,6 @@ function estanteDe(lista) {
      el anillo se rellena repitiendo la lista. */
   const GAP = 40, ANG = 38, DEPTH = 55, SEL_Z = 70;
   const HUNDE = 5;              // a partir del quinto ya no se hunden mas
-  const ROTULOS = 5;            // el titulo vertical solo en los de delante
   // Girado 38 grados, un lomo ocupa a lo ancho su anchura por el coseno; +6 px
   // de aire. Asi el paso se regula SOLO con --lomo-w y nunca quedan huecos.
   const pasoDe = (lomoW) => Math.max(40, lomoW * Math.cos(ANG * Math.PI / 180) + 6);
@@ -4237,7 +4228,6 @@ function estanteDe(lista) {
       const alFinal = lados - rank;
       b.style.opacity = alFinal <= 2 ? Math.max(0.06, alFinal / 3) : 1;
       b.style.zIndex = Math.max(1, 30 - rank); b.style.pointerEvents = 'auto';
-      b.classList.toggle('sin-rotulo', rank > ROTULOS);
     });
     const t2 = lista[sel % n];
     meta.textContent = metaDe(t2);
