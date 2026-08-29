@@ -340,6 +340,15 @@ document.addEventListener('keydown', (e) => {
   const flecha = k === K.IZQ ? 'izq' : k === K.DER ? 'der' : k === K.ARR ? 'arr' : k === K.ABA ? 'aba' : null;
   if (!flecha && k !== K.OK) return;
 
+  // Viendo algo y sin capas encima, el teclado es el del REPRODUCTOR: arriba y
+  // abajo son el volumen, izquierda y derecha el avance. Eso lo hace
+  // index.html, asi que aqui solo se deja pasar la tecla.
+  // Mover el foco entre botones a flechazos es cosa del mando de un televisor,
+  // que no tiene otra forma de llegar a ellos; con teclado se llega tabulando.
+  // Antes esto valia para todos: en un monitor, subir el volumen te metia el
+  // foco en la barra y a partir de ahi las flechas paseaban por los botones.
+  if (flecha && !TV && !hayCapa()) { despiertaBarra(); return; }
+
   entrada('mando');
 
   // Escribiendo en una caja de texto, las flechas mueven el cursor. Solo se

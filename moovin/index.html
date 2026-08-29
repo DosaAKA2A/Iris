@@ -57,6 +57,13 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 input{font:inherit}
 svg{display:block}
 
+/* La marca del foco: sin color, un gris muy tenue. La que pinta el navegador
+   por su cuenta es un ambar que sobre el negro del reproductor canta mas que
+   el propio control. Solo asoma navegando con teclado (:focus-visible). */
+:focus{outline:none}
+:focus-visible{outline:1px solid rgba(255,255,255,.26); outline-offset:2px}
+#seek:focus-visible,#vol:focus-visible{outline-color:rgba(255,255,255,.18); outline-offset:4px}
+
 /* ============================ Cabecera ============================ */
 #top{
   display:flex; align-items:center; gap:14px; height:52px;
@@ -2421,11 +2428,14 @@ seek.addEventListener('change', () => {
   arrastrando = false;
   if (video.duration) video.currentTime = seek.value / 1000 * video.duration;
 });
-vol.addEventListener('input', () => {
-  userVol = vol.value / 100; userMute = false;
-  localStorage.moovinVol = vol.value;
+/* Un solo sitio para tocar el volumen: la barra y las flechas del teclado. */
+function ponVolumen(v) {
+  userVol = Math.max(0, Math.min(1, Math.round(v * 100) / 100));
+  if (userVol) userMute = false;      // subir el volumen quita el silencio
+  try { localStorage.moovinVol = Math.round(userVol * 100); } catch (e) {}
   aplicaVolumen();
-});
+}
+vol.addEventListener('input', () => ponVolumen(vol.value / 100));
 if (localStorage.moovinVol) userVol = Math.max(0, Math.min(1, localStorage.moovinVol / 100));
 $('#c-mute').addEventListener('click', () => { userMute = !userMute; aplicaVolumen(); });
 aplicaVolumen();
@@ -2558,18 +2568,32 @@ video.addEventListener('timeupdate', pintaTiempo);
 video.addEventListener('durationchange', pintaTiempo);
 muestraBarra();
 
-/* Atajos: espacio, flechas, F, M. */
+/* Atajos: espacio, flechas, F, M. Mandan ellos, tenga el foco quien lo tenga.
+   Antes se salía en cuanto el foco estaba en un INPUT, y las dos barras
+   (#seek y #vol) lo son: al tocar una, las flechas dejaban de mover el vídeo y
+   se ponían a mover el control enfocado. Solo se cede el paso a los campos de
+   escribir, donde una flecha es mover el cursor. */
+const TECLEABLE = /^(text|search|password|email|number|tel|url)$/;
 document.addEventListener('keydown', (e) => {
-  if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+  const t = e.target;
+  if (t.tagName === 'TEXTAREA' || t.isContentEditable) return;
+  if (t.tagName === 'INPUT' && TECLEABLE.test(t.type)) return;
   /* Con la ficha abierta manda la ficha: el espacio o las flechas no pueden
      mover un vídeo que ni se ve. */
   if (!$('#caja').classList.contains('hidden')) return;
   if (!video.src) return;
-  if (e.code === 'Space') { e.preventDefault(); video.paused ? playSafe() : video.pause(); }
+  if (e.code === 'Space') video.paused ? playSafe() : video.pause();
   else if (e.key === 'ArrowRight') video.currentTime += 5;
   else if (e.key === 'ArrowLeft') video.currentTime -= 5;
+  else if (e.key === 'ArrowUp') ponVolumen(userVol + .05);
+  else if (e.key === 'ArrowDown') ponVolumen(userVol - .05);
   else if (e.key === 'f' || e.key === 'F') $('#c-fs').click();
   else if (e.key === 'm' || e.key === 'M') $('#c-mute').click();
+  else return;
+  /* Se corta lo de serie: el espacio pulsaría el botón que tenga el foco y las
+     flechas moverían la barra enfocada o harían rodar la página. */
+  e.preventDefault();
+  muestraBarra();
 });
 
 /* El velo solo debe salir cuando el navegador EXIGE un gesto para arrancar, y

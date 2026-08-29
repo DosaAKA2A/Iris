@@ -20,9 +20,21 @@
    atributo data-entrada en vez de fiarlo a la heuristica del navegador. */
 :root[data-entrada="mando"] :focus,
 :root[data-entrada="mando"] :focus-visible{
-  outline:2px solid var(--red);
+  outline:1px solid rgba(255,255,255,.30);
   outline-offset:3px;
   border-radius:8px;
+}
+/* En un monitor el anillo solo tiene que recordarte donde estas: gris tenue y
+   sin color. En el televisor es otra cosa, ahi ES el cursor y se mira desde
+   tres metros, asi que ahi si va grueso. */
+:root[data-plataforma="tv"][data-entrada="mando"] :focus,
+:root[data-plataforma="tv"][data-entrada="mando"] :focus-visible,
+/* Las dos barras llevan su propio anillo tenue en index.html, y ese va por id:
+   para ganarle en el televisor hay que nombrarlas aqui tambien. */
+:root[data-plataforma="tv"][data-entrada="mando"] #seek:focus-visible,
+:root[data-plataforma="tv"][data-entrada="mando"] #vol:focus-visible{
+  outline:2px solid var(--red);
+  outline-offset:3px;
 }
 /* Dentro de la rejilla el anillo se pega al borde de la propia tarjeta en vez
    de dibujar un rectangulo por fuera que se solapa con las vecinas. */
