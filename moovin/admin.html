@@ -124,6 +124,53 @@ h1{font-size:20px; font-weight:700; letter-spacing:-.01em}
   transition:opacity .2s; z-index:50; max-width:min(480px,calc(100vw - 40px));
 }
 #toast.show{opacity:1}
+
+/* Pestanas del panel */
+.tabs{display:flex; gap:4px; margin:-8px 0 4px; border-bottom:1px solid var(--line)}
+.tab{
+  padding:11px 2px; margin-right:20px; font-size:13px; font-weight:700;
+  color:var(--dim); border-bottom:2px solid transparent; margin-bottom:-1px;
+  transition:color .12s, border-color .12s;
+}
+.tab:hover{color:var(--muted)}
+.tab.activa{color:var(--text); border-bottom-color:var(--red)}
+
+/* Cuentas */
+.cta{display:flex; gap:12px; align-items:center; padding:13px 0; border-bottom:1px solid var(--line)}
+.cta:last-child{border-bottom:none}
+.cta .av{
+  width:38px; height:38px; border-radius:50%; flex:none; overflow:hidden;
+  background:rgba(255,255,255,.07); display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:13px; font-weight:700; color:var(--muted);
+}
+.cta .av img{width:100%; height:100%; object-fit:cover}
+.cta .datos{flex:1; min-width:0}
+.cta .t{font-size:13.5px; font-weight:700; display:flex; align-items:center; gap:7px}
+.cta .n{font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.cta .meta{font-family:var(--mono); font-size:10.5px; color:var(--dim); margin-top:2px}
+.cta .acc{display:flex; gap:6px; flex:none; flex-wrap:wrap; justify-content:flex-end}
+.pill{
+  font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.1em;
+  text-transform:uppercase; padding:3px 7px; border-radius:999px; flex:none;
+  background:rgba(255,255,255,.07); color:var(--dim);
+}
+.pill.si{background:rgba(158,226,184,.14); color:var(--ok)}
+.pill.no{background:rgba(230,169,180,.14); color:var(--err)}
+.clave{
+  font-family:var(--mono); font-size:16px; font-weight:700; letter-spacing:.18em;
+  padding:12px 14px; border-radius:10px; background:rgba(255,255,255,.06);
+  word-break:break-all; user-select:all; margin-top:10px;
+}
+.reg{font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.8}
+.reg b{color:var(--text); font-weight:700}
+.reg i{color:var(--dim); font-style:normal}
+
+@media (max-width:560px){
+  main{padding:24px 16px 50px}
+  .cta{flex-wrap:wrap}
+  .cta .acc{width:100%; justify-content:flex-start; margin-top:2px}
+  .tab{margin-right:14px}
+}
 </style>
 </head>
 <body>
@@ -162,6 +209,12 @@ h1{font-size:20px; font-weight:700; letter-spacing:-.01em}
       <div id="g-err" class="aviso err hidden">Clave incorrecta o el servidor no responde.</div>
     </div>
   </section>
+
+
+  <nav id="tabs" class="tabs hidden">
+    <button class="tab activa" data-p="panel">Biblioteca</button>
+    <button class="tab" data-p="cuentas">Cuentas</button>
+  </nav>
 
   <!-- Panel -->
   <section id="panel" class="hidden">
@@ -233,6 +286,72 @@ h1{font-size:20px; font-weight:700; letter-spacing:-.01em}
 
     <div class="card"><div id="lista"></div></div>
   </section>
+  <!-- Cuentas -->
+  <section id="cuentas" class="hidden">
+    <div class="row" style="justify-content:space-between">
+      <div>
+        <h1>Cuentas</h1>
+        <div class="sub" id="c-resumen">Cargando...</div>
+      </div>
+      <button id="c-nueva" class="btn red">Nueva cuenta</button>
+    </div>
+
+    <div id="c-sincorreo" class="aviso hidden" style="margin-top:14px">
+      Todavía no hay proveedor de correo configurado, así que nadie recibe su
+      código de entrada por su cuenta. Mientras tanto, el botón <b>Código</b>
+      acuña uno y lo enseña aquí para pasárselo a mano. Dura 10 minutos y solo
+      sirve una vez.
+    </div>
+
+    <div id="c-form" class="card hidden">
+      <h1 style="font-size:15px">Nueva cuenta</h1>
+      <div class="lbl">Correo</div>
+      <input id="c-correo" class="in" type="email" placeholder="nombre@correo.com" />
+      <div class="lbl">Nombre (opcional)</div>
+      <input id="c-nombre" class="in" maxlength="40" placeholder="Cómo se le llama" />
+      <div class="row" style="margin-top:16px">
+        <button id="c-crear" class="btn red">Crear</button>
+        <button id="c-crear-acceso" class="btn">Crear y dar acceso</button>
+        <button id="c-cancelar" class="btn">Cancelar</button>
+      </div>
+      <div id="c-form-err" class="aviso err hidden"></div>
+    </div>
+
+    <div class="card">
+      <input id="c-buscar" class="in" placeholder="Buscar por correo, nombre o código" />
+      <div id="c-lista" style="margin-top:6px"></div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <h1 style="font-size:15px">Pases temporales</h1>
+          <div class="sub">Para quien no tiene cuenta. Se enseña una sola vez.</div>
+        </div>
+        <button id="pa-nuevo" class="btn">Acuñar pase</button>
+      </div>
+      <div id="pa-form" class="hidden" style="margin-top:14px">
+        <div class="row">
+          <input id="pa-nota" class="in" maxlength="60" placeholder="Para quién es" />
+          <input id="pa-dias" class="in" style="flex:0 0 92px" type="number" min="0" placeholder="Días" />
+          <input id="pa-usos" class="in" style="flex:0 0 92px" type="number" min="0" placeholder="Usos" />
+          <button id="pa-crear" class="btn red">Acuñar</button>
+        </div>
+        <div class="aviso">Días y usos vacíos o en 0 = sin límite.</div>
+      </div>
+      <div id="pa-clave" class="hidden">
+        <div class="aviso">Cópiala ahora: aquí solo se guarda su huella, no se puede volver a ver.</div>
+        <div class="clave" id="pa-clave-txt"></div>
+      </div>
+      <div id="pa-lista" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card">
+      <h1 style="font-size:15px">Registro</h1>
+      <div class="sub">Lo último que ha pasado con las cuentas.</div>
+      <div id="c-eventos" class="reg" style="margin-top:12px"></div>
+    </div>
+  </section>
 </main>
 
 <div id="toast"></div>
@@ -302,6 +421,7 @@ async function entrar(clave) {
   paseTok = await fetch(W + '/api/pase', { headers: H() })
     .then((r) => r.json()).then((j) => j.token || '').catch(() => '');
   $('#gate').classList.add('hidden');
+  $('#tabs').classList.remove('hidden');
   $('#panel').classList.remove('hidden');
   await cargaCatalogo();
 }
@@ -628,6 +748,249 @@ $('#f-guardar').addEventListener('click', async () => {
     $('#f-guardar').disabled = false;
   }
 });
+
+
+/* ---------- Pestanas ---------- */
+function vePestana(cual) {
+  document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('activa', b.dataset.p === cual));
+  $('#panel').classList.toggle('hidden', cual !== 'panel');
+  $('#cuentas').classList.toggle('hidden', cual !== 'cuentas');
+  if (cual === 'cuentas') cargaCuentas();
+}
+document.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () => vePestana(b.dataset.p)));
+
+/* ---------- Cuentas ---------- */
+let CUENTAS = [];
+let hayCorreo = true;
+
+const api = async (ruta, opciones) => {
+  const r = await fetch(W + ruta, Object.assign({ headers: { ...H(), 'Content-Type': 'application/json' } }, opciones || {}));
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || ('error ' + r.status));
+  return j;
+};
+const post = (ruta, cuerpo) => api(ruta, { method: 'POST', body: JSON.stringify(cuerpo || {}) });
+
+const escapa = (t) => String(t == null ? '' : t)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+/* Fechas cortas: la lista se lee de un vistazo, no es un informe. */
+function fecha(seg) {
+  if (!seg) return '-';
+  const d = new Date(seg * 1000);
+  return d.toLocaleDateString('es', { day: '2-digit', month: 'short', year: '2-digit' });
+}
+function hace(seg) {
+  if (!seg) return 'nunca';
+  const d = Math.floor(Date.now() / 1000) - seg;
+  if (d < 3600) return 'hace ' + Math.max(1, Math.floor(d / 60)) + ' min';
+  if (d < 86400) return 'hace ' + Math.floor(d / 3600) + ' h';
+  if (d < 2592000) return 'hace ' + Math.floor(d / 86400) + ' d';
+  return fecha(seg);
+}
+
+async function cargaCuentas() {
+  const q = $('#c-buscar').value.trim();
+  try {
+    const j = await api('/api/cuentas' + (q ? '?q=' + encodeURIComponent(q) : ''));
+    CUENTAS = j.cuentas || [];
+    hayCorreo = !!j.correo;
+  } catch (e) { $('#c-resumen').textContent = 'No se pudo cargar: ' + e.message; return; }
+  $('#c-sincorreo').classList.toggle('hidden', hayCorreo);
+  const con = CUENTAS.filter((c) => c.acceso).length;
+  $('#c-resumen').textContent = CUENTAS.length + (CUENTAS.length === 1 ? ' cuenta' : ' cuentas')
+    + ' · ' + con + ' con acceso';
+  pintaCuentas();
+  cargaPases();
+  cargaEventos();
+}
+
+function pintaCuentas() {
+  const cont = $('#c-lista');
+  if (!CUENTAS.length) {
+    cont.innerHTML = '<div class="aviso">No hay ninguna cuenta todavía.</div>';
+    return;
+  }
+  cont.innerHTML = CUENTAS.map((c) => {
+    const av = c.avatar
+      ? '<img src="' + escapa(conPase(W + '/media?key=' + encodeURIComponent(c.avatar))) + '" alt="" />'
+      : escapa((c.nombre || c.correo).slice(0, 1).toUpperCase());
+    const bloqueada = c.estado === 'bloqueada';
+    const pill = bloqueada ? '<span class="pill no">bloqueada</span>'
+      : (c.acceso ? '<span class="pill si">acceso</span>' : '<span class="pill">sin acceso</span>');
+    const meta = [
+      c.codigo,
+      c.pantallas ? c.pantallas + (c.pantallas === 1 ? ' pantalla' : ' pantallas') : 'sin pantallas',
+      c.caduca ? 'vence ' + fecha(c.caduca) : '',
+      'visto ' + hace(c.visto)
+    ].filter(Boolean).join(' &middot; ');
+    return '<div class="cta" data-id="' + escapa(c.id) + '">'
+      + '<div class="av">' + av + '</div>'
+      + '<div class="datos">'
+      + '<div class="t">' + escapa(c.nombre) + pill + (c.admin ? '<span class="pill">admin</span>' : '') + '</div>'
+      + '<div class="n">' + escapa(c.correo) + '</div>'
+      + '<div class="meta">' + meta + '</div>'
+      + '</div>'
+      + '<div class="acc">'
+      + '<button class="btn chico" data-a="' + (c.acceso ? 'quitar' : 'dar') + '">'
+      + (c.acceso ? 'Quitar acceso' : 'Dar acceso') + '</button>'
+      + '<button class="btn chico" data-a="codigo">Código</button>'
+      + (c.pantallas ? '<button class="btn chico" data-a="olvidar">Olvidar pantallas</button>' : '')
+      + '<button class="btn chico peligro" data-a="' + (bloqueada ? 'activar' : 'bloquear') + '">'
+      + (bloqueada ? 'Desbloquear' : 'Bloquear') + '</button>'
+      + '</div></div>';
+  }).join('');
+}
+
+$('#c-lista').addEventListener('click', async (e) => {
+  const b = e.target.closest('button[data-a]');
+  if (!b) return;
+  const id = b.closest('.cta').dataset.id;
+  const c = CUENTAS.find((x) => x.id === id);
+  if (!c) return;
+  b.disabled = true;
+  try {
+    if (b.dataset.a === 'dar') {
+      /* Los días se piden aquí y no en un formulario aparte: dar acceso es un
+         gesto de un segundo y no merece abrir nada. */
+      const dias = prompt('Días de acceso para ' + c.nombre + '. Vacío o 0 = sin caducidad.', '');
+      if (dias === null) { b.disabled = false; return; }
+      await post('/api/cuentas/acceso', { id, acceso: true, dias: parseInt(dias, 10) || 0, avisar: hayCorreo });
+      toast('Acceso dado a ' + c.nombre);
+    } else if (b.dataset.a === 'quitar') {
+      await post('/api/cuentas/acceso', { id, acceso: false });
+      toast('Acceso quitado');
+    } else if (b.dataset.a === 'codigo') {
+      const j = await post('/api/cuentas/codigo', { id, enviar: hayCorreo });
+      ensenaCodigo(c, j);
+    } else if (b.dataset.a === 'olvidar') {
+      const j = await post('/api/cuentas/olvidar', { id });
+      toast(j.n + (j.n === 1 ? ' pantalla olvidada' : ' pantallas olvidadas'));
+    } else if (b.dataset.a === 'bloquear') {
+      if (!confirm('¿Bloquear a ' + c.nombre + '? Se cierran sus sesiones y sus pantallas.')) { b.disabled = false; return; }
+      await post('/api/cuentas/estado', { id, estado: 'bloqueada' });
+      toast('Cuenta bloqueada');
+    } else if (b.dataset.a === 'activar') {
+      await post('/api/cuentas/estado', { id, estado: 'activa' });
+      toast('Cuenta desbloqueada');
+    }
+    await cargaCuentas();
+  } catch (err) {
+    toast('Error: ' + err.message);
+    b.disabled = false;
+  }
+});
+
+/* El código se enseña en su propia fila, no en un toast: hay que copiarlo. */
+function ensenaCodigo(c, j) {
+  const fila = $('#c-lista').querySelector('.cta[data-id="' + c.id + '"]');
+  if (!fila) return;
+  let el = fila.querySelector('.clave');
+  if (!el) {
+    el = document.createElement('div');
+    el.className = 'clave';
+    el.style.width = '100%';
+    fila.appendChild(el);
+  }
+  el.textContent = j.codigo;
+  toast(j.enviado ? 'Código enviado a ' + c.correo : 'Código para ' + c.correo + ' (10 min)');
+}
+
+let buscarT = 0;
+$('#c-buscar').addEventListener('input', () => { clearTimeout(buscarT); buscarT = setTimeout(cargaCuentas, 250); });
+
+/* ---- alta ---- */
+$('#c-nueva').addEventListener('click', () => {
+  $('#c-form').classList.toggle('hidden');
+  if (!$('#c-form').classList.contains('hidden')) $('#c-correo').focus();
+});
+$('#c-cancelar').addEventListener('click', () => $('#c-form').classList.add('hidden'));
+async function creaCuenta(conAcceso) {
+  const correo = $('#c-correo').value.trim();
+  const errEl = $('#c-form-err');
+  errEl.classList.add('hidden');
+  if (!correo) { errEl.textContent = 'Falta el correo.'; errEl.classList.remove('hidden'); return; }
+  try {
+    await post('/api/cuentas/nueva', { correo, nombre: $('#c-nombre').value.trim(), acceso: conAcceso });
+    $('#c-correo').value = ''; $('#c-nombre').value = '';
+    $('#c-form').classList.add('hidden');
+    toast('Cuenta creada');
+    await cargaCuentas();
+  } catch (e) {
+    errEl.textContent = e.message; errEl.classList.remove('hidden');
+  }
+}
+$('#c-crear').addEventListener('click', () => creaCuenta(false));
+$('#c-crear-acceso').addEventListener('click', () => creaCuenta(true));
+
+/* ---- pases temporales ---- */
+async function cargaPases() {
+  let j;
+  try { j = await api('/api/pases'); } catch (e) { return; }
+  const l = j.pases || [];
+  $('#pa-lista').innerHTML = l.length ? l.map((x) => {
+    const muerto = x.estado !== 'activo'
+      || (x.caduca && x.caduca * 1000 < Date.now())
+      || (x.max_usos != null && x.usos >= x.max_usos);
+    const meta = [
+      'acaba en ' + x.pista,
+      x.caduca ? 'vence ' + fecha(x.caduca) : 'sin caducidad',
+      x.usos + (x.max_usos != null ? ' de ' + x.max_usos : '') + ' usos'
+    ].join(' &middot; ');
+    return '<div class="cta" data-h="' + escapa(x.hash) + '">'
+      + '<div class="datos">'
+      + '<div class="t">' + escapa(x.nota || 'Pase sin nota')
+      + (muerto ? '<span class="pill no">agotado</span>' : '<span class="pill si">activo</span>') + '</div>'
+      + '<div class="meta">' + meta + '</div></div>'
+      + (muerto ? '' : '<div class="acc"><button class="btn chico peligro" data-a="anular">Anular</button></div>')
+      + '</div>';
+  }).join('') : '<div class="aviso">No hay pases temporales.</div>';
+}
+$('#pa-nuevo').addEventListener('click', () => $('#pa-form').classList.toggle('hidden'));
+$('#pa-crear').addEventListener('click', async (e) => {
+  e.target.disabled = true;
+  try {
+    const j = await post('/api/pases/nuevo', {
+      nota: $('#pa-nota').value.trim(),
+      dias: parseInt($('#pa-dias').value, 10) || 0,
+      max_usos: parseInt($('#pa-usos').value, 10) || 0
+    });
+    $('#pa-clave-txt').textContent = j.clave;
+    $('#pa-clave').classList.remove('hidden');
+    $('#pa-form').classList.add('hidden');
+    $('#pa-nota').value = ''; $('#pa-dias').value = ''; $('#pa-usos').value = '';
+    await cargaPases();
+  } catch (err) { toast('Error: ' + err.message); }
+  e.target.disabled = false;
+});
+$('#pa-lista').addEventListener('click', async (e) => {
+  const b = e.target.closest('button[data-a="anular"]');
+  if (!b) return;
+  b.disabled = true;
+  try { await post('/api/pases/anular', { hash: b.closest('.cta').dataset.h }); toast('Pase anulado'); await cargaPases(); }
+  catch (err) { toast('Error: ' + err.message); b.disabled = false; }
+});
+
+/* ---- registro ---- */
+const NOMBRES = {
+  'cuenta.creada': 'cuenta nueva', 'cuenta.creada.admin': 'cuenta creada aquí',
+  'cuenta.activa': 'desbloqueada', 'cuenta.bloqueada': 'bloqueada',
+  'cuenta.borrada': 'cuenta borrada', 'acceso.dado': 'acceso dado',
+  'acceso.quitado': 'acceso quitado', 'codigo.admin': 'código acuñado aquí',
+  'codigo.sin_correo': 'código pedido (sin correo)', 'sesion.abierta': 'ha entrado',
+  'pantalla.vinculada': 'pantalla emparejada', 'pantallas.olvidadas': 'pantallas olvidadas',
+  'pase.acunado': 'pase acuñado', 'pase.anulado': 'pase anulado'
+};
+async function cargaEventos() {
+  let j;
+  try { j = await api('/api/eventos'); } catch (e) { return; }
+  const l = j.eventos || [];
+  $('#c-eventos').innerHTML = l.length ? l.map((e) =>
+    '<div><i>' + hace(e.ts) + '</i> &nbsp; <b>' + escapa(NOMBRES[e.tipo] || e.tipo) + '</b>'
+    + (e.quien ? ' &nbsp; ' + escapa(e.quien) : '')
+    + (e.detalle ? ' &nbsp; <i>' + escapa(e.detalle) + '</i>' : '') + '</div>'
+  ).join('') : '<div class="aviso">Nada todavía.</div>';
+}
 
 /* ---------- Arranque ---------- */
 if (TOK) entrar(TOK); else $('#g-tok').focus();

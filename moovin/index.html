@@ -238,6 +238,54 @@ body:has(#loader.hidden) #mando-bar{display:none}
   background:rgba(6,6,8,.86); z-index:5;
 }
 .veil.hidden{display:none}
+/* Entrada: la cuenta y el pase comparten tarjeta. Aqui no vale el .hidden de
+   los velos: estos son bloques sueltos dentro de la misma tarjeta. */
+#e-correo.hidden,#e-codigo.hidden,#e-pase.hidden{display:none}
+.e-sep{
+  display:flex; align-items:center; gap:10px; margin:18px 0 2px;
+  font-size:11px; color:var(--dim);
+}
+.e-sep::before,.e-sep::after{content:''; flex:1; height:1px; background:var(--line)}
+.lnk{
+  display:inline-block; margin-top:12px; font-size:12.5px; font-weight:600;
+  color:var(--muted); text-decoration:underline; text-underline-offset:3px;
+  transition:color .12s;
+}
+.lnk:hover{color:var(--text)}
+#espera{z-index:9; background:var(--bg)}
+.e-espera{
+  display:flex; align-items:center; gap:9px; margin-top:16px;
+  font-size:12.5px; color:var(--muted);
+}
+/* El punto late despacio para que se vea que sigue mirando, sin ser un
+   cargador dando vueltas: esto puede estar horas en pantalla. */
+.e-punto{
+  width:7px; height:7px; border-radius:50%; background:var(--red); flex:none;
+  animation:e-late 2.4s ease-in-out infinite;
+}
+@keyframes e-late{0%,100%{opacity:.25}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.e-punto{animation:none; opacity:.7}}
+
+/* Aviso de emparejamiento en el mando */
+#mando-dar{
+  position:fixed; left:12px; right:12px; top:calc(12px + env(safe-area-inset-top,0px));
+  z-index:14; background:var(--surface); border:1px solid var(--line-2);
+  border-radius:12px; padding:13px 14px;
+}
+#mando-dar.hidden{display:none}
+#mando-dar .t{font-size:13px; font-weight:700}
+#mando-dar .d{margin-top:4px; font-size:12px; color:var(--muted); line-height:1.5}
+#mando-dar .r{margin-top:11px; display:flex; gap:8px}
+#mando-dar .r button{
+  flex:1; padding:9px 10px; border-radius:9px; font-size:12px; font-weight:700;
+  background:rgba(255,255,255,.08);
+}
+#mando-dar .r button.si{background:var(--red); color:var(--sobre-acc)}
+
+/* Estado del emparejamiento bajo el QR de la pantalla */
+#qp-estado{margin-top:12px; font-size:12.5px; color:var(--muted); line-height:1.55}
+#qp-estado.ok{color:var(--ok,#9ee2b8)}
+
 .pase-card{max-width:400px}
 /* La biblioteca ES la landing: capa opaca a pantalla completa con scroll */
 /* overflow-x oculto: el hero se sale a proposito hasta los bordes de la
@@ -1698,21 +1746,74 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
       <div class="caja-acc" id="caja-acc"></div>
     </div>
 
-    <!-- Pase de acceso: la biblioteca es privada y el worker no sirve nada sin él -->
+    <!-- Entrada: la biblioteca es privada y el worker no sirve nada sin token.
+         Dos caminos, la cuenta primero porque es el que sobrevive: el pase es
+         el mismo secreto para todos y no se le puede quitar a una persona. -->
     <div id="pase" class="veil hidden">
       <div class="dl-card pase-card">
         <h2>Biblioteca privada</h2>
-        <div class="sub">
-          Escribe el pase para entrar. En Naviris se pone solo: guárdalo en
-          Ajustes y no vuelve a aparecer esta pantalla.
+        <div class="sub" id="e-sub">
+          Entra con tu cuenta. Te mandamos un código al correo, sin contraseñas.
         </div>
-        <div class="fieldrow" style="margin-top:16px">
-          <input id="pase-in" class="in code" maxlength="24" placeholder="Pase" autocomplete="off"
-                 autocapitalize="characters" autocorrect="off" spellcheck="false" />
-          <button id="pase-ok" class="btn red">Entrar</button>
+
+        <!-- cuenta, paso 1: el correo -->
+        <div id="e-correo">
+          <div class="lbl">Tu correo</div>
+          <div class="fieldrow">
+            <input id="e-correo-in" class="in" type="email" inputmode="email" autocomplete="email"
+                   autocapitalize="off" autocorrect="off" spellcheck="false"
+                   placeholder="nombre@correo.com" />
+            <button id="e-correo-ok" class="btn red">Continuar</button>
+          </div>
         </div>
-        <div id="pase-err" class="hint" style="margin-top:10px; color:var(--err); display:none">
+
+        <!-- cuenta, paso 2: el código -->
+        <div id="e-codigo" class="hidden">
+          <div class="lbl">Código de entrada</div>
+          <div class="fieldrow">
+            <input id="e-codigo-in" class="in code" maxlength="6" placeholder="ABC123"
+                   autocomplete="one-time-code" autocapitalize="characters"
+                   autocorrect="off" spellcheck="false" />
+            <button id="e-codigo-ok" class="btn red">Entrar</button>
+          </div>
+          <p class="hint" id="e-codigo-pie" style="margin-top:10px"></p>
+          <button id="e-otro" class="lnk">Usar otro correo</button>
+        </div>
+
+        <!-- el pase de siempre -->
+        <div id="e-pase" class="hidden">
+          <div class="lbl">Pase</div>
+          <div class="fieldrow">
+            <input id="pase-in" class="in code" maxlength="24" placeholder="Pase" autocomplete="off"
+                   autocapitalize="characters" autocorrect="off" spellcheck="false" />
+            <button id="pase-ok" class="btn red">Entrar</button>
+          </div>
+        </div>
+
+        <div id="pase-err" class="hint" style="margin-top:12px; color:var(--err); display:none">
           Ese pase no vale.
+        </div>
+
+        <div class="e-sep">o</div>
+        <button id="e-cambia" class="lnk">Tengo un pase</button>
+        <!-- La salida del televisor: ahí no se escribe un correo con el mando. -->
+        <button id="e-tele" class="lnk" style="margin-left:18px">Entrar desde otro dispositivo</button>
+      </div>
+    </div>
+
+    <!-- Cuenta creada pero todavía sin acceso. No es un error: es una sala de
+         espera, y se queda mirando sola para que no haya que recargar. -->
+    <div id="espera" class="veil hidden">
+      <div class="dl-card pase-card">
+        <h2>Tu cuenta ya existe</h2>
+        <div class="sub">
+          La cuenta de <b id="es-correo"></b> está creada. Falta que le den acceso
+          a la biblioteca; en cuanto lo tenga, esta pantalla entra sola.
+        </div>
+        <div class="e-espera"><span class="e-punto"></span><span id="es-estado">Comprobando cada minuto</span></div>
+        <div class="dl-foot">
+          <button id="es-mira" class="btn red">Comprobar ahora</button>
+          <button id="es-salir" class="btn">Salir</button>
         </div>
       </div>
     </div>
@@ -1753,6 +1854,19 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
     <div id="qp-qr"></div>
     <div id="qp-cod"></div>
     <p class="qp-pie">O entra en <b id="qp-url">moovin.live/mando</b> y escribe el código.</p>
+    <p id="qp-estado"></p>
+  </div>
+</div>
+
+<!-- Emparejar la pantalla desde el movil: solo sale si ese codigo esta
+     esperando y esta cuenta puede darlo. -->
+<div id="mando-dar" class="hidden">
+  <div class="t">Dar acceso a esta pantalla</div>
+  <div class="d">La pantalla que acabas de escanear todavía no puede ver la
+    biblioteca. Si le das acceso, entra con tu cuenta y no vuelve a pedir nada.</div>
+  <div class="r">
+    <button id="md-si" class="si">Dar acceso</button>
+    <button id="md-no">Ahora no</button>
   </div>
 </div>
 
@@ -1983,6 +2097,75 @@ async function entrarConApp() {
   } catch (e) { return false; }
 }
 
+/* ---------------------------- Cuentas ----------------------------
+   Hay tres formas de conseguir el token de arriba y todas acaban en el mismo
+   sitio, así que el resto de la página no se entera de por dónde entraste:
+
+     - el pase de siempre (entrar);
+     - una cuenta con acceso, que canjea su sesión en /cuenta/pase;
+     - una pantalla emparejada, que canjea su clave en /entrar-dispositivo.
+
+   La sesión de la cuenta NO abre la biblioteca por sí sola: sirve para pedir
+   el token y para dar acceso a una pantalla. Si a la cuenta le quitan el
+   acceso, el próximo canje falla y se cae a la sala de espera. */
+
+let CUENTA = null;            // el perfil, cuando se entra con cuenta
+const sesionGuardada = () => { try { return localStorage.moovinSesion || ''; } catch (e) { return ''; } };
+function guardaSesion(t) {
+  try { if (t) localStorage.moovinSesion = t; else localStorage.removeItem('moovinSesion'); }
+  catch (e) { /* en algunos televisores escribir revienta */ }
+}
+const pantallaGuardada = () => { try { return localStorage.moovinPantalla || ''; } catch (e) { return ''; } };
+
+async function apiCuenta(ruta, opciones) {
+  const o = Object.assign({ headers: {} }, opciones || {});
+  const t = sesionGuardada();
+  if (t) o.headers.Authorization = 'Bearer ' + t;
+  if (o.body && !o.headers['Content-Type']) o.headers['Content-Type'] = 'application/json';
+  const r = await fetch(MOOVIN_API + ruta, o);
+  let j = null;
+  try { j = await r.json(); } catch (e) { /* puede venir vacío */ }
+  return { ok: r.ok, estado: r.status, j: j || {} };
+}
+
+/* Canjea la sesión por el token. Devuelve 'ok', 'espera' (la cuenta existe
+   pero aún no tiene acceso) o 'no' (no hay sesión o ya no vale). */
+async function entrarConCuenta() {
+  if (!sesionGuardada()) return 'no';
+  let r;
+  try { r = await apiCuenta('/cuenta/pase', { method: 'POST', body: '{}' }); }
+  catch (e) { paseSinRed = true; return 'no'; }
+  if (r.ok && r.j.token) {
+    pase = { token: r.j.token, exp: r.j.exp || 0 };
+    CUENTA = r.j.usuario || null;
+    return 'ok';
+  }
+  if (r.estado === 403) { CUENTA = r.j.usuario || null; return 'espera'; }
+  if (r.estado === 401) { guardaSesion(''); CUENTA = null; }
+  return 'no';
+}
+
+/* La pantalla emparejada. Su clave no caduca sola: deja de valer cuando la
+   cuenta pierde el acceso o cuando desde el backoffice se olvidan sus
+   pantallas. Entonces se tira y vuelve a salir la pantalla de entrada. */
+async function entrarConPantalla() {
+  const clave = pantallaGuardada();
+  if (!clave) return false;
+  try {
+    const r = await fetch(MOOVIN_API + '/entrar-dispositivo', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clave })
+    });
+    if (r.status === 401) { try { localStorage.removeItem('moovinPantalla'); } catch (e) { /* nada */ } return false; }
+    if (!r.ok) { paseSinRed = true; return false; }
+    const j = await r.json();
+    if (!j.token) return false;
+    pase = { token: j.token, exp: j.exp || 0 };
+    CUENTA = j.usuario || null;
+    return true;
+  } catch (e) { paseSinRed = true; return false; }
+}
+
 /* Añade el token a lo que sirve el worker. Lo demás (blobs del disco, rutas
    del propio sitio) se queda como está. Ojo: la identidad de la película que
    viaja por la sala NO lleva token, solo la URL con la que se pide el archivo. */
@@ -1994,11 +2177,16 @@ function conPase(u) {
 // Naviris se puede haber entrado con la clave de la app y SIN pase guardado, así
 // que si no hay pase se renueva por la misma vía por la que se entró; si no, a
 // las 24 h se caería la sesión en mitad de una película.
-setInterval(() => {
+setInterval(async () => {
   const quedan = pase.exp - Math.floor(Date.now() / 1000);
   if (!pase.token || quedan >= 3600) return;
-  if (localStorage.moovinPase) entrar(localStorage.moovinPase);
-  else entrarConApp();
+  // Por el mismo camino por el que se entró, y en el mismo orden que al
+  // arrancar. Si la cuenta perdió el acceso, el canje falla y el token se
+  // acaba solo: no se echa a nadie en mitad de una película.
+  if (pantallaGuardada() && await entrarConPantalla()) return;
+  if (sesionGuardada() && await entrarConCuenta() === 'ok') return;
+  try { if (localStorage.moovinPase) { await entrar(localStorage.moovinPase); return; } } catch (e) { /* nada */ }
+  await entrarConApp();
 }, 15 * 60 * 1000);
 
 /* ============================ Película ============================ */
@@ -3857,24 +4045,99 @@ const MANDO = {
   arrastra: false, tocaVol: 0, tick: null
 };
 
-/* --- La pantalla: el QR que empareja --- */
+/* --- La pantalla: el QR que empareja ---
+   El mismo código hace dos cosas: es la sala del relay (para mandar) y el
+   emparejamiento (para dar acceso). Por eso lo acuña el worker y no
+   randomCode(): junto al código devuelve un secreto que NO sale de esta
+   pantalla. El QR solo lleva el código, que lo ve cualquiera que mire la tele;
+   la clave de acceso solo la recoge quien enseñe el secreto.
+
+   Esto no podía ir por el relay: es un difusor tonto y reparte cada mensaje a
+   toda la sala, así que la clave se la habría llevado cualquiera que acertase
+   seis caracteres. */
 function urlMando(code) { return location.origin + '/mando/' + code; }
-function abreQR() {
-  // Si ya hay sala se usa SU codigo: regenerarlo echaria a quien estuviera
-  // dentro. Si no la hay, esta pantalla crea una y se queda de anfitriona.
-  if (!sala) start(randomCode(), true, 'pantalla');
-  const code = sala ? sala.code : '';
+
+const VINC = { codigo: '', secreto: '', tick: 0 };
+
+function pintaQR(code) {
   $('#qp-cod').textContent = code;
   $('#qp-url').textContent = location.host + '/mando';
   const caja = $('#qp-qr');
   caja.innerHTML = '';
   try { caja.innerHTML = window.MoovinQR.svg(urlMando(code), { borde: 2 }); }
   catch (e) { caja.textContent = urlMando(code); }   // sin QR, queda el codigo
-  $('#qrpanel').classList.remove('hidden');
 }
+function paraVinculo() { clearInterval(VINC.tick); VINC.tick = 0; VINC.codigo = ''; VINC.secreto = ''; }
+
+async function abreQR() {
+  const est = $('#qp-estado');
+  est.className = ''; est.textContent = '';
+  $('#qrpanel').classList.remove('hidden');
+  paraVinculo();
+
+  // Si ya hay sala se usa SU codigo: regenerarlo echaria a quien estuviera
+  // dentro. Esa pantalla ya entro, asi que no necesita emparejarse.
+  if (sala) { pintaQR(sala.code); return; }
+
+  let j = null;
+  try {
+    const r = await fetch(MOOVIN_API + '/vincular/nuevo', { method: 'POST' });
+    if (r.ok) j = await r.json();
+  } catch (e) { /* sin red se sigue con un codigo local: el mando funciona igual */ }
+
+  const code = (j && j.codigo) || randomCode();
+  if (j && j.secreto) { VINC.codigo = j.codigo; VINC.secreto = j.secreto; }
+  start(code, true, 'pantalla');
+  // start() abre el panel de Watch Party al crear sala; aqui la sala es solo el
+  // canal del mando y ese panel no pinta nada. Se cierra en el mismo tick, asi
+  // que no llega a verse.
+  panelAbre(false);
+  pintaQR(code);
+
+  if (!VINC.secreto) return;
+  est.textContent = pase.token
+    ? 'Si lo escaneas con tu cuenta, esta pantalla se queda con acceso propio.'
+    : 'Escanéalo con un móvil que ya tenga acceso y esta pantalla entra sola.';
+  VINC.tick = setInterval(miraVinculo, 2500);
+}
+
+async function miraVinculo() {
+  if (!VINC.secreto) return;
+  let j;
+  try {
+    const r = await fetch(MOOVIN_API + '/vincular/estado', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigo: VINC.codigo, secreto: VINC.secreto })
+    });
+    if (!r.ok) return;
+    j = await r.json();
+  } catch (e) { return; }
+  if (!j.listo) {
+    // El emparejamiento caduca a los 10 minutos; cuando muere se deja de mirar.
+    if (j.vivo === false) { paraVinculo(); $('#qp-estado').textContent = 'El código caducó. Cierra y vuelve a abrir para pedir otro.'; }
+    return;
+  }
+  paraVinculo();
+  try { localStorage.moovinPantalla = j.clave; } catch (e) { /* sin guardar: vale para esta sesion */ }
+  CUENTA = j.usuario || null;
+  const est = $('#qp-estado');
+  est.className = 'ok';
+  est.textContent = 'Listo. Esta pantalla entra con la cuenta de '
+    + ((j.usuario && j.usuario.nombre) || 'quien la escaneó') + '.';
+  if (!pase.token && await entrarConPantalla()) {
+    clearInterval(esperaT);
+    $('#espera').classList.add('hidden');
+    $('#pase').classList.add('hidden');
+    arranca();
+    setTimeout(() => $('#qrpanel').classList.add('hidden'), 1800);
+  }
+}
+
 $('#btn-mando').addEventListener('click', abreQR);
-$('#qp-cerrar').addEventListener('click', () => $('#qrpanel').classList.add('hidden'));
-$('#qrpanel').addEventListener('click', (e) => { if (e.target.id === 'qrpanel') $('#qrpanel').classList.add('hidden'); });
+$('#e-tele').addEventListener('click', abreQR);
+const cierraQR = () => { paraVinculo(); $('#qrpanel').classList.add('hidden'); };
+$('#qp-cerrar').addEventListener('click', cierraQR);
+$('#qrpanel').addEventListener('click', (e) => { if (e.target.id === 'qrpanel') cierraQR(); });
 
 /* --- El telefono: entrar y salir del modo mando --- */
 function entraModoMando(code) {
@@ -3889,7 +4152,48 @@ function entraModoMando(code) {
   if (code !== MANDO.code || !sala) { MANDO.code = code; start(code, false, 'mando'); }
   mandoTick(true);
   mandoPinta();
+  ofreceVinculo(code);
 }
+
+/* Si el código que se acaba de escanear viene de una pantalla que aún no ha
+   entrado, se ofrece darle acceso. Solo tiene sentido con una cuenta detrás:
+   lo que se le presta a la pantalla es el acceso de esa cuenta, y el pase
+   compartido no es de nadie. Sin cuenta, el mando sigue funcionando igual. */
+let DAR = '';
+async function ofreceVinculo(code) {
+  const av = $('#mando-dar');
+  av.classList.add('hidden');
+  DAR = '';
+  if (!code || !sesionGuardada()) return;
+  let j;
+  try {
+    const r = await fetch(MOOVIN_API + '/vincular/mira?codigo=' + encodeURIComponent(code));
+    if (!r.ok) return;
+    j = await r.json();
+  } catch (e) { return; }
+  if (!j.existe || j.dado) return;   // no espera a nadie, o ya se lo dio otro
+  DAR = code;
+  av.classList.remove('hidden');
+}
+
+$('#md-si').addEventListener('click', async (e) => {
+  if (!DAR) return;
+  e.target.disabled = true;
+  let r;
+  try { r = await apiCuenta('/vincular/confirmar', { method: 'POST', body: JSON.stringify({ codigo: DAR }) }); }
+  catch (err) { e.target.disabled = false; toast('No se pudo conectar'); return; }
+  e.target.disabled = false;
+  if (r.ok) {
+    DAR = '';
+    $('#mando-dar').classList.add('hidden');
+    toast('Listo: la pantalla ya tiene acceso');
+    return;
+  }
+  // El caso que importa: tu propia cuenta todavia esta en la sala de espera.
+  $('#mando-dar').querySelector('.d').textContent =
+    r.j.error || 'No se pudo dar acceso a esa pantalla.';
+});
+$('#md-no').addEventListener('click', () => { DAR = ''; $('#mando-dar').classList.add('hidden'); });
 function saleModoMando() {
   if (!MANDO.on) return;
   MANDO.on = false; MANDO.code = ''; MANDO.hay = false;
@@ -3897,6 +4201,7 @@ function saleModoMando() {
   $('#mando-bar').classList.add('hidden');
   $('#mando-entrar').classList.add('hidden');
   $('#mb-menu').classList.add('hidden');
+  $('#mando-dar').classList.add('hidden'); DAR = '';
   mandoTick(false);
   leave(true);
 }
@@ -4204,6 +4509,122 @@ $('#se-poster').addEventListener('click', () => abreCaja(fichaDeSeccion()));
 $('#se-poster').style.cursor = 'pointer';
 $('#pase-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') dePase(); });
 
+/* ---------- la pantalla de entrada: cuenta o pase ---------- */
+let correoPedido = '';
+
+function ePinta(cual) {
+  $('#e-correo').classList.toggle('hidden', cual !== 'correo');
+  $('#e-codigo').classList.toggle('hidden', cual !== 'codigo');
+  $('#e-pase').classList.toggle('hidden', cual !== 'pase');
+  $('#e-cambia').textContent = cual === 'pase' ? 'Entrar con mi cuenta' : 'Tengo un pase';
+  $('#e-sub').textContent = cual === 'pase'
+    ? 'Escribe el pase que te dieron. En Naviris se pone solo.'
+    : 'Entra con tu cuenta. Te mandamos un código al correo, sin contraseñas.';
+  $('#pase-err').style.display = 'none';
+  const foco = { correo: '#e-correo-in', codigo: '#e-codigo-in', pase: '#pase-in' }[cual];
+  // En el televisor el foco automatico levanta el teclado en pantalla encima
+  // de todo, asi que ahi no se toca.
+  if (foco && !enTele()) setTimeout(() => { try { $(foco).focus(); } catch (e) { /* nada */ } }, 30);
+}
+const enTele = () => document.documentElement.getAttribute('data-plataforma') === 'tv';
+
+function eError(txt) {
+  $('#pase-err').textContent = txt;
+  $('#pase-err').style.display = '';
+}
+
+$('#e-cambia').addEventListener('click', () => {
+  ePinta($('#e-pase').classList.contains('hidden') ? 'pase' : 'correo');
+});
+$('#e-otro').addEventListener('click', () => { correoPedido = ''; ePinta('correo'); });
+
+async function pideCodigo() {
+  const correo = $('#e-correo-in').value.trim();
+  if (!correo || correo.indexOf('@') < 1) { eError('Escribe un correo válido.'); return; }
+  $('#e-correo-ok').disabled = true;
+  $('#pase-err').style.display = 'none';
+  let r;
+  try { r = await apiCuenta('/cuenta/codigo', { method: 'POST', body: JSON.stringify({ correo }) }); }
+  catch (e) { $('#e-correo-ok').disabled = false; eError('No se pudo conectar con la biblioteca.'); return; }
+  $('#e-correo-ok').disabled = false;
+  if (!r.ok) { eError(r.j.error || 'No se pudo pedir el código.'); return; }
+  correoPedido = correo;
+  /* Cuando no hay proveedor de correo se dice, en vez de dejar a alguien
+     esperando un mensaje que no va a llegar nunca. */
+  $('#e-codigo-pie').textContent = r.j.correo
+    ? 'Te lo hemos mandado a ' + correo + '. Dura 10 minutos.'
+    : 'Todavía no hay correo de salida, así que el código hay que pedirlo a quien '
+      + 'lleva la biblioteca. Dura 10 minutos.';
+  ePinta('codigo');
+}
+$('#e-correo-ok').addEventListener('click', pideCodigo);
+$('#e-correo-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') pideCodigo(); });
+
+async function daCodigo() {
+  const codigo = $('#e-codigo-in').value.trim().toUpperCase();
+  if (codigo.length !== 6) { eError('El código tiene 6 caracteres.'); return; }
+  $('#e-codigo-ok').disabled = true;
+  $('#pase-err').style.display = 'none';
+  let r;
+  try {
+    r = await apiCuenta('/cuenta/entrar', {
+      method: 'POST', body: JSON.stringify({ correo: correoPedido, codigo })
+    });
+  } catch (e) { $('#e-codigo-ok').disabled = false; eError('No se pudo conectar con la biblioteca.'); return; }
+  $('#e-codigo-ok').disabled = false;
+  if (!r.ok || !r.j.token) { eError(r.j.error || 'Ese código no vale.'); $('#e-codigo-in').select(); return; }
+  guardaSesion(r.j.token);
+  CUENTA = r.j.usuario || null;
+  $('#e-codigo-in').value = '';
+  if (CUENTA && CUENTA.acceso && await entrarConCuenta() === 'ok') { $('#pase').classList.add('hidden'); arranca(); return; }
+  $('#pase').classList.add('hidden');
+  salaDeEspera();
+}
+$('#e-codigo-ok').addEventListener('click', daCodigo);
+$('#e-codigo-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') daCodigo(); });
+
+/* ---------- sala de espera: la cuenta existe pero no tiene acceso ---------- */
+let esperaT = 0;
+function salaDeEspera() {
+  $('#es-correo').textContent = (CUENTA && CUENTA.correo) || '';
+  $('#espera').classList.remove('hidden');
+  clearInterval(esperaT);
+  // Un minuto: en cuanto Dosa da el acceso desde el backoffice, la pantalla
+  // entra sola sin que nadie recargue nada.
+  esperaT = setInterval(miraAcceso, 60 * 1000);
+}
+async function miraAcceso() {
+  const q = await entrarConCuenta();
+  if (q === 'ok') {
+    clearInterval(esperaT);
+    $('#espera').classList.add('hidden');
+    arranca();
+    return true;
+  }
+  if (q === 'no') {   // la sesión se cayó: de vuelta a la entrada
+    clearInterval(esperaT);
+    $('#espera').classList.add('hidden');
+    $('#pase').classList.remove('hidden');
+    ePinta('correo');
+  }
+  return false;
+}
+$('#es-mira').addEventListener('click', async (e) => {
+  e.target.disabled = true;
+  $('#es-estado').textContent = 'Comprobando...';
+  const ok = await miraAcceso();
+  if (!ok) $('#es-estado').textContent = 'Todavía no. Se sigue comprobando cada minuto';
+  e.target.disabled = false;
+});
+$('#es-salir').addEventListener('click', () => {
+  clearInterval(esperaT);
+  apiCuenta('/cuenta/salir', { method: 'POST', body: '{}' }).catch(() => {});
+  guardaSesion(''); CUENTA = null;
+  $('#espera').classList.add('hidden');
+  $('#pase').classList.remove('hidden');
+  ePinta('correo');
+});
+
 (async () => {
   // El pase puede venir de Naviris, de una visita anterior o del enlace. Si
   // viene en el enlace se borra de la URL en cuanto se usa.
@@ -4212,13 +4633,22 @@ $('#pase-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') dePase
     qs.delete('pase');
     try { history.replaceState(null, '', location.pathname + (qs.toString() ? '?' + qs : '')); } catch (e) { /* nada */ }
   }
+  /* Orden a propósito. La pantalla emparejada va primero porque es la que no
+     puede escribir: un televisor tiene que entrar solo o no entra. Luego la
+     cuenta, que es la única credencial que se le puede quitar a una persona
+     sin cambiársela a todos. El pase y Naviris quedan detrás. */
+  if (await entrarConPantalla()) { arranca(); return; }
+  const q = await entrarConCuenta();
+  if (q === 'ok') { arranca(); return; }
   if (await entrar(guardado)) { arranca(); return; }
   // Naviris trae su propia clave: entra sin que nadie escriba nada, aunque en
-  // este equipo no se haya usado nunca el pase. Se prueba DESPUÉS del pase para
-  // que un pase válido siga mandando, y si falla se cae a la pantalla de
-  // siempre. En cualquier otro navegador esta rama no existe.
+  // este equipo no se haya usado nunca el pase. En cualquier otro navegador
+  // esta rama no existe.
   if (await entrarConApp()) { arranca(); return; }
-  $('#pase').classList.remove('hidden'); $('#pase-in').focus();
+  // Con sesión pero sin acceso no se pide nada: se espera.
+  if (q === 'espera') { salaDeEspera(); return; }
+  $('#pase').classList.remove('hidden');
+  ePinta('correo');
 })();
 
 // Gancho de consola para pruebas: window.MOOVIN.sala() / cargar(url) / video
