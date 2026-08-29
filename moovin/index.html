@@ -167,6 +167,12 @@ button.tag:hover{opacity:.7}
    debajo de otra no valía: cada título nuevo empujaba el anime más al fondo
    de la página, y con la biblioteca creciendo eso solo empeora. */
 .lib-tabs{margin:0 0 20px}
+/* El renglon que separa la pasarela de la rejilla: mismo mono en versal que
+   los demas rotulos pequenos de la casa. */
+.lib-rotulo{
+  font-family:var(--mono); font-size:11px; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--dim); margin:38px 0 16px;
+}
 .lib-rejilla{
   display:grid; gap:16px;
   grid-template-columns:repeat(auto-fill,minmax(158px,1fr));
@@ -884,13 +890,24 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    lo que se estrecha es cada linea por dentro. Poniendole el ancho al bloque
    se contaba el margen izquierdo dentro de esos 54ch (box-sizing:border-box)
    y el titulo se partia en dos a media pantalla. */
+/* La franja va ENCIMA del arte, no debajo: cristal de verdad, con el fondo
+   desenfocado por detras. El brillo se baja en el propio backdrop-filter
+   porque el arte puede ser casi blanco -la nieve de Interestelar- y un velo
+   traslucido a secas no salva el titulo en blanco. */
 #lib-hero .hero-tx{
-  position:relative; width:100%; flex:none;
+  position:absolute; left:0; right:0; bottom:0; z-index:3; width:100%; flex:none;
   display:flex; align-items:center; gap:26px;
-  background:var(--bg); border-top:1px solid var(--line);
+  background:rgba(11,11,13,.34); border-top:1px solid rgba(255,255,255,.14);
+  -webkit-backdrop-filter:blur(26px) saturate(1.3) brightness(.55);
+  backdrop-filter:blur(26px) saturate(1.3) brightness(.55);
   /* mas respiro arriba que abajo: el renglon mono apenas deja tinta y el
      margen superior se percibe menor del que mide */
   padding:30px var(--lado) 20px;
+}
+/* Sin backdrop-filter (televisores viejos) la franja vuelve a ser opaca: antes
+   solida que un texto blanco flotando sobre la nieve. */
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+  #lib-hero .hero-tx{background:var(--bg); border-top-color:var(--line)}
 }
 #lib-hero .hero-col{min-width:0; flex:1}
 #lib-hero .hero-meta span{white-space:nowrap}
@@ -1011,7 +1028,9 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   #lib-hero{--alto-top:48px; margin:-22px 0 20px calc(50% - 50vw); min-height:420px}
   #lib-hero .lib-tabs{padding:10px var(--lado) 10px}
   #lib-hero .hero-arte{
-    inset:0; width:auto;
+    /* --tx-h lo publica pintaHero midiendo la franja: con `contain` el cartel
+       entero tiene que quedar por encima del cristal, no debajo. */
+    inset:0 0 var(--tx-h,0px) 0; width:auto;
     background-image:var(--arte-alto,var(--arte-ancho,none));
     background-size:contain; background-position:center;
     -webkit-mask-image:none; mask-image:none;
@@ -2770,9 +2789,13 @@ function pintaBiblioteca(bib) {
   }
   /* Las películas se ven como tickets; el anime, como discos en un estante.
      Son dos formas de mirar lo mismo y cada catálogo pide la suya. */
+  /* La pasarela ensena unos pocos de frente; debajo van TODOS con su portada,
+     que es como se busca un titulo concreto sin girar el anillo entero. */
   if (libSec === 'anime' && dentro.length) {
     grid.appendChild(estanteDe(dentro));
-    return;
+    const rot = document.createElement('p'); rot.className = 'lib-rotulo';
+    rot.textContent = 'Todo el anime';
+    grid.appendChild(rot);
   }
   const rejilla = document.createElement('div'); rejilla.className = 'lib-rejilla';
   dentro.forEach((t) => rejilla.appendChild(tarjetaDe(t)));
@@ -4002,6 +4025,11 @@ function pintaHero(t) {
   col.append(eb, h, me);
   tx.append(col, acc);
   box.append(lienzo, tx);
+  /* La franja flota sobre el arte, asi que su alto es dato: el movil lo usa
+     para dejarle sitio al cartel. Se remide al cambiar (el titulo envuelve). */
+  const mideTx = () => box.style.setProperty('--tx-h', tx.offsetHeight + 'px');
+  if (window.ResizeObserver) new ResizeObserver(mideTx).observe(tx);
+  else mideTx();
 }
 
 
