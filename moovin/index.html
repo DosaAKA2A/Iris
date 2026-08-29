@@ -1668,19 +1668,19 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   </button>
   <div class="right">
     <!-- Instalarla como app. Solo aparece si el navegador lo ofrece. -->
-    <button id="btn-instalar" title="Instalar MOOVIN como aplicación">
+    <button id="btn-instalar" title="Instalar MOOVIN como aplicación" aria-label="Instalar MOOVIN como aplicación">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4 17v2.5A1.5 1.5 0 0 0 5.5 21h13a1.5 1.5 0 0 0 1.5-1.5V17"/></svg>
-      Instalar
+      <span class="rot">Instalar</span>
     </button>
     <!-- El mando: la pantalla ensena el QR, el telefono lo escanea. -->
-    <button id="btn-mando" title="Controlar desde el movil">
+    <button id="btn-mando" title="Controlar desde el móvil" aria-label="Controlar desde el móvil">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 18.5h.01"/></svg>
-      Mando
+      <span class="rot">Mando</span>
     </button>
-    <button id="btn-party" title="Abrir Watch Party">
+    <button id="btn-party" title="Abrir Watch Party" aria-label="Abrir Watch Party">
       <span class="dot"></span>
       <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M0 8L3.07945 4.30466C4.29638 2.84434 6.09909 2 8 2C9.90091 2 11.7036 2.84434 12.9206 4.30466L16 8L12.9206 11.6953C11.7036 13.1557 9.90091 14 8 14C6.09909 14 4.29638 13.1557 3.07945 11.6953L0 8ZM8 11C9.65685 11 11 9.65685 11 8C11 6.34315 9.65685 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65685 6.34315 11 8 11Z"/></svg>
-      Watch Party
+      <span class="rot">Watch Party</span>
     </button>
   </div>
 </header>
@@ -2683,8 +2683,29 @@ function sumaAudio(pista) {
   audios.push({ label: pista.label, url: pista.url, local: !!pista.local });
   audioPinta();
 }
-function ponTiempoAudio() {
+/* Cada `a2.currentTime = x` sobre una pista recién abierta es una petición de
+   rango NUEVA contra R2, y esa descarga compite con la del vídeo. Sin freno se
+   entra en bucle: el vídeo se queda sin colchón, salta `waiting`, vuelve
+   `playing`, se re-sincroniza, roba ancho de banda otra vez. Un ajuste por
+   segundo basta de sobra para corregir deriva; lo que de verdad tiene que
+   cuadrar (abrir la pista, un salto del usuario) pasa `true` y no espera. */
+let ultimoAjuste = 0;
+function ponTiempoAudio(forzar) {
+  const ahora = performance.now();
+  if (!forzar && ahora - ultimoAjuste < 1000) return;
+  ultimoAjuste = ahora;
   try { a2.currentTime = video.currentTime || 0; } catch (e) { /* aún sin metadatos */ }
+}
+/* Segundos ya descargados por delante del punto en el que va el elemento. */
+function colchon(el) {
+  try {
+    for (let i = 0; i < el.buffered.length; i++) {
+      if (el.buffered.start(i) <= el.currentTime && el.buffered.end(i) >= el.currentTime) {
+        return el.buffered.end(i) - el.currentTime;
+      }
+    }
+  } catch (e) { /* sin metadatos todavía */ }
+  return 0;
 }
 function aplicaAudio() {
   const p = audios.find((a) => a.label === audioSel) || audios[0] || { url: '' };
@@ -2693,16 +2714,51 @@ function aplicaAudio() {
     a2.pause();
     if (a2.dataset.url) { a2.dataset.url = ''; a2.removeAttribute('src'); a2.load(); }
   } else if (a2.dataset.url !== p.url) {
+    const rodando = !video.paused;
     a2.dataset.url = p.url;
     a2.src = p.url;
     a2.load();
-    ponTiempoAudio();
+    ponTiempoAudio(true);
+    if (rodando) esperaAudio();
   }
   a2.playbackRate = video.playbackRate || 1;
   aplicaVolumen();
   audioPinta();
   if (audioExt && !video.paused) audioPlay();
 }
+/* Cambiar de pista a mitad de película abre un archivo nuevo de cientos de MB
+   -"Inglés" de Interestelar son 246 MB- y su descarga compite con la del vídeo,
+   que va con unos dos segundos de colchón y nada más. Si se le deja rodar, el
+   vídeo se queda sin buffer y la imagen se congela mientras el sonido repite
+   los mismos segundos una y otra vez.
+
+   Así que se para el vídeo a propósito hasta que la pista nueva tenga con qué
+   sonar. Es una pausa corta y explicada en vez de un cuelgue. La sala no se
+   entera: es una pausa técnica, no la de una persona. */
+let esperando = 0;
+let cambiandoAudio = false;
+function esperaAudio() {
+  clearTimeout(esperando);
+  cambiandoAudio = true;
+  video.pause();
+  toast('Cargando la pista de audio…');
+  const t0 = performance.now();
+  const mira = () => {
+    const listo = a2.readyState >= 3 || colchon(a2) > 1.5;
+    // Techo de 12 s: si la pista no arranca, mejor seguir viendo la película
+    // que quedarse mirando una imagen parada sin explicación.
+    if (listo || performance.now() - t0 > 12000) {
+      if (!listo) toast('El audio va lento, pero sigue la película');
+      ponTiempoAudio(true);
+      cambiandoAudio = false;
+      playSafe();
+      return;
+    }
+    esperando = setTimeout(mira, 250);
+  };
+  mira();
+}
+
 function aplicaVolumen() {
   // El volumen y el silencio son de la persona, no del elemento: se aplican a
   // la fuente que esté sonando y el video se calla cuando manda la externa.
@@ -2720,6 +2776,9 @@ function aplicaVolumen() {
 function audioPlay() {
   if (!audioExt) return;
   const d = video.currentTime - a2.currentTime;
+  /* Sin forzar: esto se llama tambien desde `playing`, y en un vídeo que va
+     entrando y saliendo de buffer eso son varios saltos por segundo. El ajuste
+     de verdad ya lo hacen `loadedmetadata`, `seeked` y abrir la pista. */
   if (!isFinite(d) || Math.abs(d) > 0.5) ponTiempoAudio();
   // Mismo criterio que el vídeo: un fallo del audio paralelo por interrupción
   // no significa que haga falta un gesto del usuario.
@@ -2739,13 +2798,17 @@ function audioPinta() {
 video.addEventListener('play', () => { if (audioExt) audioPlay(); });
 video.addEventListener('pause', () => a2.pause());
 video.addEventListener('seeking', () => { if (audioExt) a2.pause(); });
-video.addEventListener('seeked', () => { if (audioExt) { ponTiempoAudio(); if (!video.paused) audioPlay(); } });
+video.addEventListener('seeked', () => { if (audioExt) { ponTiempoAudio(true); if (!video.paused) audioPlay(); } });
 video.addEventListener('waiting', () => { if (audioExt) a2.pause(); });
 video.addEventListener('playing', () => { if (audioExt && !video.paused) audioPlay(); });
 video.addEventListener('ratechange', () => { a2.playbackRate = video.playbackRate || 1; });
-a2.addEventListener('loadedmetadata', () => { if (audioExt) { ponTiempoAudio(); if (!video.paused) audioPlay(); } });
+a2.addEventListener('loadedmetadata', () => { if (audioExt) { ponTiempoAudio(true); if (!video.paused) audioPlay(); } });
 setInterval(() => {
+  /* Con el vídeo esperando buffer (readyState < 3) su reloj está clavado: la
+     deriva que se mide contra él es mentira y corregirla arrastra el audio
+     hacia atrás, que es justo lo que se veía como "se repiten tres segundos". */
   if (!audioExt || video.paused || a2.paused || a2.readyState < 2) return;
+  if (video.readyState < 3) return;
   const base = video.playbackRate || 1;
   const d = video.currentTime - a2.currentTime;   // > 0: el audio va por detrás
   if (!isFinite(d)) return;
@@ -3796,6 +3859,8 @@ function emitLocal(kind) {
   if (!sala || Date.now() < mute) return;
   // "Ver aqui" es privado: lo que el telefono reproduce no toca la sala.
   if (MANDO.on) return;
+  // Parar para cargar una pista de audio es cosa de esta pantalla.
+  if (cambiandoAudio) return;
   const now = Date.now();
   if (lastEv.k === kind && now - lastEv.at < 1200) return;   // dedup de stalls del player
   lastEv = { k: kind, at: now };

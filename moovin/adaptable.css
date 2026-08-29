@@ -191,7 +191,8 @@
   :root{--gutter:16px}
   #top{height:48px; padding:0 12px; gap:10px}
   #top .tag{font-size:10px; letter-spacing:.18em}
-  #btn-party{padding:7px 11px; font-size:12px}
+  #top .right{gap:8px}
+  #btn-party,#btn-mando,#btn-instalar{padding:7px 11px; font-size:12px; gap:6px}
 
   .lib{padding:22px var(--gutter) 34px}
   .lib h1{font-size:20px}
@@ -232,6 +233,27 @@
   /* El panel de Watch Party a media pantalla no deja leer ni el chat ni ver
      el video. En un telefono es una cosa o la otra. */
   #party{width:100%; left:0}
+}
+
+/* Con la marca a la izquierda, tres pastillas con rótulo no caben en un
+   teléfono: la última -Watch Party- se salía por el borde derecho y la página
+   entera cogía scroll horizontal. Medido a 390 px: 60 (marca) + 96 + 92 + 122
+   + huecos = 390, justo el ancho, sin un pixel de margen.
+
+   Se quedan solo los iconos, en cuadrados de 38 px -mas que los 36 que pide una
+   zona tactil comoda-, y el nombre sigue ahí para el lector de pantalla en el
+   aria-label. Así los tres ocupan 138 px y sobra sitio. */
+@media (max-width:560px){
+  #btn-party,#btn-mando,#btn-instalar{
+    width:38px; height:38px; padding:0; gap:0; justify-content:center;
+    border-radius:50%;
+  }
+  #btn-party svg,#btn-mando svg,#btn-instalar svg{width:16px; height:16px}
+  #btn-party .rot,#btn-mando .rot,#btn-instalar .rot{display:none}
+  /* El punto verde de "hay gente en la sala" se va a la esquina del circulo:
+     dentro ya no cabe al lado del icono. */
+  #btn-party{position:relative}
+  #btn-party .dot{position:absolute; top:6px; right:6px; margin:0}
 }
 
 /* Con el telefono tumbado el alto es lo escaso: la cabecera se retira
