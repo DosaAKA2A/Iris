@@ -138,12 +138,16 @@ body:has(#loader.hidden) #mando-bar{display:none}
 .mb-tit{display:flex; align-items:baseline; gap:10px; min-width:0}
 #mb-nom{font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 #mb-est{color:var(--dim); font-size:11.5px; white-space:nowrap; margin-left:auto}
+#mb-est b{font-family:var(--mono); color:var(--muted); font-weight:600}
 #mb-pos{width:100%; height:26px; margin:8px 0 0}
 #mb-pos::-webkit-slider-thumb{width:16px; height:16px; margin-top:-6px}
 #mb-vol{flex:1; width:auto; height:26px}
 #mb-vol::-webkit-slider-thumb{width:14px; height:14px; margin-top:-5.5px}
 .mb-t{display:flex; justify-content:space-between; color:var(--dim); font-family:var(--mono); font-size:11px}
-.mb-bots{display:flex; align-items:center; gap:8px; margin-top:10px}
+/* Dos filas a proposito. En una sola, a 390 px, los seis botones suman mas
+   que el ancho de la pantalla y "Ver aqui" se sale por la derecha. Arriba el
+   transporte, que es lo que se pulsa a ciegas; abajo lo demás, repartido. */
+.mb-bots{display:flex; align-items:center; gap:8px; margin-top:10px; justify-content:center}
 .mb-bots button{
   height:46px; min-width:46px; padding:0 12px; border:1px solid var(--line-2); border-radius:12px;
   color:var(--muted); font-size:12.5px; font-weight:600; display:flex; align-items:center;
@@ -151,9 +155,14 @@ body:has(#loader.hidden) #mando-bar{display:none}
 }
 .mb-bots button:hover,.mb-bots button.on{color:var(--text); border-color:var(--muted)}
 .mb-bots button svg{width:18px; height:18px}
-#mb-pp{background:var(--text); color:var(--sobre-acc); border-color:var(--text); width:56px}
-#mb-pp svg{width:20px; height:20px}
-#mb-aqui{margin-left:auto}
+#mb-menos,#mb-mas{flex:1 1 0; max-width:120px}
+#mb-pp{background:var(--text); color:var(--sobre-acc); border-color:var(--text); width:64px; height:52px}
+#mb-pp svg{width:22px; height:22px}
+.mb-sec{margin-top:8px}
+.mb-sec.hidden{display:none}
+.mb-sec button{flex:1 1 0; min-width:0; height:42px}
+/* Como mando, el teléfono no se baja películas: manda. */
+.modo-mando .lib-dl,.modo-mando .se-film-dl,.modo-mando .se-ep-dl{display:none}
 .mb-vol{display:flex; align-items:center; gap:10px; margin-top:12px; color:var(--dim)}
 .mb-vol svg{width:16px; height:16px; flex:0 0 auto}
 #mb-menu{
@@ -1177,6 +1186,16 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
     background-size:contain; background-position:center;
     -webkit-mask-image:none; mask-image:none;
   }
+  /* El cartel va en `contain`, así que arriba y abajo asoma el relleno
+     borroso. Con un póster casi blanco -la nieve de Interestelar- el
+     desenfoque se queda en un gris plano que parece un fallo. Se apaga y se
+     funde con la página. El velo va en z-index 1: por encima del relleno y
+     por DEBAJO del cartel (z-index 2), que no se toca. */
+  #lib-hero .hero-fondo{filter:blur(34px) saturate(1.1) brightness(.22)}
+  #lib-hero .hero-lienzo::after{
+    content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
+    background:linear-gradient(180deg,var(--bg) 0,rgba(11,11,13,0) 26%);
+  }
   #lib-hero .hero-tx{flex-direction:column; gap:0; text-align:center; padding:14px 18px 20px}
   #lib-hero .hero-tit{font-size:clamp(20px,5.6vw,26px); white-space:normal; margin-top:6px}
   #lib-hero .hero-eyebrow,#lib-hero .hero-meta,#lib-hero .hero-acc{justify-content:center}
@@ -1880,6 +1899,8 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
     <button id="mb-menos" title="Atrás 10 segundos">−10 s</button>
     <button id="mb-pp" title="Reproducir o pausar"></button>
     <button id="mb-mas" title="Adelante 10 segundos">+10 s</button>
+  </div>
+  <div class="mb-bots mb-sec" id="mb-sec">
     <button id="mb-cc" title="Subtítulos">CC</button>
     <button id="mb-au" title="Audio">Audio</button>
     <button id="mb-aqui" title="Verla en este teléfono">Ver aquí</button>
@@ -4144,7 +4165,13 @@ function entraModoMando(code) {
   MANDO.on = true;
   document.body.classList.add('modo-mando');
   try { video.pause(); } catch (e) { /* no hay nada */ }
-  $('#lib-sub').textContent = 'Elige un título y se abre en la pantalla. Desde aquí solo mandas.';
+  $('#lib-sub').textContent = code
+    ? 'Mandas la pantalla ' + code + '. Elige un título y se abre allí.'
+    : 'Elige un título y se abre en la pantalla. Desde aquí solo mandas.';
+  /* La última pantalla se recuerda: así entrar por /mando (el acceso directo de
+     la app instalada) no obliga a volver a escanear el QR. */
+  if (code) { try { localStorage.moovinMando = code; } catch (e) { /* nada */ } }
+  else { try { $('#me-cod').value = localStorage.moovinMando || ''; } catch (e) { /* nada */ } }
   $('#mando-entrar').classList.toggle('hidden', !!code);
   $('#mando-bar').classList.toggle('hidden', !code);
   $('#loader-close').style.display = video.src ? 'flex' : 'none';
@@ -4241,9 +4268,18 @@ function mandoPinta() {
   if (!MANDO.on) return;
   const t = mandoAhora();
   $('#mb-nom').textContent = MANDO.tit || (MANDO.hay ? 'En la pantalla' : 'Nada en la pantalla');
-  $('#mb-est').textContent = !sala ? 'sin conexión'
+  /* El código va aquí porque la barra siempre está en pantalla: con el hero
+     delante, la línea de debajo del título no se ve. Con varias teles en casa,
+     saber cuál se está mandando no es un detalle. */
+  const est = !sala ? 'sin conexión'
     : !sala.ok ? sala.status
     : MANDO.hay ? (MANDO.pausa ? 'en pausa' : 'reproduciendo') : 'la pantalla está en la biblioteca';
+  $('#mb-est').innerHTML = '';
+  if (MANDO.code) {
+    const c = document.createElement('b'); c.textContent = MANDO.code;
+    $('#mb-est').append(c, document.createTextNode(' · '));
+  }
+  $('#mb-est').appendChild(document.createTextNode(est));
   $('#mb-pp').innerHTML = MANDO.pausa ? IC_PLAY : IC_PAUSA;
   $('#mb-a').textContent = fmtT(t);
   $('#mb-b').textContent = MANDO.dur ? fmtT(MANDO.dur) : '--:--';
@@ -4255,6 +4291,9 @@ function mandoPinta() {
   $('#mb-cc').style.display = MANDO.subs.length ? '' : 'none';
   $('#mb-au').style.display = MANDO.auds.length > 1 ? '' : 'none';
   $('#mb-aqui').style.display = MANDO.v ? '' : 'none';
+  // Los tres se esconden por separado; la fila vacía dejaría un hueco.
+  $('#mb-sec').classList.toggle('hidden',
+    !(MANDO.subs.length || MANDO.auds.length > 1 || MANDO.v));
   const v = $('#mb-vol');
   if (Date.now() - MANDO.tocaVol > 2500) v.value = MANDO.mudo ? 0 : MANDO.vol;
   v.style.setProperty('--p', v.value + '%');
@@ -5034,7 +5073,10 @@ function pintaHero(t) {
     .forEach((x) => { const e = document.createElement('span'); e.textContent = x; me.appendChild(e); });
 
   const acc = document.createElement('div'); acc.className = 'hero-acc';
-  acc.appendChild(botonHero('solido', IC.play, 'Reproducir', () => abreTitulo(t)));
+  // El gesto es el mismo, pero desde el mando la película se abre en la tele:
+  // decir "Reproducir" en un teléfono que no va a reproducir nada es mentir.
+  acc.appendChild(botonHero('solido', IC.play,
+    MANDO.on ? 'Ver en la pantalla' : 'Reproducir', () => abreTitulo(t)));
   /* "Más información" abre la caja: la ficha de MOOVIN es su contraportada. */
   acc.appendChild(botonHero('hueco', IC.info, 'Más información', () => abreCaja(t)));
 

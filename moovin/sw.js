@@ -21,7 +21,7 @@
    conexion, no la fuente de la verdad.
    ========================================================================== */
 
-const CACHE = 'moovin-interfaz-v5';
+const CACHE = 'moovin-interfaz-v6';
 
 /* La interfaz completa. Si alguno falla no se aborta la instalacion entera:
    un icono que no este no puede dejar la app sin instalar. */
