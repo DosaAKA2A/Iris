@@ -82,14 +82,24 @@ button.tag{
 }
 button.tag:hover{opacity:.7}
 #top .right{margin-left:auto; display:flex; align-items:center; gap:10px}
-#btn-party,#btn-mando{
+#btn-party,#btn-mando,#btn-instalar{
   display:flex; align-items:center; gap:8px; padding:8px 14px;
   border:1px solid var(--line-2); border-radius:999px;
   font-size:12.5px; font-weight:600; color:var(--muted);
   transition:color .15s,border-color .15s;
 }
-#btn-party:hover,#btn-mando:hover{color:var(--text); border-color:var(--muted)}
-#btn-party svg,#btn-mando svg{width:14px; height:14px}
+#btn-party:hover,#btn-mando:hover,#btn-instalar:hover{color:var(--text); border-color:var(--muted)}
+#btn-party svg,#btn-mando svg,#btn-instalar svg{width:14px; height:14px}
+/* Instalar solo se ofrece cuando el navegador dice que se puede: un boton que
+   no lleva a ninguna parte es peor que no tenerlo. */
+#btn-instalar{display:none}
+body.instalable #btn-instalar{display:flex}
+/* Instalada como app no hay barra de navegador: la cabecera pasa a ser lo
+   primero de la pantalla y en un telefono con muesca se le mete debajo del
+   reloj. Con viewport-fit=cover eso hay que devolverlo a mano. */
+@media (display-mode:standalone),(display-mode:fullscreen),(display-mode:window-controls-overlay){
+  #top{height:calc(52px + env(safe-area-inset-top)); padding-top:env(safe-area-inset-top)}
+}
 #btn-party .dot{width:7px; height:7px; border-radius:50%; background:var(--ok); display:none}
 #btn-party.live{color:var(--text); border-color:var(--line-2)}
 #btn-party.live .dot{display:block}
@@ -165,6 +175,14 @@ body:has(#loader.hidden) #mando-bar{display:none}
 .modo-mando .lib-dl,.modo-mando .se-film-dl,.modo-mando .se-ep-dl{display:none}
 .mb-vol{display:flex; align-items:center; gap:10px; margin-top:12px; color:var(--dim)}
 .mb-vol svg{width:16px; height:16px; flex:0 0 auto}
+/* Desconectar va aqui, apartado de los botones que se pulsan a menudo: cierra
+   la sesion de la pantalla y volver a entrar cuesta escanear otro QR. */
+#mb-salir{
+  width:36px; height:36px; flex:0 0 auto; border-radius:10px; color:var(--dim);
+  display:flex; align-items:center; justify-content:center; transition:color .15s;
+}
+#mb-salir svg{width:17px; height:17px}
+#mb-salir:hover{color:var(--rubi)}
 #mb-menu{
   position:absolute; left:var(--gutter); right:var(--gutter); bottom:calc(100% + 8px);
   background:var(--surface); border:1px solid var(--line); border-radius:14px;
@@ -1649,6 +1667,11 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
     <svg class="mv-palabra" viewBox="0 0 816.44 139.16" aria-hidden="true"><path fill="currentColor" d="M255.76,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S292.18,7.27,255.76,7.27ZM255.76,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M399.87,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S436.29,7.27,399.87,7.27ZM399.87,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M177.6,59.04v80.12h-26.23V59.07c0-6.61-2.68-12.59-7.01-16.93-4.33-4.33-10.32-7.01-16.93-7.01-13.22,0-23.93,10.7-23.95,23.91v80.12h-29.36V59.07c0-6.61-2.68-12.59-7.01-16.93-4.34-4.33-10.32-7.01-16.94-7.01-13.22,0-23.94,10.72-23.94,23.94v80.09H0V59.04C0,30.95,22.77,8.18,50.86,8.18h1.76c14.35,0,27.31,5.94,36.55,15.5,9.24-9.56,22.2-15.5,36.55-15.5h1.02c28.09,0,50.86,22.77,50.86,50.86Z"/><g><rect fill="currentColor" x="641.77" y="35.5" width="30.22" height="103.21"/><rect fill="currentColor" x="641.77" width="30.22" height="23.94"/></g><path fill="currentColor" d="M816.44,74.65v64.34h-27.14v-65.52c0-21.44-17.38-38.81-38.81-38.81s-38.81,17.37-38.81,38.81v65.52h-27.14v-64.34c0-36.42,29.53-65.95,65.95-65.95s65.95,29.53,65.95,65.95Z"/><path fill="currentColor" d="M487.85,73.04V8.7h27.14v65.52c0,21.44,17.38,38.81,38.81,38.81s38.81-17.37,38.81-38.81V8.7h27.14v64.34c0,36.42-29.53,65.95-65.95,65.95s-65.95-29.53-65.95-65.95Z"/></svg>
   </button>
   <div class="right">
+    <!-- Instalarla como app. Solo aparece si el navegador lo ofrece. -->
+    <button id="btn-instalar" title="Instalar MOOVIN como aplicación">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4 17v2.5A1.5 1.5 0 0 0 5.5 21h13a1.5 1.5 0 0 0 1.5-1.5V17"/></svg>
+      Instalar
+    </button>
     <!-- El mando: la pantalla ensena el QR, el telefono lo escanea. -->
     <button id="btn-mando" title="Controlar desde el movil">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 18.5h.01"/></svg>
@@ -1908,6 +1931,9 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   <div class="mb-vol">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
     <input id="mb-vol" type="range" min="0" max="100" value="100" aria-label="Volumen de la pantalla" />
+    <button id="mb-salir" title="Desconectar y cerrar la sesión en la pantalla" aria-label="Desconectar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+    </button>
   </div>
 </div>
 
@@ -3802,12 +3828,46 @@ function seguirURL(url) {
     logSys('La sala usa un archivo local: carga tu copia de la película');
   }
 }
+/* El mando dice que esta pantalla se desconecta. Se da de baja en el worker,
+   para que no vuelva a entrar sola, y ademas se tira el token que ya tiene:
+   dar de baja la clave no caduca un token ya firmado, que seguía valiendo
+   hasta 24 h. Se recarga porque es lo honesto: la app queda en la pantalla de
+   entrada, igual que recién instalada.
+
+   La orden viaja por el relay y no lleva nada dentro. Lo peor que puede hacer
+   quien acierte un código de sala es dejar una tele fuera; no se le entrega
+   ninguna clave a nadie. */
+async function desvinculaPantalla() {
+  const clave = pantallaGuardada();
+  pase = { token: '', exp: 0 };
+  /* Se van las TRES puertas, no solo la de la pantalla: si la tele guardaba
+     ademas el pase compartido o una sesion de cuenta, dejarla dentro por otro
+     lado seria mentirle al que ha pulsado "desconectar". */
+  if (sesionGuardada()) apiCuenta('/cuenta/salir', { method: 'POST', body: '{}' }).catch(() => {});
+  guardaSesion(''); CUENTA = null;
+  try {
+    localStorage.removeItem('moovinPantalla');
+    localStorage.removeItem('moovinPase');
+  } catch (e) { /* nada */ }
+  if (clave) {
+    try {
+      await fetch(MOOVIN_API + '/salir-dispositivo', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clave })
+      });
+    } catch (e) { /* sin red la clave local ya no esta: tampoco entra */ }
+  }
+  leave(true);
+  location.replace('/');
+}
+
 function applyRemote(m) {
   if (!sala) return;
   const who = m.from || 'Alguien';
   // El mando no reproduce nada: lo que pasa en la pantalla se lo cuenta el
   // latido, asi que aqui solo repinta.
   if (MANDO.on) { mandoPinta(); return; }
+  if (m.kind === 'salir') { desvinculaPantalla(); return; }
   /* Ordenes que solo manda el mando. Son ADITIVAS: un cliente viejo (el
      addon de Naviris, otra pestana) no las conoce y las deja pasar. */
   if (m.kind === 'subs') {
@@ -4154,6 +4214,45 @@ async function miraVinculo() {
   }
 }
 
+/* ---------- Instalarla como aplicación ----------
+   Chrome avisa con `beforeinstallprompt` cuando la página cumple (https,
+   manifiesto, service worker) y hay que QUEDARSE el aviso: es lo único que
+   permite ofrecer la instalación desde aquí en vez de desde el menú del
+   navegador, que casi nadie abre. iOS no dispara ese evento nunca, así que
+   ahí lo único honesto es explicar los dos toques. */
+let avisoInstalar = null;
+const enApp = () => matchMedia('(display-mode: standalone)').matches
+  || matchMedia('(display-mode: fullscreen)').matches
+  || navigator.standalone === true;
+const esIOS = /iP(hone|od|ad)/.test(navigator.userAgent)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  avisoInstalar = e;
+  document.body.classList.add('instalable');
+});
+window.addEventListener('appinstalled', () => {
+  avisoInstalar = null;
+  document.body.classList.remove('instalable');
+  toast('MOOVIN instalada. Búscala entre tus aplicaciones');
+});
+if (esIOS && !enApp()) document.body.classList.add('instalable');
+
+$('#btn-instalar').addEventListener('click', async () => {
+  if (!avisoInstalar) {
+    toast(esIOS ? 'Toca Compartir y luego "Añadir a pantalla de inicio"'
+                : 'Instalar desde el menú del navegador');
+    return;
+  }
+  const aviso = avisoInstalar;
+  avisoInstalar = null;              // el aviso no se puede reutilizar
+  aviso.prompt();
+  const r = await aviso.userChoice.catch(() => null);
+  // Si dice que no, el navegador volvera a avisar mas adelante por su cuenta.
+  if (!r || r.outcome !== 'accepted') document.body.classList.remove('instalable');
+});
+
 $('#btn-mando').addEventListener('click', abreQR);
 $('#e-tele').addEventListener('click', abreQR);
 const cierraQR = () => { paraVinculo(); $('#qrpanel').classList.add('hidden'); };
@@ -4339,6 +4438,23 @@ $('#mb-pp').addEventListener('click', () => {
   const t = mandoAhora();
   if (!mandoManda(MANDO.pausa ? 'play' : 'pause', { time: t })) return;
   MANDO.pausa = !MANDO.pausa; MANDO.time = t; MANDO.visto = Date.now(); mandoPinta();
+});
+/* Con confirmación a propósito: no es "salir del mando", es dejar la tele sin
+   acceso, y volver a darselo cuesta levantarse a escanear otro QR. */
+$('#mb-salir').addEventListener('click', () => {
+  const menu = $('#mb-menu');
+  if (!menu.classList.contains('hidden')) { menu.classList.add('hidden'); return; }
+  mandoMenu('Desconectar la pantalla ' + MANDO.code, [
+    { rotulo: 'Sí: cerrar la sesión en la pantalla', valor: 'si' },
+    { rotulo: 'Dejarlo como está', valor: 'no' }
+  ], 'no', (q) => {
+    if (q !== 'si') return;
+    if (!mandoManda('salir')) return;
+    try { localStorage.removeItem('moovinMando'); } catch (e) { /* nada */ }
+    toast('Pantalla desconectada');
+    // Un respiro para que el mensaje salga antes de cerrar el socket.
+    setTimeout(() => location.replace('/'), 700);
+  });
 });
 $('#mb-menos').addEventListener('click', () => mandoSalta(-10));
 $('#mb-mas').addEventListener('click', () => mandoSalta(10));

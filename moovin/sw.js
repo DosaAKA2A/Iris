@@ -21,7 +21,7 @@
    conexion, no la fuente de la verdad.
    ========================================================================== */
 
-const CACHE = 'moovin-interfaz-v6';
+const CACHE = 'moovin-interfaz-v7';
 
 /* La interfaz completa. Si alguno falla no se aborta la instalacion entera:
    un icono que no este no puede dejar la app sin instalar. */
@@ -83,25 +83,29 @@ self.addEventListener('fetch', (e) => {
   // cabeceras Range y una cache intermedia solo puede estropearlo.
   if (/\.(mp4|m4a|m4v|webm|mkv|mp3|opus|aac)$/i.test(url.pathname)) return;
 
+  /* Todas las rutas son la MISMA pagina: el router vive dentro del HTML y el
+     _redirects de Pages devuelve index.html para cualquiera. Si se guardara
+     cada navegacion por su URL, la cache se llenaria de copias identicas -una
+     por serie abierta, una por codigo de mando- y ademas la primera dejaria de
+     refrescarse. Se guarda una sola entrada y se lee siempre esa. */
+  const navega = req.mode === 'navigate';
+  const laPagina = new Request('./index.html');
+
   e.respondWith((async () => {
     try {
       const red = await fetch(req);
       // Solo se guarda lo que forma la interfaz, y solo si vino bien.
-      if (red && red.ok && (req.mode === 'navigate' || /\.(html|css|js|json|webmanifest|svg|png|woff2?)$/i.test(url.pathname))) {
+      if (red && red.ok && (navega || /\.(html|css|js|json|webmanifest|svg|png|woff2?)$/i.test(url.pathname))) {
         const c = await caches.open(CACHE);
-        c.put(req, red.clone());
+        c.put(navega ? laPagina : req, red.clone());
       }
       return red;
     } catch (err) {
       // Sin red: lo que haya guardado. Y para una navegacion, la propia pagina,
       // que es lo unico que hace falta para que la app abra y avise de que no
       // hay conexion en vez de quedarse en blanco.
-      const guardado = await caches.match(req);
+      const guardado = await caches.match(navega ? laPagina : req);
       if (guardado) return guardado;
-      if (req.mode === 'navigate') {
-        const portada = await caches.match('./index.html');
-        if (portada) return portada;
-      }
       throw err;
     }
   })());

@@ -19,6 +19,7 @@
    Público:
      GET  /health                     -> ok
      POST /entrar {pase}              -> {token, exp}; MOOVIN_PASE o un pase temporal
+     POST /salir-dispositivo {clave} -> la pantalla se da de baja a si misma
      POST /entrar-dispositivo {clave} -> {token, exp}; la clave de una pantalla
      POST /cuenta/codigo {correo}     -> manda el código de acceso al correo
      POST /cuenta/entrar {correo, codigo, nombre} -> {token, exp, usuario}
@@ -75,7 +76,7 @@ import { barreVencidos } from './limites.js';
 import {
   pideCodigo, verificaCodigo, sesionDe, cierraSesion, perfil, tieneAcceso,
   cambiaPerfil, vinculoNuevo, vinculoMira, vinculoConfirma, vinculoEstado,
-  dispositivoDe, paseTemporalOk
+  dispositivoDe, dispositivoBaja, paseTemporalOk
 } from './cuentas.js';
 import * as backoffice from './admin.js';
 
@@ -172,7 +173,7 @@ export default {
     const sinD1 = () => json({ error: 'las cuentas no estan configuradas' }, 503);
 
     if (url.pathname.startsWith('/cuenta/') || url.pathname.startsWith('/vincular/')
-      || url.pathname === '/entrar-dispositivo') {
+      || url.pathname === '/entrar-dispositivo' || url.pathname === '/salir-dispositivo') {
       if (!env.DB) return sinD1();
     }
 
@@ -182,6 +183,12 @@ export default {
       const u = await dispositivoDe(env, String(clave || ''));
       if (!u) return json({ error: 'esta pantalla ya no tiene acceso' }, 401);
       return json({ ...(await nuevoToken(env)), usuario: perfil(u) });
+    }
+
+    /* Y se da de baja sola cuando el mando se lo pide. */
+    if (url.pathname === '/salir-dispositivo' && req.method === 'POST') {
+      const { clave } = await cuerpoDe();
+      return resp(await dispositivoBaja(env, String(clave || '')));
     }
 
     if (url.pathname === '/cuenta/codigo' && req.method === 'POST') {

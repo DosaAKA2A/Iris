@@ -343,6 +343,24 @@ export async function dispositivoDe(env, clave) {
   return d;
 }
 
+/* La pantalla se da de baja a si misma. No hace falta sesion: tener la clave
+   ES ser esa pantalla, igual que en /entrar-dispositivo. Quien mande la orden
+   por el relay no lleva la clave, asi que el peor caso de un codigo de sala
+   adivinado es dejar una tele fuera; no se le entrega nada a nadie.
+
+   El token firmado que ya tenga sigue valiendo hasta que caduque -es la vida
+   del token, no de la clave-, por eso la tele ademas se lo tira ella. */
+export async function dispositivoBaja(env, clave) {
+  if (!clave) return { estado: 400, cuerpo: { error: 'falta la clave' } };
+  const h = await sha256(clave);
+  const d = await env.DB.prepare('SELECT usuario_id FROM dispositivos WHERE hash = ?1')
+    .bind(h).first();
+  if (!d) return { estado: 200, cuerpo: { ok: true } };   // ya no estaba
+  await env.DB.prepare('DELETE FROM dispositivos WHERE hash = ?1').bind(h).run();
+  await evento(env, 'pantalla.desvinculada', d.usuario_id, '');
+  return { estado: 200, cuerpo: { ok: true } };
+}
+
 // ---- pases temporales -----------------------------------------------------
 //
 // Para quien no tiene cuenta. El pase compartido de siempre (MOOVIN_PASE) sigue
