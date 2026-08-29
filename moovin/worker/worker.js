@@ -7,9 +7,31 @@
    exige un pase. Si no, cerrar la página no cerraría nada: los archivos se
    bajaban con la URL del bucket sin pasar por aquí.
 
+   Hay tres formas de entrar y las tres acaban en el MISMO token firmado, que es
+   lo único que abre /catalogo y /media:
+     1. el pase compartido de siempre (el secreto MOOVIN_PASE), o un pase
+        temporal acuñado en el backoffice;
+     2. una cuenta a la que Dosa le dio acceso (se entra con un código al correo);
+     3. una pantalla emparejada — un televisor que quedó colgando de una cuenta
+        al escanear el QR del mando desde un móvil que ya había entrado.
+   Así el portón no cambia y las URLs de /media siguen sirviendo igual.
+
    Público:
-     GET  /health                  -> ok
-     POST /entrar {pase}           -> {token, exp}; el pase es el secret MOOVIN_PASE
+     GET  /health                     -> ok
+     POST /entrar {pase}              -> {token, exp}; MOOVIN_PASE o un pase temporal
+     POST /entrar-dispositivo {clave} -> {token, exp}; la clave de una pantalla
+     POST /cuenta/codigo {correo}     -> manda el código de acceso al correo
+     POST /cuenta/entrar {correo, codigo, nombre} -> {token, exp, usuario}
+     POST /vincular/nuevo             -> {codigo, secreto}; lo pide el televisor
+     GET  /vincular/mira?codigo=      -> ¿ese código está esperando una cuenta?
+     POST /vincular/estado {codigo, secreto} -> la tele recoge su clave
+   Con sesión de cuenta (Authorization: Bearer <token de sesión>):
+     GET  /cuenta/yo                  -> perfil y si tiene acceso
+     POST /cuenta/pase                -> el token firmado, si la cuenta tiene acceso
+     PUT  /cuenta/perfil {nombre, avatar}
+     PUT  /cuenta/avatar              -> sube la foto (webp de 256x256, tope 200 KB)
+     POST /cuenta/salir
+     POST /vincular/confirmar {codigo} -> le da acceso a esa pantalla
    Con pase (?t=<token> o Authorization: Bearer <token>):
      GET /catalogo                 -> biblioteca.json guardado en el bucket
      GET /media?key=               -> el objeto para reproducir (con rangos)
@@ -23,6 +45,7 @@
      PUT  /api/multipart/part?key&uploadId&part          -> {etag, part}
      POST /api/multipart/complete  -> {key, uploadId, parts:[{part,etag}]}
      POST /api/multipart/abort     -> {key, uploadId}
+     /api/cuentas* /api/pases* /api/eventos                -> ver admin.js
 
    Las películas se suben por partes porque cada request a un Worker admite
    ~100 MB de cuerpo; el backoffice trocea el archivo y las une R2.
@@ -32,11 +55,32 @@
    verifica solo. Dura un día, que da de sobra para ver la película y para
    descargarla, y un enlace que se escape deja de servir al caducar.
 
-   Desplegar:  npx wrangler deploy      (desde cine/worker/)
-   Secretos:   npx wrangler secret put MOOVIN_TOKEN   (administración)
-               npx wrangler secret put MOOVIN_PASE    (pase de la biblioteca)
+   Cuentas, pantallas, pases temporales y contadores viven en D1 (ver
+   esquema.sql). El token firmado sigue sin guardarse en ningún sitio.
+
+   Ojo con la revocación: quitarle el acceso a una cuenta no mata el token que
+   ya tenga en la mano, que dura un día. Es el mismo trato que el pase de
+   siempre y se acepta a sabiendas; lo que sí corta en seco es bloquear la
+   cuenta, que además borra sus sesiones y sus pantallas.
+
+   Desplegar:  npx wrangler deploy      (desde moovin/worker/)
+               npx wrangler d1 execute moovin --remote --file=esquema.sql
+   Secretos:   npx wrangler secret put MOOVIN_TOKEN      (administración)
+               npx wrangler secret put MOOVIN_PASE       (pase de la biblioteca)
+               npx wrangler secret put CORREO_PROVEEDOR  (brevo | resend)
+               npx wrangler secret put CORREO_CLAVE
+               npx wrangler secret put CORREO_REMITENTE
 */
+import { barreVencidos } from './limites.js';
+import {
+  pideCodigo, verificaCodigo, sesionDe, cierraSesion, perfil, tieneAcceso,
+  cambiaPerfil, vinculoNuevo, vinculoMira, vinculoConfirma, vinculoEstado,
+  dispositivoDe, paseTemporalOk
+} from './cuentas.js';
+import * as backoffice from './admin.js';
+
 const TTL_PASE = 24 * 3600;
+const MAX_AVATAR = 200 * 1024;
 
 const b64url = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)))
   .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -92,7 +136,9 @@ export default {
     if (url.pathname === '/entrar' && req.method === 'POST') {
       let pase = '';
       try { pase = String((await req.json()).pase || '').trim(); } catch (e) { /* cuerpo raro */ }
-      if (!igual(pase, (env.MOOVIN_PASE || '').trim())) return json({ error: 'pase incorrecto' }, 401);
+      const bueno = igual(pase, (env.MOOVIN_PASE || '').trim())
+        || await paseTemporalOk(env, pase);
+      if (!bueno) return json({ error: 'pase incorrecto' }, 401);
       return json(await nuevoToken(env));
     }
 
@@ -115,6 +161,85 @@ export default {
       try { clave = String((await req.json()).clave || '').trim(); } catch (e) { /* cuerpo raro */ }
       if (!igual(clave, esperada)) return json({ error: 'clave incorrecta' }, 401);
       return json(await nuevoToken(env));
+    }
+
+    /* ---- cuentas, pantallas y emparejamiento -------------------------------
+       Todo lo de aqui abajo acaba en el MISMO token firmado de arriba. El
+       porton no se entera de que existen las cuentas: solo ve el token. */
+
+    const cuerpoDe = async () => { try { return await req.json(); } catch (e) { return {}; } };
+    const resp = (r) => json(r.cuerpo, r.estado);
+    const sinD1 = () => json({ error: 'las cuentas no estan configuradas' }, 503);
+
+    if (url.pathname.startsWith('/cuenta/') || url.pathname.startsWith('/vincular/')
+      || url.pathname === '/entrar-dispositivo') {
+      if (!env.DB) return sinD1();
+    }
+
+    /* La tele cambia su clave de pantalla por el token de siempre. */
+    if (url.pathname === '/entrar-dispositivo' && req.method === 'POST') {
+      const { clave } = await cuerpoDe();
+      const u = await dispositivoDe(env, String(clave || ''));
+      if (!u) return json({ error: 'esta pantalla ya no tiene acceso' }, 401);
+      return json({ ...(await nuevoToken(env)), usuario: perfil(u) });
+    }
+
+    if (url.pathname === '/cuenta/codigo' && req.method === 'POST') {
+      return resp(await pideCodigo(env, req, await cuerpoDe()));
+    }
+    if (url.pathname === '/cuenta/entrar' && req.method === 'POST') {
+      return resp(await verificaCodigo(env, req, await cuerpoDe()));
+    }
+    if (url.pathname === '/vincular/nuevo' && req.method === 'POST') {
+      return resp(await vinculoNuevo(env, req));
+    }
+    if (url.pathname === '/vincular/mira' && req.method === 'GET') {
+      return resp(await vinculoMira(env, url.searchParams.get('codigo')));
+    }
+    if (url.pathname === '/vincular/estado' && req.method === 'POST') {
+      return resp(await vinculoEstado(env, req, await cuerpoDe()));
+    }
+
+    /* De aqui en adelante hace falta una sesion de cuenta. El bearer se mira
+       solo si la ruta lo pide: una sesion no vale como pase. */
+    if (url.pathname === '/cuenta/yo' || url.pathname === '/cuenta/pase'
+      || url.pathname === '/cuenta/perfil' || url.pathname === '/cuenta/avatar'
+      || url.pathname === '/cuenta/salir' || url.pathname === '/vincular/confirmar') {
+
+      if (url.pathname === '/cuenta/salir' && req.method === 'POST') {
+        return resp(await cierraSesion(env, req));
+      }
+      const u = await sesionDe(env, req, bearer);
+      if (!u) return json({ error: 'sesion no valida' }, 401);
+
+      if (url.pathname === '/cuenta/yo' && req.method === 'GET') {
+        return json({ usuario: perfil(u) });
+      }
+      /* El canje: la cuenta con acceso pide el token firmado. Se pide otra vez
+         cada pocas horas, y ahi es donde se nota que le quitaron el acceso. */
+      if (url.pathname === '/cuenta/pase' && req.method === 'POST') {
+        if (!tieneAcceso(u)) {
+          return json({ error: 'tu cuenta todavia no tiene acceso', usuario: perfil(u) }, 403);
+        }
+        return json({ ...(await nuevoToken(env)), usuario: perfil(u) });
+      }
+      if (url.pathname === '/cuenta/perfil' && (req.method === 'PUT' || req.method === 'POST')) {
+        return resp(await cambiaPerfil(env, u.id, await cuerpoDe()));
+      }
+      /* La foto llega ya recortada y en webp desde el navegador; aqui solo se
+         mira el tamano y se guarda en el bucket. */
+      if (url.pathname === '/cuenta/avatar' && (req.method === 'PUT' || req.method === 'POST')) {
+        const bytes = new Uint8Array(await req.arrayBuffer());
+        if (!bytes.length) return json({ error: 'no llego la foto' }, 400);
+        if (bytes.length > MAX_AVATAR) return json({ error: 'la foto pesa demasiado' }, 413);
+        const key = 'avatares/' + u.id + '.webp';
+        await env.MOOVIN.put(key, bytes, { httpMetadata: { contentType: 'image/webp' } });
+        return resp(await cambiaPerfil(env, u.id, { avatar: key }));
+      }
+      if (url.pathname === '/vincular/confirmar' && req.method === 'POST') {
+        return resp(await vinculoConfirma(env, req, u, await cuerpoDe()));
+      }
+      return json({ error: 'metodo' }, 405);
     }
 
     /* ---- de aquí en adelante hace falta el pase (o ser administración) ---- */
@@ -175,6 +300,13 @@ export default {
     if (!admin) return json({ error: 'no autorizado' }, 401);
 
     if (url.pathname === '/api/check') return json({ ok: true });
+
+    if (url.pathname.startsWith('/api/cuentas') || url.pathname.startsWith('/api/pases/')
+      || url.pathname === '/api/pases' || url.pathname === '/api/eventos') {
+      if (!env.DB) return json({ error: 'las cuentas no estan configuradas' }, 503);
+      const r = await backoffice.ruta(env, req, url);
+      return json(r.cuerpo, r.estado);
+    }
 
     /* Token de pase para el backoffice: un <img> no puede mandar cabeceras, así
        que las miniaturas necesitan el token en la URL. Mejor uno de un día que
@@ -249,5 +381,11 @@ export default {
     }
 
     return json({ error: 'ruta desconocida' }, 404);
+  },
+
+  /* Una vez al dia se tiran los codigos vencidos, las sesiones muertas, los
+     emparejamientos que nadie recogio y los contadores del rato pasado. */
+  async scheduled(evt, env, ctx) {
+    if (env.DB) ctx.waitUntil(barreVencidos(env));
   }
 };

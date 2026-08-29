@@ -8,3 +8,15 @@ compatibility_date = "2026-08-01"
 [[r2_buckets]]
 binding = "MOOVIN"
 bucket_name = "cine"
+
+# Cuentas, sesiones, pantallas emparejadas, pases temporales y contadores.
+# El esquema esta en esquema.sql:
+#   npx wrangler d1 execute moovin --remote --file=esquema.sql
+[[d1_databases]]
+binding = "DB"
+database_name = "moovin"
+database_id = "997ccbd9-df97-4849-8765-44aad65a71d6"
+
+# La barredera de vencidos, una vez al dia de madrugada.
+[triggers]
+crons = ["17 4 * * *"]
