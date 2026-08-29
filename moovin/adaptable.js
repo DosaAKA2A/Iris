@@ -491,7 +491,7 @@ if (plataforma === 'movil') {
    anade una forma mas de servir algo viejo. */
 if ('serviceWorker' in navigator && !TV && location.protocol === 'https:') {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => { /* sin cache se sigue funcionando igual */ });
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* sin cache se sigue funcionando igual */ });
   });
 }
 })();

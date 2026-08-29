@@ -7,18 +7,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="robots" content="noindex" />
 <title>MOOVIN — IRIS Studio</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
 <!-- Instalable como aplicación. En Android y en el escritorio basta con el
      manifiesto y el service worker, que registra adaptable.js; iOS no lee el
      manifiesto y necesita sus propias etiquetas. -->
-<link rel="manifest" href="manifest.webmanifest" />
+<link rel="manifest" href="/manifest.webmanifest" />
 <meta name="theme-color" content="#0a0a0a" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="MOOVIN" />
-<link rel="apple-touch-icon" href="icono-192.png" />
+<link rel="apple-touch-icon" href="/icono-192.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
@@ -1285,7 +1285,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 </style>
 <!-- La capa adaptable va DESPUES de los estilos de arriba: reajusta lo justo
      para televisor y para telefono, y para eso tiene que poder pisarlos. -->
-<link rel="stylesheet" href="adaptable.css" />
+<link rel="stylesheet" href="/adaptable.css" />
 </head>
 <body>
 
@@ -2107,7 +2107,7 @@ function actualizarShare() {
   // La URL de la pestaña refleja la película (sin el código de sala): así el
   // addon de Naviris identifica la "misma película" y los enlaces se pueden
   // guardar. El código de sala solo viaja en el enlace de invitación.
-  try { history.replaceState(null, '', shareUrl()); } catch (e) { /* nada */ }
+  try { history.replaceState(history.state, '', shareUrl()); } catch (e) { /* nada */ }
 }
 function vDe(url) {
   try { return new URL(url).searchParams.get('v'); } catch (e) { return null; }
@@ -2689,7 +2689,11 @@ $('#dl').addEventListener('click', (e) => { if (e.target.id === 'dl') $('#dl').c
    un título = añadir una entrada ahí; el video puede vivir en el repo o en
    cualquier URL directa (p. ej. R2). */
 let bibData = null;
-const absCat = (u) => { try { return new URL(u, location.href).href; } catch (e) { return u; } };
+/* Contra la RAIZ, no contra location.href: en /t/<slug> un poster relativo
+   (posters/x.jpg) se iria a /t/posters/x.jpg. Ademas la url absoluta de un
+   titulo es su identidad en el indice y en el progreso, asi que tiene que
+   salir igual se mire desde donde se mire. */
+const absCat = (u) => { try { return new URL(u, location.origin + '/').href; } catch (e) { return u; } };
 
 /* Un título del catálogo puede ser una película suelta o una serie con
    `episodios[]`. Todo lo demás (reproductor, descargas, sala) sigue hablando
@@ -2759,13 +2763,22 @@ function aplicaCatalogoActual() {
    así que una serie de anime y una película de anime caen en el mismo sitio.
    Sin `grupo` se da por hecho que es película: es lo que traen las altas
    antiguas y lo más probable en una nueva. */
-const GRUPOS = [
-  { clave: 'pelicula', rotulo: 'Películas' },
-  { clave: 'anime', rotulo: 'Anime' }
-];
 const grupoDe = (t) => (t && t.grupo === 'anime' ? 'anime' : 'pelicula');
+/* Cada division tiene su URL. `Series` no es un grupo del catalogo sino un
+   corte transversal: las series de las dos divisiones juntas. */
+const GRUPOS = [
+  { clave: 'pelicula', rotulo: 'Películas', ruta: '/peliculas', filtro: (t) => grupoDe(t) === 'pelicula' },
+  { clave: 'anime', rotulo: 'Anime', ruta: '/anime', filtro: (t) => grupoDe(t) === 'anime' },
+  { clave: 'serie', rotulo: 'Series', ruta: '/series', filtro: (t) => t.tipo === 'serie' }
+];
 const LIBSEC = 'moovinSeccion';
-let libSec = (() => { try { return localStorage[LIBSEC] || ''; } catch (e) { return ''; } })();
+/* Manda la URL; si no dice nada, la ultima division que se miro. */
+let libSec = (() => {
+  const p = location.pathname.replace(/[/]+$/, '');
+  const g = GRUPOS.find((x) => x.ruta === p);
+  if (g) return g.clave;
+  try { return localStorage[LIBSEC] || ''; } catch (e) { return ''; }
+})();
 
 function pintaBiblioteca(bib) {
   const grid = $('#lib-grid');
@@ -2780,7 +2793,7 @@ function pintaBiblioteca(bib) {
   // Solo se ofrecen las secciones que tienen algo. Si queda una sola, no se
   // pinta la barra: con la biblioteca de una sola clase, unas pestañas que no
   // llevan a ningún sitio sobran.
-  const conTitulos = GRUPOS.filter((g) => tt.some((t) => grupoDe(t) === g.clave));
+  const conTitulos = GRUPOS.filter((g) => tt.some(g.filtro));
   if (!conTitulos.some((g) => g.clave === libSec)) libSec = conTitulos[0].clave;
   let tabs = null;
   if (conTitulos.length > 1) {
@@ -2795,11 +2808,13 @@ function pintaBiblioteca(bib) {
         try { localStorage[LIBSEC] = libSec; } catch (e) { /* cuota llena */ }
         pintaBiblioteca(bib);
         $('#loader').scrollTop = 0;
+        sincronizaRuta();
       });
       tabs.appendChild(b);
     });
   }
-  const dentro = tt.filter((t) => grupoDe(t) === libSec);
+  const grupoAbierto = conTitulos.find((g) => g.clave === libSec) || conTitulos[0];
+  const dentro = tt.filter(grupoAbierto.filtro);
   /* La portada grande manda el último título de la sección: es lo recién
      llegado y es lo que justifica una imagen de este tamaño. */
   pintaHero(dentro[dentro.length - 1]);
@@ -2815,10 +2830,10 @@ function pintaBiblioteca(bib) {
      Son dos formas de mirar lo mismo y cada catálogo pide la suya. */
   /* La pasarela ensena unos pocos de frente; debajo van TODOS con su portada,
      que es como se busca un titulo concreto sin girar el anillo entero. */
-  if (libSec === 'anime' && dentro.length) {
+  if ((libSec === 'anime' || libSec === 'serie') && dentro.length) {
     grid.appendChild(estanteDe(dentro));
     const rot = document.createElement('p'); rot.className = 'lib-rotulo';
-    rot.textContent = 'Todo el anime';
+    rot.textContent = libSec === 'serie' ? 'Todas las series' : 'Todo el anime';
     grid.appendChild(rot);
   }
   const rejilla = document.createElement('div'); rejilla.className = 'lib-rejilla';
@@ -2966,6 +2981,7 @@ function abreSerie(t, sec) {
   pintaTabs();
   pintaSeccion();
   $('#loader').scrollTop = 0;
+  sincronizaRuta();
 }
 // Lo que hay dentro de cada sección, que es lo que ayuda a elegir.
 function cuentaDe(s) {
@@ -2979,6 +2995,7 @@ function cuentaDe(s) {
 function eligeSeccion(i) {
   if (i === seccion) return;
   seccion = i; pintaTabs(); pintaSeccion(); $('#loader').scrollTop = 0;
+  sincronizaRuta();
 }
 /* El selector de secciones: una tarjeta por temporada (más la de películas),
    con su carátula. La marcada en rojo es la abierta. */
@@ -3105,6 +3122,7 @@ function cierraSerie() {
   $('#lib-h1').classList.remove('oculto');
   $('#lib-sub').classList.remove('oculto');
   $('#lib-grid').classList.remove('oculto');
+  sincronizaRuta();
 }
 /* Una fila de la lista. Sirve igual para un capítulo que para una película de
    la saga: solo cambian la etiqueta de arriba y de dónde sale la imagen (un
@@ -3284,7 +3302,7 @@ function avatar(who) {
   const id = avs[who];
   if (id && AVATARES.includes(id)) {
     const img = document.createElement('img');
-    img.src = 'avatares/' + id + '.svg'; img.alt = '';
+    img.src = '/avatares/' + id + '.svg'; img.alt = '';
     el.appendChild(img);
     return el;
   }
@@ -3312,7 +3330,7 @@ function pintaSelectorAv() {
   haz('', null);
   for (const id of AVATARES) {
     const img = document.createElement('img');
-    img.src = 'avatares/' + id + '.svg'; img.alt = id;
+    img.src = '/avatares/' + id + '.svg'; img.alt = id;
     haz(id, img);
   }
 }
@@ -3630,12 +3648,112 @@ const doChat = () => {
 $('#p-send').addEventListener('click', doChat);
 $('#p-chatin').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); doChat(); } });
 
+/* ============================ Rutas ============================
+   Cada division y cada ficha tienen su URL. Antes MOOVIN era una sola pagina
+   sin ni un pushState: abrir una serie no creaba entrada de historial y el
+   atras del navegador se salia de la aplicacion (dentro de Naviris, eso
+   dejaba la pestana en blanco).
+
+   El reproductor sigue siendo ?v=<url> a proposito: esa URL es la identidad
+   de la pelicula para el Watch Party, para el addon de Naviris y para los
+   enlaces ya repartidos. Convive con la ruta sin estorbarla.
+
+     /            la biblioteca, por donde se quedo
+     /peliculas   la division Peliculas
+     /anime       la division Anime
+     /series      todas las series de las dos divisiones
+     /t/<slug>    la ficha de un titulo
+     /t/<slug>/N  una temporada concreta                                     */
+
+/* Las series ya traen `id` en el catalogo; una pelicula suelta no, asi que se
+   le saca del titulo. */
+const slugDe = (t) => (t && (t.id || String(t.titulo || '').toLowerCase()
+  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''))) || '';
+function tituloDeSlug(sl) {
+  const tt = (bibData && bibData.titulos) || [];
+  return tt.find((t) => slugDe(t) === sl) || null;
+}
+/* La ruta que le toca a lo que hay ahora mismo en pantalla. */
+function rutaActual() {
+  if (serieAbierta) {
+    const r = '/t/' + slugDe(serieAbierta);
+    return seccion > 0 ? r + '/' + (seccion + 1) : r;
+  }
+  const g = GRUPOS.find((x) => x.clave === libSec);
+  return g ? g.ruta : '/';
+}
+let aplicandoRuta = false;      // pintando desde la URL: no se toca el historial
+let reemplazaProxima = false;   // el proximo destino sustituye la entrada de la caja
+/* Se llama despues de CADA gesto que cambia de vista. No hace falta decirle a
+   donde: mira el estado y empuja la ruta que le corresponde. Si ya coincide
+   con la barra de direcciones, no hace nada. */
+function sincronizaRuta() {
+  if (aplicandoRuta) return;
+  const r = rutaActual();
+  if (r === location.pathname && !reemplazaProxima) return;
+  const est = { ruta: r, grupo: libSec, caja: null };
+  try {
+    if (reemplazaProxima) history.replaceState(est, '', r + location.search);
+    else history.pushState(est, '', r + location.search);
+  } catch (e) { /* historial lleno */ }
+  reemplazaProxima = false;
+}
+function muestraLoader() {
+  $('#loader').classList.remove('hidden');
+  $('#loader-close').style.display = video.src ? 'flex' : 'none';
+}
+/* Deja la interfaz como diga la URL. Una ruta que no se reconoce cae en la
+   biblioteca: pase lo que pase, esto NUNCA deja la pagina en blanco. */
+function aplicaRuta(op) {
+  const inicial = !!(op && op.inicial);
+  const est = history.state || {};
+  aplicandoRuta = true;
+  try {
+    const p = location.pathname.replace(/\/+$/, '') || '/';
+    const m = /^\/t\/([^/]+)(?:\/(\d+))?$/.exec(p);
+    if (m) {
+      let sl = m[1];
+      try { sl = decodeURIComponent(sl); } catch (e) { /* tal cual */ }
+      const t = tituloDeSlug(sl);
+      if (t) { abreSerie(t, m[2] ? (+m[2] - 1) : 0); if (!inicial) muestraLoader(); return; }
+    }
+    const g = GRUPOS.find((x) => x.ruta === p);
+    if (g) libSec = g.clave;
+    else if (est.grupo) libSec = est.grupo;
+    try { localStorage[LIBSEC] = libSec; } catch (e) { /* cuota llena */ }
+    if (serieAbierta) cierraSerie();
+    pintaBiblioteca(bibData);
+    if (!inicial) muestraLoader();
+  } finally {
+    aplicandoRuta = false;
+    // La primera entrada tambien se queda con la division que estaba puesta:
+    // sin esto, volver a / desde /peliculas no cambiaba nada en pantalla y el
+    // atras parecia roto.
+    if (inicial) {
+      try { history.replaceState({ ruta: location.pathname, grupo: libSec, caja: null }, '', location.href); } catch (e) { /* nada */ }
+    }
+  }
+}
+addEventListener('popstate', () => {
+  const est = history.state || {};
+  // El atras cierra primero la caja, que es lo de encima.
+  if (CAJA.t && !est.caja) cierraCaja(true);
+  aplicaRuta();
+  if (est.caja && !CAJA.t) {
+    const t = tituloDeSlug(est.caja);
+    if (t) abreCaja(t, true);
+  }
+});
+
 /* ============================ Arranque ============================ */
 const qs = new URLSearchParams(location.search);
 
 function arranca() {
   $('#pase').classList.add('hidden');
-  cargaCatalogo();
+  // La ficha de una serie necesita el catalogo para saber a que `slug`
+  // corresponde, asi que la ruta se aplica cuando ya esta.
+  cargaCatalogo().then(() => aplicaRuta({ inicial: true }));
   if (qs.get('v')) {
     cargarURL(qs.get('v'), { remoto: true });
   }
@@ -3884,16 +4002,43 @@ function ajustaCaja() {
   const e = $('.caja-esc');
   if (e) e.style.setProperty('--u', (e.clientWidth / 100) + 'px');
 }
-function cierraCaja() {
+/* La caja tiene entrada propia en el historial: en el movil, el atras del
+   sistema la cierra en vez de sacarte de MOOVIN. `sinHistorial` es para
+   cuando el propio historial es quien la esta cerrando. */
+function cierraCaja(sinHistorial) {
+  const habia = !!CAJA.t;
   clearTimeout(CAJA.giro);
   clearTimeout(CAJA.saca);
   $('#caja').classList.add('hidden');
   $('#caja').classList.remove('abierta');
   CAJA.t = null;
+  if (!sinHistorial && habia && (history.state || {}).caja) {
+    try { history.back(); } catch (e) { /* nada */ }
+  }
 }
-function abreCaja(t) {
+/* Salir de la caja hacia otro sitio (ver, descargar): el destino SUSTITUYE la
+   entrada de la caja, para no dejar un atras que no hace nada. */
+function saleDeCaja(fn) {
+  const eraCaja = !!(history.state || {}).caja;
+  cierraCaja(true);
+  reemplazaProxima = eraCaja;
+  fn();
+  if (reemplazaProxima) {
+    reemplazaProxima = false;
+    const est = history.state;
+    if (est && est.caja) {
+      try { history.replaceState(Object.assign({}, est, { caja: null }), '', location.pathname + location.search); } catch (e) { /* nada */ }
+    }
+  }
+}
+function abreCaja(t, sinHistorial) {
   if (!t) return;
   CAJA.t = t;
+  if (!sinHistorial) {
+    try {
+      history.pushState({ ruta: location.pathname, grupo: libSec, caja: slugDe(t) }, '', location.pathname + location.search);
+    } catch (e) { /* nada */ }
+  }
   const velo = $('#caja'), giro = $('#caja-giro');
   const frente = $('#caja-frente'), dorso = $('#caja-dorso');
   const img = conPase(absCat(t.poster || t.miniatura || ''));
@@ -3921,21 +4066,21 @@ function abreCaja(t) {
   const enLaSerie = t.tipo === 'serie' && $('#serie').classList.contains('on');
   if (enLaSerie) {
     ver.textContent = ($('#se-seguir').textContent || 'Empezar').trim();
-    ver.addEventListener('click', () => { cierraCaja(); $('#se-seguir').click(); });
+    ver.addEventListener('click', () => saleDeCaja(() => $('#se-seguir').click()));
   } else {
     ver.textContent = t.tipo === 'serie' ? 'Ver la serie' : 'Ver ahora';
-    ver.addEventListener('click', () => { cierraCaja(); abreTitulo(t); });
+    ver.addEventListener('click', () => saleDeCaja(() => abreTitulo(t)));
   }
   acc.appendChild(ver);
   if (t.tipo !== 'serie') {
     const baja = document.createElement('button'); baja.className = 'mv-btn hueco';
     baja.textContent = 'Descargar';
-    baja.addEventListener('click', () => { cierraCaja(); abreDescarga(t); });
+    baja.addEventListener('click', () => saleDeCaja(() => abreDescarga(t)));
     acc.appendChild(baja);
   }
   const cerrar = document.createElement('button'); cerrar.className = 'mv-btn hueco';
   cerrar.textContent = 'Cerrar';
-  cerrar.addEventListener('click', cierraCaja);
+  cerrar.addEventListener('click', () => cierraCaja());
   acc.appendChild(cerrar);
 
   velo.classList.remove('hidden');
@@ -4453,6 +4598,6 @@ window.MOOVIN = {
 </script>
 <!-- Y el script, DESPUES del de arriba: escucha las mismas teclas y necesita
      que los controles ya esten montados para poder moverles el foco. -->
-<script src="adaptable.js"></script>
+<script src="/adaptable.js"></script>
 </body>
 </html>

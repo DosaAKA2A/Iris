@@ -1,0 +1,4 @@
+# Rutas por division: /peliculas, /anime, /series, /t/<slug>. Todas son la
+# misma pagina, el router de index.html las reparte. Los archivos que existen
+# de verdad (posters, avatares, admin.html) siguen ganando a esta regla.
+/*  /index.html  200
