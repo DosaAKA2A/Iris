@@ -62,7 +62,7 @@ svg{display:block}
    el propio control. Solo asoma navegando con teclado (:focus-visible). */
 :focus{outline:none}
 :focus-visible{outline:1px solid rgba(255,255,255,.26); outline-offset:2px}
-#seek:focus-visible,#vol:focus-visible{outline-color:rgba(255,255,255,.18); outline-offset:4px}
+#seek:focus-visible,#vol:focus-visible,#mb-pos:focus-visible,#mb-vol:focus-visible{outline-color:rgba(255,255,255,.18); outline-offset:4px}
 
 /* ============================ Cabecera ============================ */
 #top{
@@ -82,17 +82,104 @@ button.tag{
 }
 button.tag:hover{opacity:.7}
 #top .right{margin-left:auto; display:flex; align-items:center; gap:10px}
-#btn-party{
+#btn-party,#btn-mando{
   display:flex; align-items:center; gap:8px; padding:8px 14px;
   border:1px solid var(--line-2); border-radius:999px;
   font-size:12.5px; font-weight:600; color:var(--muted);
   transition:color .15s,border-color .15s;
 }
-#btn-party:hover{color:var(--text); border-color:var(--muted)}
-#btn-party svg{width:14px; height:14px}
+#btn-party:hover,#btn-mando:hover{color:var(--text); border-color:var(--muted)}
+#btn-party svg,#btn-mando svg{width:14px; height:14px}
 #btn-party .dot{width:7px; height:7px; border-radius:50%; background:var(--ok); display:none}
 #btn-party.live{color:var(--text); border-color:var(--line-2)}
 #btn-party.live .dot{display:block}
+
+/* ============================ Mando desde el movil ============================
+   Dos piezas separadas: el panel del QR, que sale en la PANTALLA, y la barra
+   de mando, que sale en el TELEFONO. Nunca conviven en el mismo aparato. */
+#qrpanel{
+  position:fixed; inset:0; z-index:40; display:flex; align-items:center; justify-content:center;
+  padding:24px; background:rgba(8,8,10,.93); backdrop-filter:blur(6px);
+}
+#qrpanel.hidden{display:none}
+.qp-caja{
+  position:relative; width:min(520px,100%); background:var(--surface);
+  border:1px solid var(--line); border-radius:20px; padding:34px 30px 26px; text-align:center;
+}
+.qp-caja h2{font-family:var(--display); font-size:clamp(20px,2.4vw,26px); margin:0 0 8px}
+.qp-sub{color:var(--muted); font-size:14px; line-height:1.5; margin:0 auto 22px; max-width:36ch}
+#qp-qr{
+  width:min(300px,64vw); aspect-ratio:1; margin:0 auto; background:#fff;
+  border-radius:14px; padding:10px; display:flex; align-items:center; justify-content:center;
+  color:#17181b; font-size:13px; word-break:break-all;
+}
+#qp-cod{
+  font-family:var(--mono); font-size:clamp(28px,5vw,40px); letter-spacing:.18em;
+  margin:20px 0 4px; padding-left:.18em;
+}
+.qp-pie{color:var(--dim); font-size:12.5px; margin:0}
+.qp-pie b{color:var(--muted); font-weight:600}
+#qp-cerrar{position:absolute; top:14px; right:14px; width:34px; height:34px; color:var(--muted)}
+#qp-cerrar svg{width:18px; height:18px}
+#qp-cerrar:hover{color:var(--text)}
+
+/* --- El telefono haciendo de mando --- */
+.modo-mando #btn-party,.modo-mando #btn-mando{display:none}
+/* Con "Ver aqui" el telefono se pone a reproducir: la barra estorbaria
+   encima del video, asi que solo vive mientras la biblioteca esta delante. */
+body:has(#loader.hidden) #mando-bar{display:none}
+.modo-mando .lib{padding-bottom:210px}
+#mando-bar{
+  position:fixed; left:0; right:0; bottom:0; z-index:30;
+  background:rgba(14,14,17,.96); backdrop-filter:blur(14px);
+  border-top:1px solid var(--line); padding:12px var(--gutter) calc(12px + env(safe-area-inset-bottom));
+}
+#mando-bar.hidden{display:none}
+.mb-tit{display:flex; align-items:baseline; gap:10px; min-width:0}
+#mb-nom{font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+#mb-est{color:var(--dim); font-size:11.5px; white-space:nowrap; margin-left:auto}
+#mb-pos{width:100%; height:26px; margin:8px 0 0}
+#mb-pos::-webkit-slider-thumb{width:16px; height:16px; margin-top:-6px}
+#mb-vol{flex:1; width:auto; height:26px}
+#mb-vol::-webkit-slider-thumb{width:14px; height:14px; margin-top:-5.5px}
+.mb-t{display:flex; justify-content:space-between; color:var(--dim); font-family:var(--mono); font-size:11px}
+.mb-bots{display:flex; align-items:center; gap:8px; margin-top:10px}
+.mb-bots button{
+  height:46px; min-width:46px; padding:0 12px; border:1px solid var(--line-2); border-radius:12px;
+  color:var(--muted); font-size:12.5px; font-weight:600; display:flex; align-items:center;
+  justify-content:center; gap:6px; flex:0 0 auto;
+}
+.mb-bots button:hover,.mb-bots button.on{color:var(--text); border-color:var(--muted)}
+.mb-bots button svg{width:18px; height:18px}
+#mb-pp{background:var(--text); color:var(--sobre-acc); border-color:var(--text); width:56px}
+#mb-pp svg{width:20px; height:20px}
+#mb-aqui{margin-left:auto}
+.mb-vol{display:flex; align-items:center; gap:10px; margin-top:12px; color:var(--dim)}
+.mb-vol svg{width:16px; height:16px; flex:0 0 auto}
+#mb-menu{
+  position:absolute; left:var(--gutter); right:var(--gutter); bottom:calc(100% + 8px);
+  background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:6px; max-height:46vh; overflow:auto;
+}
+#mb-menu.hidden{display:none}
+#mb-menu .t{color:var(--dim); font-size:11px; letter-spacing:.08em; padding:8px 12px 4px}
+#mb-menu button{
+  display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%;
+  padding:12px 12px; border-radius:10px; color:var(--muted); font-size:13.5px; text-align:left;
+}
+#mb-menu button:hover{background:rgba(255,255,255,.05); color:var(--text)}
+#mb-menu button.on{color:var(--text)}
+#mb-menu button.on::after{content:""; width:7px; height:7px; border-radius:50%; background:var(--text); flex:0 0 auto}
+#mando-entrar{
+  position:fixed; inset:0; z-index:35; background:var(--bg); display:flex;
+  align-items:center; justify-content:center; padding:24px;
+}
+#mando-entrar.hidden{display:none}
+.me-caja{width:min(360px,100%); text-align:center}
+.me-caja h2{font-family:var(--display); font-size:24px; margin:0 0 8px}
+.me-caja p{color:var(--muted); font-size:14px; line-height:1.5; margin:0 0 22px}
+#me-cod{width:100%; text-align:center; font-family:var(--mono); font-size:24px; letter-spacing:.2em; text-transform:uppercase}
+#me-ok{margin-top:12px; width:100%}
 
 /* ============================ Layout ============================ */
 #row{display:flex; height:calc(100% - 52px); min-height:0}
@@ -536,21 +623,21 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 #stage.controls #bar{opacity:1; pointer-events:auto}
 #stage.controls{cursor:default}
 #stage.playing:not(.controls){cursor:none}
-#seek{
+#seek,#mb-pos{
   -webkit-appearance:none; appearance:none; width:100%; height:14px;
   background:transparent; cursor:pointer; display:block;
 }
-#seek::-webkit-slider-runnable-track{
+#seek::-webkit-slider-runnable-track,#mb-pos::-webkit-slider-runnable-track{
   height:4px; border-radius:2px;
   background:linear-gradient(to right,var(--red) var(--p,0%),rgba(255,255,255,.22) var(--p,0%));
 }
-#seek::-webkit-slider-thumb{
+#seek::-webkit-slider-thumb,#mb-pos::-webkit-slider-thumb{
   -webkit-appearance:none; width:13px; height:13px; border-radius:50%;
   background:#fff; margin-top:-4.5px;
 }
-#seek::-moz-range-track{height:4px; border-radius:2px; background:rgba(255,255,255,.22)}
-#seek::-moz-range-progress{height:4px; border-radius:2px; background:var(--red)}
-#seek::-moz-range-thumb{width:13px; height:13px; border:none; border-radius:50%; background:#fff}
+#seek::-moz-range-track,#mb-pos::-moz-range-track{height:4px; border-radius:2px; background:rgba(255,255,255,.22)}
+#seek::-moz-range-progress,#mb-pos::-moz-range-progress{height:4px; border-radius:2px; background:var(--red)}
+#seek::-moz-range-thumb,#mb-pos::-moz-range-thumb{width:13px; height:13px; border:none; border-radius:50%; background:#fff}
 .bar-row{display:flex; align-items:center; gap:6px; margin-top:6px}
 .cbtn{
   width:36px; height:36px; display:flex; align-items:center; justify-content:center;
@@ -563,21 +650,21 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 #t-cur,#t-dur{font-family:var(--mono); font-size:11.5px; color:var(--muted)}
 #t-cur{color:var(--text)}
 .tsep{font-family:var(--mono); font-size:11.5px; color:var(--dim)}
-#vol{
+#vol,#mb-vol{
   -webkit-appearance:none; appearance:none; width:74px; height:14px;
   background:transparent; cursor:pointer;
 }
-#vol::-webkit-slider-runnable-track{
+#vol::-webkit-slider-runnable-track,#mb-vol::-webkit-slider-runnable-track{
   height:3px; border-radius:2px;
   background:linear-gradient(to right,#fff var(--p,100%),rgba(255,255,255,.22) var(--p,100%));
 }
-#vol::-webkit-slider-thumb{
+#vol::-webkit-slider-thumb,#mb-vol::-webkit-slider-thumb{
   -webkit-appearance:none; width:10px; height:10px; border-radius:50%;
   background:#fff; margin-top:-3.5px;
 }
-#vol::-moz-range-track{height:3px; border-radius:2px; background:rgba(255,255,255,.22)}
-#vol::-moz-range-progress{height:3px; border-radius:2px; background:#fff}
-#vol::-moz-range-thumb{width:10px; height:10px; border:none; border-radius:50%; background:#fff}
+#vol::-moz-range-track,#mb-vol::-moz-range-track{height:3px; border-radius:2px; background:rgba(255,255,255,.22)}
+#vol::-moz-range-progress,#mb-vol::-moz-range-progress{height:3px; border-radius:2px; background:#fff}
+#vol::-moz-range-thumb,#mb-vol::-moz-range-thumb{width:10px; height:10px; border:none; border-radius:50%; background:#fff}
 #movie-name{
   flex:1; min-width:0; margin:0 8px; font-size:12.5px; color:var(--muted);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;
@@ -1495,6 +1582,11 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
     <svg class="mv-palabra" viewBox="0 0 816.44 139.16" aria-hidden="true"><path fill="currentColor" d="M255.76,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S292.18,7.27,255.76,7.27ZM255.76,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M399.87,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S436.29,7.27,399.87,7.27ZM399.87,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M177.6,59.04v80.12h-26.23V59.07c0-6.61-2.68-12.59-7.01-16.93-4.33-4.33-10.32-7.01-16.93-7.01-13.22,0-23.93,10.7-23.95,23.91v80.12h-29.36V59.07c0-6.61-2.68-12.59-7.01-16.93-4.34-4.33-10.32-7.01-16.94-7.01-13.22,0-23.94,10.72-23.94,23.94v80.09H0V59.04C0,30.95,22.77,8.18,50.86,8.18h1.76c14.35,0,27.31,5.94,36.55,15.5,9.24-9.56,22.2-15.5,36.55-15.5h1.02c28.09,0,50.86,22.77,50.86,50.86Z"/><g><rect fill="currentColor" x="641.77" y="35.5" width="30.22" height="103.21"/><rect fill="currentColor" x="641.77" width="30.22" height="23.94"/></g><path fill="currentColor" d="M816.44,74.65v64.34h-27.14v-65.52c0-21.44-17.38-38.81-38.81-38.81s-38.81,17.37-38.81,38.81v65.52h-27.14v-64.34c0-36.42,29.53-65.95,65.95-65.95s65.95,29.53,65.95,65.95Z"/><path fill="currentColor" d="M487.85,73.04V8.7h27.14v65.52c0,21.44,17.38,38.81,38.81,38.81s38.81-17.37,38.81-38.81V8.7h27.14v64.34c0,36.42-29.53,65.95-65.95,65.95s-65.95-29.53-65.95-65.95Z"/></svg>
   </button>
   <div class="right">
+    <!-- El mando: la pantalla ensena el QR, el telefono lo escanea. -->
+    <button id="btn-mando" title="Controlar desde el movil">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 18.5h.01"/></svg>
+      Mando
+    </button>
     <button id="btn-party" title="Abrir Watch Party">
       <span class="dot"></span>
       <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M0 8L3.07945 4.30466C4.29638 2.84434 6.09909 2 8 2C9.90091 2 11.7036 2.84434 12.9206 4.30466L16 8L12.9206 11.6953C11.7036 13.1557 9.90091 14 8 14C6.09909 14 4.29638 13.1557 3.07945 11.6953L0 8ZM8 11C9.65685 11 11 9.65685 11 8C11 6.34315 9.65685 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65685 6.34315 11 8 11Z"/></svg>
@@ -1651,6 +1743,49 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
   </section>
 
   <!-- Panel Watch Party -->
+<!-- El QR de emparejamiento: sale en la pantalla, se escanea con el telefono.
+     El codigo va debajo en grande para poder escribirlo si la camara falla. -->
+<div id="qrpanel" class="hidden">
+  <div class="qp-caja">
+    <button id="qp-cerrar" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18L18 6M6 6L18 18"/></svg></button>
+    <h2>Controla MOOVIN desde el móvil</h2>
+    <p class="qp-sub">Apunta con la cámara del teléfono. Se abre el mando y se queda unido a esta pantalla.</p>
+    <div id="qp-qr"></div>
+    <div id="qp-cod"></div>
+    <p class="qp-pie">O entra en <b id="qp-url">moovin.live/mando</b> y escribe el código.</p>
+  </div>
+</div>
+
+<!-- El mando, en el telefono: la biblioteca de siempre y esta barra. -->
+<div id="mando-bar" class="hidden">
+  <div id="mb-menu" class="hidden"></div>
+  <div class="mb-tit"><span id="mb-nom">Nada en la pantalla</span><span id="mb-est"></span></div>
+  <input id="mb-pos" type="range" min="0" max="1000" value="0" step="1" aria-label="Posición" />
+  <div class="mb-t"><span id="mb-a">0:00</span><span id="mb-b">0:00</span></div>
+  <div class="mb-bots">
+    <button id="mb-menos" title="Atrás 10 segundos">−10 s</button>
+    <button id="mb-pp" title="Reproducir o pausar"></button>
+    <button id="mb-mas" title="Adelante 10 segundos">+10 s</button>
+    <button id="mb-cc" title="Subtítulos">CC</button>
+    <button id="mb-au" title="Audio">Audio</button>
+    <button id="mb-aqui" title="Verla en este teléfono">Ver aquí</button>
+  </div>
+  <div class="mb-vol">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+    <input id="mb-vol" type="range" min="0" max="100" value="100" aria-label="Volumen de la pantalla" />
+  </div>
+</div>
+
+<!-- /mando sin codigo: se escribe a mano el que sale en la pantalla. -->
+<div id="mando-entrar" class="hidden">
+  <div class="me-caja">
+    <h2>Mando de MOOVIN</h2>
+    <p>Escribe el código que sale en la pantalla, o vuelve a escanear el QR.</p>
+    <input id="me-cod" class="in" maxlength="12" placeholder="CÓDIGO" autocomplete="off" />
+    <button id="me-ok" class="cta">Conectar</button>
+  </div>
+</div>
+
   <aside id="party" class="hidden">
     <div class="p-head">
       <span class="ico"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M0 8L3.07945 4.30466C4.29638 2.84434 6.09909 2 8 2C9.90091 2 11.7036 2.84434 12.9206 4.30466L16 8L12.9206 11.6953C11.7036 13.1557 9.90091 14 8 14C6.09909 14 4.29638 13.1557 3.07945 11.6953L0 8ZM8 11C9.65685 11 11 9.65685 11 8C11 6.34315 9.65685 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65685 6.34315 11 8 11Z"/></svg></span>
@@ -1906,6 +2041,10 @@ function ponNombre(n) {
           audios/subs extra que ha traído la persona en local */
 function cargarURL(url, opts) {
   opts = opts || {};
+  /* En el telefono haciendo de mando, elegir una pelicula NO la abre aqui:
+     se la manda a la pantalla. `aqui` es el boton "Ver aqui" y `src` un
+     archivo del propio telefono, que la pantalla no podria abrir. */
+  if (MANDO.on && !opts.remoto && !opts.aqui && !opts.src) { mandoNav(url); return; }
   // Cambiar de fuente dispara pause/seek espurios del propio player: que no
   // se difundan como acciones de la persona.
   mute = Date.now() + ECHO_MS;
@@ -2104,6 +2243,7 @@ function shareUrl() {
   return location.origin + location.pathname + (curV ? '?v=' + encodeURIComponent(curV) : '');
 }
 function actualizarShare() {
+  if (MANDO.on) return;   // la barra del telefono es /mando/<CODIGO>, no la peli
   // La URL de la pestaña refleja la película (sin el código de sala): así el
   // addon de Naviris identifica la "misma película" y los enlaces se pueden
   // guardar. El código de sala solo viaja en el enlace de invitación.
@@ -2605,6 +2745,7 @@ document.addEventListener('keydown', (e) => {
    vídeo que ya estaba corriendo, y había que quitarlo a mano en cada episodio. */
 function velo(ver) { $('#tapveil').classList.toggle('hidden', !ver); }
 function playSafe() {
+  if (MANDO.on && !video.src) return;   // el mando no tiene nada que reproducir
   video.play().catch((err) => {
     if (err && err.name === 'NotAllowedError' && video.paused) velo(true);
   });
@@ -3256,11 +3397,17 @@ function send(obj) {
   // campos tal cual y así cualquier mensaje enseña la cara de quien lo manda.
   // Campo ADITIVO: los clientes viejos lo ignoran sin romperse.
   const av = miAv(); if (av && !obj.av) obj.av = av;
+  // El rol viaja igual de aditivo: asi la pantalla sabe que quien le habla
+  // es un mando y no otro reproductor.
+  if (sala && sala.rol && !obj.rol) obj.rol = sala.rol;
   try { if (sala && sala.ws && sala.ws.readyState === 1) sala.ws.send(JSON.stringify(obj)); } catch (e) { /* nada */ }
 }
+/* Seis caracteres, no cuatro: el codigo tambien empareja el mando, y un
+   millon de combinaciones se quedaba corto para eso. Las salas viejas de
+   cuatro siguen valiendo, esto solo decide las nuevas. */
 function randomCode() {
   const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s = '';
-  for (let i = 0; i < 4; i++) s += A[Math.floor(Math.random() * A.length)];
+  for (let i = 0; i < 6; i++) s += A[Math.floor(Math.random() * A.length)];
   return s;
 }
 
@@ -3412,6 +3559,8 @@ function pintaSala() {
 /* --- Acciones locales del video -> sala --- */
 function emitLocal(kind) {
   if (!sala || Date.now() < mute) return;
+  // "Ver aqui" es privado: lo que el telefono reproduce no toca la sala.
+  if (MANDO.on) return;
   const now = Date.now();
   if (lastEv.k === kind && now - lastEv.at < 1200) return;   // dedup de stalls del player
   lastEv = { k: kind, at: now };
@@ -3447,6 +3596,31 @@ function seguirURL(url) {
 function applyRemote(m) {
   if (!sala) return;
   const who = m.from || 'Alguien';
+  // El mando no reproduce nada: lo que pasa en la pantalla se lo cuenta el
+  // latido, asi que aqui solo repinta.
+  if (MANDO.on) { mandoPinta(); return; }
+  /* Ordenes que solo manda el mando. Son ADITIVAS: un cliente viejo (el
+     addon de Naviris, otra pestana) no las conoce y las deja pasar. */
+  if (m.kind === 'subs') {
+    const l = (m.label === undefined || m.label === null) ? null : String(m.label);
+    if (l !== null && ![...video.textTracks].some((t) => t.label === l)) return;
+    eligeSub(l);
+    logAct(who, l === null ? 'quitó los subtítulos' : 'puso los subtítulos en ' + l);
+    return;
+  }
+  if (m.kind === 'audio') {
+    if (!audios.some((a) => a.label === m.label)) return;
+    eligeAudio(m.label);
+    logAct(who, 'cambió el audio a ' + m.label);
+    return;
+  }
+  if (m.kind === 'vol') {
+    userVol = Math.max(0, Math.min(1, (+m.v || 0) / 100));
+    userMute = !!m.mute;
+    try { localStorage.moovinVol = Math.round(userVol * 100); } catch (e) { /* cuota */ }
+    aplicaVolumen();
+    return;
+  }
   if (m.kind === 'nav') {
     // Sala cerrada: solo se sigue al anfitrión. `m.host` lo marca el servidor
     // al reenviar; sin ese dato el guard miraba `sala.host` y un invitado
@@ -3492,6 +3666,17 @@ function beatStart() {
     if (!sala) return;
     const msg = { t: 'beat', url: shareUrl(), lock: !!sala.lock, nlock: !!sala.navLock, at: Date.now() };
     if (video.src && video.duration) { msg.time = video.currentTime; msg.paused = video.paused; }
+    /* Aditivo para el mando: lo que hace falta para dibujar el estado de la
+       pantalla sin tener el video delante. Son unas decenas de bytes cada
+       dos segundos y el relay reenvia los campos tal cual. */
+    msg.tit = nombrePeli || '';
+    if (video.src && isFinite(video.duration)) msg.dur = video.duration;
+    msg.subs = [...video.textTracks].map((t) => t.label || '');
+    msg.sub = subSel;
+    msg.auds = audios.map((a) => a.label);
+    msg.aud = audioSel;
+    msg.vol = Math.round(userVol * 100);
+    msg.mute = !!userMute;
     send(msg);
   };
   tick();
@@ -3500,12 +3685,15 @@ function beatStart() {
 function beatStop() { if (beatTimer) { clearInterval(beatTimer); beatTimer = null; } }
 
 /* --- Entrar / salir --- */
-function start(code, asHost) {
+/* `rol`: 'pantalla' es quien reproduce (el de siempre) y 'mando' el telefono
+   que solo manda ordenes. Para el relay no hay diferencia: es un campo mas. */
+function start(code, asHost, rol) {
   leave(true);
-  const name = ($('#p-name').value.trim() || (asHost ? 'Anfitrión' : 'Invitado')).slice(0, 32);
+  const name = ($('#p-name').value.trim()
+    || (rol === 'mando' ? 'Mando' : asHost ? 'Anfitrión' : 'Invitado')).slice(0, 32);
   try { localStorage.__navPartyName = $('#p-name').value.trim(); } catch (e) { /* nada */ }
   apuntaAv(name, miAv());
-  sala = { code, host: asHost, name, ws: null, ok: false, everOk: false, n: 1, status: 'Conectando…', msgs: [], lock: false, navLock: true };
+  sala = { code, host: asHost, name, rol: rol || 'pantalla', ws: null, ok: false, everOk: false, n: 1, status: 'Conectando…', msgs: [], lock: false, navLock: true };
   /* El socket se abre aquí dentro para poder repetirlo: si se cae (el relay se
      redespliega, el equipo se suspende, un bache de red) antes quedaba la sala
      pintada con su código mientras ya no sincronizaba nada — que desde el sofá
@@ -3520,7 +3708,7 @@ function start(code, asHost) {
     sala.status = 'Sin conexión con el servidor'; pintaSala(); return;
   }
   sala.ws = ws;
-  ws.onopen = () => { reintento = 0; send({ t: 'join', room: code, name, host: asHost }); };
+  ws.onopen = () => { reintento = 0; send({ t: 'join', room: code, name, host: asHost, rol: sala.rol }); };
   ws.onmessage = (ev) => {
     if (!sala || sala.ws !== ws) return;
     let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
@@ -3541,7 +3729,8 @@ function start(code, asHost) {
     else if (m.t === 'ev') { apuntaAv(m.from, m.av); applyRemote(m); }
     else if (m.t === 'beat') {
       apuntaAv(m.from, m.av);
-      if (!sala.host) {
+      if (MANDO.on) mandoBeat(m);
+      else if (!sala.host) {
         const hadLock = !!sala.lock; sala.lock = !!m.lock;
         if (sala.lock !== hadLock) logSys(sala.lock ? 'El anfitrión activó el control exclusivo' : 'El anfitrión desactivó el control exclusivo');
         const hadNav = !!sala.navLock; sala.navLock = m.nlock !== false;
@@ -3585,7 +3774,7 @@ function start(code, asHost) {
     clearInterval(zombi);
   };
   abreSocket();
-  panelAbre(true);
+  if (!MANDO.on) panelAbre(true);   // en el mando el panel de sala sobra
   pintaSala();
 }
 function leave(silent) {
@@ -3648,6 +3837,220 @@ const doChat = () => {
 $('#p-send').addEventListener('click', doChat);
 $('#p-chatin').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); doChat(); } });
 
+/* ============================ Mando desde el movil ============================
+   La pantalla ensena un QR; el telefono lo escanea y entra en la MISMA sala de
+   Watch Party que ya sincroniza play, pausa, salto y cambio de pelicula. Lo
+   unico nuevo es el `rol`: la pantalla sigue latiendo igual y el mando ni carga
+   video ni descarga nada — pinta lo que dice el latido y manda ordenes.
+
+   Todo son campos ADITIVOS sobre el mismo canal, asi que el relay no se toca y
+   los clientes viejos los ignoran sin romperse.
+
+   Aviso sin adornos: el relay es un difusor tonto y las salas no llevan
+   contrasena. Seis caracteres son mil millones de combinaciones y el codigo
+   solo vive mientras la pantalla esta encendida; eso frena los accidentes y a
+   quien pase por ahi, no a alguien decidido. Es el mismo trato que el pase. */
+const MANDO = {
+  on: false, code: '', hay: false,
+  v: null, tit: '', time: 0, dur: 0, pausa: true, visto: 0,
+  subs: [], sub: null, auds: [], aud: '', vol: 100, mudo: false,
+  arrastra: false, tocaVol: 0, tick: null
+};
+
+/* --- La pantalla: el QR que empareja --- */
+function urlMando(code) { return location.origin + '/mando/' + code; }
+function abreQR() {
+  // Si ya hay sala se usa SU codigo: regenerarlo echaria a quien estuviera
+  // dentro. Si no la hay, esta pantalla crea una y se queda de anfitriona.
+  if (!sala) start(randomCode(), true, 'pantalla');
+  const code = sala ? sala.code : '';
+  $('#qp-cod').textContent = code;
+  $('#qp-url').textContent = location.host + '/mando';
+  const caja = $('#qp-qr');
+  caja.innerHTML = '';
+  try { caja.innerHTML = window.MoovinQR.svg(urlMando(code), { borde: 2 }); }
+  catch (e) { caja.textContent = urlMando(code); }   // sin QR, queda el codigo
+  $('#qrpanel').classList.remove('hidden');
+}
+$('#btn-mando').addEventListener('click', abreQR);
+$('#qp-cerrar').addEventListener('click', () => $('#qrpanel').classList.add('hidden'));
+$('#qrpanel').addEventListener('click', (e) => { if (e.target.id === 'qrpanel') $('#qrpanel').classList.add('hidden'); });
+
+/* --- El telefono: entrar y salir del modo mando --- */
+function entraModoMando(code) {
+  MANDO.on = true;
+  document.body.classList.add('modo-mando');
+  try { video.pause(); } catch (e) { /* no hay nada */ }
+  $('#lib-sub').textContent = 'Elige un título y se abre en la pantalla. Desde aquí solo mandas.';
+  $('#mando-entrar').classList.toggle('hidden', !!code);
+  $('#mando-bar').classList.toggle('hidden', !code);
+  $('#loader-close').style.display = video.src ? 'flex' : 'none';
+  if (!code) { MANDO.code = ''; if (sala) leave(true); return; }
+  if (code !== MANDO.code || !sala) { MANDO.code = code; start(code, false, 'mando'); }
+  mandoTick(true);
+  mandoPinta();
+}
+function saleModoMando() {
+  if (!MANDO.on) return;
+  MANDO.on = false; MANDO.code = ''; MANDO.hay = false;
+  document.body.classList.remove('modo-mando');
+  $('#mando-bar').classList.add('hidden');
+  $('#mando-entrar').classList.add('hidden');
+  $('#mb-menu').classList.add('hidden');
+  mandoTick(false);
+  leave(true);
+}
+
+/* --- Lo que cuenta el latido de la pantalla --- */
+function mandoBeat(m) {
+  MANDO.v = vDe(m.url) || null;
+  MANDO.tit = m.tit || '';
+  MANDO.hay = typeof m.time === 'number';
+  if (MANDO.hay) { MANDO.time = m.time; MANDO.visto = Date.now(); }
+  MANDO.dur = +m.dur || 0;
+  MANDO.pausa = m.paused !== false;
+  MANDO.subs = Array.isArray(m.subs) ? m.subs : [];
+  MANDO.sub = m.sub === undefined ? null : m.sub;
+  MANDO.auds = Array.isArray(m.auds) ? m.auds : [];
+  MANDO.aud = m.aud || '';
+  // El volumen no se pisa mientras el dedo esta en la barra: el latido va dos
+  // segundos por detras y el mando daba tirones.
+  if (typeof m.vol === 'number' && Date.now() - MANDO.tocaVol > 2500) MANDO.vol = m.vol;
+  MANDO.mudo = !!m.mute;
+  mandoPinta();
+}
+/* Entre latidos la posicion se estima aqui: si no, la barra iria a saltos de
+   dos segundos. */
+function mandoAhora() {
+  if (!MANDO.hay) return 0;
+  const t = MANDO.time + (MANDO.pausa ? 0 : (Date.now() - MANDO.visto) / 1000);
+  return MANDO.dur ? Math.max(0, Math.min(t, MANDO.dur)) : Math.max(0, t);
+}
+function mandoTick(enciende) {
+  if (MANDO.tick) { clearInterval(MANDO.tick); MANDO.tick = null; }
+  if (enciende) MANDO.tick = setInterval(() => { if (!MANDO.arrastra) mandoPinta(); }, 500);
+}
+const IC_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>';
+const IC_PAUSA = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></svg>';
+function mandoPinta() {
+  if (!MANDO.on) return;
+  const t = mandoAhora();
+  $('#mb-nom').textContent = MANDO.tit || (MANDO.hay ? 'En la pantalla' : 'Nada en la pantalla');
+  $('#mb-est').textContent = !sala ? 'sin conexión'
+    : !sala.ok ? sala.status
+    : MANDO.hay ? (MANDO.pausa ? 'en pausa' : 'reproduciendo') : 'la pantalla está en la biblioteca';
+  $('#mb-pp').innerHTML = MANDO.pausa ? IC_PLAY : IC_PAUSA;
+  $('#mb-a').textContent = fmtT(t);
+  $('#mb-b').textContent = MANDO.dur ? fmtT(MANDO.dur) : '--:--';
+  const pos = $('#mb-pos');
+  if (!MANDO.arrastra) pos.value = MANDO.dur ? Math.round((t / MANDO.dur) * 1000) : 0;
+  pos.disabled = !MANDO.dur;
+  pos.style.setProperty('--p', (pos.value / 10) + '%');
+  $('#mb-cc').classList.toggle('on', MANDO.sub !== null && MANDO.sub !== undefined);
+  $('#mb-cc').style.display = MANDO.subs.length ? '' : 'none';
+  $('#mb-au').style.display = MANDO.auds.length > 1 ? '' : 'none';
+  $('#mb-aqui').style.display = MANDO.v ? '' : 'none';
+  const v = $('#mb-vol');
+  if (Date.now() - MANDO.tocaVol > 2500) v.value = MANDO.mudo ? 0 : MANDO.vol;
+  v.style.setProperty('--p', v.value + '%');
+}
+
+/* --- Ordenes hacia la pantalla --- */
+function mandoManda(kind, extra) {
+  if (!sala || !sala.ok) { toast('Sin conexión con la pantalla'); return false; }
+  send(Object.assign({ t: 'ev', kind, at: Date.now() }, extra || {}));
+  return true;
+}
+/* El clic en una tarjeta se convierte en el mismo `nav` que ya usa la sala: la
+   pantalla lo recibe y abre la pelicula. */
+function mandoNav(url) {
+  if (!url) return;
+  if (!mandoManda('nav', { url: location.origin + '/?v=' + encodeURIComponent(url) })) return;
+  MANDO.v = url;
+  toast('Enviado a la pantalla');
+  $('#mb-menu').classList.add('hidden');
+}
+function mandoSalta(seg) {
+  if (!MANDO.hay) return;
+  const t = Math.max(0, MANDO.dur ? Math.min(mandoAhora() + seg, MANDO.dur - 1) : mandoAhora() + seg);
+  if (!mandoManda('seek', { time: t })) return;
+  MANDO.time = t; MANDO.visto = Date.now(); mandoPinta();
+}
+function mandoMenu(titulo, opciones, actual, elige) {
+  const menu = $('#mb-menu');
+  menu.innerHTML = '';
+  const t = document.createElement('div'); t.className = 't'; t.textContent = titulo;
+  menu.appendChild(t);
+  opciones.forEach((o) => {
+    const b = document.createElement('button');
+    b.textContent = o.rotulo;
+    if (o.valor === actual) b.classList.add('on');
+    b.addEventListener('click', () => { elige(o.valor); menu.classList.add('hidden'); });
+    menu.appendChild(b);
+  });
+  menu.classList.remove('hidden');
+}
+$('#mb-pp').addEventListener('click', () => {
+  if (!MANDO.hay) { toast('No hay nada en la pantalla'); return; }
+  const t = mandoAhora();
+  if (!mandoManda(MANDO.pausa ? 'play' : 'pause', { time: t })) return;
+  MANDO.pausa = !MANDO.pausa; MANDO.time = t; MANDO.visto = Date.now(); mandoPinta();
+});
+$('#mb-menos').addEventListener('click', () => mandoSalta(-10));
+$('#mb-mas').addEventListener('click', () => mandoSalta(10));
+$('#mb-pos').addEventListener('input', () => {
+  MANDO.arrastra = true;
+  $('#mb-pos').style.setProperty('--p', ($('#mb-pos').value / 10) + '%');
+});
+$('#mb-pos').addEventListener('change', () => {
+  MANDO.arrastra = false;
+  if (!MANDO.dur) return;
+  const t = (+$('#mb-pos').value / 1000) * MANDO.dur;
+  if (!mandoManda('seek', { time: t })) return;
+  MANDO.time = t; MANDO.visto = Date.now(); mandoPinta();
+});
+$('#mb-cc').addEventListener('click', () => {
+  const menu = $('#mb-menu');
+  if (!menu.classList.contains('hidden')) { menu.classList.add('hidden'); return; }
+  const ops = MANDO.subs.map((l, i) => ({ rotulo: l || 'Pista ' + (i + 1), valor: l }));
+  ops.push({ rotulo: 'Sin subtítulos', valor: null });
+  mandoMenu('Subtítulos', ops, MANDO.sub, (l) => {
+    if (!mandoManda('subs', { label: l })) return;
+    MANDO.sub = l; mandoPinta();
+  });
+});
+$('#mb-au').addEventListener('click', () => {
+  const menu = $('#mb-menu');
+  if (!menu.classList.contains('hidden')) { menu.classList.add('hidden'); return; }
+  mandoMenu('Audio', MANDO.auds.map((l) => ({ rotulo: l, valor: l })), MANDO.aud, (l) => {
+    if (!mandoManda('audio', { label: l })) return;
+    MANDO.aud = l; mandoPinta();
+  });
+});
+$('#mb-vol').addEventListener('input', () => {
+  MANDO.tocaVol = Date.now();
+  const v = +$('#mb-vol').value;
+  MANDO.vol = v; MANDO.mudo = v === 0;
+  $('#mb-vol').style.setProperty('--p', v + '%');
+  mandoManda('vol', { v, mute: v === 0 });
+});
+/* "Ver aqui": la pelicula que esta en la pantalla se abre en el telefono, sin
+   sacar a nadie de la sala. */
+$('#mb-aqui').addEventListener('click', () => {
+  if (!MANDO.v) return;
+  const desde = MANDO.hay ? mandoAhora() : 0;
+  cargarURL(MANDO.v, { aqui: true, desde });   // ya oculta el loader
+  playSafe();
+});
+const deMando = () => {
+  const c = $('#me-cod').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!c) return;
+  history.pushState({ ruta: '/mando/' + c, grupo: libSec, caja: null }, '', '/mando/' + c);
+  aplicaRuta();
+};
+$('#me-ok').addEventListener('click', deMando);
+$('#me-cod').addEventListener('keydown', (e) => { if (e.key === 'Enter') deMando(); });
+
 /* ============================ Rutas ============================
    Cada division y cada ficha tienen su URL. Antes MOOVIN era una sola pagina
    sin ni un pushState: abrir una serie no creaba entrada de historial y el
@@ -3676,12 +4079,17 @@ function tituloDeSlug(sl) {
 }
 /* La ruta que le toca a lo que hay ahora mismo en pantalla. */
 function rutaActual() {
+  // Con el mando encendido todo cuelga de /mando/<CODIGO>: asi el atras del
+  // telefono vuelve a la biblioteca del mando en vez de salirse de MOOVIN.
+  const raiz = MANDO.on ? '/mando' + (MANDO.code ? '/' + MANDO.code : '') : '';
   if (serieAbierta) {
-    const r = '/t/' + slugDe(serieAbierta);
+    const r = raiz + '/t/' + slugDe(serieAbierta);
     return seccion > 0 ? r + '/' + (seccion + 1) : r;
   }
   const g = GRUPOS.find((x) => x.clave === libSec);
-  return g ? g.ruta : '/';
+  const sufijo = g ? g.ruta : '/';
+  if (!raiz) return sufijo;
+  return sufijo === '/' ? raiz : raiz + sufijo;
 }
 let aplicandoRuta = false;      // pintando desde la URL: no se toca el historial
 let reemplazaProxima = false;   // el proximo destino sustituye la entrada de la caja
@@ -3710,7 +4118,15 @@ function aplicaRuta(op) {
   const est = history.state || {};
   aplicandoRuta = true;
   try {
-    const p = location.pathname.replace(/\/+$/, '') || '/';
+    let p = location.pathname.replace(/\/+$/, '') || '/';
+    /* /mando enciende el mando y /mando/<CODIGO> ademas lo empareja. Lo que
+       venga detras se resuelve como una ruta normal, que es la biblioteca
+       vista desde el telefono. */
+    const mm = /^\/mando(?:\/([A-Za-z0-9]{1,12}))?(\/.*)?$/.exec(p);
+    if (mm) { entraModoMando((mm[1] || '').toUpperCase()); p = mm[2] || '/'; }
+    else if (MANDO.on) saleModoMando();
+    // Sin codigo no hay nada que pintar: manda la pantalla de emparejar.
+    if (MANDO.on && !MANDO.code) return;
     const m = /^\/t\/([^/]+)(?:\/(\d+))?$/.exec(p);
     if (m) {
       let sl = m[1];
@@ -3818,9 +4234,11 @@ $('#pase-in').addEventListener('keydown', (e) => { if (e.key === 'Enter') dePase
   const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const enTV = document.documentElement.getAttribute('data-plataforma') === 'tv' ||
                /\btv=1\b/.test(location.search);
+  // El mando no es una sesion de cine: entra directo.
+  const enMando = /^\/mando(\/|$)/.test(location.pathname);
   let yaVista = false;
   try { yaVista = sessionStorage.moovinIntro === '1'; sessionStorage.moovinIntro = '1'; } catch (e) { /* nada */ }
-  if (yaVista || enTV) { cap.classList.add('oculto'); return; }
+  if (yaVista || enTV || enMando) { cap.classList.add('oculto'); return; }
 
   const tempo = [];
   let vivo = true;
@@ -4598,6 +5016,7 @@ window.MOOVIN = {
 </script>
 <!-- Y el script, DESPUES del de arriba: escucha las mismas teclas y necesita
      que los controles ya esten montados para poder moverles el foco. -->
+<script src="/qr.js"></script>
 <script src="/adaptable.js"></script>
 </body>
 </html>

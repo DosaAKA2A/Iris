@@ -21,7 +21,7 @@
    conexion, no la fuente de la verdad.
    ========================================================================== */
 
-const CACHE = 'moovin-interfaz-v4';
+const CACHE = 'moovin-interfaz-v5';
 
 /* La interfaz completa. Si alguno falla no se aborta la instalacion entera:
    un icono que no este no puede dejar la app sin instalar. */
@@ -30,6 +30,7 @@ const INTERFAZ = [
   './index.html',
   './adaptable.css',
   './adaptable.js',
+  './qr.js',
   './manifest.webmanifest',
   './icono-192.png',
   './icono-512.png',
