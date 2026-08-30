@@ -337,6 +337,9 @@ body.con-cuenta #btn-perfil{display:flex}
 .pf-lic .pf-lt b{display:block; font-size:13px; font-weight:600}
 .pf-lic .pf-lt span{display:block; margin-top:2px; font-size:11.5px; color:var(--dim)}
 .pf-cod{font-family:var(--mono); font-size:12px; color:var(--muted); letter-spacing:.08em}
+/* Por encima de #espera (z-index 9): con la cuenta sin acceso todavia se
+   quiere poder mirar el perfil y, sobre todo, salir. */
+#perfil{z-index:11}
 #pf-err{margin-top:12px; font-size:12.5px; color:var(--err); display:none}
 #pf-ok{margin-top:12px; font-size:12.5px; color:var(--ok); display:none}
 /* Cerrar sesion se aparta del resto: en una tele o en un ordenador prestado
@@ -4554,6 +4557,8 @@ async function miraVinculo() {
   }
   paraVinculo();
   try { localStorage.moovinPantalla = j.clave; } catch (e) { /* sin guardar: vale para esta sesion */ }
+  // Emparejarse es entrar a mano: alguien acaba de escanear el codigo.
+  marcaSalida(false);
   CUENTA = j.usuario || null;
   const est = $('#qp-estado');
   est.className = 'ok';
@@ -5004,7 +5009,7 @@ const dePase = async () => {
   $('#pase-ok').disabled = true;
   const vale = await entrar(c);
   $('#pase-ok').disabled = false;
-  if (vale) { $('#pase-in').value = ''; arranca(); return; }
+  if (vale) { $('#pase-in').value = ''; marcaSalida(false); arranca(); return; }
   // Sin esta distinción, un televisor sin conexión decía "pase incorrecto" y se
   // perdía el tiempo reescribiendo un pase que estaba bien.
   $('#pase-err').textContent = paseSinRed
@@ -5086,6 +5091,8 @@ async function daCodigo() {
   if (!r.ok || !r.j.token) { eError(r.j.error || 'Ese código no vale.'); $('#e-codigo-in').select(); return; }
   guardaSesion(r.j.token);
   CUENTA = r.j.usuario || null;
+  // Entrada a mano: se levanta la marca de "aqui alguien se fue".
+  marcaSalida(false);
   $('#e-codigo-in').value = '';
   if (CUENTA && CUENTA.acceso && await entrarConCuenta() === 'ok') { $('#pase').classList.add('hidden'); arranca(); return; }
   $('#pase').classList.add('hidden');
@@ -5129,11 +5136,7 @@ $('#es-mira').addEventListener('click', async (e) => {
 });
 $('#es-salir').addEventListener('click', () => {
   clearInterval(esperaT);
-  apiCuenta('/cuenta/salir', { method: 'POST', body: '{}' }).catch(() => {});
-  guardaSesion(''); CUENTA = null;
-  $('#espera').classList.add('hidden');
-  $('#pase').classList.remove('hidden');
-  ePinta('correo');
+  salir();
 });
 
 /* ------------------------------ Tu perfil ------------------------------
@@ -5166,11 +5169,16 @@ function ponFoto(el, u) {
   img.src = url;
   el.appendChild(img);
 }
-/* El boton de la cabecera solo existe si se entro con cuenta: con el pase
-   suelto no hay perfil que enseñar. */
+/* El boton pide CUENTA **y SESION**, no solo CUENTA. Parece lo mismo y no lo
+   es: `entrarConPantalla` y el emparejado del QR tambien rellenan CUENTA con
+   el perfil de quien presto la cuenta, pero esa pantalla NO tiene sesion, solo
+   la clave del dispositivo. Con la primera version el boton salia en la tele
+   (y en cualquier navegador que se hubiera emparejado alguna vez) y todo lo
+   que escribia contestaba 401 "sesion no valida". */
+function hayPerfil() { return !!CUENTA && !!sesionGuardada(); }
 function pintaBotonPerfil() {
-  document.body.classList.toggle('con-cuenta', !!CUENTA);
-  if (!CUENTA) return;
+  document.body.classList.toggle('con-cuenta', hayPerfil());
+  if (!hayPerfil()) return;
   ponFoto($('#btn-perfil'), CUENTA);
   $('#btn-perfil').title = 'Tu perfil — ' + (CUENTA.nombre || CUENTA.correo || '');
 }
@@ -5222,7 +5230,7 @@ function pintaPerfil() {
   pintaBotonPerfil();
 }
 async function abrePerfil() {
-  if (!CUENTA) return;
+  if (!hayPerfil()) return;
   pfAviso('');
   $('#perfil').classList.remove('hidden');
   pintaPerfil();
@@ -5231,7 +5239,15 @@ async function abrePerfil() {
      horas. Es el unico sitio donde alguien se entera de que le caduca. */
   let r;
   try { r = await apiCuenta('/cuenta/yo', { method: 'GET' }); } catch (e) { return; }
-  if (r.ok && r.j.usuario) { CUENTA = r.j.usuario; pintaPerfil(); }
+  if (r.ok && r.j.usuario) { CUENTA = r.j.usuario; pintaPerfil(); return; }
+  /* La sesion dura 30 dias y puede haber muerto (o habersela cerrado desde
+     otro sitio). Antes de esto el panel se quedaba con los datos viejos en
+     pantalla y solo se notaba al intentar guardar. */
+  if (r.estado === 401) {
+    guardaSesion(''); CUENTA = null; pintaBotonPerfil();
+    $('#perfil').classList.add('hidden');
+    salir({ motivo: 'Tu sesión caducó. Entra otra vez con tu correo.' });
+  }
 }
 $('#btn-perfil').addEventListener('click', abrePerfil);
 $('#pf-cerrar').addEventListener('click', () => $('#perfil').classList.add('hidden'));
@@ -5294,26 +5310,87 @@ $('#pf-file').addEventListener('change', async () => {
   CUENTA = r.j; pintaPerfil(); pfAviso('Foto cambiada.');
 });
 
-/* Desconectar. Se avisa al worker para que la sesion muera de verdad y no
-   solo en este navegador, y se recarga: media pagina cuelga del token del
-   pase y limpiarlo a mano dejaria cabos sueltos. El pase compartido, si lo
-   habia, NO se toca: es otra credencial y no es de esta cuenta. */
+/* Desconectar: ver `salir()`. Se lleva por delante TODAS las credenciales de
+   este navegador -- sesion, pase guardado y clave de pantalla -- porque Dosa
+   lo pidio asi el 2026-08-30: cerrar sesion tiene que obligar a volver a
+   entrar con el codigo del correo. */
 $('#pf-salir').addEventListener('click', async () => {
   $('#pf-salir').disabled = true;
   pfAviso('Cerrando la sesión...');
-  try { await apiCuenta('/cuenta/salir', { method: 'POST', body: '{}' }); } catch (e) { /* nada */ }
-  guardaSesion(''); CUENTA = null;
-  location.reload();
+  await salir();
 });
 
+/* ------------------------- Salir de verdad -------------------------
+   Cerrar sesion tiene que significar que hay que volver a entrar con el
+   codigo del correo. Antes no lo significaba: se borraba `moovinSesion` y
+   al recargar el arranque volvia a entrar solo por cualquiera de las otras
+   tres puertas -- la clave de pantalla, el pase guardado o la clave que
+   inyecta Naviris -- y la persona se quedaba dentro sin haber escrito nada.
+
+   Asi que se tiran TODAS las credenciales de este navegador y ademas se
+   deja una marca, `moovinSalida`. La marca hace falta porque las de Naviris
+   no viven en localStorage: las pone su preload en cada carga, y sin algo
+   que diga "aqui alguien se fue a proposito" volverian a abrir la puerta.
+   La marca se levanta sola en cuanto se entra a mano por cualquiera de los
+   tres caminos (correo, pase escrito o QR). */
+const seFue = () => { try { return localStorage.moovinSalida === '1'; } catch (e) { return false; } };
+function marcaSalida(si) {
+  try {
+    if (si) localStorage.moovinSalida = '1';
+    else localStorage.removeItem('moovinSalida');
+  } catch (e) { /* en la tele escribir puede reventar */ }
+}
+function olvidaCredenciales() {
+  guardaSesion('');
+  CUENTA = null;
+  pase = { token: '', exp: 0 };
+  try {
+    localStorage.removeItem('moovinPase');
+    localStorage.removeItem('moovinPantalla');
+  } catch (e) { /* nada */ }
+}
+/* `motivo` se guarda para la pantalla de entrada: si no, alguien a quien se
+   le cayo la sesion se encuentra el formulario de golpe sin saber por que. */
+async function salir(op) {
+  const motivo = (op && op.motivo) || '';
+  /* Primero el aviso al worker, que necesita la sesion todavia puesta: asi
+     la sesion muere tambien en el servidor y no solo en este navegador. */
+  if (sesionGuardada()) {
+    try { await apiCuenta('/cuenta/salir', { method: 'POST', body: '{}' }); } catch (e) { /* nada */ }
+  }
+  /* Y la pantalla emparejada, si este navegador era una. Se da de baja en el
+     worker para que la clave deje de valer, no solo se borra de aqui. */
+  const clave = pantallaGuardada();
+  if (clave) {
+    try {
+      await fetch(MOOVIN_API + '/salir-dispositivo', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clave })
+      });
+    } catch (e) { /* nada */ }
+  }
+  olvidaCredenciales();
+  marcaSalida(true);
+  try { if (motivo) sessionStorage.moovinMotivo = motivo; } catch (e) { /* nada */ }
+  location.reload();
+}
 (async () => {
-  // El pase puede venir de Naviris, de una visita anterior o del enlace. Si
-  // viene en el enlace se borra de la URL en cuanto se usa.
-  const guardado = window.__navMoovinPase || localStorage.moovinPase || qs.get('pase') || '';
-  if (qs.get('pase')) {
+  /* El pase puede venir de Naviris, de una visita anterior o del enlace. El
+     del enlace se borra de la URL en cuanto se usa y ademas cuenta como
+     entrada a mano: quien abre un enlace con pase esta pidiendo entrar, asi
+     que levanta la marca de salida. */
+  const delEnlace = qs.get('pase') || '';
+  if (delEnlace) {
     qs.delete('pase');
     try { history.replaceState(null, '', location.pathname + (qs.toString() ? '?' + qs : '')); } catch (e) { /* nada */ }
+    marcaSalida(false);
   }
+  const guardado = window.__navMoovinPase || localStorage.moovinPase || delEnlace || '';
+  /* Si en este navegador alguien cerro sesion, NINGUNA puerta se abre sola.
+     Las dos primeras se quedan sin llave porque `salir()` las borra; estas
+     dos hay que cerrarlas a mano, porque el pase puede volver a aparecer y
+     la clave de Naviris la inyecta su preload en CADA carga. */
+  const fuera = seFue();
   /* Orden a propósito. La pantalla emparejada va primero porque es la que no
      puede escribir: un televisor tiene que entrar solo o no entra. Luego la
      cuenta, que es la única credencial que se le puede quitar a una persona
@@ -5321,15 +5398,20 @@ $('#pf-salir').addEventListener('click', async () => {
   if (await entrarConPantalla()) { arranca(); return; }
   const q = await entrarConCuenta();
   if (q === 'ok') { arranca(); return; }
-  if (await entrar(guardado)) { arranca(); return; }
+  if (!fuera && await entrar(guardado)) { arranca(); return; }
   // Naviris trae su propia clave: entra sin que nadie escriba nada, aunque en
   // este equipo no se haya usado nunca el pase. En cualquier otro navegador
   // esta rama no existe.
-  if (await entrarConApp()) { arranca(); return; }
+  if (!fuera && await entrarConApp()) { arranca(); return; }
   // Con sesión pero sin acceso no se pide nada: se espera.
   if (q === 'espera') { salaDeEspera(); return; }
   $('#pase').classList.remove('hidden');
   ePinta('correo');
+  /* Por que se esta viendo esta pantalla. Sin esto, a quien se le cayo la
+     sesion se le planta el formulario de golpe y parece una averia. */
+  let motivo = '';
+  try { motivo = sessionStorage.moovinMotivo || ''; sessionStorage.removeItem('moovinMotivo'); } catch (e) { /* nada */ }
+  if (motivo) { $('#pase-err').textContent = motivo; $('#pase-err').style.display = 'block'; }
 })();
 
 // Gancho de consola para pruebas: window.MOOVIN.sala() / cargar(url) / video
