@@ -340,6 +340,13 @@ body.con-cuenta #btn-perfil{display:flex}
 /* Por encima de #espera (z-index 9): con la cuenta sin acceso todavia se
    quiere poder mirar el perfil y, sobre todo, salir. */
 #perfil{z-index:11}
+/* Una pantalla emparejada NO tiene sesion: no puede cambiar nada de la
+   cuenta que le prestaron. Solo mira y se desconecta. */
+#perfil.solo-pantalla .pf-fotos,
+#perfil.solo-pantalla #pf-lbl-elenco,
+#perfil.solo-pantalla #pf-elenco,
+#perfil.solo-pantalla #pf-lbl-nombre,
+#perfil.solo-pantalla #pf-fila-nombre{display:none}
 #pf-err{margin-top:12px; font-size:12.5px; color:var(--err); display:none}
 #pf-ok{margin-top:12px; font-size:12.5px; color:var(--ok); display:none}
 /* Cerrar sesion se aparta del resto: en una tele o en un ordenador prestado
@@ -2008,7 +2015,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
     <div id="perfil" class="veil hidden">
       <div class="dl-card pf-card">
         <h2>Tu perfil</h2>
-        <div class="sub">Tu cuenta de MOOVIN. La foto y el nombre son los que ven los demás en el Watch Party.</div>
+        <div class="sub" id="e-sub-pf">Tu cuenta de MOOVIN. La foto y el nombre son los que ven los demás en el Watch Party.</div>
 
         <div class="pf-cab">
           <div class="pf-foto" id="pf-foto"></div>
@@ -2023,11 +2030,11 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
           <button class="btn" id="pf-quitar">Quitar la foto</button>
         </div>
 
-        <div class="lbl">O elige del elenco</div>
+        <div class="lbl" id="pf-lbl-elenco">O elige del elenco</div>
         <div id="pf-elenco"></div>
 
-        <div class="lbl">Tu nombre</div>
-        <div class="fieldrow">
+        <div class="lbl" id="pf-lbl-nombre">Tu nombre</div>
+        <div class="fieldrow" id="pf-fila-nombre">
           <input id="pf-nombre" class="in" maxlength="32" placeholder="Cómo te ven los demás" />
           <button id="pf-guardar" class="btn red">Guardar</button>
         </div>
@@ -4206,6 +4213,9 @@ async function desvinculaPantalla() {
     localStorage.removeItem('moovinPantalla');
     localStorage.removeItem('moovinPase');
   } catch (e) { /* nada */ }
+  // Igual que al cerrar sesion: sin la marca, la clave que inyecta Naviris
+  // volveria a abrir la puerta en la siguiente carga.
+  marcaSalida(true);
   if (clave) {
     try {
       await fetch(MOOVIN_API + '/salir-dispositivo', {
@@ -5176,9 +5186,15 @@ function ponFoto(el, u) {
    (y en cualquier navegador que se hubiera emparejado alguna vez) y todo lo
    que escribia contestaba 401 "sesion no valida". */
 function hayPerfil() { return !!CUENTA && !!sesionGuardada(); }
+/* Emparejada como pantalla: tiene perfil prestado pero ninguna sesion con la
+   que escribir. Aun asi el boton sale, porque si no NO HAY POR DONDE SALIR:
+   la unica desconexion que existia vivia en la barra del mando, o sea solo
+   con el telefono delante. Una tele -- o un navegador que se emparejo una vez
+   probando -- se quedaba dentro para siempre. */
+function esPantalla() { return !!CUENTA && !sesionGuardada() && !!pantallaGuardada(); }
 function pintaBotonPerfil() {
-  document.body.classList.toggle('con-cuenta', hayPerfil());
-  if (!hayPerfil()) return;
+  document.body.classList.toggle('con-cuenta', hayPerfil() || esPantalla());
+  if (!hayPerfil() && !esPantalla()) return;
   ponFoto($('#btn-perfil'), CUENTA);
   $('#btn-perfil').title = 'Tu perfil — ' + (CUENTA.nombre || CUENTA.correo || '');
 }
@@ -5198,6 +5214,14 @@ function pfAviso(txt, mal) {
 }
 function pintaPerfil() {
   const u = CUENTA; if (!u) return;
+  /* Dos caras del mismo panel. Con sesion se puede tocar todo; emparejada
+     como pantalla solo se mira y se desconecta. */
+  const soloPantalla = !hayPerfil() && esPantalla();
+  $('#perfil').classList.toggle('solo-pantalla', soloPantalla);
+  $('#e-sub-pf').textContent = soloPantalla
+    ? 'Esta pantalla entra con la cuenta de abajo. Para cambiar la foto o el nombre hay que abrir la cuenta en el equipo de esa persona.'
+    : 'Tu cuenta de MOOVIN. La foto y el nombre son los que ven los demás en el Watch Party.';
+  $('#pf-salir').textContent = soloPantalla ? 'Desconectar esta pantalla' : 'Cerrar sesión';
   ponFoto($('#pf-foto'), u);
   $('#pf-nombre-v').textContent = u.nombre || 'Sin nombre';
   $('#pf-correo').textContent = u.correo || '';
@@ -5230,10 +5254,13 @@ function pintaPerfil() {
   pintaBotonPerfil();
 }
 async function abrePerfil() {
-  if (!hayPerfil()) return;
+  if (!hayPerfil() && !esPantalla()) return;
   pfAviso('');
   $('#perfil').classList.remove('hidden');
   pintaPerfil();
+  // Sin sesion no hay a quien preguntarle: el perfil que se enseña es el que
+  // vino con la clave del aparato y no se puede refrescar ni cambiar.
+  if (!hayPerfil()) return;
   /* Se vuelve a preguntar al worker: el acceso lo da y lo quita Dosa a mano
      desde el backoffice, y el CUENTA que hay en memoria puede ser de hace
      horas. Es el unico sitio donde alguien se entera de que le caduca. */
@@ -5316,6 +5343,11 @@ $('#pf-file').addEventListener('change', async () => {
    entrar con el codigo del correo. */
 $('#pf-salir').addEventListener('click', async () => {
   $('#pf-salir').disabled = true;
+  if (!hayPerfil() && esPantalla()) {
+    pfAviso('Desconectando esta pantalla...');
+    await desvinculaPantalla();
+    return;
+  }
   pfAviso('Cerrando la sesión...');
   await salir();
 });
