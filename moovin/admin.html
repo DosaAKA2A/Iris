@@ -161,6 +161,22 @@ h1{font-size:20px; font-weight:700; letter-spacing:-.01em}
   padding:12px 14px; border-radius:10px; background:rgba(255,255,255,.06);
   word-break:break-all; user-select:all; margin-top:10px;
 }
+/* Sesiones y pantallas de una cuenta. Se abren DENTRO de su fila, no en un
+   modal: hay que verlas al lado de a quien pertenecen. */
+.cta{flex-wrap:wrap}
+.ses{width:100%; margin-top:11px; border:1px solid var(--line); border-radius:10px; overflow:hidden}
+.ses-cab{
+  display:flex; align-items:center; gap:10px; padding:9px 12px;
+  background:rgba(255,255,255,.04); font-family:var(--mono);
+  font-size:10.5px; letter-spacing:.06em; color:var(--dim); text-transform:uppercase;
+}
+.ses-cab .btn{margin-left:auto}
+.ses-it{display:flex; align-items:center; gap:10px; padding:10px 12px; border-top:1px solid var(--line)}
+.ses-it .q{flex:1; min-width:0}
+.ses-it .q b{display:block; font-size:12.5px; font-weight:600}
+.ses-it .q span{display:block; font-family:var(--mono); font-size:10.5px; color:var(--dim); margin-top:2px}
+.ses-it.muerta .q b{color:var(--dim); text-decoration:line-through}
+.ses-vacio{padding:12px; font-size:12px; color:var(--dim)}
 .reg{font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.8}
 .reg b{color:var(--text); font-weight:700}
 .reg i{color:var(--dim); font-style:normal}
@@ -821,6 +837,7 @@ function pintaCuentas() {
     const meta = [
       c.codigo,
       c.pantallas ? c.pantallas + (c.pantallas === 1 ? ' pantalla' : ' pantallas') : 'sin pantallas',
+      (c.sesiones || 0) + (c.sesiones === 1 ? ' sesion' : ' sesiones'),
       c.caduca ? 'vence ' + fecha(c.caduca) : '',
       'visto ' + hace(c.visto)
     ].filter(Boolean).join(' &middot; ');
@@ -835,6 +852,7 @@ function pintaCuentas() {
       + '<button class="btn chico" data-a="' + (c.acceso ? 'quitar' : 'dar') + '">'
       + (c.acceso ? 'Quitar acceso' : 'Dar acceso') + '</button>'
       + '<button class="btn chico" data-a="codigo">Código</button>'
+      + '<button class="btn chico" data-a="sesiones">Sesiones</button>'
       + (c.pantallas ? '<button class="btn chico" data-a="olvidar">Olvidar pantallas</button>' : '')
       + '<button class="btn chico peligro" data-a="' + (bloqueada ? 'activar' : 'bloquear') + '">'
       + (bloqueada ? 'Desbloquear' : 'Bloquear') + '</button>'
@@ -863,6 +881,10 @@ $('#c-lista').addEventListener('click', async (e) => {
     } else if (b.dataset.a === 'codigo') {
       const j = await post('/api/cuentas/codigo', { id, enviar: hayCorreo });
       ensenaCodigo(c, j);
+    } else if (b.dataset.a === 'sesiones') {
+      await abreSesiones(c, b.closest('.cta'));
+      b.disabled = false;
+      return;   // sin recargar: recargar repinta la lista y cerraria el panel
     } else if (b.dataset.a === 'olvidar') {
       const j = await post('/api/cuentas/olvidar', { id });
       toast(j.n + (j.n === 1 ? ' pantalla olvidada' : ' pantallas olvidadas'));
@@ -875,6 +897,110 @@ $('#c-lista').addEventListener('click', async (e) => {
       toast('Cuenta desbloqueada');
     }
     await cargaCuentas();
+  } catch (err) {
+    toast('Error: ' + err.message);
+    b.disabled = false;
+  }
+});
+
+/* ---------------------- Sesiones de una cuenta ----------------------
+   Dosa lo pidio por seguridad: la persona puede cerrar la suya desde su
+   perfil, pero desde aqui se cierra la de cualquiera. Sirve ademas para que
+   MOOVIN no siga cargando una sesion vieja de un equipo que ya no se usa. */
+
+/* Naviris se presenta como Chrome A PROPOSITO, asi que el User-Agent no lo
+   delata; por eso la sesion guarda ademas por donde entro. */
+function queNavegador(ua) {
+  ua = String(ua || '');
+  if (/Tizen|SmartTV|SMART-TV/i.test(ua)) return 'Televisor';
+  const n = /Edg\//.test(ua) ? 'Edge'
+    : /OPR\/|Opera/.test(ua) ? 'Opera'
+      : /Firefox\//.test(ua) ? 'Firefox'
+        : /Chrome\//.test(ua) ? 'Chrome'
+          : /Safari\//.test(ua) ? 'Safari' : 'Navegador';
+  const so = /Windows NT/.test(ua) ? 'Windows'
+    : /Android/.test(ua) ? 'Android'
+      : /iPhone|iPad|iPod/.test(ua) ? 'iOS'
+        : /Mac OS X/.test(ua) ? 'Mac'
+          : /Linux|X11/.test(ua) ? 'Linux' : '';
+  return so ? n + ' en ' + so : n;
+}
+
+async function abreSesiones(c, fila) {
+  let caja = fila.querySelector('.ses');
+  // Segundo clic: se cierra. El boton es un interruptor.
+  if (caja) { caja.remove(); return; }
+  caja = document.createElement('div');
+  caja.className = 'ses';
+  caja.innerHTML = '<div class="ses-vacio">Cargando...</div>';
+  fila.appendChild(caja);
+  let j;
+  try { j = await api('/api/cuentas/sesiones?id=' + encodeURIComponent(c.id)); }
+  catch (e) { caja.innerHTML = '<div class="ses-vacio">No se pudo cargar: ' + escapa(e.message) + '</div>'; return; }
+  pintaSesiones(caja, c, j);
+}
+
+function pintaSesiones(caja, c, j) {
+  const ses = j.sesiones || [];
+  const pan = j.pantallas || [];
+  const vivas = ses.filter((s) => s.viva).length;
+  let h = '<div class="ses-cab">' + vivas + (vivas === 1 ? ' sesion abierta' : ' sesiones abiertas')
+    + ' &middot; ' + pan.length + (pan.length === 1 ? ' pantalla' : ' pantallas')
+    + (ses.length ? '<button class="btn chico peligro" data-s="todas">Cerrar todas</button>' : '')
+    + '</div>';
+  if (!ses.length && !pan.length) {
+    h += '<div class="ses-vacio">Esta cuenta no tiene ninguna sesion abierta.</div>';
+  }
+  for (const s of ses) {
+    h += '<div class="ses-it' + (s.viva ? '' : ' muerta') + '">'
+      + '<div class="q"><b>' + escapa(queNavegador(s.ua))
+      + (s.origen === 'naviris' ? '<span class="pill" style="margin-left:7px">Naviris</span>' : '')
+      + '</b><span>' + (s.pais ? escapa(s.pais) + ' &middot; ' : '')
+      + 'visto ' + hace(s.vista) + ' &middot; '
+      + (s.viva ? 'caduca ' + fecha(s.caduca) : 'caducada')
+      + '</span></div>'
+      + '<button class="btn chico" data-s="una" data-h="' + escapa(s.hash) + '">Cerrar</button>'
+      + '</div>';
+  }
+  for (const p of pan) {
+    h += '<div class="ses-it">'
+      + '<div class="q"><b>' + escapa(p.nombre || 'Pantalla')
+      + '<span class="pill" style="margin-left:7px">pantalla</span></b>'
+      + '<span>' + escapa(queNavegador(p.ua)) + ' &middot; visto ' + hace(p.visto) + '</span></div>'
+      + '<button class="btn chico" data-s="pantalla" data-h="' + escapa(p.hash) + '">Desconectar</button>'
+      + '</div>';
+  }
+  caja.innerHTML = h;
+}
+
+/* Las acciones de dentro del panel se escuchan aparte de las de la fila: si no,
+   el manejador de arriba las tomaria por acciones de la cuenta. */
+$('#c-lista').addEventListener('click', async (e) => {
+  const b = e.target.closest('button[data-s]');
+  if (!b) return;
+  e.stopPropagation();
+  const caja = b.closest('.ses');
+  const fila = b.closest('.cta');
+  const c = CUENTAS.find((x) => x.id === fila.dataset.id);
+  if (!c) return;
+  const que = b.dataset.s;
+  if (que === 'todas' && !confirm('¿Cerrar TODAS las sesiones de ' + c.nombre
+    + '? Tendra que volver a entrar con el codigo de su correo.')) return;
+  b.disabled = true;
+  try {
+    if (que === 'pantalla') {
+      await post('/api/cuentas/pantallas/cerrar', { id: c.id, hash: b.dataset.h });
+      toast('Pantalla desconectada');
+    } else {
+      const j = await post('/api/cuentas/sesiones/cerrar',
+        que === 'todas' ? { id: c.id, todas: true } : { id: c.id, hash: b.dataset.h });
+      toast(j.n === 1 ? 'Sesion cerrada' : j.n + ' sesiones cerradas');
+    }
+    /* Se repinta el panel en el sitio, sin recargar la lista entera: recargar
+       repinta las filas y el panel se cerraria solo justo cuando se quiere
+       ver que ha quedado. */
+    const j2 = await api('/api/cuentas/sesiones?id=' + encodeURIComponent(c.id));
+    pintaSesiones(caja, c, j2);
   } catch (err) {
     toast('Error: ' + err.message);
     b.disabled = false;

@@ -36,20 +36,28 @@ export async function ruta(env, req, url) {
       ).bind('%' + q + '%', q).all()
       : await env.DB.prepare('SELECT * FROM usuarios ORDER BY creado DESC LIMIT 200').all();
 
-    // Cuantas pantallas tiene emparejadas cada uno. Una sola consulta: la
-    // biblioteca es de un grupo pequeño y no compensa complicar el JOIN.
+    // Cuantas pantallas y cuantas sesiones vivas tiene cada uno. Dos consultas
+    // sueltas: la biblioteca es de un grupo pequeño y no compensa el JOIN.
     const pant = await env.DB.prepare(
       'SELECT usuario_id, COUNT(*) AS n FROM dispositivos GROUP BY usuario_id'
     ).all();
     const cuenta = {};
     for (const f of pant.results || []) cuenta[f.usuario_id] = f.n;
+    // Vivas = no caducadas. Las caducadas las barre el cron, pero mientras
+    // tanto contarlas daria un numero que no se corresponde con nada.
+    const ses = await env.DB.prepare(
+      'SELECT usuario_id, COUNT(*) AS n FROM sesiones WHERE caduca > ?1 GROUP BY usuario_id'
+    ).bind(ahora()).all();
+    const sesiones = {};
+    for (const f of ses.results || []) sesiones[f.usuario_id] = f.n;
 
     return ok({
       cuentas: (filas.results || []).map((u) => ({
         id: u.id, correo: u.correo, nombre: u.nombre, codigo: u.codigo,
         avatar: u.avatar || '', rol: u.rol, estado: u.estado,
         acceso: !!u.acceso, caduca: u.acceso_caduca || null,
-        creado: u.creado, visto: u.visto, pantallas: cuenta[u.id] || 0
+        creado: u.creado, visto: u.visto, pantallas: cuenta[u.id] || 0,
+        sesiones: sesiones[u.id] || 0
       })),
       correo: hayCorreo(env)
     });
@@ -152,6 +160,67 @@ export async function ruta(env, req, url) {
     ]);
     await evento(env, 'cuenta.borrada', u.correo, '');
     return ok({ ok: true });
+  }
+
+  /* ---- sesiones y pantallas de una cuenta -------------------------------
+     Lo pidio Dosa: poder ver desde donde esta abierta una cuenta y cerrar lo
+     que sobre, para que MOOVIN no cargue una sesion vieja. Ya se podia a lo
+     bruto (bloquear y desbloquear borra las dos cosas), pero eso echa a la
+     persona de todo a la vez y no dice desde donde estaba entrando.
+
+     Del token de sesion solo existe su hash, aqui y en la base, asi que
+     enseñarlo no compromete nada: no se puede volver atras para sacar el
+     token. Sirve de identificador de fila y de nada mas. */
+  if (p === '/api/cuentas/sesiones' && req.method === 'GET') {
+    const id = String(url.searchParams.get('id') || '');
+    const u = id
+      ? await env.DB.prepare('SELECT * FROM usuarios WHERE id = ?1').bind(id).first()
+      : await usuarioDe(env, { correo: url.searchParams.get('correo') });
+    if (!u) return mal('esa cuenta no existe', 404);
+    const s = await env.DB.prepare(
+      `SELECT hash, creada, vista, caduca, ua, pais, origen FROM sesiones
+       WHERE usuario_id = ?1 ORDER BY vista DESC`
+    ).bind(u.id).all();
+    const d = await env.DB.prepare(
+      `SELECT hash, nombre, creado, visto, ua FROM dispositivos
+       WHERE usuario_id = ?1 ORDER BY visto DESC`
+    ).bind(u.id).all();
+    const t = ahora();
+    return ok({
+      id: u.id, correo: u.correo,
+      sesiones: (s.results || []).map((x) => ({ ...x, viva: x.caduca > t })),
+      pantallas: d.results || []
+    });
+  }
+
+  if (p === '/api/cuentas/sesiones/cerrar' && req.method === 'POST') {
+    const u = await usuarioDe(env, cuerpo);
+    if (!u) return mal('esa cuenta no existe', 404);
+    let r;
+    if (cuerpo.todas) {
+      r = await env.DB.prepare('DELETE FROM sesiones WHERE usuario_id = ?1').bind(u.id).run();
+    } else {
+      const h = String(cuerpo.hash || '');
+      if (!h) return mal('falta que sesion cerrar');
+      // Con el usuario en el WHERE: asi un hash de otra cuenta no cuela.
+      r = await env.DB.prepare('DELETE FROM sesiones WHERE usuario_id = ?1 AND hash = ?2')
+        .bind(u.id, h).run();
+    }
+    const n = r.meta.changes || 0;
+    await evento(env, 'sesiones.cerradas', u.correo, String(n));
+    return ok({ ok: true, n });
+  }
+
+  /* Una pantalla suelta. Para todas de golpe ya estaba /api/cuentas/olvidar. */
+  if (p === '/api/cuentas/pantallas/cerrar' && req.method === 'POST') {
+    const u = await usuarioDe(env, cuerpo);
+    if (!u) return mal('esa cuenta no existe', 404);
+    const h = String(cuerpo.hash || '');
+    if (!h) return mal('falta que pantalla cerrar');
+    const r = await env.DB.prepare('DELETE FROM dispositivos WHERE usuario_id = ?1 AND hash = ?2')
+      .bind(u.id, h).run();
+    await evento(env, 'pantalla.olvidada', u.correo, '');
+    return ok({ ok: true, n: r.meta.changes || 0 });
   }
 
   // ---- pases temporales ---------------------------------------------------

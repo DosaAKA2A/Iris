@@ -263,24 +263,30 @@ export async function entraConNaviris(env, req, cuerpo) {
     return { estado: 404, cuerpo: { error: 'esta cuenta de Naviris no esta vinculada', vincular: true } };
   }
   if (u.estado === 'bloqueada') return { estado: 403, cuerpo: { error: 'cuenta bloqueada' } };
-  const s = await abreSesion(env, req, u.id);
+  const s = await abreSesion(env, req, u.id, 'naviris');
   await evento(env, 'entrar-naviris', u.correo, null);
   return { estado: 200, cuerpo: { token: s.token, caduca: s.caduca, usuario: perfil(u) } };
 }
 
 // ---- sesiones -------------------------------------------------------------
 
-async function abreSesion(env, req, usuarioId) {
+/* `origen` dice por donde se entro: "correo" o "naviris". No es cosmetico —
+   Naviris se presenta como Chrome a proposito (para no dejarse fichar), asi
+   que por el User-Agent NO hay forma de distinguir una sesion de Naviris de
+   una del navegador de siempre, y desde el backoffice hace falta saber cual
+   se esta cerrando. */
+async function abreSesion(env, req, usuarioId, origen) {
   const token = azar(10) + '.' + azar(32);
   const t = ahora();
   const caduca = t + VIDA_SESION;
   await env.DB.prepare(
-    `INSERT INTO sesiones (hash, usuario_id, creada, vista, caduca, ua, pais)
-     VALUES (?1, ?2, ?3, ?3, ?4, ?5, ?6)`
+    `INSERT INTO sesiones (hash, usuario_id, creada, vista, caduca, ua, pais, origen)
+     VALUES (?1, ?2, ?3, ?3, ?4, ?5, ?6, ?7)`
   ).bind(
     await sha256(token), usuarioId, t, caduca,
     (req.headers.get('User-Agent') || '').slice(0, 180),
-    req.headers.get('CF-IPCountry') || null
+    req.headers.get('CF-IPCountry') || null,
+    origen === 'naviris' ? 'naviris' : 'correo'
   ).run();
 
   // Tope de sesiones vivas por cuenta: la mas vieja cae sola. No limita

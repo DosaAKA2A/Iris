@@ -54,7 +54,10 @@ CREATE TABLE IF NOT EXISTS sesiones (
   vista      INTEGER NOT NULL,
   caduca     INTEGER NOT NULL,
   ua         TEXT,
-  pais       TEXT
+  pais       TEXT,
+  -- por donde se entro: correo | naviris. Naviris se presenta como Chrome,
+  -- asi que el User-Agent no lo dice.
+  origen     TEXT NOT NULL DEFAULT 'correo'
 );
 CREATE INDEX IF NOT EXISTS ix_sesiones_usuario ON sesiones(usuario_id, vista DESC);
 
