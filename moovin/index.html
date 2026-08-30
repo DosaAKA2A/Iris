@@ -4045,7 +4045,39 @@ function narrate(kind, who, text) {
    compone una URL con un valor ajeno. Sin avatar (o con uno desconocido) se
    cae a la inicial de siempre, que es lo que pintan los clientes viejos. */
 const AVATARES = ['aria', 'pj1', 'pj2', 'pj3', 'pj4', 'pj5', 'pj6', 'pj7', 'pj8', 'pj9', 'pj10', 'pj11'];
-const avs = {};   // nombre -> id de avatar, aprendido de los mensajes de la sala
+const avs = {};     // nombre -> id de avatar del elenco
+const fotos = {};   // nombre -> foto propia, la que manda cada quien al entrar
+/* Una foto que llega de OTRA persona de la sala solo se pinta si es una
+   imagen de mapa de bits en data URI: nada de SVG (puede traer script) ni de
+   URLs de fuera, y con tope de tamaño. */
+function fotoValida(f) {
+  return typeof f === 'string' && f.length < 200000
+    && /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(f);
+}
+function apuntaFoto(who, f) { if (who && fotoValida(f)) fotos[who] = f; }
+/* Tu foto lista para viajar. La del perfil vive en el bucket detras del pase,
+   asi que una URL no la podria abrir nadie mas de la sala: se baja con el
+   pase y se pasa a data URI. Se guarda para no repetirlo en cada reconexion. */
+let fotoSala = null;
+async function fotoParaLaSala() {
+  if (fotoSala !== null) return fotoSala;
+  const u = miFoto();
+  if (!u) { fotoSala = ''; return fotoSala; }
+  try {
+    const r = await fetch(u);
+    if (!r.ok) { fotoSala = ''; return fotoSala; }
+    const b = await r.blob();
+    if (b.size > 140000) { fotoSala = ''; return fotoSala; }
+    fotoSala = await new Promise((ok) => {
+      const fr = new FileReader();
+      fr.onload = () => ok(String(fr.result || ''));
+      fr.onerror = () => ok('');
+      fr.readAsDataURL(b);
+    });
+    if (!fotoValida(fotoSala)) fotoSala = '';
+  } catch (e) { fotoSala = ''; }
+  return fotoSala;
+}
 /* El avatar que se enseña en la sala. Manda la CUENTA: si tienes una y su
    avatar es del elenco, ese es el que viaja. Antes esto miraba solo
    `localStorage.__navPartyAvatar`, o sea que la foto que te pusieras en el
@@ -4071,7 +4103,7 @@ function apuntaAv(who, av) {
 function avatar(who) {
   const el = document.createElement('span'); el.className = 'av';
   /* Tu propia foto de cuenta: solo la ves tu, porque no viaja por la sala. */
-  const foto = (sala && who === sala.name) ? miFoto() : '';
+  const foto = (sala && who === sala.name) ? miFoto() : (fotos[who] || '');
   if (foto) {
     const im = document.createElement('img');
     im.src = foto; im.alt = '';
@@ -4380,7 +4412,15 @@ function start(code, asHost, rol) {
     sala.status = 'Sin conexión con el servidor'; pintaSala(); return;
   }
   sala.ws = ws;
-  ws.onopen = () => { reintento = 0; send({ t: 'join', room: code, name, host: asHost, rol: sala.rol }); };
+  ws.onopen = async () => {
+    reintento = 0;
+    const join = { t: 'join', room: code, name, host: asHost, rol: sala.rol };
+    /* La foto va UNA vez, aqui: en cada mensaje serian kilobytes por latido.
+       El resto del protocolo se queda igual. */
+    const f = await fotoParaLaSala();
+    if (f) join.foto = f;
+    send(join);
+  };
   ws.onmessage = (ev) => {
     if (!sala || sala.ws !== ws) return;
     let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
@@ -4398,9 +4438,9 @@ function start(code, asHost, rol) {
       actualizarShare();
     }
     else if (m.t === 'peers') { sala.n = m.n; if (m.joined && m.who) logAct(m.who, 'se unió a la sala'); else if (m.left && m.who) logAct(m.who, 'salió de la sala'); }
-    else if (m.t === 'ev') { apuntaAv(m.from, m.av); applyRemote(m); }
+    else if (m.t === 'ev') { apuntaAv(m.from, m.av); apuntaFoto(m.from, m.foto); applyRemote(m); }
     else if (m.t === 'beat') {
-      apuntaAv(m.from, m.av);
+      apuntaAv(m.from, m.av); apuntaFoto(m.from, m.foto);
       if (MANDO.on) mandoBeat(m);
       else if (!sala.host) {
         const hadLock = !!sala.lock; sala.lock = !!m.lock;
@@ -4411,7 +4451,7 @@ function start(code, asHost, rol) {
         if (typeof m.time === 'number') applyBeat(m);
       }
     }
-    else if (m.t === 'chat') { apuntaAv(m.from, m.av); logChat(m.from || '?', String(m.msg || '')); }
+    else if (m.t === 'chat') { apuntaAv(m.from, m.av); apuntaFoto(m.from, m.foto); logChat(m.from || '?', String(m.msg || '')); }
     else if (m.t === 'error') sala.status = 'Error: ' + m.msg;
     pintaSala();
   };
