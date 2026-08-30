@@ -147,7 +147,10 @@ export function perfil(u) {
     avatar: u.avatar || '',
     admin: u.rol === 'admin',
     acceso: tieneAcceso(u),
-    caduca: u.acceso_caduca || null
+    caduca: u.acceso_caduca || null,
+    // Solo si esta atada o no. El identificador de Naviris no sale de aqui:
+    // no le sirve de nada a la pagina y es lo que abre la puerta.
+    naviris: !!u.naviris_id
   };
 }
 
@@ -169,6 +172,100 @@ export async function cambiaPerfil(env, usuarioId, cuerpo) {
   await env.DB.prepare('UPDATE usuarios SET ' + campos.join(', ') + ' WHERE id = ?1').bind(...vals).run();
   const u = await env.DB.prepare('SELECT * FROM usuarios WHERE id = ?1').bind(usuarioId).first();
   return { estado: 200, cuerpo: perfil(u) };
+}
+
+// ---- vinculo con Naviris --------------------------------------------------
+//
+// Naviris deja de dar acceso a la biblioteca por traer una clave dentro del
+// instalador: eso metia a CUALQUIERA que usara Naviris. Ahora entra a la
+// cuenta de MOOVIN que este ATADA a esa cuenta de Naviris, y a ninguna otra.
+//
+// Lo que NO se hace, a proposito: fiarse del correo que diga Naviris. Las
+// cuentas de Naviris son correo+contrasena y ese correo no se verifica
+// nunca, asi que cualquiera podria registrarse alli con el correo de otro y
+// entrar en su MOOVIN. Se ata un identificador OPACO de Naviris, y el atado
+// se hace desde dentro de MOOVIN, que es donde el correo si esta verificado
+// (hay que haber puesto el codigo que llego al buzon). O sea que en el
+// momento de atar las dos partes estan probadas: la de Naviris porque hay
+// que saber su contrasena, y la de MOOVIN por el codigo.
+//
+// La prueba que trae Naviris es `v1.<id>.<caduca>.<firma>`, firmada por su
+// worker con NAVIRIS_VINCULO_KEY, que es un secreto de los DOS. Dura poco a
+// proposito: dentro de esa ventana una prueba robada se podria reusar, y la
+// unica defensa es que la ventana sea corta. No viaja por ningun sitio raro
+// (del proceso de Naviris a este worker, por HTTPS).
+
+const VENTANA_PRUEBA = 10 * 60;   // no se acepta una prueba que dure mas
+const ID_NAVIRIS = /^[A-Za-z0-9._:-]{1,120}$/;
+
+async function firmaNaviris(env, texto) {
+  const secreto = (env.NAVIRIS_VINCULO_KEY || "").trim();
+  if (!secreto) return "";
+  const clave = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(secreto),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  const f = new Uint8Array(await crypto.subtle.sign('HMAC', clave, new TextEncoder().encode(texto)));
+  let s = "";
+  for (const b of f) s += String.fromCharCode(b);
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+/* Devuelve el identificador de Naviris si la prueba vale, o "" si no. */
+export async function idDeNaviris(env, prueba) {
+  if (!(env.NAVIRIS_VINCULO_KEY || "").trim()) return "";
+  const p = String(prueba || "").split(".");
+  if (p.length !== 4 || p[0] !== "v1") return "";
+  const [, id, caduca, sello] = p;
+  if (!ID_NAVIRIS.test(id)) return "";
+  const cad = parseInt(caduca, 10);
+  if (!(cad > ahora())) return "";
+  // Una prueba que dice durar un ano no vale: acota la ventana de reuso
+  // aunque el reloj del otro lado ande mal o alguien se pase de listo.
+  if (cad - ahora() > VENTANA_PRUEBA) return "";
+  const esperado = await firmaNaviris(env, "v1." + id + "." + caduca);
+  return (esperado && igual(sello, esperado)) ? id : "";
+}
+
+/* Atar. Pide sesion de MOOVIN (la trae el que llama) y una prueba viva. */
+export async function vinculaNaviris(env, usuarioId, cuerpo) {
+  const id = await idDeNaviris(env, cuerpo && cuerpo.prueba);
+  if (!id) return { estado: 400, cuerpo: { error: 'la prueba de Naviris no vale o caduco' } };
+  // Una cuenta de Naviris ata a UNA de MOOVIN. Si ya estaba en otra se dice,
+  // en vez de mover el vinculo por detras y dejar a alguien fuera sin saber
+  // por que.
+  const otra = await env.DB.prepare('SELECT id FROM usuarios WHERE naviris_id = ?1').bind(id).first();
+  if (otra && otra.id !== usuarioId) {
+    return { estado: 409, cuerpo: { error: 'esa cuenta de Naviris ya esta vinculada a otra cuenta de MOOVIN' } };
+  }
+  await env.DB.prepare('UPDATE usuarios SET naviris_id = ?2 WHERE id = ?1').bind(usuarioId, id).run();
+  const u = await env.DB.prepare('SELECT * FROM usuarios WHERE id = ?1').bind(usuarioId).first();
+  return { estado: 200, cuerpo: perfil(u) };
+}
+
+export async function desvinculaNaviris(env, usuarioId) {
+  await env.DB.prepare('UPDATE usuarios SET naviris_id = NULL WHERE id = ?1').bind(usuarioId).run();
+  const u = await env.DB.prepare('SELECT * FROM usuarios WHERE id = ?1').bind(usuarioId).first();
+  return { estado: 200, cuerpo: perfil(u) };
+}
+
+/* Entrar. Devuelve una SESION, no el token de la biblioteca: a partir de ahi
+   el camino es el mismo que el del codigo del correo, asi que una cuenta
+   vinculada pero sin acceso cae en la sala de espera igual que las demas.
+   Vincular y tener licencia son cosas distintas, y esto lo deja claro. */
+export async function entraConNaviris(env, req, cuerpo) {
+  const id = await idDeNaviris(env, cuerpo && cuerpo.prueba);
+  if (!id) return { estado: 401, cuerpo: { error: 'la prueba de Naviris no vale o caduco' } };
+  const u = await env.DB.prepare('SELECT * FROM usuarios WHERE naviris_id = ?1').bind(id).first();
+  if (!u) {
+    // No es un error de nadie: es que todavia no se ha atado. La pagina lo
+    // usa para ofrecer el vinculo en vez de dar un fallo.
+    return { estado: 404, cuerpo: { error: 'esta cuenta de Naviris no esta vinculada', vincular: true } };
+  }
+  if (u.estado === 'bloqueada') return { estado: 403, cuerpo: { error: 'cuenta bloqueada' } };
+  const s = await abreSesion(env, req, u.id);
+  await evento(env, 'entrar-naviris', u.correo, null);
+  return { estado: 200, cuerpo: { token: s.token, caduca: s.caduca, usuario: perfil(u) } };
 }
 
 // ---- sesiones -------------------------------------------------------------

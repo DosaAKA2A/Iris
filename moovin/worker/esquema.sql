@@ -21,12 +21,19 @@ CREATE TABLE IF NOT EXISTS usuarios (
   avatar        TEXT NOT NULL DEFAULT '',        -- nombre del elenco, o 'avatares/<id>.webp' en el bucket
   rol           TEXT NOT NULL DEFAULT 'usuario', -- usuario | admin
   estado        TEXT NOT NULL DEFAULT 'activa',  -- activa | bloqueada
+  -- Identificador OPACO de la cuenta de Naviris atada a esta, o NULL. NO es
+  -- el correo: el de Naviris no se verifica nunca y no prueba nada. Se ata
+  -- desde dentro de MOOVIN, con la sesion puesta.
+  naviris_id    TEXT,
   acceso        INTEGER NOT NULL DEFAULT 0,      -- 0 = sin biblioteca, 1 = con biblioteca
   acceso_caduca INTEGER,                         -- NULL = sin caducidad
   creado        INTEGER NOT NULL,
   visto         INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS ix_usuarios_creado ON usuarios(creado DESC);
+-- Una cuenta de Naviris ata a UNA de MOOVIN. En SQLite un indice unico deja
+-- pasar todos los NULL que quiera, asi que las no vinculadas no estorban.
+CREATE UNIQUE INDEX IF NOT EXISTS ux_usuarios_naviris ON usuarios(naviris_id);
 
 -- Código de acceso de un solo uso. Uno vivo por correo: pedir otro pisa el
 -- anterior, así que nadie acumula intentos abriendo códigos.

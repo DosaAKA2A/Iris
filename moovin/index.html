@@ -347,6 +347,10 @@ body.con-cuenta #btn-perfil{display:flex}
 #perfil.solo-pantalla #pf-elenco,
 #perfil.solo-pantalla #pf-lbl-nombre,
 #perfil.solo-pantalla #pf-fila-nombre{display:none}
+/* Sin sesion no se puede atar ni soltar: se ve el estado y nada mas. */
+#perfil.solo-pantalla #pf-nav-b{display:none}
+#pf-nav-b{flex:none; padding:8px 13px; font-size:12px}
+#pf-nav-b.oculto{display:none}
 #pf-err{margin-top:12px; font-size:12.5px; color:var(--err); display:none}
 #pf-ok{margin-top:12px; font-size:12.5px; color:var(--ok); display:none}
 /* Cerrar sesion se aparta del resto: en una tele o en un ordenador prestado
@@ -2043,6 +2047,14 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
           <span class="pf-punto"></span>
           <span class="pf-lt"><b id="pf-lic-t"></b><span id="pf-lic-d"></span></span>
           <span class="pf-cod" id="pf-cod" title="Tu código, para pedir soporte"></span>
+        </div>
+
+        <!-- El vínculo con Naviris. Atarlo se hace desde aquí a propósito:
+             es el único lado donde el correo está verificado de verdad. -->
+        <div class="pf-lic" id="pf-nav">
+          <span class="pf-punto"></span>
+          <span class="pf-lt"><b id="pf-nav-t"></b><span id="pf-nav-d"></span></span>
+          <button class="btn" id="pf-nav-b"></button>
         </div>
 
         <div id="pf-err"></div>
@@ -5044,7 +5056,7 @@ function ePinta(cual) {
   $('#e-pase').classList.toggle('hidden', cual !== 'pase');
   $('#e-cambia').textContent = cual === 'pase' ? 'Entrar con mi cuenta' : 'Tengo un pase';
   $('#e-sub').textContent = cual === 'pase'
-    ? 'Escribe el pase que te dieron. En Naviris se pone solo.'
+    ? 'Escribe el pase que te dieron. Caduca, y se puede anular.'
     : 'Entra con tu cuenta. Te mandamos un código al correo, sin contraseñas.';
   $('#pase-err').style.display = 'none';
   const foco = { correo: '#e-correo-in', codigo: '#e-codigo-in', pase: '#pase-in' }[cual];
@@ -5239,6 +5251,21 @@ function pintaPerfil() {
   $('#pf-lic-d').textContent = u.acceso
     ? (u.caduca ? 'Hasta el ' + fechaLarga(u.caduca) : 'Sin fecha de caducidad')
     : 'Pídeselo a quien lleva la biblioteca.';
+  /* La fila de Naviris. Tres estados: atada, sin atar pero con Naviris
+     delante (se puede atar ahora), y sin Naviris (se dice donde hacerlo). */
+  const nav = $('#pf-nav');
+  const atada = !!u.naviris;
+  nav.classList.toggle('si', atada);
+  nav.classList.toggle('no', !atada);
+  $('#pf-nav-t').textContent = atada ? 'Vinculada con Naviris' : 'Sin vincular con Naviris';
+  $('#pf-nav-d').textContent = atada
+    ? 'Naviris entra solo a esta cuenta, sin pedirte nada.'
+    : (hayNaviris()
+        ? 'Vincúlala y Naviris entrará solo a esta cuenta.'
+        : 'Abre MOOVIN desde Naviris para vincularlo.');
+  const nb = $('#pf-nav-b');
+  nb.textContent = atada ? 'Desvincular' : 'Vincular';
+  nb.classList.toggle('oculto', !atada && !hayNaviris());
   const cont = $('#pf-elenco'); cont.innerHTML = '';
   AVATARES.forEach((id) => {
     const b = document.createElement('button');
@@ -5294,6 +5321,12 @@ $('#pf-guardar').addEventListener('click', () => {
   guardaPerfil({ nombre: n });
 });
 $('#pf-quitar').addEventListener('click', () => guardaPerfil({ avatar: '' }));
+$('#pf-nav-b').addEventListener('click', async () => {
+  const b = $('#pf-nav-b');
+  b.disabled = true;
+  try { await (CUENTA && CUENTA.naviris ? desvinculaNaviris() : vinculaNaviris()); }
+  finally { b.disabled = false; }
+});
 
 /* La foto se recorta y se encoge AQUI. El worker acepta 200 KB y no sabe de
    imagenes: le llega ya cuadrada, a 256 y en webp. Una foto de movil son
@@ -5351,6 +5384,72 @@ $('#pf-salir').addEventListener('click', async () => {
   pfAviso('Cerrando la sesión...');
   await salir();
 });
+
+/* --------------------------- Naviris ---------------------------------
+   Naviris deja de abrir la biblioteca por traer una clave dentro del
+   instalador -- eso metia a cualquiera que usara Naviris -- y pasa a entrar
+   a la cuenta de MOOVIN que este ATADA a esa cuenta de Naviris.
+
+   El contrato con Naviris es UNA funcion que su preload inyecta:
+
+       window.__navMoovinIdentidad() -> Promise<string>
+
+   La cadena es `v1.<id>.<caduca>.<firma>`, firmada por el worker de Naviris
+   con el secreto que comparte con el de MOOVIN. Aqui no se mira por dentro:
+   se pasa tal cual y el worker decide. Si la funcion no esta (cualquier
+   navegador que no sea Naviris) todo esto no hace nada.
+
+   Lo que NO se hace: fiarse de un correo que diga Naviris. Alli el correo no
+   se verifica nunca, asi que no prueba quien eres. */
+const NAV = { puede: false };   // hay Naviris y su cuenta aun no esta atada
+const hayNaviris = () => typeof window.__navMoovinIdentidad === "function";
+async function identidadNaviris() {
+  if (!hayNaviris()) return "";
+  try { return String(await window.__navMoovinIdentidad() || ""); }
+  catch (e) { return ""; }
+}
+/* Entrar por el vinculo. Devuelve "ok", "vincular" (hay Naviris pero esa
+   cuenta no esta atada a ninguna de MOOVIN) o "no". */
+async function entrarConNaviris() {
+  const prueba = await identidadNaviris();
+  if (!prueba) return "no";
+  let r;
+  try {
+    r = await fetch(MOOVIN_API + "/entrar-naviris", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prueba })
+    });
+  } catch (e) { paseSinRed = true; return "no"; }
+  let j = null; try { j = await r.json(); } catch (e) { /* vacio */ }
+  j = j || {};
+  if (r.status === 404 && j.vincular) { NAV.puede = true; return "vincular"; }
+  if (!r.ok || !j.token) return "no";
+  /* Devuelve una SESION, no el token de la biblioteca: de aqui en adelante
+     el camino es el mismo que el del codigo del correo, asi que una cuenta
+     vinculada pero sin licencia cae en la sala de espera como todas. */
+  guardaSesion(j.token);
+  CUENTA = j.usuario || null;
+  return "ok";
+}
+/* Atar la cuenta que hay abierta a la de Naviris. Pide las dos cosas a la
+   vez: la sesion de MOOVIN (que ya esta puesta) y una prueba viva. */
+async function vinculaNaviris() {
+  const prueba = await identidadNaviris();
+  if (!prueba) { pfAviso("Abre MOOVIN desde Naviris para poder vincularlo.", true); return; }
+  const r = await apiCuenta("/cuenta/naviris", { method: "POST", body: JSON.stringify({ prueba }) })
+    .catch(() => null);
+  if (!r) { pfAviso("No se pudo conectar con la biblioteca.", true); return; }
+  if (!r.ok) { pfAviso(r.j.error || "No se pudo vincular.", true); return; }
+  CUENTA = r.j; NAV.puede = false; pintaPerfil();
+  pfAviso("Vinculado con Naviris. La próxima vez entras solo.");
+}
+async function desvinculaNaviris() {
+  const r = await apiCuenta("/cuenta/naviris", { method: "DELETE" }).catch(() => null);
+  if (!r) { pfAviso("No se pudo conectar con la biblioteca.", true); return; }
+  if (!r.ok) { pfAviso(r.j.error || "No se pudo desvincular.", true); return; }
+  CUENTA = r.j; NAV.puede = hayNaviris(); pintaPerfil();
+  pfAviso("Desvinculado. Naviris ya no entra solo a esta cuenta.");
+}
 
 /* ------------------------- Salir de verdad -------------------------
    Cerrar sesion tiene que significar que hay que volver a entrar con el
@@ -5430,10 +5529,23 @@ async function salir(op) {
   if (await entrarConPantalla()) { arranca(); return; }
   const q = await entrarConCuenta();
   if (q === 'ok') { arranca(); return; }
+  /* Naviris, por VINCULO: entra a la cuenta atada a la suya, no a la
+     biblioteca a secas. Devuelve una sesion, asi que se canjea como siempre
+     y una cuenta sin licencia acaba en la sala de espera. */
+  if (!fuera) {
+    const n = await entrarConNaviris();
+    if (n === 'ok') {
+      const q2 = await entrarConCuenta();
+      if (q2 === 'ok') { arranca(); return; }
+      if (q2 === 'espera') { salaDeEspera(); return; }
+    }
+  }
   if (!fuera && await entrar(guardado)) { arranca(); return; }
-  // Naviris trae su propia clave: entra sin que nadie escriba nada, aunque en
-  // este equipo no se haya usado nunca el pase. En cualquier otro navegador
-  // esta rama no existe.
+  /* PUENTE, a quitar. La clave que Naviris mete en su instalador abre la
+     biblioteca a cualquiera que use Naviris, que es justo lo que se esta
+     quitando. Se deja hasta que la version de Naviris que firma la prueba
+     este publicada: retirarla antes dejaria fuera a quien no actualice.
+     Cuando se quite, va tambien NAVIRIS_KEY del worker. */
   if (!fuera && await entrarConApp()) { arranca(); return; }
   // Con sesión pero sin acceso no se pide nada: se espera.
   if (q === 'espera') { salaDeEspera(); return; }

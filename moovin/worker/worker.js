@@ -76,7 +76,8 @@ import { barreVencidos } from './limites.js';
 import {
   pideCodigo, verificaCodigo, sesionDe, cierraSesion, perfil, tieneAcceso,
   cambiaPerfil, vinculoNuevo, vinculoMira, vinculoConfirma, vinculoEstado,
-  dispositivoDe, dispositivoBaja, paseTemporalOk
+  dispositivoDe, dispositivoBaja, paseTemporalOk,
+  entraConNaviris, vinculaNaviris, desvinculaNaviris
 } from './cuentas.js';
 import * as backoffice from './admin.js';
 
@@ -164,6 +165,24 @@ export default {
       return json(await nuevoToken(env));
     }
 
+    /* Entrar por el VINCULO con Naviris. Es lo que sustituye a la clave de
+       arriba: en vez de abrirle la biblioteca a cualquiera que use Naviris,
+       abre la SESION de la cuenta de MOOVIN atada a esa cuenta de Naviris.
+       Devuelve una sesion, no el token de la biblioteca, asi que de aqui en
+       adelante el camino es identico al del codigo del correo: si la cuenta
+       no tiene acceso, sala de espera. El detalle esta en cuentas.js.
+
+       Cuando Naviris publique la version que firma la prueba, `/entrar-app`
+       y NAVIRIS_KEY se pueden retirar. Hasta entonces conviven: quitarla
+       antes dejaria fuera a quien todavia no haya actualizado. */
+    if (url.pathname === '/entrar-naviris' && req.method === 'POST') {
+      if (!env.DB) return json({ error: "las cuentas no estan configuradas" }, 503);
+      let cuerpo = {};
+      try { cuerpo = await req.json(); } catch (e) { /* cuerpo raro */ }
+      const r = await entraConNaviris(env, req, cuerpo);
+      return json(r.cuerpo, r.estado);
+    }
+
     /* ---- cuentas, pantallas y emparejamiento -------------------------------
        Todo lo de aqui abajo acaba en el MISMO token firmado de arriba. El
        porton no se entera de que existen las cuentas: solo ve el token. */
@@ -211,7 +230,8 @@ export default {
        solo si la ruta lo pide: una sesion no vale como pase. */
     if (url.pathname === '/cuenta/yo' || url.pathname === '/cuenta/pase'
       || url.pathname === '/cuenta/perfil' || url.pathname === '/cuenta/avatar'
-      || url.pathname === '/cuenta/salir' || url.pathname === '/vincular/confirmar') {
+      || url.pathname === '/cuenta/salir' || url.pathname === '/vincular/confirmar'
+      || url.pathname === '/cuenta/naviris') {
 
       if (url.pathname === '/cuenta/salir' && req.method === 'POST') {
         return resp(await cierraSesion(env, req));
@@ -245,6 +265,15 @@ export default {
       }
       if (url.pathname === '/vincular/confirmar' && req.method === 'POST') {
         return resp(await vinculoConfirma(env, req, u, await cuerpoDe()));
+      }
+      /* Atar esta cuenta a la de Naviris que trae la prueba, o soltarla. Se
+         hace desde AQUI, con la sesion puesta, porque este es el lado donde
+         el correo esta verificado de verdad. */
+      if (url.pathname === '/cuenta/naviris' && req.method === 'POST') {
+        return resp(await vinculaNaviris(env, u.id, await cuerpoDe()));
+      }
+      if (url.pathname === '/cuenta/naviris' && req.method === 'DELETE') {
+        return resp(await desvinculaNaviris(env, u.id));
       }
       return json({ error: 'metodo' }, 405);
     }

@@ -1,3 +1,7 @@
 # Estado local de wrangler dev (nunca al repo)
 **/.wrangler/
 node_modules/
+
+# Secretos de wrangler dev: NUNCA al repo
+.dev.vars
+**/.dev.vars
