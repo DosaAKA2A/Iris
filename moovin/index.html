@@ -4046,15 +4046,39 @@ function narrate(kind, who, text) {
    cae a la inicial de siempre, que es lo que pintan los clientes viejos. */
 const AVATARES = ['aria', 'pj1', 'pj2', 'pj3', 'pj4', 'pj5', 'pj6', 'pj7', 'pj8', 'pj9', 'pj10', 'pj11'];
 const avs = {};   // nombre -> id de avatar, aprendido de los mensajes de la sala
+/* El avatar que se enseña en la sala. Manda la CUENTA: si tienes una y su
+   avatar es del elenco, ese es el que viaja. Antes esto miraba solo
+   `localStorage.__navPartyAvatar`, o sea que la foto que te pusieras en el
+   perfil no llegaba nunca al Watch Party — lo canto Dosa el 2026-08-30.
+
+   Con una FOTO subida no se manda nada por ahora: `av` viaja en cada mensaje
+   y una foto ahi seria kilobytes por latido. La ves tu (ver `miFoto`), y a
+   los demas les llega tu inicial. */
 function miAv() {
+  if (CUENTA && AVATARES.includes(CUENTA.avatar)) return CUENTA.avatar;
   try { const v = localStorage.__navPartyAvatar; return AVATARES.includes(v) ? v : ''; }
   catch (e) { return ''; }
+}
+/* Tu foto de la cuenta, para pintarte a TI en el chat. No sale de este
+   navegador. */
+function miFoto() {
+  if (!CUENTA || !CUENTA.avatar || AVATARES.includes(CUENTA.avatar)) return '';
+  return urlAvatar(CUENTA.avatar);
 }
 function apuntaAv(who, av) {
   if (who && AVATARES.includes(av)) avs[who] = av;
 }
 function avatar(who) {
   const el = document.createElement('span'); el.className = 'av';
+  /* Tu propia foto de cuenta: solo la ves tu, porque no viaja por la sala. */
+  const foto = (sala && who === sala.name) ? miFoto() : '';
+  if (foto) {
+    const im = document.createElement('img');
+    im.src = foto; im.alt = '';
+    im.addEventListener('error', () => { el.innerHTML = ''; el.style.background = nameColor(who); el.textContent = (who || '?').trim().charAt(0).toUpperCase() || '?'; });
+    el.appendChild(im);
+    return el;
+  }
   const id = avs[who];
   if (id && AVATARES.includes(id)) {
     const img = document.createElement('img');
@@ -4442,6 +4466,16 @@ function panelAbre(force) {
   const p = $('#party');
   const abrir = force !== undefined ? force : p.classList.contains('hidden');
   p.classList.toggle('hidden', !abrir);
+  /* El nombre lo propone la CUENTA, y se rellena AL ABRIR el panel: al
+     cargar la pagina `CUENTA` aun es null (la sesion se canjea despues), asi
+     que puesto arriba no llegaba nunca. Solo si el campo esta vacio: lo que
+     la persona haya escrito manda. */
+  if (abrir && !$('#p-name').value.trim()) {
+    $('#p-name').value = (CUENTA && CUENTA.nombre) || localStorage.__navPartyName || '';
+  }
+  // El selector tambien: al cargar la pagina se pinto sin cuenta, y el avatar
+  // del perfil no quedaba marcado.
+  if (abrir) pintaSelectorAv();
 }
 $('#btn-party').addEventListener('click', () => panelAbre());
 $('#p-close').addEventListener('click', () => panelAbre(false));
@@ -5017,7 +5051,9 @@ function arranca() {
   if (qs.get('sala')) {
     $('#p-codein').value = qs.get('sala').toUpperCase();
     panelAbre(true);
-    $('#p-name').value = localStorage.__navPartyName || '';
+    /* El nombre de la sala lo propone la CUENTA: es el que la persona ya eligio
+   en su perfil. Si no hay cuenta, el de siempre. Se puede cambiar a mano. */
+$('#p-name').value = (CUENTA && CUENTA.nombre) || localStorage.__navPartyName || '';
   }
   pintaSala();
   ccPinta();
