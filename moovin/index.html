@@ -208,6 +208,142 @@ body:has(#loader.hidden) #mando-bar{display:none}
 #me-cod{width:100%; text-align:center; font-family:var(--mono); font-size:24px; letter-spacing:.2em; text-transform:uppercase}
 #me-ok{margin-top:12px; width:100%}
 
+/* --- La barra de "seguir viendo" --------------------------------------
+   Al volver a la biblioteca el capitulo sigue sonando por detras, y el unico
+   camino de vuelta era una X gris de 32 px que ademas se iba con el scroll.
+   Esta barra se queda pegada abajo mientras la biblioteca esta delante: dice
+   que se esta viendo, deja pausarlo sin salir y al pulsarla vuelve al
+   reproductor por donde se quedo. */
+#nowbar{
+  position:fixed; left:0; right:0; bottom:0; z-index:28;
+  display:flex; align-items:center; gap:12px;
+  padding:10px var(--gutter) calc(10px + env(safe-area-inset-bottom));
+  background:rgba(14,14,17,.72);
+  backdrop-filter:blur(22px) saturate(1.3); -webkit-backdrop-filter:blur(22px) saturate(1.3);
+  border-top:1px solid var(--line);
+}
+#nowbar.hidden{display:none}
+/* Lo mismo que el mando: encima del video estorbaria. Solo mientras la
+   biblioteca esta delante. */
+body:has(#loader.hidden) #nowbar{display:none}
+/* Con el telefono de mando manda la barra del mando, que ya hace esto y mas. */
+.modo-mando #nowbar{display:none}
+/* El hueco de abajo. La altura la mide el propio JS (`--alto-nowbar`):
+   en el movil la barra es mas baja y con muesca lleva ademas el safe-area,
+   asi que suponerla dejaba el pie tapado o un hueco de mas. */
+body.con-nowbar .lib{padding-bottom:calc(var(--alto-nowbar,63px) + 42px)}
+/* Y el hero, que mide una pantalla entera: sin esto la franja de cristal con
+   el titulo y los botones se queda justo debajo de la barra. */
+body.con-nowbar #lib-hero{height:calc(100dvh - var(--alto-top,52px) - var(--alto-nowbar,63px))}
+/* La linea de progreso va pegada al filo de arriba, como en la barra del
+   reproductor. El acento de la interfaz es neutro, asi que blanco. */
+#nb-linea{position:absolute; left:0; right:0; top:0; height:2px; background:rgba(255,255,255,.10)}
+#nb-linea i{display:block; height:100%; width:0; background:var(--text); transition:width .25s linear}
+#nb-ir{
+  flex:1; min-width:0; display:flex; align-items:center; gap:12px;
+  text-align:left; padding:0; color:inherit;
+}
+.nb-mini{
+  width:64px; height:36px; flex:0 0 auto; border-radius:6px; overflow:hidden;
+  background:rgba(255,255,255,.06); transition:outline-color .15s;
+  outline:1px solid transparent; outline-offset:0;
+}
+.nb-mini img{width:100%; height:100%; object-fit:cover; display:block}
+.nb-txt{min-width:0; display:flex; flex-direction:column; gap:2px}
+#nb-tit{
+  font-size:13.5px; font-weight:600; color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+#nb-sub{
+  font-size:11.5px; color:var(--dim);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+#nb-sub b{font-family:var(--mono); font-weight:600; color:var(--muted)}
+#nb-ir:hover .nb-mini{outline-color:var(--muted)}
+#nowbar .nb-bot{
+  width:42px; height:42px; flex:0 0 auto; border-radius:12px;
+  border:1px solid var(--line-2); color:var(--muted);
+  display:flex; align-items:center; justify-content:center;
+  transition:color .15s,border-color .15s;
+}
+#nowbar .nb-bot:hover{color:var(--text); border-color:var(--muted)}
+#nowbar .nb-bot svg{width:18px; height:18px}
+/* Con la misma cuenta de especificidad que la regla de arriba: `#nowbar
+   .nb-bot` le ganaba a `#nb-pp` a secas y el icono salia blanco sobre blanco,
+   o sea invisible. */
+#nowbar #nb-pp{background:var(--text); color:var(--sobre-acc); border-color:var(--text)}
+#nowbar #nb-pp:hover{color:var(--sobre-acc); border-color:var(--text); opacity:.86}
+@media (max-width:560px){
+  #nowbar{gap:10px}
+  /* El reloj se queda tambien en el movil: cabe de sobra y es la mitad de
+     lo que se viene a mirar. El que se recorta es el titulo, que para eso
+     lleva puntos suspensivos. */
+  .nb-mini{width:52px; height:30px}
+  #nowbar .nb-bot{width:40px; height:40px}
+}
+
+/* --- El perfil de la cuenta -------------------------------------------
+   El worker ya servia /cuenta/yo, /cuenta/perfil y /cuenta/avatar desde que
+   existen las cuentas, pero no habia por donde verlos: se entraba y ya. Aqui
+   se mira quien eres, si tienes acceso a la biblioteca y hasta cuando, se
+   cambia el nombre y la foto, y se cierra la sesion. */
+#btn-perfil{
+  width:32px; height:32px; flex:0 0 auto; border-radius:50%; overflow:hidden;
+  border:1px solid var(--line-2); display:none; align-items:center; justify-content:center;
+  font-size:12.5px; font-weight:700; color:var(--text); transition:border-color .15s;
+}
+body.con-cuenta #btn-perfil{display:flex}
+#btn-perfil:hover{border-color:var(--muted)}
+#btn-perfil img{width:100%; height:100%; object-fit:cover; display:block}
+/* En el televisor y de mando el perfil no pinta nada: alli no se escribe. */
+.modo-mando #btn-perfil,html[data-plataforma="tv"] #btn-perfil{display:none}
+
+.pf-card{max-width:440px}
+.pf-cab{display:flex; align-items:center; gap:16px; margin-top:18px}
+.pf-foto{
+  width:76px; height:76px; flex:0 0 auto; border-radius:50%; overflow:hidden;
+  border:1px solid var(--line-2); background:rgba(255,255,255,.05);
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; font-weight:700; color:var(--text);
+}
+.pf-foto img{width:100%; height:100%; object-fit:cover; display:block}
+.pf-cab .pf-quien{min-width:0; flex:1}
+#pf-nombre-v{font-size:16px; font-weight:700; letter-spacing:-.012em; word-break:break-word}
+#pf-correo{margin-top:3px; font-size:12.5px; color:var(--muted); word-break:break-all}
+.pf-fotos{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap}
+.pf-fotos .btn{padding:8px 13px; font-size:12px}
+/* El elenco de Verby, el mismo que ya usa el Watch Party. */
+#pf-elenco{display:flex; flex-wrap:wrap; gap:7px; margin-top:10px}
+#pf-elenco button{
+  width:42px; height:42px; border-radius:50%; overflow:hidden;
+  border:1px solid var(--line); background:rgba(255,255,255,.04);
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:700; color:var(--muted); transition:border-color .12s;
+}
+#pf-elenco button img{width:100%; height:100%; object-fit:cover; display:block}
+#pf-elenco button:hover{border-color:var(--muted)}
+#pf-elenco button.on{border-color:var(--text); outline:1px solid var(--text); outline-offset:-2px}
+
+/* La licencia. Es un campo de la cuenta, no algo que se compre: aqui solo se
+   informa, y el punto de color es lo unico que cambia. */
+.pf-lic{
+  margin-top:16px; display:flex; align-items:center; gap:11px;
+  padding:13px 14px; border:1px solid var(--line); border-radius:10px;
+}
+.pf-punto{width:8px; height:8px; border-radius:50%; flex:0 0 auto; background:var(--dim)}
+.pf-lic.si .pf-punto{background:var(--ok)}
+.pf-lic.no .pf-punto{background:var(--err)}
+.pf-lic .pf-lt{flex:1; min-width:0}
+.pf-lic .pf-lt b{display:block; font-size:13px; font-weight:600}
+.pf-lic .pf-lt span{display:block; margin-top:2px; font-size:11.5px; color:var(--dim)}
+.pf-cod{font-family:var(--mono); font-size:12px; color:var(--muted); letter-spacing:.08em}
+#pf-err{margin-top:12px; font-size:12.5px; color:var(--err); display:none}
+#pf-ok{margin-top:12px; font-size:12.5px; color:var(--ok); display:none}
+/* Cerrar sesion se aparta del resto: en una tele o en un ordenador prestado
+   volver a entrar cuesta un correo y un codigo. */
+#pf-salir{color:var(--rubi)}
+#pf-salir:hover{background:rgba(214,31,69,.12)}
+
 /* ============================ Layout ============================ */
 #row{display:flex; height:calc(100% - 52px); min-height:0}
 #stage{
@@ -1682,6 +1818,9 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
       <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M0 8L3.07945 4.30466C4.29638 2.84434 6.09909 2 8 2C9.90091 2 11.7036 2.84434 12.9206 4.30466L16 8L12.9206 11.6953C11.7036 13.1557 9.90091 14 8 14C6.09909 14 4.29638 13.1557 3.07945 11.6953L0 8ZM8 11C9.65685 11 11 9.65685 11 8C11 6.34315 9.65685 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65685 6.34315 11 8 11Z"/></svg>
       <span class="rot">Watch Party</span>
     </button>
+    <!-- El perfil. Solo asoma cuando se entro con cuenta: con el pase suelto
+         no hay a quien enseñar. -->
+    <button id="btn-perfil" title="Tu perfil" aria-label="Tu perfil"></button>
   </div>
 </header>
 
@@ -1860,6 +1999,52 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
       </div>
     </div>
 
+
+    <!-- Tu perfil: quien eres, si tienes acceso a la biblioteca, la foto y el
+         nombre que ven los demas, y la salida. -->
+    <div id="perfil" class="veil hidden">
+      <div class="dl-card pf-card">
+        <h2>Tu perfil</h2>
+        <div class="sub">Tu cuenta de MOOVIN. La foto y el nombre son los que ven los demás en el Watch Party.</div>
+
+        <div class="pf-cab">
+          <div class="pf-foto" id="pf-foto"></div>
+          <div class="pf-quien">
+            <div id="pf-nombre-v"></div>
+            <div id="pf-correo"></div>
+          </div>
+        </div>
+
+        <div class="pf-fotos">
+          <button class="btn" id="pf-subir">Subir una foto</button>
+          <button class="btn" id="pf-quitar">Quitar la foto</button>
+        </div>
+
+        <div class="lbl">O elige del elenco</div>
+        <div id="pf-elenco"></div>
+
+        <div class="lbl">Tu nombre</div>
+        <div class="fieldrow">
+          <input id="pf-nombre" class="in" maxlength="32" placeholder="Cómo te ven los demás" />
+          <button id="pf-guardar" class="btn red">Guardar</button>
+        </div>
+
+        <div class="pf-lic" id="pf-lic">
+          <span class="pf-punto"></span>
+          <span class="pf-lt"><b id="pf-lic-t"></b><span id="pf-lic-d"></span></span>
+          <span class="pf-cod" id="pf-cod" title="Tu código, para pedir soporte"></span>
+        </div>
+
+        <div id="pf-err"></div>
+        <div id="pf-ok"></div>
+
+        <div class="dl-foot">
+          <button id="pf-cerrar" class="btn">Cerrar</button>
+          <button id="pf-salir" class="btn">Cerrar sesión</button>
+        </div>
+        <input id="pf-file" type="file" accept="image/*" hidden />
+      </div>
+    </div>
     <!-- Velo de autoplay bloqueado -->
     <div id="tapveil" class="veil hidden">
       <button id="tap-btn">
@@ -1910,6 +2095,24 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
     <button id="md-si" class="si">Dar acceso</button>
     <button id="md-no">Ahora no</button>
   </div>
+</div>
+
+<!-- Seguir viendo: mientras la biblioteca esta delante, el capitulo sigue
+     sonando por detras. Esta barra dice cual es, deja pausarlo sin salir y
+     devuelve al reproductor. -->
+<div id="nowbar" class="hidden">
+  <div id="nb-linea"><i id="nb-prog"></i></div>
+  <button id="nb-ir" title="Volver al reproductor">
+    <span class="nb-mini"><img id="nb-img" alt="" /></span>
+    <span class="nb-txt">
+      <span id="nb-tit"></span>
+      <span id="nb-sub"></span>
+    </span>
+  </button>
+  <button id="nb-pp" class="nb-bot" title="Pausar" aria-label="Pausar"></button>
+  <button id="nb-volver" class="nb-bot" title="Volver al reproductor" aria-label="Volver al reproductor">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>
+  </button>
 </div>
 
 <!-- El mando, en el telefono: la biblioteca de siempre y esta barra. -->
@@ -3681,6 +3884,92 @@ function cargaCatalogo() {
     .catch(() => { reindexa(null); pintaBiblioteca(null); });
 }
 
+/* ---------------------- La barra de "seguir viendo" ----------------------
+   El video NO se para al volver a la biblioteca, y eso es a proposito: se
+   sigue escuchando mientras se busca otra cosa. Lo que faltaba era la vuelta.
+   Habia una, la X de la esquina, pero mide 32 px, no dice nada y va dentro de
+   `.lib`, que se desplaza: en cuanto se baja un poco desaparece de la
+   pantalla. Esta barra vive fija abajo mientras la biblioteca esta delante. */
+const NB = {
+  bar: $('#nowbar'), img: $('#nb-img'), tit: $('#nb-tit'),
+  sub: $('#nb-sub'), prog: $('#nb-prog'), pp: $('#nb-pp')
+};
+/* Solo el tiempo y la linea: esto se llama en cada `timeupdate` y no tiene
+   por que tocar ni la imagen ni el titulo. */
+function tickNowbar() {
+  const d = video.duration, t = video.currentTime;
+  const hayD = isFinite(d) && d > 0;
+  NB.sub.textContent = (video.paused ? 'En pausa' : 'Seguir viendo')
+    + ' · ' + fmtT(t) + (hayD ? ' / ' + fmtT(d) : '');
+  NB.prog.style.width = (hayD ? Math.min(100, (t / d) * 100) : 0) + '%';
+}
+function pintaNowbar() {
+  const hay = !!video.src;
+  document.body.classList.toggle('con-nowbar', hay);
+  NB.bar.classList.toggle('hidden', !hay);
+  if (!hay) return;
+  const u = ubicaDe(curV);
+  /* El nombre del reproductor, pero con la serie delante si no la trae ya.
+     Alli sobra, porque acabas de entrar por su ficha; aqui no: con temporadas
+     el nombre empieza por el de la temporada, y "Temporada 1 · E00" en medio
+     de la biblioteca no dice de que serie es. */
+  let rotulo = (u && nombreDe(u)) || nombrePeli || 'Reproduciendo';
+  if (u && u.serie && u.serie.titulo && rotulo.indexOf(u.serie.titulo) !== 0) {
+    rotulo = u.serie.titulo + ' · ' + rotulo;
+  }
+  NB.tit.textContent = rotulo;
+  /* La miniatura del capitulo; si no la trae, la de su serie, y si tampoco,
+     el cartel. Un archivo local no tiene ninguna y el hueco se queda vacio. */
+  const im = (u && (u.ent.miniatura || u.ent.poster))
+    || (u && u.serie && (u.serie.miniatura || u.serie.poster)) || '';
+  const nueva = im ? conPase(absCat(im)) : '';
+  if (nueva) {
+    if (NB.img.getAttribute('src') !== nueva) NB.img.src = nueva;
+    NB.img.style.display = '';
+  } else {
+    NB.img.removeAttribute('src');
+    NB.img.style.display = 'none';
+  }
+  NB.pp.innerHTML = video.paused ? IC.play : IC.pause;
+  const rot = video.paused ? 'Reproducir' : 'Pausar';
+  NB.pp.title = rot;
+  NB.pp.setAttribute('aria-label', rot);
+  /* Lo que mide la barra se publica para que el hero y el pie de la
+     biblioteca le dejen sitio. Se mide, no se supone: cambia con el ancho y
+     con el safe-area del movil. Escondida da 0 y entonces vale la de antes. */
+  const alto = Math.round(NB.bar.getBoundingClientRect().height);
+  if (alto) document.documentElement.style.setProperty('--alto-nowbar', alto + 'px');
+  tickNowbar();
+}
+function vuelveAlReproductor() {
+  if (!video.src) return;
+  $('#loader').classList.add('hidden');
+}
+$('#nb-ir').addEventListener('click', vuelveAlReproductor);
+$('#nb-volver').addEventListener('click', vuelveAlReproductor);
+/* Pausar sin salir de la biblioteca: es la mitad de la queja. Se busca otra
+   cosa en silencio y se sigue cuando toque. */
+NB.pp.addEventListener('click', () => {
+  if (!video.src) return;
+  video.paused ? playSafe() : video.pause();
+  pintaNowbar();
+});
+['play', 'pause', 'loadedmetadata', 'durationchange', 'emptied'].forEach((ev) => {
+  video.addEventListener(ev, pintaNowbar);
+});
+/* El reloj solo corre cuando la barra se ve. Con el reproductor delante seria
+   repintar cuatro veces por segundo algo que esta tapado. */
+video.addEventListener('timeupdate', () => {
+  if (video.src && !$('#loader').classList.contains('hidden')) tickNowbar();
+});
+/* El velo de la biblioteca se abre y se cierra desde media docena de sitios.
+   En vez de tocarlos todos se mira la clase: asi ninguna via nueva se olvida
+   de refrescar la barra. */
+try {
+  new MutationObserver(() => pintaNowbar())
+    .observe($('#loader'), { attributes: true, attributeFilter: ['class'] });
+} catch (e) { /* sin observer la barra se refresca igual con los eventos del video */ }
+
 /* ============================ Watch Party ============================ */
 let sala = null;        // { code, host, name, ws, ok, everOk, n, status, msgs, lock, navLock }
 let mute = 0;           // ventana anti-eco tras aplicar acciones remotas
@@ -4705,6 +4994,8 @@ function arranca() {
   }
   pintaSala();
   ccPinta();
+  pintaBotonPerfil();
+  pintaNowbar();
 }
 const dePase = async () => {
   const c = $('#pase-in').value.trim();
@@ -4843,6 +5134,176 @@ $('#es-salir').addEventListener('click', () => {
   $('#espera').classList.add('hidden');
   $('#pase').classList.remove('hidden');
   ePinta('correo');
+});
+
+/* ------------------------------ Tu perfil ------------------------------
+   El worker sirve /cuenta/yo, /cuenta/perfil y /cuenta/avatar desde que hay
+   cuentas; lo que no habia era pantalla. Aqui se mira quien eres, si tienes
+   acceso a la biblioteca y hasta cuando, se cambia el nombre y la foto, y se
+   cierra la sesion. */
+
+/* La foto puede ser una del elenco (un SVG del propio sitio) o una subida por
+   la persona, que vive en el bucket y necesita el pase para verse. Cualquier
+   otra cosa se ignora: el valor viene de la base, pero de ahi a componer una
+   URL con el hay un paso que no se da a ciegas. */
+function urlAvatar(av) {
+  if (!av) return '';
+  if (AVATARES.includes(av)) return '/avatares/' + av + '.svg';
+  if (/^avatares\/[A-Za-z0-9._-]+$/.test(av)) {
+    return conPase(MOOVIN_API + '/media?key=' + encodeURIComponent(av));
+  }
+  return '';
+}
+const inicialDe = (u) => (((u && (u.nombre || u.correo)) || '').trim().charAt(0).toUpperCase() || '?');
+function ponFoto(el, u) {
+  el.innerHTML = '';
+  const url = urlAvatar(u && u.avatar);
+  if (!url) { el.textContent = inicialDe(u); return; }
+  const img = document.createElement('img');
+  img.alt = '';
+  // Si la foto no carga (pase caido, archivo borrado) queda la inicial.
+  img.addEventListener('error', () => { el.innerHTML = ''; el.textContent = inicialDe(u); });
+  img.src = url;
+  el.appendChild(img);
+}
+/* El boton de la cabecera solo existe si se entro con cuenta: con el pase
+   suelto no hay perfil que enseñar. */
+function pintaBotonPerfil() {
+  document.body.classList.toggle('con-cuenta', !!CUENTA);
+  if (!CUENTA) return;
+  ponFoto($('#btn-perfil'), CUENTA);
+  $('#btn-perfil').title = 'Tu perfil — ' + (CUENTA.nombre || CUENTA.correo || '');
+}
+const fechaLarga = (s) => {
+  try { return new Date(s * 1000).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' }); }
+  catch (e) { return ''; }
+};
+function pfAviso(txt, mal) {
+  const e = $('#pf-err'), o = $('#pf-ok');
+  e.textContent = mal ? (txt || '') : '';
+  o.textContent = mal ? '' : (txt || '');
+  /* `block` y no `''`: los dos avisos llevan display:none en la hoja de
+     estilos, asi que vaciar el estilo en linea los deja igual de escondidos.
+     Se paso la primera vez y el panel se quedaba mudo al fallar. */
+  e.style.display = (mal && txt) ? 'block' : 'none';
+  o.style.display = (!mal && txt) ? 'block' : 'none';
+}
+function pintaPerfil() {
+  const u = CUENTA; if (!u) return;
+  ponFoto($('#pf-foto'), u);
+  $('#pf-nombre-v').textContent = u.nombre || 'Sin nombre';
+  $('#pf-correo').textContent = u.correo || '';
+  $('#pf-nombre').value = u.nombre || '';
+  $('#pf-cod').textContent = u.codigo || '';
+  $('#pf-quitar').style.display = u.avatar ? '' : 'none';
+  /* El acceso es un campo de la cuenta, no una licencia que se compre: aqui
+     solo se informa. Quien no lo tiene ni siquiera pasa de la sala de espera,
+     asi que lo normal es verlo en verde; lo que importa es la caducidad. */
+  const lic = $('#pf-lic');
+  lic.classList.toggle('si', !!u.acceso);
+  lic.classList.toggle('no', !u.acceso);
+  $('#pf-lic-t').textContent = u.acceso
+    ? 'Con acceso a la biblioteca' : 'Sin acceso a la biblioteca';
+  $('#pf-lic-d').textContent = u.acceso
+    ? (u.caduca ? 'Hasta el ' + fechaLarga(u.caduca) : 'Sin fecha de caducidad')
+    : 'Pídeselo a quien lleva la biblioteca.';
+  const cont = $('#pf-elenco'); cont.innerHTML = '';
+  AVATARES.forEach((id) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.title = 'Avatar del elenco';
+    b.className = (u.avatar === id) ? 'on' : '';
+    const img = document.createElement('img');
+    img.src = '/avatares/' + id + '.svg'; img.alt = id;
+    b.appendChild(img);
+    b.addEventListener('click', () => guardaPerfil({ avatar: id }));
+    cont.appendChild(b);
+  });
+  pintaBotonPerfil();
+}
+async function abrePerfil() {
+  if (!CUENTA) return;
+  pfAviso('');
+  $('#perfil').classList.remove('hidden');
+  pintaPerfil();
+  /* Se vuelve a preguntar al worker: el acceso lo da y lo quita Dosa a mano
+     desde el backoffice, y el CUENTA que hay en memoria puede ser de hace
+     horas. Es el unico sitio donde alguien se entera de que le caduca. */
+  let r;
+  try { r = await apiCuenta('/cuenta/yo', { method: 'GET' }); } catch (e) { return; }
+  if (r.ok && r.j.usuario) { CUENTA = r.j.usuario; pintaPerfil(); }
+}
+$('#btn-perfil').addEventListener('click', abrePerfil);
+$('#pf-cerrar').addEventListener('click', () => $('#perfil').classList.add('hidden'));
+
+async function guardaPerfil(cambios) {
+  pfAviso('');
+  let r;
+  try { r = await apiCuenta('/cuenta/perfil', { method: 'PUT', body: JSON.stringify(cambios) }); }
+  catch (e) { pfAviso('No se pudo conectar con la biblioteca.', true); return false; }
+  if (!r.ok) { pfAviso(r.j.error || 'No se pudo guardar.', true); return false; }
+  CUENTA = r.j; pintaPerfil(); pfAviso('Guardado.');
+  return true;
+}
+$('#pf-guardar').addEventListener('click', () => {
+  const n = $('#pf-nombre').value.trim();
+  if (!n) { pfAviso('El nombre no puede estar vacío.', true); return; }
+  guardaPerfil({ nombre: n });
+});
+$('#pf-quitar').addEventListener('click', () => guardaPerfil({ avatar: '' }));
+
+/* La foto se recorta y se encoge AQUI. El worker acepta 200 KB y no sabe de
+   imagenes: le llega ya cuadrada, a 256 y en webp. Una foto de movil son
+   varios MB y sin esto no entraria ninguna. */
+function fotoCuadrada(file, lado) {
+  return new Promise((ok, mal) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const l = Math.min(img.naturalWidth, img.naturalHeight);
+      if (!l) { mal(new Error('vacia')); return; }
+      const c = document.createElement('canvas');
+      c.width = c.height = lado;
+      const g = c.getContext('2d');
+      // Recorte central: en una foto de perfil la cara esta en medio.
+      g.drawImage(img, (img.naturalWidth - l) / 2, (img.naturalHeight - l) / 2, l, l, 0, 0, lado, lado);
+      c.toBlob((b) => ok(b), 'image/webp', 0.85);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); mal(new Error('imagen')); };
+    img.src = url;
+  });
+}
+$('#pf-subir').addEventListener('click', () => $('#pf-file').click());
+$('#pf-file').addEventListener('change', async () => {
+  const f = $('#pf-file').files && $('#pf-file').files[0];
+  $('#pf-file').value = '';
+  if (!f) return;
+  pfAviso('Subiendo la foto...');
+  let blob;
+  try { blob = await fotoCuadrada(f, 256); }
+  catch (e) { pfAviso('No se pudo leer esa imagen.', true); return; }
+  if (!blob) { pfAviso('Este navegador no sabe guardar webp. Elige un avatar del elenco.', true); return; }
+  let r;
+  try {
+    r = await apiCuenta('/cuenta/avatar', {
+      method: 'PUT', headers: { 'Content-Type': 'image/webp' }, body: blob
+    });
+  } catch (e) { pfAviso('No se pudo conectar con la biblioteca.', true); return; }
+  if (!r.ok) { pfAviso(r.j.error || 'No se pudo subir la foto.', true); return; }
+  CUENTA = r.j; pintaPerfil(); pfAviso('Foto cambiada.');
+});
+
+/* Desconectar. Se avisa al worker para que la sesion muera de verdad y no
+   solo en este navegador, y se recarga: media pagina cuelga del token del
+   pase y limpiarlo a mano dejaria cabos sueltos. El pase compartido, si lo
+   habia, NO se toca: es otra credencial y no es de esta cuenta. */
+$('#pf-salir').addEventListener('click', async () => {
+  $('#pf-salir').disabled = true;
+  pfAviso('Cerrando la sesión...');
+  try { await apiCuenta('/cuenta/salir', { method: 'POST', body: '{}' }); } catch (e) { /* nada */ }
+  guardaSesion(''); CUENTA = null;
+  location.reload();
 });
 
 (async () => {
@@ -5663,7 +6124,14 @@ window.MOOVIN = {
   // worker. El resto son las piezas que deciden secciones y encadenado.
   catalogo: () => bibData,
   pon: (b) => { bibData = b; reindexa(b); pintaBiblioteca(b); },
-  abreSerie, secciones: seccionesDe, siguiente: siguienteEp, ubica: ubicaDe
+  abreSerie, secciones: seccionesDe, siguiente: siguienteEp, ubica: ubicaDe,
+  // El perfil. `ponCuenta` es lo mismo que `pon` con el catalogo: deja probar
+  // el panel sin una sesion de verdad, que aqui cuesta un correo y un codigo.
+  cuenta: () => CUENTA,
+  ponCuenta: (u) => { CUENTA = u || null; pintaBotonPerfil(); if (u) pintaPerfil(); },
+  perfil: abrePerfil, recorta: fotoCuadrada,
+  // Y la barra de seguir viendo, para mirarla sin esperar a un timeupdate.
+  nowbar: pintaNowbar
 };
 })();
 </script>
