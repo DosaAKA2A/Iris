@@ -174,7 +174,10 @@ h1{font-size:20px; font-weight:700; letter-spacing:-.01em}
 .ses-it{display:flex; align-items:center; gap:10px; padding:10px 12px; border-top:1px solid var(--line)}
 .ses-it .q{flex:1; min-width:0}
 .ses-it .q b{display:block; font-size:12.5px; font-weight:600}
-.ses-it .q span{display:block; font-family:var(--mono); font-size:10.5px; color:var(--dim); margin-top:2px}
+/* Hijo DIRECTO: sin el `>`, esta regla pillaba tambien la pildora que va
+   dentro del <b> y la estiraba de lado a lado. */
+.ses-it .q > span{display:block; font-family:var(--mono); font-size:10.5px; color:var(--dim); margin-top:2px}
+.ses-it .q b .pill{display:inline-block; vertical-align:middle}
 .ses-it.muerta .q b{color:var(--dim); text-decoration:line-through}
 .ses-vacio{padding:12px; font-size:12px; color:var(--dim)}
 .reg{font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.8}
@@ -964,9 +967,10 @@ function pintaSesiones(caja, c, j) {
   }
   for (const p of pan) {
     h += '<div class="ses-it">'
-      + '<div class="q"><b>' + escapa(p.nombre || 'Pantalla')
+      + '<div class="q"><b>' + escapa(queNavegador(p.ua))
       + '<span class="pill" style="margin-left:7px">pantalla</span></b>'
-      + '<span>' + escapa(queNavegador(p.ua)) + ' &middot; visto ' + hace(p.visto) + '</span></div>'
+      + '<span>' + escapa(p.nombre || 'Pantalla') + ' &middot; emparejada ' + hace(p.creado)
+      + ' &middot; vista ' + hace(p.visto) + '</span></div>'
       + '<button class="btn chico" data-s="pantalla" data-h="' + escapa(p.hash) + '">Desconectar</button>'
       + '</div>';
   }
