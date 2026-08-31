@@ -10,10 +10,11 @@
    los iconos. Nada mas.
 
    Que NO se guarda, nunca:
-     - El catalogo y los videos. Van por el worker con un token firmado que
-       caduca cada dia; guardarlos seria repartir contenido privado desde el
-       disco de cada equipo, sin control ninguno, y ademas la primera cache de
-       una pelicula llenaria la cuota del navegador.
+     - El catalogo y los videos. El catalogo cambia cada vez que se sube algo
+       y tiene que verse al dia; los videos van por el worker con un token
+       firmado que caduca cada dia, y guardarlos seria repartir contenido de
+       pago desde el disco de cada equipo, sin control ninguno -- ademas de que
+       la primera cache de una pelicula llenaria la cuota del navegador.
      - Cualquier peticion que no sea de este mismo origen.
 
    La estrategia es red primero. Importa mas que la biblioteca este al dia que
@@ -21,7 +22,7 @@
    conexion, no la fuente de la verdad.
    ========================================================================== */
 
-const CACHE = 'moovin-interfaz-v9';
+const CACHE = 'moovin-interfaz-v10';
 
 /* La interfaz completa. Si alguno falla no se aborta la instalacion entera:
    un icono que no este no puede dejar la app sin instalar. */

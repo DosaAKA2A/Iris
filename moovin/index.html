@@ -1071,80 +1071,54 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
    intro y las portadas. Todo lo de aquí abajo pisa a propósito lo de
    arriba; se mantiene separado para poder repasarlo de un vistazo. */
 
-/* ---------- intro: título filmado con ojo de pez ----------
-   La referencia no es una tele con nieve: es un plano de cámara con lente de
-   ojo de pez — el círculo de la lente recorta la imagen por los lados y el
-   rótulo va encima, centrado. El aire de cinta queda en lo justo: grano,
-   una pasada de tracking y un pelo de aberración en el logo. */
+/* ---------- intro: la marca y ya ----------
+   Antes esto era un plano de camara con ojo de pez y aire de cinta: lente que
+   abria, pasada de tracking, grano y cuatro segundos largos. Se cayo entero el
+   2026-08-31 a pedido de Dosa. Lo que queda es un rotulo: la M entra, la
+   palabra la sigue y las dos se van. Poco mas de un segundo, sin boton de
+   saltar -- dura menos de lo que se tarda en buscarlo. */
 #intro{
   position:fixed; inset:0; z-index:100; background:#050505;
   display:flex; align-items:center; justify-content:center; overflow:hidden;
 }
-#intro.fin{opacity:0; pointer-events:none; transition:opacity .6s ease}
+#intro.fin{opacity:0; pointer-events:none; transition:opacity .34s ease}
 #intro.oculto{display:none}
-/* El círculo es más ancho que la pantalla, así que arriba y abajo se corta:
-   quedan los costados curvos del ojo de pez y el encuadre apaisado. */
-#lente{
-  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(.86);
-  width:min(148vh,124vw); aspect-ratio:1; border-radius:50%; overflow:hidden;
-  opacity:0; transition:transform 1.5s cubic-bezier(.16,.7,.3,1), opacity .9s ease;
-}
-#intro.abre #lente{opacity:1; transform:translate(-50%,-50%) scale(1)}
-#lente-fondo{
-  position:absolute; inset:0; border-radius:50%;
-  background:
-    radial-gradient(60% 50% at 50% 38%, #4a2a24 0%, #2a1a1c 42%, #140e12 68%, #0a0a0c 100%);
-}
-/* la caída de luz de una lente ancha: el centro pega y los bordes se apagan */
-#lente-brillo{
-  position:absolute; inset:0; border-radius:50%;
-  background:
-    radial-gradient(36% 30% at 50% 33%, rgba(255,196,128,.26), transparent 68%),
-    radial-gradient(circle at 50% 50%, transparent 44%, rgba(5,5,6,.55) 72%, rgba(5,5,6,.96) 92%, #050506 100%);
-  /* el filo del cristal: sin este aro la curvatura no se lee */
-  box-shadow:inset 0 0 0 1px rgba(255,225,190,.16), inset 0 0 90px 20px rgba(5,5,6,.9);
-}
 #intro-centro{
-  position:relative; z-index:3; display:flex; flex-direction:column;
-  align-items:center; gap:16px; opacity:0; transform:scale(.97);
-  padding:0 24px; text-align:center;
+  display:flex; flex-direction:column; align-items:center; gap:16px;
+  padding:0 24px;
 }
-#intro.marca #intro-centro{animation:mv-entra 1s cubic-bezier(.16,.7,.3,1) forwards}
-@keyframes mv-entra{to{opacity:1; transform:scale(1)}}
-#intro-logo .mv-m{height:clamp(58px,9.5vw,96px); width:auto; display:block}
-/* un pelo de aberración cromática, como una cinta leída de más */
-#intro.marca #intro-logo{animation:mv-crom 1.1s ease-out forwards}
-@keyframes mv-crom{
-  0%{filter:drop-shadow(3px 0 rgba(255,60,90,.55)) drop-shadow(-3px 0 rgba(70,200,255,.45))}
-  100%{filter:none}
+/* Las dos piezas arrancan invisibles: la clase que las anima se pone en el
+   mismo tick de carga, y sin esto se ven un fotograma ya puestas. */
+#intro-logo,#intro-palabra{opacity:0}
+#intro-logo .mv-m{height:clamp(58px,9vw,104px); width:auto; display:block}
+#intro-palabra{height:clamp(15px,2.3vw,25px); width:auto; color:#f6f2ea}
+#intro.marca #intro-logo{animation:mv-entra .5s cubic-bezier(.16,.84,.3,1) both}
+#intro.marca #intro-palabra{animation:mv-palabra .42s cubic-bezier(.16,.84,.3,1) .16s both}
+@keyframes mv-entra{from{opacity:0; transform:scale(.9)} to{opacity:1; transform:none}}
+@keyframes mv-palabra{from{opacity:0; transform:translateY(7px)} to{opacity:1; transform:none}}
+
+/* ---------- invitado: la biblioteca se mira, no se reproduce ----------
+   El escaparate esta abierto para cualquiera; la llave se pide en el play. Lo
+   unico que cambia en pantalla mientras no la hay es este boton. */
+#btn-entrar{
+  display:none; align-items:center; height:32px; padding:0 15px;
+  border:1px solid var(--line); border-radius:999px; background:none;
+  color:var(--text); font-size:12.5px; cursor:pointer;
+  transition:border-color .15s, color .15s;
 }
-#intro-palabra{height:clamp(15px,2.3vw,23px); width:auto; color:#f6f2ea}
-#intro-studio{
-  font-family:var(--mono); font-size:10.5px; letter-spacing:.42em;
-  text-transform:uppercase; color:rgba(246,242,234,.62); margin-top:2px;
+body.invitado #btn-entrar{display:inline-flex}
+#btn-entrar:hover{border-color:var(--muted)}
+.modo-mando #btn-entrar,html[data-plataforma="tv"] #btn-entrar{display:none}
+/* La X de las dos puertas. Antes no existia porque detras no habia nada; ahora
+   detras esta la biblioteca, asi que cerrar tiene sentido. */
+.pase-card{position:relative}
+.veil-x{
+  position:absolute; right:10px; top:10px; width:32px; height:32px;
+  display:flex; align-items:center; justify-content:center; padding:0;
+  border:0; background:none; color:var(--muted); cursor:pointer; border-radius:50%;
 }
-/* una sola pasada de tracking, como cuando la cinta engancha */
-#intro-tracking{
-  position:absolute; left:0; right:0; height:96px; top:-96px; z-index:4;
-  pointer-events:none; opacity:.5;
-  background:linear-gradient(180deg,transparent,rgba(255,255,255,.05) 38%,rgba(255,255,255,.11) 50%,rgba(255,255,255,.04) 66%,transparent);
-  mix-blend-mode:screen;
-}
-#intro.marca #intro-tracking{animation:mv-track 2.1s linear 1 forwards}
-@keyframes mv-track{from{top:-96px} to{top:100%}}
-/* grano y líneas de barrido, muy por debajo */
-#intro::after{
-  content:""; position:absolute; inset:0; pointer-events:none; z-index:5;
-  background:repeating-linear-gradient(180deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px);
-  opacity:.5;
-}
-#intro-saltar{
-  position:absolute; right:22px; bottom:20px; z-index:6;
-  font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
-  color:rgba(246,242,234,.5); background:none; border:1px solid rgba(246,242,234,.18);
-  border-radius:999px; padding:8px 16px; cursor:pointer; transition:color .15s,border-color .15s;
-}
-#intro-saltar:hover{color:#f6f2ea; border-color:rgba(246,242,234,.45)}
+.veil-x:hover{color:var(--text); background:rgba(255,255,255,.07)}
+.veil-x svg{width:17px; height:17px}
 
 /* ---------- marca de la cabecera ---------- */
 #top .tag{
@@ -1612,17 +1586,10 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 <body>
 
 <div id="intro" aria-hidden="true">
-  <div id="lente">
-    <div id="lente-fondo"></div>
-    <div id="lente-brillo"></div>
-  </div>
   <div id="intro-centro">
     <div id="intro-logo"><svg class="mv-m" viewBox="0 0 220 179.98" aria-hidden="true"><defs><linearGradient id="mvqg1" x1="212.7" y1="95.95" x2="212.7" y2="-79.05" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#8f1338"/><stop offset=".55" stop-color="#d61f45"/><stop offset="1" stop-color="#ff4d5e"/></linearGradient><linearGradient id="mvqg2" x1="281.39" y1="47.91" x2="284.51" y2="-86.12" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe08a"/><stop offset=".41" stop-color="#ffb62e"/><stop offset=".98" stop-color="#ff7a45"/></linearGradient><linearGradient id="mvqg3" x1="233.78" y1="-88.6" x2="283.28" y2="-27.85" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".02" stop-color="#7a1f2e"/><stop offset=".65" stop-color="#7a1f2e" stop-opacity="0"/></linearGradient><linearGradient id="mvqg4" x1="329.17" y1="-102.97" x2="279.67" y2="-24.72" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".02" stop-color="#7a1f2e"/><stop offset=".65" stop-color="#7a1f2e" stop-opacity="0"/></linearGradient><linearGradient id="mvqg5" x1="353.99" y1="-80.1" x2="352.99" y2="94.9" gradientTransform="translate(393.12 95.1) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset=".03" stop-color="#ff7a45"/><stop offset=".51" stop-color="#d61f45"/><stop offset="1" stop-color="#8f1338"/></linearGradient></defs><g transform="translate(0,179.98) scale(1,-1)"><path fill="url(#mvqg1)" d="M140.84,164.58c14.05-.94,25.16-12.64,25.16-26.93V27c0-14.91,12.09-27,27-27s27,12.09,27,27v107.76c0,19.7-12.6,36.99-31.36,43.03-17.33,5.57-36,.27-47.8-13.21Z"/><path fill="url(#mvqg2)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvqg3)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvqg4)" d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path fill="url(#mvqg5)" d="M0,134.76V27C0,12.09,12.09,0,27,0s27,12.09,27,27v110.65c0,7.46,3.02,14.2,7.91,19.09,4.48,4.48,10.52,7.4,17.25,7.84-11.8,13.48-30.47,18.78-47.8,13.21C12.6,171.75,0,154.46,0,134.76Z"/></g></svg></div>
     <svg id="intro-palabra" viewBox="0 0 816.44 139.16" aria-hidden="true"><path fill="currentColor" d="M255.76,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S292.18,7.27,255.76,7.27ZM255.76,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M399.87,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S436.29,7.27,399.87,7.27ZM399.87,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M177.6,59.04v80.12h-26.23V59.07c0-6.61-2.68-12.59-7.01-16.93-4.33-4.33-10.32-7.01-16.93-7.01-13.22,0-23.93,10.7-23.95,23.91v80.12h-29.36V59.07c0-6.61-2.68-12.59-7.01-16.93-4.34-4.33-10.32-7.01-16.94-7.01-13.22,0-23.94,10.72-23.94,23.94v80.09H0V59.04C0,30.95,22.77,8.18,50.86,8.18h1.76c14.35,0,27.31,5.94,36.55,15.5,9.24-9.56,22.2-15.5,36.55-15.5h1.02c28.09,0,50.86,22.77,50.86,50.86Z"/><g><rect fill="currentColor" x="641.77" y="35.5" width="30.22" height="103.21"/><rect fill="currentColor" x="641.77" width="30.22" height="23.94"/></g><path fill="currentColor" d="M816.44,74.65v64.34h-27.14v-65.52c0-21.44-17.38-38.81-38.81-38.81s-38.81,17.37-38.81,38.81v65.52h-27.14v-64.34c0-36.42,29.53-65.95,65.95-65.95s65.95,29.53,65.95,65.95Z"/><path fill="currentColor" d="M487.85,73.04V8.7h27.14v65.52c0,21.44,17.38,38.81,38.81,38.81s38.81-17.37,38.81-38.81V8.7h27.14v64.34c0,36.42-29.53,65.95-65.95,65.95s-65.95-29.53-65.95-65.95Z"/></svg>
-    <p id="intro-studio">IRIS Studio</p>
   </div>
-  <div id="intro-tracking"></div>
-  <button id="intro-saltar">Saltar</button>
 </div>
 
 <svg id="vhs-piezas" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><defs><filter id="vhs-grano" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></defs><symbol id="vhs-lomo" viewBox="996.01 0.6 233.41 1570.66"><rect fill="var(--vhs-carton,#fdf4d5)" x="996.01" y=".6" width="233.41" height="1570.66"/><rect fill="var(--vhs-f1,#ff9362)" x="996.01" y="916.12" width="233.41" height="131.03"/><rect fill="var(--vhs-f2,#fb3f35)" x="996.01" y="1047.15" width="233.41" height="131.03"/><rect fill="var(--vhs-f3,#ff29b6)" x="996.01" y="1178.17" width="233.41" height="131.03"/><rect fill="var(--vhs-f4,#b82bf1)" x="996.01" y="1309.2" width="233.41" height="131.03"/><rect fill="var(--vhs-f5,#7a32af)" x="996.01" y="1440.23" width="233.41" height="131.03"/></symbol><symbol id="vhs-cinta" viewBox="2591.87 7.68 929.50 1570.66"><g>
@@ -1832,6 +1799,9 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
       <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M0 8L3.07945 4.30466C4.29638 2.84434 6.09909 2 8 2C9.90091 2 11.7036 2.84434 12.9206 4.30466L16 8L12.9206 11.6953C11.7036 13.1557 9.90091 14 8 14C6.09909 14 4.29638 13.1557 3.07945 11.6953L0 8ZM8 11C9.65685 11 11 9.65685 11 8C11 6.34315 9.65685 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65685 6.34315 11 8 11Z"/></svg>
       <span class="rot">Watch Party</span>
     </button>
+    <!-- Sin llave. La biblioteca se ve igual, asi que esto no es un muro: es
+         la puerta, por si alguien quiere entrar antes de darle al play. -->
+    <button id="btn-entrar" title="Entrar en MOOVIN">Entrar</button>
     <!-- El perfil. Solo asoma cuando se entro con cuenta: con el pase suelto
          no hay a quien enseñar. -->
     <button id="btn-perfil" title="Tu perfil" aria-label="Tu perfil"></button>
@@ -1941,14 +1911,20 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
       <div class="caja-acc" id="caja-acc"></div>
     </div>
 
-    <!-- Entrada: la biblioteca es privada y el worker no sirve nada sin token.
+    <!-- Entrada. Ya no es el porton del sitio: el catalogo lo sirve el worker
+         sin pedir nada y las caratulas tambien. Esto sale al darle al play, que
+         es lo unico que el worker no suelta sin token.
          Dos caminos, la cuenta primero porque es el que sobrevive: el pase es
          el mismo secreto para todos y no se le puede quitar a una persona. -->
     <div id="pase" class="veil hidden">
       <div class="dl-card pase-card">
-        <h2>Biblioteca privada</h2>
+        <button id="pase-x" class="veil-x" title="Seguir mirando" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <h2>Entra para reproducir</h2>
         <div class="sub" id="e-sub">
-          Entra con tu cuenta. Te mandamos un código al correo, sin contraseñas.
+          Mirar es libre; darle al play no. Entra con tu cuenta: te mandamos un
+          código al correo, sin contraseñas.
         </div>
 
         <!-- cuenta, paso 1: el correo -->
@@ -2000,10 +1976,14 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
          espera, y se queda mirando sola para que no haya que recargar. -->
     <div id="espera" class="veil hidden">
       <div class="dl-card pase-card">
+        <button id="es-x" class="veil-x" title="Seguir mirando" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
         <h2>Tu cuenta ya existe</h2>
         <div class="sub">
-          La cuenta de <b id="es-correo"></b> está creada. Falta que le den acceso
-          a la biblioteca; en cuanto lo tenga, esta pantalla entra sola.
+          La cuenta de <b id="es-correo"></b> está creada. Falta la licencia para
+          reproducir; en cuanto la tenga, esta pantalla entra sola. Mientras,
+          puedes cerrar esto y seguir mirando el catálogo.
         </div>
         <div class="e-espera"><span class="e-punto"></span><span id="es-estado">Comprobando cada minuto</span></div>
         <div class="dl-foot">
@@ -2505,6 +2485,11 @@ function cargarURL(url, opts) {
      se la manda a la pantalla. `aqui` es el boton "Ver aqui" y `src` un
      archivo del propio telefono, que la pantalla no podria abrir. */
   if (MANDO.on && !opts.remoto && !opts.aqui && !opts.src) { mandoNav(url); return; }
+  /* Aqui es donde se pide la llave. Mirar el catalogo no la necesita, pero el
+     worker no suelta el video sin token, asi que en vez de dejar que el <video>
+     se coma un 401 en silencio se abre la puerta y se reanuda despues.
+     Un archivo del propio disco (`src`) no pasa por el worker: ese va solo. */
+  if (!pase.token && !opts.src) { pideAcceso(() => cargarURL(url, opts)); return; }
   // Cambiar de fuente dispara pause/seek espurios del propio player: que no
   // se difundan como acciones de la persona.
   mute = Date.now() + ECHO_MS;
@@ -3326,6 +3311,8 @@ function fmtTam(b) {
 }
 function abreDescarga(ent) {
   if (!ent) { toast('Esta película no está en la biblioteca'); return; }
+  // Bajarse la pelicula es reproducirla en diferido: la misma llave.
+  if (!pase.token) { pideAcceso(() => abreDescarga(ent)); return; }
   $('#dl-tit').textContent = 'Descargar ' + (nombreDe(ubicaDe(absCat(ent.url || ''))) || ent.titulo || 'la película');
   const lista = $('#dl-list');
   lista.innerHTML = '';
@@ -5080,8 +5067,49 @@ addEventListener('popstate', () => {
 /* ============================ Arranque ============================ */
 const qs = new URLSearchParams(location.search);
 
+/* --------------------- La puerta, delante del play ---------------------
+   Hasta el 2026-08-31 esto vivia en la entrada del sitio: sin llave no habia
+   biblioteca. Ahora la biblioteca la ve cualquiera -- el worker sirve
+   /catalogo y las caratulas sin pedir nada -- y la llave se pide justo cuando
+   hace falta, que es al reproducir o al descargar.
+
+   `pendiente` es lo que se iba a hacer cuando salto la puerta. En cuanto la
+   llave aparece se hace solo, para no obligar a volver a buscar la pelicula. */
+let pendiente = null;
+function pideAcceso(reintento) {
+  pendiente = reintento || null;
+  /* Con cuenta pero sin licencia no hay nada que escribir: lo que falta es que
+     se la den, asi que va a la sala de espera y no al formulario. */
+  if (CUENTA && !CUENTA.acceso) { salaDeEspera(); return; }
+  $('#espera').classList.add('hidden');
+  $('#pase').classList.remove('hidden');
+  ePinta(correoPedido ? 'codigo' : 'correo');
+}
+/* Cerrar la puerta es volver a mirar, no salir del sitio. */
+function cierraPuerta() {
+  clearInterval(esperaT);
+  pendiente = null;
+  $('#pase').classList.add('hidden');
+  $('#espera').classList.add('hidden');
+}
+/* Ya hay llave. NO se vuelve a llamar a arranca(): la biblioteca ya esta
+   pintada y volver a aplicar la ruta sacaria a la persona de donde estaba. El
+   catalogo tampoco se recarga: es el mismo con llave y sin ella. */
+function entroDeVerdad() {
+  clearInterval(esperaT);
+  $('#pase').classList.add('hidden');
+  $('#espera').classList.add('hidden');
+  document.body.classList.remove('invitado');
+  pintaBotonPerfil();
+  const f = pendiente;
+  pendiente = null;
+  if (f) setTimeout(f, 0);
+}
+
 function arranca() {
   $('#pase').classList.add('hidden');
+  $('#espera').classList.add('hidden');
+  document.body.classList.toggle('invitado', !pase.token);
   // La ficha de una serie necesita el catalogo para saber a que `slug`
   // corresponde, asi que la ruta se aplica cuando ya esta.
   cargaCatalogo().then(() => aplicaRuta({ inicial: true }));
@@ -5107,7 +5135,7 @@ const dePase = async () => {
   $('#pase-ok').disabled = true;
   const vale = await entrar(c);
   $('#pase-ok').disabled = false;
-  if (vale) { $('#pase-in').value = ''; marcaSalida(false); arranca(); return; }
+  if (vale) { $('#pase-in').value = ''; marcaSalida(false); entroDeVerdad(); return; }
   // Sin esta distinción, un televisor sin conexión decía "pase incorrecto" y se
   // perdía el tiempo reescribiendo un pase que estaba bien.
   $('#pase-err').textContent = paseSinRed
@@ -5133,7 +5161,7 @@ function ePinta(cual) {
   $('#e-cambia').textContent = cual === 'pase' ? 'Entrar con mi cuenta' : 'Tengo un pase';
   $('#e-sub').textContent = cual === 'pase'
     ? 'Escribe el pase que te dieron. Caduca, y se puede anular.'
-    : 'Entra con tu cuenta. Te mandamos un código al correo, sin contraseñas.';
+    : 'Mirar es libre; darle al play no. Entra con tu cuenta: te mandamos un código al correo, sin contraseñas.';
   $('#pase-err').style.display = 'none';
   const foco = { correo: '#e-correo-in', codigo: '#e-codigo-in', pase: '#pase-in' }[cual];
   // En el televisor el foco automatico levanta el teclado en pantalla encima
@@ -5192,7 +5220,7 @@ async function daCodigo() {
   // Entrada a mano: se levanta la marca de "aqui alguien se fue".
   marcaSalida(false);
   $('#e-codigo-in').value = '';
-  if (CUENTA && CUENTA.acceso && await entrarConCuenta() === 'ok') { $('#pase').classList.add('hidden'); arranca(); return; }
+  if (CUENTA && CUENTA.acceso && await entrarConCuenta() === 'ok') { entroDeVerdad(); return; }
   $('#pase').classList.add('hidden');
   salaDeEspera();
 }
@@ -5211,12 +5239,7 @@ function salaDeEspera() {
 }
 async function miraAcceso() {
   const q = await entrarConCuenta();
-  if (q === 'ok') {
-    clearInterval(esperaT);
-    $('#espera').classList.add('hidden');
-    arranca();
-    return true;
-  }
+  if (q === 'ok') { entroDeVerdad(); return true; }
   if (q === 'no') {   // la sesión se cayó: de vuelta a la entrada
     clearInterval(esperaT);
     $('#espera').classList.add('hidden');
@@ -5380,6 +5403,9 @@ async function abrePerfil() {
   }
 }
 $('#btn-perfil').addEventListener('click', abrePerfil);
+$('#btn-entrar').addEventListener('click', () => pideAcceso(null));
+$('#pase-x').addEventListener('click', cierraPuerta);
+$('#es-x').addEventListener('click', cierraPuerta);
 $('#pf-cerrar').addEventListener('click', () => $('#perfil').classList.add('hidden'));
 
 async function guardaPerfil(cambios) {
@@ -5613,7 +5639,7 @@ async function salir(op) {
     if (n === 'ok') {
       const q2 = await entrarConCuenta();
       if (q2 === 'ok') { arranca(); return; }
-      if (q2 === 'espera') { salaDeEspera(); return; }
+      if (q2 === 'espera') { arranca(); return; }
     }
   }
   if (!fuera && await entrar(guardado)) { arranca(); return; }
@@ -5623,28 +5649,28 @@ async function salir(op) {
      este publicada: retirarla antes dejaria fuera a quien no actualice.
      Cuando se quite, va tambien NAVIRIS_KEY del worker. */
   if (!fuera && await entrarConApp()) { arranca(); return; }
-  // Con sesión pero sin acceso no se pide nada: se espera.
-  if (q === 'espera') { salaDeEspera(); return; }
-  $('#pase').classList.remove('hidden');
-  ePinta('correo');
-  /* Por que se esta viendo esta pantalla. Sin esto, a quien se le cayo la
-     sesion se le planta el formulario de golpe y parece una averia. */
+  /* Ninguna puerta se abrio, y eso ya no es el final del camino: se entra de
+     invitado, a mirar. La llave se pide al darle al play. Vale igual para la
+     cuenta sin licencia (`espera`): tambien mira, y al reproducir le sale su
+     sala de espera en vez del formulario. */
+  arranca();
+  /* Por que se cayo la sesion, si se cayo. Antes esto iba pegado al formulario;
+     ahora no hay formulario delante de nadie, asi que se dice de pasada. */
   let motivo = '';
   try { motivo = sessionStorage.moovinMotivo || ''; sessionStorage.removeItem('moovinMotivo'); } catch (e) { /* nada */ }
-  if (motivo) { $('#pase-err').textContent = motivo; $('#pase-err').style.display = 'block'; }
+  if (motivo) toast(motivo);
 })();
 
 // Gancho de consola para pruebas: window.MOOVIN.sala() / cargar(url) / video
 
 /* ============================ REWORK 2026 ============================
-   Intro VHS, portada grande y estante de discos. Todo lo demás (reproductor,
+   Intro, portada grande y estante de discos. Todo lo demás (reproductor,
    sala, subtítulos) se queda como estaba. */
 
 /* ---------- intro: una vez por sesión, nunca en el televisor ---------- */
-(function introOjoDePez() {
+(function introMarca() {
   const cap = document.getElementById('intro');
   if (!cap) return;
-  const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const enTV = document.documentElement.getAttribute('data-plataforma') === 'tv' ||
                /\btv=1\b/.test(location.search);
   // El mando no es una sesion de cine: entra directo.
@@ -5653,22 +5679,21 @@ async function salir(op) {
   try { yaVista = sessionStorage.moovinIntro === '1'; sessionStorage.moovinIntro = '1'; } catch (e) { /* nada */ }
   if (yaVista || enTV || enMando) { cap.classList.add('oculto'); return; }
 
-  const tempo = [];
-  let vivo = true;
+  const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let vivo = true, salida = 0;
   function fin() {
     if (!vivo) return;
     vivo = false;
-    tempo.forEach(clearTimeout);
+    clearTimeout(salida);
     cap.classList.add('fin');
-    setTimeout(() => cap.classList.add('oculto'), 620);
+    setTimeout(() => cap.classList.add('oculto'), 360);
   }
-  document.getElementById('intro-saltar').addEventListener('click', fin);
-  if (quieto) { cap.classList.add('abre', 'marca'); tempo.push(setTimeout(fin, 1400)); return; }
-
-  /* La lente abre, el rótulo entra y se va: sin bucles ni canvas pintando. */
-  cap.classList.add('abre');
-  tempo.push(setTimeout(() => cap.classList.add('marca'), 520));
-  tempo.push(setTimeout(fin, 3600));
+  /* Ya no hay boton de saltar: el rotulo dura poco mas de un segundo y el
+     boton tardaba mas en encontrarse que la intro en acabarse. Un clic en
+     cualquier sitio la corta igual, por si alguien tiene prisa. */
+  cap.addEventListener('click', fin);
+  cap.classList.add('marca');
+  salida = setTimeout(fin, quieto ? 500 : 1100);
 })();
 
 /* ---------- datos de la ficha, en una línea ---------- */
@@ -5880,7 +5905,7 @@ function abreCaja(t, sinHistorial) {
      mismo tinte y misma etiqueta rotulada — para que las dos vistas casen */
   const cinta = $('#caja-cinta');
   cinta.innerHTML = '';
-  const anioCinta = ((t.nota || '').match(/(19|20)\d{2}/) || [''])[0];
+  const anioCinta = ((t.nota || '').match(/\b(19|20)\d{2}\b/) || [''])[0];
   const pintaCinta = (p) => {
     const c = cintaDeTitulo(t.titulo || '', p, anioCinta);
     cinta.style.background = 'url("' + c.uri + '") center/contain no-repeat';
@@ -6260,7 +6285,7 @@ function estanteDe(lista) {
     const lomo = document.createElement('div'); lomo.className = 'pas-lomo';
     if (artLomo) lomo.style.backgroundImage = 'url("' + artLomo + '")';
     const cinta = document.createElement('div'); cinta.className = 'pas-cinta';
-    const anioVHS = ((t2.nota || '').match(/(19|20)\d{2}/) || [''])[0];
+    const anioVHS = ((t2.nota || '').match(/\b(19|20)\d{2}\b/) || [''])[0];
     const pinta = (pal) => {
       const c = cintaDeTitulo(t2.titulo || '', pal, anioVHS);
       cinta.style.backgroundImage = 'url("' + c.uri + '")';

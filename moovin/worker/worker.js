@@ -2,13 +2,19 @@
    (El bucket, el worker y la ruta /cine conservan ese nombre a propósito:
    son identificadores, y renombrarlos rompería los enlaces ya compartidos.)
    ---------------------------------------------------------------------------
-   La biblioteca es PRIVADA: el bucket no tiene URL pública (se apagó con
-   `wrangler r2 bucket dev-url disable cine`) y todo lo sirve este worker, que
-   exige un pase. Si no, cerrar la página no cerraría nada: los archivos se
-   bajaban con la URL del bucket sin pasar por aquí.
+   Lo que se MIRA es público y lo que se REPRODUCE no. Desde el 2026-08-31, a
+   pedido de Dosa, cualquiera puede ver el catálogo y las carátulas: la
+   biblioteca es un escaparate. Lo que sigue cerrado con llave es el vídeo, el
+   audio, los subtítulos y las descargas, que es donde está el material.
+
+   El bucket no tiene URL pública (se apagó con `wrangler r2 bucket dev-url
+   disable cine`) y todo lo sirve este worker. Si no, cerrar la página no
+   cerraría nada: los archivos se bajaban con la URL del bucket sin pasar por
+   aquí. Por eso /media distingue por EXTENSIÓN: una imagen la da a cualquiera,
+   cualquier otra cosa exige el token.
 
    Hay tres formas de entrar y las tres acaban en el MISMO token firmado, que es
-   lo único que abre /catalogo y /media:
+   lo único que abre el material de /media:
      1. el pase compartido de siempre (el secreto MOOVIN_PASE), o un pase
         temporal acuñado en el backoffice;
      2. una cuenta a la que Dosa le dio acceso (se entra con un código al correo);
@@ -26,6 +32,8 @@
      POST /vincular/nuevo             -> {codigo, secreto}; lo pide el televisor
      GET  /vincular/mira?codigo=      -> ¿ese código está esperando una cuenta?
      POST /vincular/estado {codigo, secreto} -> la tele recoge su clave
+     GET  /catalogo                   -> biblioteca.json guardado en el bucket
+     GET  /media?key=<imagen>         -> carátulas y demás imágenes, sin pase
    Con sesión de cuenta (Authorization: Bearer <token de sesión>):
      GET  /cuenta/yo                  -> perfil y si tiene acceso
      POST /cuenta/pase                -> el token firmado, si la cuenta tiene acceso
@@ -34,7 +42,6 @@
      POST /cuenta/salir
      POST /vincular/confirmar {codigo} -> le da acceso a esa pantalla
    Con pase (?t=<token> o Authorization: Bearer <token>):
-     GET /catalogo                 -> biblioteca.json guardado en el bucket
      GET /media?key=               -> el objeto para reproducir (con rangos)
      GET /descargar?key=&n=        -> el mismo objeto como adjunto
    Con token de administración (Authorization: Bearer <MOOVIN_TOKEN>):
@@ -278,12 +285,13 @@ export default {
       return json({ error: 'metodo' }, 405);
     }
 
-    /* ---- de aquí en adelante hace falta el pase (o ser administración) ---- */
     const pasa = admin || await tokenOk(env, url.searchParams.get('t') || bearer);
     const sinPase = () => json({ error: 'hace falta el pase' }, 401);
 
+    /* El catálogo es el escaparate y no lleva llave: dice qué hay, no dónde
+       está el archivo de forma útil, porque las URLs que trae apuntan a
+       /media y ese sí la pide. */
     if (url.pathname === '/catalogo' && req.method === 'GET') {
-      if (!pasa) return sinPase();
       const obj = await env.MOOVIN.get('biblioteca.json');
       if (!obj) return json({ titulos: [] });
       return new Response(obj.body, {
@@ -299,11 +307,21 @@ export default {
        descarga. */
     if ((url.pathname === '/media' || url.pathname === '/descargar')
       && (req.method === 'GET' || req.method === 'HEAD')) {
-      if (!pasa) return sinPase();
       const key = url.searchParams.get('key') || '';
       if (!key || key === 'biblioteca.json' || key.indexOf('..') !== -1) {
         return json({ error: 'key invalida' }, 400);
       }
+      /* Una carátula la ve cualquiera; una película, no. La regla es la
+         extensión y no un prefijo de carpeta porque el póster vive en la MISMA
+         carpeta que el vídeo (peliculas/<slug>/poster.jpg junto a video.mp4),
+         así que por ruta no se pueden separar. Y va solo para /media: bajarse
+         algo sigue pidiendo el pase, sea lo que sea.
+         Las fotos de perfil se quedan fuera: son de personas, no del
+         escaparate, y su clave solo la reparte /cuenta/yo, que sí pide sesión. */
+      const esImagen = url.pathname === '/media' &&
+        key.indexOf('avatares/') !== 0 &&
+        /\.(jpe?g|png|webp|avif|gif|svg)$/i.test(key);
+      if (!pasa && !esImagen) return sinPase();
       const rango = req.headers.get('range');
       let obj;
       try { obj = await env.MOOVIN.get(key, { range: req.headers }); }
