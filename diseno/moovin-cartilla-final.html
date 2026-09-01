@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8" /><title>MOOVIN — cartilla</title>
+<style>
+/* ================================================================
+   CARTILLA de MOOVIN — TROQUELADO (2026-09-01).
+   Hermana de naviris-cartilla-final.html: misma escena, misma medida
+   (1760x1320, la que declaran index.html y site/index.html de Iris) y
+   la misma regla — la pantalla es una captura REAL de la app tomada
+   por CDP, aqui de moovin.live. Wan no dibuja interfaces.
+   La silueta de la M se copia de moovin/index.html, no se redibuja.
+   ================================================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1760px;height:1320px;overflow:hidden;background:#08090b}
+body{font-family:"Inter Var","Segoe UI",system-ui,sans-serif}
+.escena{position:relative;width:1760px;height:1320px;overflow:hidden}
+/* la captura, en diagonal y cubriendo de sobra */
+.cap{position:absolute;left:-18%;top:-22%;width:136%;height:150%;transform:rotate(-14deg);
+  background-image:url("file:///C:/Users/Dosa/AppData/Local/Temp/claude/C--WINDOWS-system32/fd8b8eef-ae74-436d-b0ab-768df97b1dde/scratchpad/moovin-alta.png");background-size:cover;background-position:center}
+/* la tapa deja el fondo como textura, no como protagonista */
+.tapa{position:absolute;inset:0;background:rgba(7,8,10,.9)}
+.vin{position:absolute;inset:0;background:radial-gradient(80% 72% at 50% 44%,transparent 34%,rgba(5,6,8,.74) 100%)}
+/* el troquel. La M es apaisada (220x180), asi que el hueco no es cuadrado
+   como el de Naviris: mantiene la proporcion del propio simbolo. */
+.hueco{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);width:790px;height:646px}
+.dentro{position:absolute;inset:0;
+  background-image:url("file:///C:/Users/Dosa/AppData/Local/Temp/claude/C--WINDOWS-system32/fd8b8eef-ae74-436d-b0ab-768df97b1dde/scratchpad/moovin-alta.png");background-size:1350px auto;background-position:12% 100%;
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20220%20179.98%22%3E%3Cg%20fill%3D%22%23000%22%20transform%3D%22translate%280%2C179.98%29%20scale%281%2C-1%29%22%3E%3Cpath%20d%3D%22M140.84%2C164.58c14.05-.94%2C25.16-12.64%2C25.16-26.93V27c0-14.91%2C12.09-27%2C27-27s27%2C12.09%2C27%2C27v107.76c0%2C19.7-12.6%2C36.99-31.36%2C43.03-17.33%2C5.57-36%2C.27-47.8-13.21Z%22%2F%3E%3Cpath%20d%3D%22M54%2C137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01%2C8.47-11.8%2C22.2-18.84%2C36.72-18.84s28.25%2C7.04%2C36.72%2C18.84c.24.33.47.67.69%2C1.01l18.59%2C28.55v32.57c0%2C14.29-11.11%2C25.99-25.16%2C26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4%2C42.07c-.22.34-.45.67-.68%2C1-.87%2C1.21-1.79%2C2.37-2.76%2C3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z%22%2F%3E%3Cpath%20d%3D%22M0%2C134.76V27C0%2C12.09%2C12.09%2C0%2C27%2C0s27%2C12.09%2C27%2C27v110.65c0%2C7.46%2C3.02%2C14.2%2C7.91%2C19.09%2C4.48%2C4.48%2C10.52%2C7.4%2C17.25%2C7.84-11.8%2C13.48-30.47%2C18.78-47.8%2C13.21C12.6%2C171.75%2C0%2C154.46%2C0%2C134.76Z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20220%20179.98%22%3E%3Cg%20fill%3D%22%23000%22%20transform%3D%22translate%280%2C179.98%29%20scale%281%2C-1%29%22%3E%3Cpath%20d%3D%22M140.84%2C164.58c14.05-.94%2C25.16-12.64%2C25.16-26.93V27c0-14.91%2C12.09-27%2C27-27s27%2C12.09%2C27%2C27v107.76c0%2C19.7-12.6%2C36.99-31.36%2C43.03-17.33%2C5.57-36%2C.27-47.8-13.21Z%22%2F%3E%3Cpath%20d%3D%22M54%2C137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01%2C8.47-11.8%2C22.2-18.84%2C36.72-18.84s28.25%2C7.04%2C36.72%2C18.84c.24.33.47.67.69%2C1.01l18.59%2C28.55v32.57c0%2C14.29-11.11%2C25.99-25.16%2C26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4%2C42.07c-.22.34-.45.67-.68%2C1-.87%2C1.21-1.79%2C2.37-2.76%2C3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z%22%2F%3E%3Cpath%20d%3D%22M0%2C134.76V27C0%2C12.09%2C12.09%2C0%2C27%2C0s27%2C12.09%2C27%2C27v110.65c0%2C7.46%2C3.02%2C14.2%2C7.91%2C19.09%2C4.48%2C4.48%2C10.52%2C7.4%2C17.25%2C7.84-11.8%2C13.48-30.47%2C18.78-47.8%2C13.21C12.6%2C171.75%2C0%2C154.46%2C0%2C134.76Z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  -webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-position:center;mask-position:center;
+  filter:brightness(1.2) contrast(1.05) saturate(1.1)}
+/* el filo, en el ambar de la marca y no en blanco: es lo unico que le pone
+   color propio a una escena que por lo demas es la captura apagada */
+.filo{position:absolute;inset:0;fill:none;stroke:rgba(255,160,110,.30);stroke-width:2.2}
+.wm{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);text-align:center}
+.wm .marca{font-size:96px;font-weight:600;letter-spacing:30px;color:rgba(255,255,255,.92);padding-left:30px}
+.wm .tipo{margin-top:26px;font-size:36px;font-weight:500;letter-spacing:20px;color:rgba(255,255,255,.45);padding-left:20px}
+.grano{position:absolute;inset:0;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)'/%3E%3C/svg%3E")}
+</style></head>
+<body><div class="escena">
+  <div class="cap"></div>
+  <div class="tapa"></div>
+  <div class="vin"></div>
+  <div class="hueco">
+    <div class="dentro"></div>
+    <svg class="filo" viewBox="0 0 220 179.98"><g transform="translate(0,179.98) scale(1,-1)"><path d="M140.84,164.58c14.05-.94,25.16-12.64,25.16-26.93V27c0-14.91,12.09-27,27-27s27,12.09,27,27v107.76c0,19.7-12.6,36.99-31.36,43.03-17.33,5.57-36,.27-47.8-13.21Z"/><path d="M54,137.65v-32.57l18.59-28.55c.22-.34.45-.68.69-1.01,8.47-11.8,22.2-18.84,36.72-18.84s28.25,7.04,36.72,18.84c.24.33.47.67.69,1.01l18.59,28.55v32.57c0,14.29-11.11,25.99-25.16,26.93-.97-1.1-1.89-2.26-2.76-3.47-.23-.33-.46-.66-.68-1l-27.4-42.07-27.4,42.07c-.22.34-.45.67-.68,1-.87,1.21-1.79,2.37-2.76,3.47-6.73-.44-12.77-3.36-17.25-7.84-4.89-4.89-7.91-11.63-7.91-19.09Z"/><path d="M0,134.76V27C0,12.09,12.09,0,27,0s27,12.09,27,27v110.65c0,7.46,3.02,14.2,7.91,19.09,4.48,4.48,10.52,7.4,17.25,7.84-11.8,13.48-30.47,18.78-47.8,13.21C12.6,171.75,0,154.46,0,134.76Z"/></g></svg>
+  </div>
+  <div class="wm">
+    <div class="marca">MOOVIN</div>
+    <div class="tipo">PLAYER</div>
+  </div>
+  <div class="grano"></div>
+</div></body></html>
