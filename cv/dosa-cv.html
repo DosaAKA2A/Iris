@@ -151,6 +151,25 @@
   .cv-contact-item:hover { color: var(--blue); }
   .cv-contact-item svg { width: 13px; height: 13px; flex-shrink: 0; }
 
+  .cv-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-end;
+    padding: 9px 16px;
+    border-radius: 100px;
+    background: var(--blue);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .04em;
+    text-decoration: none;
+    margin-bottom: 6px;
+    transition: background .2s;
+  }
+  .cv-download:hover { background: #1e40af; }
+  .cv-download svg { width: 13px; height: 13px; }
+
   /* ── LAYOUT ── */
   .cv-body {
     display: grid;
@@ -395,6 +414,16 @@
     color: var(--ink);
     margin-bottom: 6px;
   }
+  .cv-project-title a { color: inherit; text-decoration: none; transition: color .2s; }
+  .cv-project-title a:hover { color: var(--blue); }
+  .cv-project-url {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--blue);
+    letter-spacing: .02em;
+    text-decoration: none;
+    margin-bottom: 8px;
+  }
   .cv-project-desc {
     font-size: 13px;
     color: var(--body);
@@ -415,6 +444,7 @@
     .cv-side  { padding-left: 0; padding-top: 40px; }
     .cv-hero  { padding: 120px 24px 56px; }
     .cv-hero-contacts { margin-left: 0; }
+    .cv-download { align-self: flex-start; }
   }
 </style>
 </head>
@@ -446,7 +476,7 @@
 
 <!-- HERO HEADER -->
 <div class="cv-hero">
-  <div class="cv-hero-eyebrow">Perfil profesional · Madrid, España</div>
+  <div class="cv-hero-eyebrow">Soluciones digitales · Madrid, España</div>
   <h1 class="cv-hero-name">Eduardo<br>Enrico</h1>
   <div class="cv-avail-badge">
     <span class="cv-avail-dot"></span>
@@ -458,6 +488,10 @@
       Tiendas online, campañas en Meta y Google, y automatización de procesos.
     </p>
     <div class="cv-hero-contacts">
+      <a class="cv-download" href="Eduardo-Enrico-CV.pdf" download="Eduardo-Enrico-CV.pdf">
+        <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 2v7M4 6.5 7 9.5l3-3M2.5 11.5h9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Descargar CV
+      </a>
       <a class="cv-contact-item" href="https://iris.it.com" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 12h17M12 3.5c2.5 2.3 3.8 5.2 3.8 8.5s-1.3 6.2-3.8 8.5c-2.5-2.3-3.8-5.2-3.8-8.5s1.3-6.2 3.8-8.5z" stroke="currentColor" stroke-width="1.5"/></svg>
         iris.it.com
@@ -466,9 +500,9 @@
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 7l9 6 9-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         hatred.aka2a@gmail.com
       </a>
-      <a class="cv-contact-item" href="tel:+34635923470">
+      <a class="cv-contact-item" href="tel:+34624306790">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.6 10.8a15.6 15.6 0 006.6 6.6l2.2-2.2a1 1 0 011.1-.2 11.5 11.5 0 003.6.6 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.6 3.6a1 1 0 01-.2 1.1L6.6 10.8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        +34 635 923 470
+        +34 624 306 790
       </a>
       <span class="cv-contact-item">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z" stroke="currentColor" stroke-width="1.5"/></svg>
@@ -541,18 +575,21 @@
       <div class="cv-section-label">Proyectos</div>
 
       <div class="cv-project">
-        <div class="cv-project-title">Naviris — Navegador web</div>
-        <p class="cv-project-desc">Navegador propio de Iris Studio construido sobre Electron, con sistema de addons, cuenta de usuario y actualizaciones automáticas. Diseño de interfaz y web del producto en <a href="https://naviris.site" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">naviris.site</a>.</p>
+        <div class="cv-project-title"><a href="https://corlima.pe" target="_blank" rel="noopener">Suite de automatización para Corlima</a></div>
+        <a class="cv-project-url" href="https://corlima.pe" target="_blank" rel="noopener">corlima.pe</a>
+        <p class="cv-project-desc">Herramientas propias para el e-commerce de Corlima: reescalado y carga masiva de imágenes en PrestaShop, feed de catálogo para Meta generado desde SQL, medición de conversiones para Google Ads y Meta Ads, y calendario de campañas estacionales con su contenido.</p>
         <div class="cv-tags">
-          <span class="cv-tag">Electron</span>
-          <span class="cv-tag">JavaScript</span>
-          <span class="cv-tag">Diseño UI</span>
+          <span class="cv-tag">PrestaShop</span>
+          <span class="cv-tag">Google Ads</span>
+          <span class="cv-tag">Meta Ads</span>
+          <span class="cv-tag">Automatización</span>
         </div>
       </div>
 
       <div class="cv-project">
-        <div class="cv-project-title">Ederus — Tienda online</div>
-        <p class="cv-project-desc">Tienda de microtransacciones montada desde cero para una comunidad de juego online: catálogo de productos digitales, guía de compra para el usuario e integración con la pasarela de pago Tebex. Diseño, desarrollo y despliegue completos, más la definición de la economía de productos y precios de la tienda.</p>
+        <div class="cv-project-title"><a href="https://tienda.ederus.com" target="_blank" rel="noopener">Ederus — Tienda online</a></div>
+        <a class="cv-project-url" href="https://tienda.ederus.com" target="_blank" rel="noopener">tienda.ederus.com</a>
+        <p class="cv-project-desc">Tienda de microtransacciones montada desde cero para una comunidad de juego online: catálogo de productos digitales, guía de compra para el usuario e integración con la pasarela de pago Tebex. Diseño, desarrollo y despliegue completos, más la definición de la economía de productos y precios.</p>
         <div class="cv-tags">
           <span class="cv-tag">E-commerce</span>
           <span class="cv-tag">Tebex</span>
@@ -561,22 +598,46 @@
       </div>
 
       <div class="cv-project">
-        <div class="cv-project-title">Contenido & Campañas Corlima</div>
-        <p class="cv-project-desc">Contenido para Instagram, Facebook y WhatsApp con doble variante (aspiracional + urgencia) y calendario de campañas estacionales de catálogo, remarketing y visibilidad de marca.</p>
+        <div class="cv-project-title"><a href="https://naviris.site" target="_blank" rel="noopener">Naviris — Navegador web</a></div>
+        <a class="cv-project-url" href="https://naviris.site" target="_blank" rel="noopener">naviris.site</a>
+        <p class="cv-project-desc">Navegador propio de Iris Studio construido sobre Electron, con sistema de addons, cuenta de usuario y actualizaciones automáticas. Diseño de interfaz y web del producto.</p>
         <div class="cv-tags">
-          <span class="cv-tag">Meta Ads</span>
-          <span class="cv-tag">Social Media</span>
-          <span class="cv-tag">Copywriting</span>
+          <span class="cv-tag">Electron</span>
+          <span class="cv-tag">JavaScript</span>
+          <span class="cv-tag">Diseño UI</span>
         </div>
       </div>
 
       <div class="cv-project">
-        <div class="cv-project-title">DOSA Tools</div>
-        <p class="cv-project-desc">Suite web propia que automatiza tareas repetitivas de e-commerce: reescalado de imágenes, firma y carga masiva para PrestaShop. Más proyectos en <a href="https://iris.it.com" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">iris.it.com</a>.</p>
+        <div class="cv-project-title"><a href="https://moovin.live" target="_blank" rel="noopener">MOOVIN — Plataforma de vídeo</a></div>
+        <a class="cv-project-url" href="https://moovin.live" target="_blank" rel="noopener">moovin.live</a>
+        <p class="cv-project-desc">Plataforma propia de películas y series: catálogo, reproductor web con subtítulos, cuentas de usuario, backoffice de contenidos y versión adaptada a televisión y móvil.</p>
         <div class="cv-tags">
           <span class="cv-tag">JavaScript</span>
-          <span class="cv-tag">Automatización</span>
-          <span class="cv-tag">GitHub Pages</span>
+          <span class="cv-tag">Cloudflare</span>
+          <span class="cv-tag">Diseño UI</span>
+        </div>
+      </div>
+
+      <div class="cv-project">
+        <div class="cv-project-title"><a href="https://verby.cloud" target="_blank" rel="noopener">VERBY — Curso de inglés online</a></div>
+        <a class="cv-project-url" href="https://verby.cloud" target="_blank" rel="noopener">verby.cloud</a>
+        <p class="cv-project-desc">Plataforma de aprendizaje de inglés desde cero (A1) en 12 unidades: ejercicios interactivos con corrección explicada, progreso por alumno y cuentas de usuario.</p>
+        <div class="cv-tags">
+          <span class="cv-tag">Producto digital</span>
+          <span class="cv-tag">JavaScript</span>
+          <span class="cv-tag">UX</span>
+        </div>
+      </div>
+
+      <div class="cv-project">
+        <div class="cv-project-title"><a href="https://grief.es" target="_blank" rel="noopener">GRIEF — Tracker de Valorant</a></div>
+        <a class="cv-project-url" href="https://grief.es" target="_blank" rel="noopener">grief.es</a>
+        <p class="cv-project-desc">Aplicación de escritorio que muestra estadísticas de la partida en tiempo real, con instalador propio y web de producto.</p>
+        <div class="cv-tags">
+          <span class="cv-tag">Electron</span>
+          <span class="cv-tag">Node.js</span>
+          <span class="cv-tag">Diseño de producto</span>
         </div>
       </div>
     </div>
@@ -662,10 +723,6 @@
       <div class="cv-avail-item">
         <span class="cv-avail-label">Viajes</span>
         <span class="cv-avail-value">Buena disponibilidad</span>
-      </div>
-      <div class="cv-avail-item">
-        <span class="cv-avail-label">Cambio de residencia</span>
-        <span class="cv-avail-value">Depende de las condiciones</span>
       </div>
       <div class="cv-avail-item">
         <span class="cv-avail-label">Ubicación actual</span>
