@@ -89,7 +89,7 @@
       font-weight:600;color:var(--text)}
     .swap__launch-cta[hidden]{display:none}
     .swap__launch.is-live .swap__launch-label{color:var(--accent,#3fb950)}
-    /* Modal genérico (WAVA privado) */
+    /* Modal genérico (Corlima privado) */
     .pmodal{position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;
       padding:1.5rem;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
       opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease}
@@ -406,7 +406,7 @@
               <div class="swap__img" data-index="0"><img class="swap__asset" src="./assets/spacio-swap.jpg?v=20260819b" alt="SPACIO² — diseño web editorial de una nave de carga autónoma" loading="lazy" decoding="async" width="1800" height="1200"></div>
               <div class="swap__img" data-index="1"><img class="swap__asset" src="./assets/fisio-swap.jpg" alt="FISIO — rediseño web y rebranding de clínica de fisioterapia" loading="lazy" decoding="async" width="1500" height="1200"></div>
               <div class="swap__img" data-index="2"><img class="swap__asset" src="./assets/ederus-swap.jpg" alt="EDERUS — sitio oficial del servidor ederus.com" loading="lazy" decoding="async" width="1500" height="1200"></div>
-              <div class="swap__img ph" data-index="3"><span class="ph__tag">WAVA · imagen → /assets</span></div>
+              <div class="swap__img" data-index="3"><img class="swap__asset" src="./assets/kumamori-swap.webp" alt="Kumamori — la web de la cafetería en escritorio y móvil sobre los colores de la marca" loading="lazy" decoding="async" width="1800" height="1200"></div>
             </div>
           </div>
           <div class="swap__cats" aria-live="polite">
@@ -456,12 +456,12 @@
             </div>
           </li>
           <li class="swap__step" data-index="3"
-              data-tags="Naming,Branding,Identidad visual,Web animada,Packaging">
+              data-tags="Diseño web,Motion,React,Reservas,Identidad aplicada,UX/UI">
             <span class="swap__num label">04</span>
-            <h3 class="swap__title">WAVA</h3>
-            <p class="swap__cat label">Branding &amp; Web — 2023</p>
-            <p class="swap__desc">Marca nueva de pastelería, heladería y juguería. Identidad propia y una web animada y cuidada — proyecto aún en desarrollo.</p>
-            <a class="swap__link" href="#" data-modal="wava" role="button">Acceso privado <span aria-hidden="true">↗</span></a>
+            <h3 class="swap__title">Kumamori</h3>
+            <p class="swap__cat label">Diseño web &amp; Motion — 2026</p>
+            <p class="swap__desc">Web para una cafetería inspirada en Japón: fotos a pantalla completa, un oso que sigue al puntero, reservas con confirmación sellada y la identidad de la marca aplicada en cada detalle.</p>
+            <a class="swap__link" href="https://dosaaka2a.github.io/Kumamori/" target="_blank" rel="noopener">Ver caso <span aria-hidden="true">↗</span></a>
           </li>
         </ol>
       </div>
@@ -902,20 +902,7 @@
   })();
   </script>
 
-  <!-- Modal privado de WAVA (proyecto en desarrollo, no público) -->
-  <div class="pmodal" id="modalWava" role="dialog" aria-modal="true" aria-labelledby="modalWavaTitle" aria-hidden="true">
-    <div class="pmodal__box">
-      <button class="pmodal__close" type="button" data-close aria-label="Cerrar">&#215;</button>
-      <p class="pmodal__label label">WAVA · Proyecto privado</p>
-      <h3 class="pmodal__title" id="modalWavaTitle">En desarrollo</h3>
-      <p class="pmodal__text">WAVA es una marca nueva de pastelería, heladería y juguería con una web animada aún en construcción. El caso todavía no es público.</p>
-      <ul class="pmodal__tags">
-        <li>Naming</li><li>Branding</li><li>Identidad visual</li><li>Web animada</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Proyectos: chips de categorías junto a la imagen + contador de EDERUS + modal de WAVA -->
+  <!-- Proyectos: chips de categorías junto a la imagen + contador de EDERUS -->
   <script>
   (function(){
     var swap = document.querySelector('.proyectos .swap');
@@ -986,18 +973,6 @@
         setFlip('s', pad(Math.floor(ms%60000/1000)));
       }
       var iv = setInterval(tick, 1000); tick();
-    }
-
-    // WAVA: modal privado
-    var modal = document.getElementById('modalWava');
-    function openModal(){ if(modal){ modal.classList.add('is-open'); modal.setAttribute('aria-hidden','false'); } }
-    function closeModal(){ if(modal){ modal.classList.remove('is-open'); modal.setAttribute('aria-hidden','true'); } }
-    Array.prototype.slice.call(document.querySelectorAll('[data-modal="wava"]')).forEach(function(el){
-      el.addEventListener('click', function(e){ e.preventDefault(); openModal(); });
-    });
-    if(modal){
-      modal.addEventListener('click', function(e){ if(e.target === modal || e.target.hasAttribute('data-close')) closeModal(); });
-      document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
     }
   })();
   </script>
