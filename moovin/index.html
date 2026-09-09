@@ -2687,6 +2687,16 @@ function cargarArchivos(lista) {
 function shareUrl() {
   return location.origin + location.pathname + (curV ? '?v=' + encodeURIComponent(curV) : '');
 }
+/* Gancho para el addon Watch Party de Naviris (2.8.0+). Cuando la sala la
+   lleva el addon y no esta pagina, el invitado seguia cada cambio de capitulo
+   RECARGANDO la pagina entera (pase, catalogo, todo). Con esto el addon le pide
+   a la pagina que abra la pelicula, igual que hace la sala propia con un
+   latido. Acepta lo mismo que un ?v=. */
+window.__moovinAbre = (v) => {
+  v = String(v || ''); if (!v || v === curV) return;
+  cargarURL(v, { remoto: true });
+  playSafe();
+};
 function actualizarShare() {
   if (MANDO.on) return;   // la barra del telefono es /mando/<CODIGO>, no la peli
   // La URL de la pestaña refleja la película (sin el código de sala): así el
@@ -4384,7 +4394,11 @@ function start(code, asHost, rol) {
     || (rol === 'mando' ? 'Mando' : asHost ? 'Anfitrión' : 'Invitado')).slice(0, 32);
   try { localStorage.__navPartyName = $('#p-name').value.trim(); } catch (e) { /* nada */ }
   apuntaAv(name, miAv());
-  sala = { code, host: asHost, name, rol: rol || 'pantalla', ws: null, ok: false, everOk: false, n: 1, status: 'Conectando…', msgs: [], lock: false, navLock: true };
+  /* `sid` identifica ESTA sesión en la sala: al reconectar, el relay cierra
+     el socket viejo con el mismo sid en silencio (sin contar dos veces a la
+     misma persona ni anunciar un "salió" fantasma después). */
+  const sid = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  sala = { code, host: asHost, name, rol: rol || 'pantalla', ws: null, ok: false, everOk: false, n: 1, status: 'Conectando…', msgs: [], lock: false, navLock: true, sid };
   /* El socket se abre aquí dentro para poder repetirlo: si se cae (el relay se
      redespliega, el equipo se suspende, un bache de red) antes quedaba la sala
      pintada con su código mientras ya no sincronizaba nada — que desde el sofá
@@ -4400,8 +4414,10 @@ function start(code, asHost, rol) {
   }
   sala.ws = ws;
   ws.onopen = async () => {
+    const volvia = reintento > 0;
     reintento = 0;
-    const join = { t: 'join', room: code, name, host: asHost, rol: sala.rol };
+    const join = { t: 'join', room: code, name, host: asHost, rol: sala.rol, sid };
+    if (volvia) join.again = true;
     /* La foto va UNA vez, aqui: en cada mensaje serian kilobytes por latido.
        El resto del protocolo se queda igual. */
     const f = await fotoParaLaSala();
@@ -4424,7 +4440,7 @@ function start(code, asHost, rol) {
       // copia desde el botón y la URL de la pestaña identifica la película.
       actualizarShare();
     }
-    else if (m.t === 'peers') { sala.n = m.n; if (m.joined && m.who) logAct(m.who, 'se unió a la sala'); else if (m.left && m.who) logAct(m.who, 'salió de la sala'); }
+    else if (m.t === 'peers') { sala.n = m.n; if (m.joined && m.who) logAct(m.who, m.again ? 'volvió a conectarse' : 'se unió a la sala'); else if (m.left && m.who) logAct(m.who, 'salió de la sala'); }
     else if (m.t === 'ev') { apuntaAv(m.from, m.av); apuntaFoto(m.from, m.foto); applyRemote(m); }
     else if (m.t === 'beat') {
       apuntaAv(m.from, m.av); apuntaFoto(m.from, m.foto);
