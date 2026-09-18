@@ -360,6 +360,17 @@ body.con-cuenta #btn-perfil{display:flex}
 
 /* ============================ Layout ============================ */
 #row{display:flex; height:calc(100% - 52px); min-height:0}
+/* A pantalla completa entra #row ENTERO (video + panel de sala), no solo el
+   escenario. Con #stage a solas, el panel del Watch Party y los avisos
+   (#toast) —hermanos suyos— quedaban fuera del elemento en pantalla completa
+   y desaparecían justo mientras se veía la película con gente. */
+#row:fullscreen{background:#000}
+/* El botón de sala de la barra solo hace falta a pantalla completa: fuera de
+   ella ya está el de la cabecera. Lleva el mismo punto de "en sala". */
+#c-party{display:none; position:relative}
+#c-party .dot{position:absolute; top:7px; right:7px; width:6px; height:6px; border-radius:50%; background:var(--rubi); display:none}
+#c-party.live .dot{display:block}
+#row:fullscreen #c-party{display:flex}
 #stage{
   flex:1; min-width:0; position:relative; background:#000;
   display:flex; align-items:center; justify-content:center;
@@ -1064,6 +1075,7 @@ button.se-seguir{margin-top:16px; width:220px; display:inline-flex; align-items:
 
 @media (max-width:760px){
   #party{position:fixed; right:0; top:52px; bottom:0; z-index:20; border-left:1px solid var(--line)}
+  #row:fullscreen #party{top:0}
 }
 
 /* ============================ REWORK 2026 ============================
@@ -2067,6 +2079,7 @@ body.invitado #btn-entrar{display:inline-flex}
         <button id="c-open" class="cbtn" title="Cambiar película"></button>
         <button id="c-mute" class="cbtn" title="Silenciar"></button>
         <input id="vol" type="range" min="0" max="100" value="100" aria-label="Volumen" />
+        <button id="c-party" class="cbtn" title="Watch Party" aria-label="Abrir Watch Party"><span class="dot"></span></button>
         <button id="c-fs" class="cbtn" title="Pantalla completa"></button>
       </div>
     </div>
@@ -2213,9 +2226,9 @@ body.invitado #btn-entrar{display:inline-flex}
       </div>
     </div>
   </aside>
+  <!-- Dentro de #row a propósito: así también se ve a pantalla completa. -->
+  <div id="toast"></div>
 </main>
-
-<div id="toast"></div>
 
 <script>
 /* MOOVIN — el reproductor de películas de IRIS Studio, con Watch Party integrado.
@@ -3060,6 +3073,7 @@ $('#c-cc').innerHTML = IC.cc;
 $('#c-open').innerHTML = IC.open;
 $('#c-mute').innerHTML = IC.vol;
 $('#c-fs').innerHTML = IC.fs;
+$('#c-party').insertAdjacentHTML('afterbegin', $('#btn-party svg').outerHTML);
 
 const seek = $('#seek'), vol = $('#vol');
 let arrastrando = false;
@@ -3098,9 +3112,13 @@ if (localStorage.moovinVol) userVol = Math.max(0, Math.min(1, localStorage.moovi
 $('#c-mute').addEventListener('click', () => { userMute = !userMute; aplicaVolumen(); });
 aplicaVolumen();
 $('#c-play').addEventListener('click', () => { if (video.src) { video.paused ? playSafe() : video.pause(); } });
+/* Entra #row (video + panel de sala), no #stage: ver el CSS de #row. Se
+   comprueba que el método exista: en iPhone no lo hay (adaptable.js manda el
+   video al reproductor nativo) y llamarlo a ciegas lanzaba un TypeError. */
+const row = $('#row');
 $('#c-fs').addEventListener('click', () => {
-  if (document.fullscreenElement) document.exitFullscreen();
-  else stage.requestFullscreen().catch(() => {});
+  if (document.fullscreenElement) { if (document.exitFullscreen) document.exitFullscreen().catch(() => {}); }
+  else if (row.requestFullscreen) row.requestFullscreen().catch(() => {});
 });
 /* Menús de pistas, como en un MKV: audio a la izquierda, subtítulos al lado. */
 function creaMenu(id) {
@@ -4025,6 +4043,11 @@ function pushMsg(m) {
   sala.msgs.push(m);
   if (sala.msgs.length > 200) { sala.msgs.shift(); ui.pintados = Math.max(0, ui.pintados - 1); }
   pintarChat();
+  // A pantalla completa con el panel cerrado no se ve el chat: lo que llega
+  // de la sala sale como aviso flotante para no perder la conversación.
+  if (document.fullscreenElement && $('#party').classList.contains('hidden') && !m.sys) {
+    toast((m.who ? m.who + (m.act ? ' ' : ': ') : '') + m.text);
+  }
 }
 function logSys(text) { pushMsg({ text, sys: true, t: Date.now() }); }
 function logAct(who, text) { pushMsg({ who: who || '?', text, act: true, t: Date.now() }); }
@@ -4207,6 +4230,7 @@ function pintaSala() {
   $('#p-setup').style.display = dentro ? 'none' : '';
   $('#p-room').style.display = dentro ? 'flex' : 'none';
   $('#btn-party').classList.toggle('live', dentro);
+  $('#c-party').classList.toggle('live', dentro);
   pintaPeli();
   if (!dentro) return;
   $('#p-code-t').textContent = sala.code;
@@ -4521,6 +4545,7 @@ function panelAbre(force) {
   if (abrir) pintaSelectorAv();
 }
 $('#btn-party').addEventListener('click', () => panelAbre());
+$('#c-party').addEventListener('click', () => panelAbre());
 $('#p-close').addEventListener('click', () => panelAbre(false));
 $('#p-name').value = localStorage.__navPartyName || '';
 pintaSelectorAv();
