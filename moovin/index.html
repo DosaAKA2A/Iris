@@ -4157,7 +4157,7 @@ function avatar(who) {
   const id = avs[who];
   if (id && AVATARES.includes(id)) {
     const img = document.createElement('img');
-    img.src = '/avatares/' + id + '.svg'; img.alt = '';
+    img.src = 'avatares/' + id + '.svg'; img.alt = '';
     el.appendChild(img);
     return el;
   }
@@ -4185,7 +4185,7 @@ function pintaSelectorAv() {
   haz('', null);
   for (const id of AVATARES) {
     const img = document.createElement('img');
-    img.src = '/avatares/' + id + '.svg'; img.alt = id;
+    img.src = 'avatares/' + id + '.svg'; img.alt = id;
     haz(id, img);
   }
 }
@@ -5340,7 +5340,7 @@ $('#es-salir').addEventListener('click', () => {
    URL con el hay un paso que no se da a ciegas. */
 function urlAvatar(av) {
   if (!av) return '';
-  if (AVATARES.includes(av)) return '/avatares/' + av + '.svg';
+  if (AVATARES.includes(av)) return 'avatares/' + av + '.svg';
   if (/^avatares\/[A-Za-z0-9._-]+$/.test(av)) {
     return conPase(MOOVIN_API + '/media?key=' + encodeURIComponent(av));
   }
@@ -5440,7 +5440,7 @@ function pintaPerfil() {
     b.title = 'Avatar del elenco';
     b.className = (u.avatar === id) ? 'on' : '';
     const img = document.createElement('img');
-    img.src = '/avatares/' + id + '.svg'; img.alt = id;
+    img.src = 'avatares/' + id + '.svg'; img.alt = id;
     b.appendChild(img);
     b.addEventListener('click', () => guardaPerfil({ avatar: id }));
     cont.appendChild(b);
