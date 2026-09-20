@@ -2,6 +2,26 @@
 <html lang="es">
 <head>
 <meta charset="utf-8" />
+<script>
+/* MOOVIN cuelga de la raíz de su dominio (moovin.live) y también de una
+   carpeta cuando se sirve desde iris.it.com/moovin/. Con <base> las rutas
+   relativas de esta página valen en los dos sitios y a cualquier profundidad:
+   una ruta como /t/<slug> no puede resolver sus archivos contra /t/. Va lo
+   primero de todo porque tiene que quedar puesto antes del primer <link>. */
+(function () {
+  var raiz = /^\/moovin(?=\/|$)/.test(location.pathname) ? '/moovin/' : '/';
+  window.__moovinRaiz = raiz;
+  var b = document.createElement('base');
+  b.href = raiz;
+  document.head.appendChild(b);
+  /* 404.html devuelve así las rutas que GitHub Pages no sabe servir. Se
+     recompone la dirección antes de que el router lea nada. */
+  var r = new URLSearchParams(location.search).get('r');
+  if (r) {
+    try { history.replaceState(null, '', raiz.replace(/\/$/, '') + r); } catch (e) { /* nada */ }
+  }
+})();
+</script>
 <!-- viewport-fit=cover: en un teléfono con muesca, sin esto la pantalla
      completa deja una franja negra a los lados del vídeo. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -12,13 +32,13 @@
 <!-- Instalable como aplicación. En Android y en el escritorio basta con el
      manifiesto y el service worker, que registra adaptable.js; iOS no lee el
      manifiesto y necesita sus propias etiquetas. -->
-<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="manifest" href="manifest.webmanifest" />
 <meta name="theme-color" content="#0a0a0a" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="MOOVIN" />
-<link rel="apple-touch-icon" href="/icono-192.png" />
+<link rel="apple-touch-icon" href="icono-192.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
@@ -1593,7 +1613,7 @@ body.invitado #btn-entrar{display:inline-flex}
 </style>
 <!-- La capa adaptable va DESPUES de los estilos de arriba: reajusta lo justo
      para televisor y para telefono, y para eso tiene que poder pisarlos. -->
-<link rel="stylesheet" href="/adaptable.css" />
+<link rel="stylesheet" href="adaptable.css" />
 </head>
 <body>
 
@@ -3450,10 +3470,19 @@ const GRUPOS = [
   { clave: 'anime', rotulo: 'Anime', ruta: '/anime', filtro: (t) => grupoDe(t) === 'anime' },
   { clave: 'serie', rotulo: 'Series', ruta: '/series', filtro: (t) => t.tipo === 'serie' }
 ];
+/* La aplicacion puede colgar de la raiz del dominio o de una carpeta (ver el
+   <base> de la cabecera). El router lee y escribe SIEMPRE la ruta interna:
+   esa carpeta se le quita al leer y se le pone al escribir. */
+const RAIZWEB = (window.__moovinRaiz || '/').replace(/\/$/, '');
+const rutaDeUrl = () => {
+  let p = location.pathname;
+  if (RAIZWEB && p.indexOf(RAIZWEB) === 0) p = p.slice(RAIZWEB.length);
+  return p.replace(/\/+$/, '') || '/';
+};
 const LIBSEC = 'moovinSeccion';
 /* Manda la URL; si no dice nada, la ultima division que se miro. */
 let libSec = (() => {
-  const p = location.pathname.replace(/[/]+$/, '');
+  const p = rutaDeUrl();
   const g = GRUPOS.find((x) => x.ruta === p);
   if (g) return g.clave;
   try { return localStorage[LIBSEC] || ''; } catch (e) { return ''; }
@@ -4617,13 +4646,13 @@ const MANDO = {
    Esto no podía ir por el relay: es un difusor tonto y reparte cada mensaje a
    toda la sala, así que la clave se la habría llevado cualquiera que acertase
    seis caracteres. */
-function urlMando(code) { return location.origin + '/mando/' + code; }
+function urlMando(code) { return location.origin + RAIZWEB + '/mando/' + code; }
 
 const VINC = { codigo: '', secreto: '', tick: 0 };
 
 function pintaQR(code) {
   $('#qp-cod').textContent = code;
-  $('#qp-url').textContent = location.host + '/mando';
+  $('#qp-url').textContent = location.host + RAIZWEB + '/mando';
   const caja = $('#qp-qr');
   caja.innerHTML = '';
   try { caja.innerHTML = window.MoovinQR.svg(urlMando(code), { borde: 2 }); }
@@ -4988,7 +5017,7 @@ $('#mb-aqui').addEventListener('click', () => {
 const deMando = () => {
   const c = $('#me-cod').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
   if (!c) return;
-  history.pushState({ ruta: '/mando/' + c, grupo: libSec, caja: null }, '', '/mando/' + c);
+  history.pushState({ ruta: '/mando/' + c, grupo: libSec, caja: null }, '', RAIZWEB + '/mando/' + c);
   aplicaRuta();
 };
 $('#me-ok').addEventListener('click', deMando);
@@ -5020,8 +5049,12 @@ function tituloDeSlug(sl) {
   const tt = (bibData && bibData.titulos) || [];
   return tt.find((t) => slugDe(t) === sl) || null;
 }
-/* La ruta que le toca a lo que hay ahora mismo en pantalla. */
+/* La ruta que le toca a lo que hay ahora mismo en pantalla, ya con la carpeta
+   de la que cuelga la aplicacion delante: es lo que va a la barra. */
 function rutaActual() {
+  return RAIZWEB + rutaInterna();
+}
+function rutaInterna() {
   // Con el mando encendido todo cuelga de /mando/<CODIGO>: asi el atras del
   // telefono vuelve a la biblioteca del mando en vez de salirse de MOOVIN.
   const raiz = MANDO.on ? '/mando' + (MANDO.code ? '/' + MANDO.code : '') : '';
@@ -5061,7 +5094,7 @@ function aplicaRuta(op) {
   const est = history.state || {};
   aplicandoRuta = true;
   try {
-    let p = location.pathname.replace(/\/+$/, '') || '/';
+    let p = rutaDeUrl();
     /* /mando enciende el mando y /mando/<CODIGO> ademas lo empareja. Lo que
        venga detras se resuelve como una ruta normal, que es la biblioteca
        vista desde el telefono. */
@@ -5715,7 +5748,7 @@ async function salir(op) {
   const enTV = document.documentElement.getAttribute('data-plataforma') === 'tv' ||
                /\btv=1\b/.test(location.search);
   // El mando no es una sesion de cine: entra directo.
-  const enMando = /^\/mando(\/|$)/.test(location.pathname);
+  const enMando = /^\/mando(\/|$)/.test(rutaDeUrl());
   let yaVista = false;
   try { yaVista = sessionStorage.moovinIntro === '1'; sessionStorage.moovinIntro = '1'; } catch (e) { /* nada */ }
   if (yaVista || enTV || enMando) { cap.classList.add('oculto'); return; }
@@ -6505,7 +6538,7 @@ window.MOOVIN = {
 </script>
 <!-- Y el script, DESPUES del de arriba: escucha las mismas teclas y necesita
      que los controles ya esten montados para poder moverles el foco. -->
-<script src="/qr.js"></script>
-<script src="/adaptable.js"></script>
+<script src="qr.js"></script>
+<script src="adaptable.js"></script>
 </body>
 </html>

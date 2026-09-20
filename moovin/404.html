@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex" />
+<title>MOOVIN</title>
+<script>
+/* Aquí caen las rutas del router (/peliculas, /t/<slug>, /mando/…) cuando la
+   biblioteca se sirve desde iris.it.com/moovin/: eso es GitHub Pages y no
+   tiene el _redirects de Cloudflare Pages, así que ninguna de esas rutas
+   existe como archivo. Se le devuelven a la aplicación en `?r=`, y ella las
+   vuelve a poner en la barra nada más arrancar. */
+(function () {
+  var raiz = /^\/moovin(?=\/|$)/.test(location.pathname) ? '/moovin' : '';
+  var r = location.pathname.slice(raiz.length) + location.search + location.hash;
+  location.replace(raiz + '/?r=' + encodeURIComponent(r));
+})();
+</script>
+</head>
+<body style="background:#0a0a0a"></body>
+</html>
