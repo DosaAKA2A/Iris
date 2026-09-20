@@ -14,12 +14,6 @@
   var b = document.createElement('base');
   b.href = raiz;
   document.head.appendChild(b);
-  /* 404.html devuelve así las rutas que GitHub Pages no sabe servir. Se
-     recompone la dirección antes de que el router lea nada. */
-  var r = new URLSearchParams(location.search).get('r');
-  if (r) {
-    try { history.replaceState(null, '', raiz.replace(/\/$/, '') + r); } catch (e) { /* nada */ }
-  }
 })();
 </script>
 <!-- viewport-fit=cover: en un teléfono con muesca, sin esto la pantalla
