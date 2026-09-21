@@ -22,7 +22,7 @@
    conexion, no la fuente de la verdad.
    ========================================================================== */
 
-const CACHE = 'moovin-interfaz-v10';
+const CACHE = 'moovin-interfaz-v11';
 
 /* La interfaz completa. Si alguno falla no se aborta la instalacion entera:
    un icono que no este no puede dejar la app sin instalar. */
@@ -83,6 +83,9 @@ self.addEventListener('fetch', (e) => {
   // Los videos y las pistas de audio pasan de largo: se piden por trozos con
   // cabeceras Range y una cache intermedia solo puede estropearlo.
   if (/\.(mp4|m4a|m4v|webm|mkv|mp3|opus|aac)$/i.test(url.pathname)) return;
+  // La pagina de presentacion (/inicio/) no es la app: si se guardara como
+  // navegacion, pisaria la copia de index.html que abre la biblioteca sin red.
+  if (url.pathname.startsWith('/inicio')) return;
 
   /* Todas las rutas son la MISMA pagina: el router vive dentro del HTML y el
      _redirects de Pages devuelve index.html para cualquiera. Si se guardara

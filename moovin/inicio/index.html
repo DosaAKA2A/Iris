@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MOOVIN — Tu sala de cine, en cualquier pantalla</title>
+<meta name="description" content="MOOVIN es la biblioteca privada de cine y anime de IRIS Studio: películas y series con audios y subtítulos a tu elección, salas para verlas con quien quieras y la misma interfaz en escritorio, móvil y televisor." />
+<link rel="canonical" href="https://moovin.live/inicio/" />
+<meta name="theme-color" content="#0b0b0d" />
+<meta property="og:site_name" content="MOOVIN" />
+<meta property="og:locale" content="es_LA" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://moovin.live/inicio/" />
+<meta property="og:title" content="MOOVIN — Tu sala de cine, en cualquier pantalla" />
+<meta property="og:description" content="Películas y anime con audios y subtítulos a tu elección, salas para ver juntos y la misma interfaz en escritorio, móvil y televisor." />
+<meta property="og:image" content="https://moovin.live/inicio/img/og.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="MOOVIN — Tu sala de cine, en cualquier pantalla" />
+<meta name="twitter:description" content="Películas y anime con audios y subtítulos a tu elección, salas para ver juntos y la misma interfaz en escritorio, móvil y televisor." />
+<meta name="twitter:image" content="https://moovin.live/inicio/img/og.jpg" />
+<link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0b0b0d; --bg-2:#0e0e11; --surface:#131317; --surface-2:#191920;
+    --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.14);
+    --text:#f4f4f6; --muted:#9a9ba3; --dim:#66676f;
+    --rubi:#d61f45; --oro:#ffb62e;
+    --papel:#f2f0ec; --papel-2:#e4dfd6; --tinta:#17181b; --papel-suave:#5d5f67;
+    --display:'Bricolage Grotesque',system-ui,sans-serif;
+    --sans:'Geist',system-ui,sans-serif;
+    --mono:'Geist Mono',ui-monospace,Consolas,monospace;
+    --maxw:1200px; --gutter:24px;
+    /* Las mismas formas de ticket que usa la biblioteca */
+    --mask-cartel:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%273546.40 -312.61 661.10 985.76%27%3E%3Cpath d=%27M4207.5-263.32v889.54c-25.91,0-46.92,21.01-46.92,46.93h-567.25c0-25.92-21.01-46.93-46.93-46.93V-263.32c0-27.22,22.07-49.29,49.29-49.29h562.52c27.22,0,49.29,22.07,49.29,49.29Z%27 fill=%27%23000%27/%3E%3C/svg%3E');
+    --mask-talon:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%273546.40 673.15 661.10 375.30%27%3E%3Cpath d=%27M4207.5,720.07v328.38h-661.1v-328.38c25.92,0,46.93-21.01,46.93-46.92h567.25c0,25.91,21.01,46.92,46.92,46.92Z%27 fill=%27%23000%27/%3E%3C/svg%3E');
+    --mask-roto:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%274670.00 673.15 661.10 375.30%27%3E%3Cpath d=%27M5331.1,720.07v328.38h-28c0-25.92-21-46.93-46.92-46.93s-46.93,21.01-46.93,46.93h-33.96c0-25.92-21.01-46.93-46.93-46.93s-46.92,21.01-46.92,46.93h-33.97c0-25.92-21.01-46.93-46.92-46.93s-46.93,21.01-46.93,46.93h-33.97c0-25.92-21-46.93-46.92-46.93s-46.93,21.01-46.93,46.93h-33.96c0-25.92-21.01-46.93-46.93-46.93s-46.92,21.01-46.92,46.93h-27.99v-328.38c25.92,0,46.93-21.01,46.93-46.92h567.25c0,25.91,21.01,46.92,46.92,46.92Z%27 fill=%27%23000%27/%3E%3C/svg%3E');
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  img{display:block}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter)}
+  h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+  h2{font-size:clamp(28px,3.4vw,40px);line-height:1.1}
+  h3{font-size:18px;font-weight:600;letter-spacing:-.01em}
+  .lead{color:var(--muted);font-size:17px;line-height:1.6;max-width:56ch}
+  .mono{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+  ::selection{background:rgba(214,31,69,.35)}
+  :focus-visible{outline:2px solid var(--oro);outline-offset:3px;border-radius:6px}
+
+  /* ===== Botones ===== */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;height:48px;padding:0 22px;border-radius:999px;font-weight:600;font-size:15px;border:1px solid transparent;cursor:pointer;transition:transform .18s ease,background .18s ease,border-color .18s ease,color .18s ease}
+  .btn:active{transform:translateY(1px)}
+  .btn-blanco{background:var(--text);color:var(--bg)}
+  .btn-blanco:hover{background:#fff}
+  .btn-borde{border-color:var(--line-2);color:var(--text);background:rgba(11,11,13,.35);backdrop-filter:blur(8px)}
+  .btn-borde:hover{border-color:rgba(255,255,255,.32);background:rgba(255,255,255,.06)}
+  .btn svg{width:18px;height:18px}
+
+  /* ===== Cabecera ===== */
+  header{position:fixed;top:0;left:0;right:0;z-index:40;transition:background .3s ease,border-color .3s ease}
+  header.solida{background:rgba(11,11,13,.78);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;gap:28px;height:68px}
+  .marca{display:flex;align-items:center;gap:10px}
+  .marca .m{height:24px;width:auto}
+  .marca .palabra{height:12px;width:auto;color:var(--text)}
+  .nav .links{display:flex;gap:26px;margin-left:12px}
+  .nav .links a{font-size:14px;color:var(--muted);transition:color .15s}
+  .nav .links a:hover{color:var(--text)}
+  .nav .sep{flex:1}
+  .nav .btn{height:40px;padding:0 18px;font-size:14px}
+
+  /* ===== Hero ===== */
+  .hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;padding:140px 0 72px;isolation:isolate}
+  .hero .fondo{position:absolute;inset:0;z-index:-2;background:url(img/sala.jpg) center 40%/cover no-repeat}
+  .hero .velo{position:absolute;inset:0;z-index:-1;
+    background:linear-gradient(180deg,rgba(11,11,13,.55) 0%,rgba(11,11,13,.15) 32%,rgba(11,11,13,.62) 68%,var(--bg) 100%),
+               radial-gradient(90% 70% at 50% 20%,transparent 40%,rgba(11,11,13,.55) 100%)}
+  .hero .grano{position:absolute;inset:0;z-index:-1;opacity:.06;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:160px 160px}
+  .hero-cont{max-width:640px}
+  .hero-cont .m-grande{height:44px;width:auto;margin-bottom:26px;filter:drop-shadow(0 6px 24px rgba(214,31,69,.35))}
+  h1{font-size:clamp(38px,5.2vw,60px);line-height:1.02;color:#fff;text-shadow:0 2px 30px rgba(0,0,0,.5)}
+  .hero .lead{margin-top:20px;color:#d9d9de;text-shadow:0 1px 18px rgba(0,0,0,.6)}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+  .hero-meta{margin-top:34px;display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:#a9aab2}
+  .hero-meta span::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--oro);margin-right:9px;vertical-align:2px}
+
+  /* ===== Secciones ===== */
+  section{position:relative;padding:112px 0}
+  .cab{max-width:680px;margin-bottom:44px}
+  .cab .lead{margin-top:14px}
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+  .reveal.visto{opacity:1;transform:none}
+
+  /* ===== Cartelera: tickets ===== */
+  .tickets{display:grid;grid-template-columns:repeat(5,1fr);gap:22px}
+  .ticket{transition:transform .25s cubic-bezier(.16,1,.3,1)}
+  .ticket:hover{transform:translateY(-8px)}
+  .tk-cartel{aspect-ratio:661.1/985.76;background:#16161a;
+    -webkit-mask:var(--mask-cartel) 0 0/100% 100% no-repeat;mask:var(--mask-cartel) 0 0/100% 100% no-repeat}
+  .tk-cartel img{width:100%;height:100%;object-fit:cover}
+  .tk-talon{aspect-ratio:661.1/375.3;display:flex;flex-direction:column;align-items:center;text-align:center;padding:8% 10% 0;color:var(--tinta);
+    background:linear-gradient(180deg,var(--papel) 0%,var(--papel-2) 100%);
+    -webkit-mask:var(--mask-talon) 0 0/100% 100% no-repeat;mask:var(--mask-talon) 0 0/100% 100% no-repeat}
+  .tk-tit{font-family:var(--display);font-weight:700;font-size:14.5px;line-height:1.2;letter-spacing:-.01em}
+  .tk-nota{margin-top:4px;font-size:11.5px;color:var(--papel-suave)}
+  .tk-pie{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:auto;padding-bottom:10%;width:100%}
+  .tk-cod{display:block;height:18px;width:76px;opacity:.82;background:repeating-linear-gradient(90deg,var(--tinta) 0 2px,transparent 2px 4px,var(--tinta) 4px 5px,transparent 5px 9px,var(--tinta) 9px 12px,transparent 12px 14px)}
+  .tk-dur{font-family:var(--mono);font-size:10.5px;color:var(--papel-suave);letter-spacing:.04em;white-space:nowrap}
+  .ticket.vista .tk-cartel img{filter:grayscale(.6) brightness(.62)}
+  .ticket.vista .tk-talon{-webkit-mask-image:var(--mask-roto);mask-image:var(--mask-roto)}
+  .tickets-nota{margin-top:26px;font-size:14px;color:var(--dim)}
+
+  /* ===== Ver juntos ===== */
+  .dos{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+  .sala{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 30px 70px rgba(0,0,0,.45)}
+  .sala-cab{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .sala-cab .tit{display:flex;align-items:center;gap:9px;font-weight:600;font-size:15px}
+  .sala-cab .tit svg{width:18px;height:18px;color:var(--rubi)}
+  .codigo{font-family:var(--mono);font-size:14px;letter-spacing:.18em;color:var(--oro);border:1px dashed rgba(255,182,46,.45);border-radius:9px;padding:6px 12px}
+  .gente{display:flex;align-items:center;margin-top:18px}
+  .gente img{width:36px;height:36px;border-radius:50%;border:2px solid var(--surface);margin-left:-8px;background:#222}
+  .gente img:first-child{margin-left:0}
+  .gente span{margin-left:12px;font-size:13px;color:var(--muted)}
+  .chat{display:flex;flex-direction:column;gap:9px;margin-top:18px}
+  .sys{font-family:var(--mono);font-size:11px;color:var(--dim)}
+  .msg{display:flex;align-items:flex-start;gap:9px;max-width:88%}
+  .msg img{width:24px;height:24px;border-radius:50%;flex:none;background:#222}
+  .msg p{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:7px 11px;font-size:13.5px}
+  .msg p b{color:var(--oro);font-weight:600}
+  .barra{margin-top:20px;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:#0d0d10;border:1px solid var(--line)}
+  .barra .play{width:32px;height:32px;border-radius:50%;background:var(--text);color:var(--bg);display:grid;place-items:center;flex:none}
+  .barra .play svg{width:14px;height:14px}
+  .barra .linea{flex:1;height:4px;border-radius:2px;background:#26262c;position:relative;overflow:hidden}
+  .barra .linea::after{content:"";position:absolute;left:0;top:0;bottom:0;width:38%;background:linear-gradient(90deg,var(--rubi),var(--oro))}
+  .barra .t{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .lista{margin-top:28px;display:flex;flex-direction:column;gap:12px}
+  .lista li{list-style:none;display:flex;gap:12px;font-size:15px;color:var(--muted)}
+  .lista li::before{content:"";flex:none;width:18px;height:18px;margin-top:3px;border-radius:50%;background:rgba(214,31,69,.14);border:1px solid rgba(214,31,69,.4);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff4d5e' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E");background-size:10px;background-position:center;background-repeat:no-repeat}
+  .lista li b{color:var(--text);font-weight:500}
+
+  /* ===== Reproductor ===== */
+  .rasgos{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .rasgo{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;transition:border-color .25s,transform .25s}
+  .rasgo:hover{border-color:var(--line-2);transform:translateY(-4px)}
+  .rasgo .ic{width:40px;height:40px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;margin-bottom:16px;color:var(--text)}
+  .rasgo .ic svg{width:19px;height:19px}
+  .rasgo p{margin-top:6px;font-size:14px;color:var(--muted);line-height:1.55}
+
+  /* ===== Pantallas ===== */
+  .pantallas{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:18px}
+  .pantalla{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:26px;min-height:300px;display:flex;flex-direction:column}
+  .pantalla p{margin-top:6px;font-size:14px;color:var(--muted);max-width:34ch}
+  .pantalla .figura{margin-top:auto;padding-top:22px}
+  .tv{width:100%;aspect-ratio:16/9;border-radius:10px;border:1px solid var(--line-2);background:#0a0a0c url(img/cartel-faro.jpg) center 30%/cover;position:relative}
+  .tv::after{content:"";position:absolute;left:8%;right:8%;bottom:10%;height:3px;border-radius:2px;background:rgba(255,255,255,.35)}
+  .tv::before{content:"";position:absolute;left:8%;bottom:10%;height:3px;width:34%;border-radius:2px;background:linear-gradient(90deg,var(--rubi),var(--oro));z-index:1}
+  .movil{width:118px;aspect-ratio:9/19;border-radius:18px;border:1px solid var(--line-2);background:#0a0a0c;padding:10px;display:flex;flex-direction:column;gap:8px;margin:0 auto}
+  .movil .qr{aspect-ratio:1;border-radius:6px;background:
+    linear-gradient(90deg,var(--text) 22%,transparent 22% 78%,var(--text) 78%) 0 0/100% 22% no-repeat,
+    linear-gradient(90deg,var(--text) 22%,transparent 22% 78%,var(--text) 78%) 0 100%/100% 22% no-repeat,
+    repeating-linear-gradient(90deg,var(--text) 0 8%,transparent 8% 16%) 0 44%/100% 12% no-repeat,
+    repeating-linear-gradient(90deg,transparent 0 8%,var(--text) 8% 16%) 0 60%/100% 10% no-repeat}
+  .movil .mando{margin-top:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .movil .mando i{display:block;height:18px;border-radius:5px;background:#1c1c22}
+  .movil .mando i:nth-child(2){background:var(--text)}
+  .pwa{display:flex;gap:10px;align-items:center;margin-top:auto;padding-top:22px}
+  .pwa .icono{width:56px;height:56px;border-radius:14px;background:#0a0a0a;border:1px solid var(--line-2);display:grid;place-items:center}
+  .pwa .icono img{width:34px}
+  .pwa .txt{font-size:13px;color:var(--muted);line-height:1.4}
+  .pwa .txt b{display:block;color:var(--text);font-weight:600}
+  .naviris{margin-top:18px;display:flex;align-items:center;gap:16px;padding:18px 22px;border-radius:18px;background:var(--surface);border:1px solid var(--line)}
+  .naviris img{width:34px;height:34px}
+  .naviris p{font-size:14px;color:var(--muted)}
+  .naviris p b{color:var(--text);font-weight:600}
+  .naviris a{margin-left:auto;font-size:14px;color:var(--text);border-bottom:1px solid var(--line-2);white-space:nowrap}
+
+  /* ===== Acceso ===== */
+  .llaves{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .llave{border-top:1px solid var(--line-2);padding-top:20px}
+  .llave .n{font-family:var(--mono);font-size:12px;color:var(--oro);letter-spacing:.1em;margin-bottom:10px}
+  .llave p{margin-top:6px;font-size:14.5px;color:var(--muted)}
+
+  /* ===== Cierre ===== */
+  .cierre{position:relative;overflow:hidden;border-radius:26px;padding:72px 32px;text-align:center;background:var(--surface);border:1px solid var(--line)}
+  .cierre::before{content:"";position:absolute;inset:-40% -10% auto;height:120%;background:radial-gradient(50% 50% at 50% 50%,rgba(214,31,69,.22),transparent 70%);pointer-events:none}
+  .cierre>*{position:relative}
+  .cierre .m-grande{height:52px;width:auto;margin:0 auto 22px}
+  .cierre .lead{margin:14px auto 30px;text-align:center}
+  .cierre .cta{justify-content:center;margin-top:0}
+  .cierre .nota{margin-top:18px;font-size:13px;color:var(--dim)}
+
+  footer{border-top:1px solid var(--line);padding:36px 0 40px}
+  .pie{display:flex;align-items:center;gap:22px;flex-wrap:wrap;font-size:13.5px;color:var(--muted)}
+  .pie .marca .m{height:20px}
+  .pie a:hover{color:var(--text)}
+  .pie .der{margin-left:auto;color:var(--dim)}
+
+  @media (max-width:980px){
+    .tickets{grid-template-columns:repeat(3,1fr)}
+    .ticket:nth-child(n+4){display:none}
+    .dos{grid-template-columns:1fr;gap:36px}
+    .rasgos{grid-template-columns:1fr 1fr}
+    .pantallas{grid-template-columns:1fr}
+    .pantalla{min-height:0}
+    .nav .links{display:none}
+  }
+  @media (max-width:640px){
+    :root{--gutter:16px}
+    section{padding:80px 0}
+    .hero{padding:120px 0 56px}
+    .tickets{grid-template-columns:1fr 1fr;gap:14px}
+    .ticket:nth-child(3){display:none}
+    .rasgos,.llaves{grid-template-columns:1fr}
+    .naviris{flex-wrap:wrap}
+    .naviris a{margin-left:50px}
+    .cierre{padding:52px 20px}
+    .pie .der{margin-left:0;width:100%}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none}
+    .ticket,.rasgo,.btn{transition:none}
+  }
+</style>
+</head>
+<body>
+
+<header id="cab">
+  <div class="wrap nav">
+    <a class="marca" href="https://moovin.live/" aria-label="MOOVIN">
+      <img class="m" src="../logo.svg" alt="" />
+      <svg class="palabra" viewBox="0 0 816.44 139.16" aria-hidden="true"><path fill="currentColor" d="M255.76,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S292.18,7.27,255.76,7.27ZM255.76,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M399.87,7.27c-36.42,0-65.94,29.53-65.94,65.95s29.52,65.94,65.94,65.94,65.95-29.52,65.95-65.94S436.29,7.27,399.87,7.27ZM399.87,112.74c-21.83,0-39.52-17.69-39.52-39.52s17.69-39.52,39.52-39.52,39.52,17.69,39.52,39.52-17.69,39.52-39.52,39.52Z"/><path fill="currentColor" d="M177.6,59.04v80.12h-26.23V59.07c0-6.61-2.68-12.59-7.01-16.93-4.33-4.33-10.32-7.01-16.93-7.01-13.22,0-23.93,10.7-23.95,23.91v80.12h-29.36V59.07c0-6.61-2.68-12.59-7.01-16.93-4.34-4.33-10.32-7.01-16.94-7.01-13.22,0-23.94,10.72-23.94,23.94v80.09H0V59.04C0,30.95,22.77,8.18,50.86,8.18h1.76c14.35,0,27.31,5.94,36.55,15.5,9.24-9.56,22.2-15.5,36.55-15.5h1.02c28.09,0,50.86,22.77,50.86,50.86Z"/><g><rect fill="currentColor" x="641.77" y="35.5" width="30.22" height="103.21"/><rect fill="currentColor" x="641.77" width="30.22" height="23.94"/></g><path fill="currentColor" d="M816.44,74.65v64.34h-27.14v-65.52c0-21.44-17.38-38.81-38.81-38.81s-38.81,17.37-38.81,38.81v65.52h-27.14v-64.34c0-36.42,29.53-65.95,65.95-65.95s65.95,29.53,65.95,65.95Z"/><path fill="currentColor" d="M487.85,73.04V8.7h27.14v65.52c0,21.44,17.38,38.81,38.81,38.81s38.81-17.37,38.81-38.81V8.7h27.14v64.34c0,36.42-29.53,65.95-65.95,65.95s-65.95-29.53-65.95-65.95Z"/></svg>
+    </a>
+    <nav class="links">
+      <a href="#cartelera">Cartelera</a>
+      <a href="#juntos">Ver juntos</a>
+      <a href="#reproductor">Reproductor</a>
+      <a href="#pantallas">Pantallas</a>
+      <a href="#acceso">Acceso</a>
+    </nav>
+    <span class="sep"></span>
+    <a class="btn btn-blanco" href="https://moovin.live/">Entrar a la biblioteca</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="inicio">
+    <div class="fondo" role="img" aria-label="Una sala de cine vacía con la pantalla encendida"></div>
+    <div class="velo"></div>
+    <div class="grano"></div>
+    <div class="wrap">
+      <div class="hero-cont">
+        <img class="m-grande" src="../logo.svg" alt="" />
+        <h1>Tu sala de cine, en cualquier pantalla</h1>
+        <p class="lead">MOOVIN es la biblioteca privada de cine y anime de IRIS Studio. Películas y series con los audios y subtítulos que elijas, salas para verlas con quien quieras y la misma interfaz en el escritorio, el móvil y el televisor.</p>
+        <div class="cta">
+          <a class="btn btn-blanco" href="https://moovin.live/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
+            Entrar a la biblioteca
+          </a>
+          <a class="btn btn-borde" href="#acceso">Cómo se entra</a>
+        </div>
+        <div class="hero-meta"><span>Escritorio</span><span>Móvil</span><span>Televisor</span><span>Naviris</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cartelera">
+    <div class="wrap">
+      <div class="cab reveal">
+        <h2>Una cartelera, no una lista</h2>
+        <p class="lead">Cada título es un ticket: la carátula arriba y la información en el talón. Cuando terminas de verlo, el ticket queda cortado, y así sabes de un vistazo qué te falta.</p>
+      </div>
+      <div class="tickets">
+        <article class="ticket reveal">
+          <div class="tk-cartel"><img src="img/cartel-tokio.jpg" width="800" height="1200" alt="" loading="lazy" /></div>
+          <div class="tk-talon"><div class="tk-tit">Anime</div><div class="tk-nota">Temporada 1 · 12 episodios</div><div class="tk-pie"><span class="tk-cod"></span><span class="tk-dur">JAP · LAT</span></div></div>
+        </article>
+        <article class="ticket reveal">
+          <div class="tk-cartel"><img src="img/cartel-faro.jpg" width="800" height="1200" alt="" loading="lazy" /></div>
+          <div class="tk-talon"><div class="tk-tit">Película</div><div class="tk-nota">Drama · 2024</div><div class="tk-pie"><span class="tk-cod"></span><span class="tk-dur">1 h 58 min</span></div></div>
+        </article>
+        <article class="ticket reveal vista">
+          <div class="tk-cartel"><img src="img/cartel-desierto.jpg" width="800" height="1200" alt="" loading="lazy" /></div>
+          <div class="tk-talon"><div class="tk-tit">Película</div><div class="tk-nota">Ya vista</div><div class="tk-pie"><span class="tk-cod"></span><span class="tk-dur">2 h 07 min</span></div></div>
+        </article>
+        <article class="ticket reveal">
+          <div class="tk-cartel"><img src="img/cartel-nieve.jpg" width="800" height="1200" alt="" loading="lazy" /></div>
+          <div class="tk-talon"><div class="tk-tit">Serie</div><div class="tk-nota">3 temporadas</div><div class="tk-pie"><span class="tk-cod"></span><span class="tk-dur">24 episodios</span></div></div>
+        </article>
+        <article class="ticket reveal">
+          <div class="tk-cartel"><img src="img/cartel-lluvia.jpg" width="800" height="1200" alt="" loading="lazy" /></div>
+          <div class="tk-talon"><div class="tk-tit">Película</div><div class="tk-nota">Suspenso · 2023</div><div class="tk-pie"><span class="tk-cod"></span><span class="tk-dur">1 h 44 min</span></div></div>
+        </article>
+      </div>
+      <p class="tickets-nota reveal">Las carátulas de esta página son ilustrativas. La cartelera real se puede mirar sin cuenta en moovin.live.</p>
+    </div>
+  </section>
+
+  <section id="juntos">
+    <div class="wrap dos">
+      <div class="reveal">
+        <h2>Una sala para verla con quien quieras</h2>
+        <p class="lead">Crea una sala, comparte el código y todos ven lo mismo a la vez: play, pausa, saltos y hasta el cambio de capítulo. Nadie transmite su pantalla; cada persona reproduce su propia copia.</p>
+        <ul class="lista">
+          <li><span><b>El anfitrión manda.</b> Decide quién controla la reproducción y quién puede cambiar el video.</span></li>
+          <li><span><b>El chat acompaña al video</b> en un panel lateral y narra cada acción de la sala.</span></li>
+          <li><span><b>Desde cualquier navegador,</b> y también con el addon Watch Party de Naviris en la misma sala.</span></li>
+        </ul>
+      </div>
+      <div class="sala reveal" aria-hidden="true">
+        <div class="sala-cab">
+          <div class="tit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Watch Party</div>
+          <div class="codigo">KQ4-7ZM</div>
+        </div>
+        <div class="gente">
+          <img src="../avatares/pj3.svg" alt="" /><img src="../avatares/pj7.svg" alt="" /><img src="../avatares/aria.svg" alt="" />
+          <span>3 en la sala · Iris es la anfitriona</span>
+        </div>
+        <div class="chat">
+          <div class="sys">Vera se ha unido a la sala</div>
+          <div class="msg"><img src="../avatares/pj3.svg" alt="" /><p><b>Iris</b> dale play cuando quieras</p></div>
+          <div class="sys">Vera ha dado play · 00:00</div>
+          <div class="msg"><img src="../avatares/pj7.svg" alt="" /><p><b>Vera</b> qué buen arranque de temporada</p></div>
+          <div class="sys">Iris cambió al capítulo 2</div>
+        </div>
+        <div class="barra">
+          <span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+          <span class="linea"></span>
+          <span class="t">09:12 / 24:10</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reproductor">
+    <div class="wrap">
+      <div class="cab reveal">
+        <h2>Un reproductor hecho para ver series</h2>
+        <p class="lead">Lo que de verdad se usa capítulo tras capítulo, sin menús escondidos ni extensiones.</p>
+      </div>
+      <div class="rasgos">
+        <article class="rasgo reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4a1 1 0 0 0 1 1h3l4 4V5L7 9H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></div>
+          <h3>Audio japonés o latino</h3>
+          <p>Cambia de pista sin salir del video. La elección se recuerda para el siguiente capítulo.</p>
+        </article>
+        <article class="rasgo reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 14h5M14 14h3M7 10.5h3M12 10.5h5"/></svg></div>
+          <h3>Subtítulos a tu gusto</h3>
+          <p>Los de la biblioteca o los tuyos: un archivo .srt o .vtt se carga desde el propio reproductor.</p>
+        </article>
+        <article class="rasgo reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l8 7-8 7zM15 5v14"/></svg></div>
+          <h3>Saltar la intro</h3>
+          <p>Cuando el capítulo tiene opening marcado, un botón lo salta y sigue donde empieza la historia.</p>
+        </article>
+        <article class="rasgo reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9 9l5 3-5 3z" fill="currentColor" stroke="none"/></svg></div>
+          <h3>Siguiente capítulo</h3>
+          <p>Al terminar, el siguiente está a un clic desde la barra de controles. En una sala, cambia para todos.</p>
+        </article>
+        <article class="rasgo reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-4-4m4 4l4-4M4 19h16"/></svg></div>
+          <h3>Descargas</h3>
+          <p>Bájate un capítulo o una película para verla sin conexión, o usa tu copia local en la sala.</p>
+        </article>
+        <article class="rasgo reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+          <h3>Series y sagas ordenadas</h3>
+          <p>Temporadas por pestañas con su carátula, y las películas de una saga dentro de su serie, no regadas por la biblioteca.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="pantallas">
+    <div class="wrap">
+      <div class="cab reveal">
+        <h2>La misma sala en el escritorio, el móvil y el televisor</h2>
+        <p class="lead">Una sola interfaz que se adapta a cómo la manejas: con el mouse, con el dedo o con el mando a distancia.</p>
+      </div>
+      <div class="pantallas">
+        <article class="pantalla reveal">
+          <h3>Televisor</h3>
+          <p>Con el mando: el foco se mueve por la cartelera con las flechas y la barra de controles se esconde sola cuando no la usas.</p>
+          <div class="figura"><div class="tv" aria-hidden="true"></div></div>
+        </article>
+        <article class="pantalla reveal">
+          <h3>Mando desde el móvil</h3>
+          <p>Escanea el código QR que muestra la pantalla y controla la reproducción, el volumen, los audios y los subtítulos desde el teléfono.</p>
+          <div class="figura"><div class="movil" aria-hidden="true"><div class="qr"></div><div class="mando"><i></i><i></i><i></i></div></div></div>
+        </article>
+        <article class="pantalla reveal">
+          <h3>Escritorio y móvil</h3>
+          <p>Se instala como una app desde el navegador, con su icono y sin barra de direcciones. Funciona en Windows, Mac, Android e iPhone.</p>
+          <div class="pwa"><div class="icono"><img src="../logo.svg" alt="" /></div><div class="txt"><b>MOOVIN</b>Instalar aplicación</div></div>
+        </article>
+      </div>
+      <div class="naviris reveal">
+        <img src="https://naviris.site/assets/iris-favicon.svg" alt="" />
+        <p><b>En Naviris entra solo.</b> El navegador de IRIS Studio abre la biblioteca desde su hub con el pase ya puesto, y su addon Watch Party comparte sala con esta página.</p>
+        <a href="https://naviris.site/">Conocer Naviris</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="acceso">
+    <div class="wrap">
+      <div class="cab reveal">
+        <h2>Cómo se entra</h2>
+        <p class="lead">MOOVIN es una biblioteca privada. La cartelera se puede mirar sin cuenta; para reproducir hace falta una de estas tres llaves.</p>
+      </div>
+      <div class="llaves">
+        <article class="llave reveal">
+          <div class="n">01</div>
+          <h3>Un pase</h3>
+          <p>El código que comparte quien administra la biblioteca. Se escribe una vez y el navegador lo recuerda.</p>
+        </article>
+        <article class="llave reveal">
+          <div class="n">02</div>
+          <h3>Una cuenta</h3>
+          <p>Con tu correo y un código de un solo uso. Tiene perfil, avatar y sirve para dar acceso a tus pantallas.</p>
+        </article>
+        <article class="llave reveal">
+          <div class="n">03</div>
+          <h3>Una pantalla emparejada</h3>
+          <p>El televisor muestra un código; lo confirmas desde el móvil con tu cuenta y esa pantalla queda con acceso.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="entrar" style="padding-top:0">
+    <div class="wrap">
+      <div class="cierre reveal">
+        <img class="m-grande" src="../logo.svg" alt="" />
+        <h2>La función empieza cuando tú quieras</h2>
+        <p class="lead">Entra a la cartelera, elige un título y, si tienes llave, dale play. Si no, pide una a quien te invitó.</p>
+        <div class="cta">
+          <a class="btn btn-blanco" href="https://moovin.live/">Entrar a la biblioteca</a>
+          <a class="btn btn-borde" href="https://naviris.site/">Descargar Naviris</a>
+        </div>
+        <p class="nota">Un proyecto de IRIS Studio para su círculo. No es un servicio comercial.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap pie">
+    <a class="marca" href="https://moovin.live/" aria-label="MOOVIN"><img class="m" src="../logo.svg" alt="" /></a>
+    <a href="https://moovin.live/">Biblioteca</a>
+    <a href="https://naviris.site/">Naviris</a>
+    <a href="https://iris.it.com/">IRIS Studio</a>
+    <span class="der">© 2026 IRIS Studio</span>
+  </div>
+</footer>
+
+<script>
+  // Cabecera sólida al salir del hero; revelado suave de las secciones.
+  const cab = document.getElementById('cab');
+  const pinta = () => cab.classList.toggle('solida', scrollY > 40);
+  addEventListener('scroll', pinta, { passive: true }); pinta();
+  const rev = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const obs = new IntersectionObserver((es) => {
+      es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('visto'); obs.unobserve(e.target); } });
+    }, { threshold: .12, rootMargin: '0px 0px -40px 0px' });
+    rev.forEach((el, i) => { el.style.transitionDelay = ((i % 5) * 60) + 'ms'; obs.observe(el); });
+  } else {
+    rev.forEach((el) => el.classList.add('visto'));
+  }
+</script>
+</body>
+</html>
