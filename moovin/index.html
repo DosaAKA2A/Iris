@@ -1201,8 +1201,11 @@ body.invitado #btn-entrar{display:inline-flex}
 }
 /* Con el hero a pantalla completa el arte apaisado va CENTRADO y entero: la
    ventana ya tiene casi su misma forma, asi que no hay nada que elegir. */
+/* --encuadre sale del campo `encuadre` del titulo: en una pantalla panoramica
+   el arte se recorta por arriba y por abajo, y si el logo del arte va bajo
+   (Chuunibyou) la franja se lo come. "center 62%" sube el recorte. */
 #lib-hero .hero-arte.ancho{
-  inset:0; width:auto; background-position:center;
+  inset:0; width:auto; background-position:var(--encuadre,center);
   -webkit-mask-image:none; mask-image:none;
 }
 /* El bloque de texto ocupa el ancho entero y es el MARGEN el que lo coloca;
@@ -1354,6 +1357,8 @@ body.invitado #btn-entrar{display:inline-flex}
     background-size:contain; background-position:center;
     -webkit-mask-image:none; mask-image:none;
   }
+  /* aqui va el cartel entero en contain: el encuadre del arte apaisado no pinta nada */
+  #lib-hero .hero-arte.ancho{background-position:center}
   /* El cartel va en `contain`, así que arriba y abajo asoma el relleno
      borroso. Con un póster casi blanco -la nieve de Interestelar- el
      desenfoque se queda en un gris plano que parece un fallo. Se apaga y se
@@ -6071,6 +6076,8 @@ function pintaHero(t) {
   box.innerHTML = '';
   box.style.setProperty('--arte-ancho', 'url("' + (ancho || cartel) + '")');
   box.style.setProperty('--arte-alto', 'url("' + cartel + '")');
+  if (t.encuadre) box.style.setProperty('--encuadre', t.encuadre);
+  else box.style.removeProperty('--encuadre');
 
   const lienzo = document.createElement('div'); lienzo.className = 'hero-lienzo';
   const fondo = document.createElement('div'); fondo.className = 'hero-fondo';
