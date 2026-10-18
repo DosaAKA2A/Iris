@@ -137,18 +137,25 @@
 :root[data-plataforma="tv"] #vol,
 :root[data-plataforma="tv"] #c-mute{display:none}
 /* Y la pantalla completa tampoco aplica: la app YA ocupa la pantalla entera. */
-:root[data-plataforma="tv"] #c-fs{display:none}
+/* Y la pantalla completa solo sobra en la app, que YA ocupa la pantalla entera.
+   En el navegador de la tele la pagina va debajo de la barra de pestañas y de
+   la direccion, asi que ahi el boton vuelve (adaptable.js marca data-fs). */
+:root[data-plataforma="tv"]:not([data-fs]) #c-fs{display:none}
 
 /* ---------- Menus de audio y subtitulos ---------- */
 /* Los menus se anclan a la derecha contando los botones que tienen al lado.
    En televisor esos botones son mas anchos y ademas faltan tres (volumen,
-   silencio y pantalla completa), asi que la cuenta cambia. */
+   silencio y, dentro de la app, pantalla completa), asi que la cuenta cambia. */
 :root[data-plataforma="tv"] .menu{
   bottom:110px; min-width:280px; padding:8px;
 }
 :root[data-plataforma="tv"] .menu-t{font-size:13px; padding:10px 14px 7px}
 :root[data-plataforma="tv"] #cc-menu{right:calc(30px + var(--safe-x))}
 :root[data-plataforma="tv"] #audio-menu{right:calc(96px + var(--safe-x))}
+/* Con el boton de pantalla completa a la vista hay uno mas a la derecha:
+   56 px del boton y 6 de separacion. */
+:root[data-plataforma="tv"][data-fs] #cc-menu{right:calc(92px + var(--safe-x))}
+:root[data-plataforma="tv"][data-fs] #audio-menu{right:calc(158px + var(--safe-x))}
 
 /* ---------- Subtitulos ---------- */
 /* El tamano guardado viene de una sesion de escritorio y en un televisor se

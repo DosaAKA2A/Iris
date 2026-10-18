@@ -3135,9 +3135,13 @@ $('#c-play').addEventListener('click', () => { if (video.src) { video.paused ? p
    comprueba que el método exista: en iPhone no lo hay (adaptable.js manda el
    video al reproductor nativo) y llamarlo a ciegas lanzaba un TypeError. */
 const row = $('#row');
+/* Los navegadores de televisor viejos solo traen la version con prefijo. */
 $('#c-fs').addEventListener('click', () => {
-  if (document.fullscreenElement) { if (document.exitFullscreen) document.exitFullscreen().catch(() => {}); }
-  else if (row.requestFullscreen) row.requestFullscreen().catch(() => {});
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+  } else if (row.requestFullscreen) row.requestFullscreen().catch(() => {});
+  else if (row.webkitRequestFullscreen) row.webkitRequestFullscreen();
 });
 /* Menús de pistas, como en un MKV: audio a la izquierda, subtítulos al lado. */
 function creaMenu(id) {

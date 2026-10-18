@@ -457,6 +457,13 @@ if (TV) {
    un metodo suyo. Sin esto, el boton de pantalla completa no hace nada en un
    iPhone. */
 const fs = $('#c-fs'), video = $('#v');
+/* En el televisor el boton de pantalla completa solo se esconde dentro de la
+   app instalada (window.tizen / webOS), que ya ocupa la pantalla entera. En el
+   navegador de la tele, que es como se ve MOOVIN hoy, hace falta. */
+if (TV && typeof window.tizen === 'undefined' && typeof window.webOS === 'undefined' &&
+    (raiz.requestFullscreen || raiz.webkitRequestFullscreen)) {
+  raiz.setAttribute('data-fs', '');
+}
 if (fs && video && !document.documentElement.requestFullscreen && video.webkitEnterFullscreen) {
   fs.addEventListener('click', (e) => {
     e.stopPropagation();
